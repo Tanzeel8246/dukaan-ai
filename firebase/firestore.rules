@@ -1,0 +1,555 @@
+rules_version = '2';
+
+// Dukaan AI — Firestore security rules (PRODUCTION · v4 — ERP Phase B · B1–B4).
+//
+// v4 vs v3: additive blocks only — the Phase B collections
+// (documents, notes, purchaseReturns) — PLUS ONE deliberate fix to
+// a pre-existing line, called out here so it is never mistaken for
+// drift: the products stockQty carve-out now also includes
+// "accountant". A purchase return decrements stockQty inside the
+// accountant's own posting batch; without the role in that
+// carve-out the whole batch was denied in cloud mode (demo mode
+// and owner/manager postings were never affected). No other v3
+// line changed.
+//
+// Data model: every shop's data is namespaced under its owner's document —
+// users/{uid}/products, sales, bills, suppliers, purchases,
+// supplierPayments, expenses, credits, customers, returns, adjustments,
+// dayCloses, cashEntries, accounts, taxSlabs, periods and the
+// double-entry `journal`.
+//
+// Access model:
+//   * OWNER — the signed-in user whose uid == {uid}. Full access; the
+//     ONLY role allowed to write the owner doc itself (shop settings +
+//     staff list) and to manage staffIndex invitations.
+//   * STAFF — a signed-in user whose email the owner invited, resolved
+//     via staffIndex/{email} -> ownerUid AND the email still being
+//     present in the owner doc's staffEmails (removing it there cuts
+//     access immediately, even if an index doc lingers). Since v3 a
+//     staff member carries a ROLE on the index doc — "manager",
+//     "cashier" or "accountant" — and per-collection write gates below
+//     narrow staff writes to that role's row of the permission matrix
+//     (design: ERP-PHASE-A-DESIGN.md §3.2/§3.3). An index doc with NO
+//     role field resolves to "manager" — the legacy profile, which is
+//     exactly what staff could do before roles existed, so publishing
+//     these rules ahead of the A3 app build breaks no live workflow
+//     (rules v3 is fully backward compatible with the previous app).
+//   * EVERYONE ELSE — nothing. Default deny everywhere.
+//
+// Append-only collections (create + read only, NEVER update/delete):
+//   * sales   — history feeds forecasts; returns are negative rows.
+//   * journal — the double-entry ledger; corrections are reversing
+//     entries, history is never rewritten.
+//
+// A5 period backstop (design §5.3, landed with A5): creates on the
+// dated operational collections — and on the journal, via its
+// `dateISO` business date — are denied when their business instant
+// falls on/before the owner doc's `lockedThrough` instant. The
+// store's own guard is the primary enforcement; this is defence in
+// depth. Updates and deletes are NEVER period-gated: corrections of
+// closed-period documents are today-dated reversing entries, never
+// backdated rewrites, so the operational row must stay editable.
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isOwner(uid) {
+      return isSignedIn() && request.auth.uid == uid;
+    }
+
+    function staffIndexPath(email) {
+      return /databases/$(database)/documents/staffIndex/$(email);
+    }
+
+    function isStaffOf(uid) {
+      return isSignedIn()
+        && request.auth.token.email != null
+        && exists(staffIndexPath(request.auth.token.email))
+        && get(staffIndexPath(request.auth.token.email)).data.ownerUid == uid
+        && request.auth.token.email in
+             get(/databases/$(database)/documents/users/$(uid)).data
+               .get('staffEmails', []);
+    }
+
+    function canAccess(uid) {
+      return isOwner(uid) || isStaffOf(uid);
+    }
+
+    // v3: the caller's role within shop {uid} — "owner", the role
+    // stored on their staffIndex doc, or null when they have no
+    // access to this shop at all. A staffIndex doc WITHOUT a role
+    // field yields "manager" (the legacy default; .get with default
+    // also covers an explicit null).
+    function staffRole(uid) {
+      return isOwner(uid)
+        ? "owner"
+        : (isStaffOf(uid)
+            ? get(staffIndexPath(request.auth.token.email)).data
+                .get('role', 'manager')
+            : null);
+    }
+
+    function hasRole(uid, roles) {
+      return staffRole(uid) in roles;
+    }
+
+    // A5 backstop helpers (design §5.3). The owner doc's
+    // `lockedThrough` instant bounds what may be CREATED. The
+    // exists() guard is essential: during a shop's very first seed
+    // the owner doc does not exist yet, and an unguarded get() would
+    // deny the seeding writes themselves.
+    function lockedThrough(uid) {
+      return exists(/databases/$(database)/documents/users/$(uid))
+        ? get(/databases/$(database)/documents/users/$(uid)).data
+            .get('lockedThrough', '')
+        : '';
+    }
+
+    // A dated operational row (bills, sales, expenses, credits,
+    // purchases, supplierPayments, returns, cashEntries) may only
+    // be CREATED with a `ts` strictly after the lock instant.
+    function createInOpenPeriod(uid) {
+      return lockedThrough(uid) == ''
+        || request.resource.data.get('ts', '') > lockedThrough(uid);
+    }
+
+    // Journal entries carry `dateISO` (the PKT business date).
+    // lockedThrough is always the end-of-day PKT instant of its
+    // date, whose UTC clock time is 18:59:59.999 — so a YYYY-MM-DD
+    // string sorts AFTER every instant belonging to that PKT date
+    // and BEFORE every instant of the next PKT date, and comparing
+    // the date to the instant is exact at day granularity. Entries
+    // without dateISO (older clients) default to '9999-12-31' and
+    // are never blocked here.
+    function journalCreateInOpenPeriod(uid) {
+      return lockedThrough(uid) == ''
+        || request.resource.data.get('dateISO', '9999-12-31') > lockedThrough(uid);
+    }
+
+    // Staff invitations: staffIndex/{email} -> { ownerUid, email, addedAt, role }.
+    // The owner creates/deletes invitations; the invited user may read
+    // their own index doc (the app uses it to find the owner's shop
+    // and its role).
+    match /staffIndex/{email} {
+      allow read: if isSignedIn() && (
+        request.auth.token.email == email ||
+        request.auth.uid == resource.data.ownerUid
+      );
+      allow create, update: if isSignedIn()
+        && request.resource.data.ownerUid == request.auth.uid;
+      allow delete: if isSignedIn()
+        && resource.data.ownerUid == request.auth.uid;
+    }
+
+    // The owner doc: profile + shop settings + staffEmails + staff[]
+    // + seed/phaseA flags. Staff management and settings therefore
+    // stay owner-only by construction.
+    match /users/{uid} {
+      allow read: if canAccess(uid);
+      allow write: if isOwner(uid);
+
+      // Master data — v3: product writes are owner/manager (the
+      // cashier sells from the shelf but never changes it; the
+      // accountant is read-only here apart from the carve-out
+      // below). Reads stay canAccess.
+      // One deliberate refinement of the design's blanket gate: a
+      // cashier's bill/return batch atomically decrements stockQty
+      // on the product docs in the SAME write as the bill, the sale
+      // rows and the journal entry — denying every product write to
+      // cashiers would make selling itself impossible. So a
+      // stockQty-ONLY update is open to the selling roles — and, in
+      // v4, to the accountant, whose purchase-return batch
+      // decrements stockQty in its own write; any other field
+      // (name, prices, levels) still requires owner/manager.
+      match /products/{productId} {
+        allow read: if canAccess(uid);
+        allow create, delete: if hasRole(uid, ['owner', 'manager']);
+        allow update: if hasRole(uid, ['owner', 'manager'])
+          || (hasRole(uid, ['owner', 'manager', 'cashier', 'accountant'])
+              && request.resource.data.diff(resource.data)
+                   .affectedKeys().hasOnly(['stockQty']));
+      }
+      match /suppliers/{supplierId} {
+        allow read: if canAccess(uid);
+        allow write: if hasRole(uid, ['owner', 'manager']);
+      }
+      match /customers/{customerId} {
+        allow read: if canAccess(uid);
+        allow write: if hasRole(uid, ['owner', 'manager', 'cashier']);
+      }
+      match /purchases/{purchaseId} {
+        allow read: if canAccess(uid);
+        allow create: if hasRole(uid, ['owner', 'manager']) && createInOpenPeriod(uid);
+        allow update, delete: if hasRole(uid, ['owner', 'manager']);
+      }
+      // Supplier payments may also be recorded by the accountant.
+      match /supplierPayments/{paymentId} {
+        allow read: if canAccess(uid);
+        allow create: if hasRole(uid, ['owner', 'manager', 'accountant']) && createInOpenPeriod(uid);
+        allow update, delete: if hasRole(uid, ['owner', 'manager', 'accountant']);
+      }
+      // Credits (udhaar): rules grant write to all four roles — a
+      // repayment row and a standalone-credit row cannot be told
+      // apart at this layer, so the "give standalone udhaar"
+      // restriction (owner/manager) is enforced by the client +
+      // journal templates, as the design states honestly (§3.3).
+      match /credits/{creditId} {
+        allow read: if canAccess(uid);
+        allow create: if canAccess(uid) && createInOpenPeriod(uid);
+        allow update, delete: if canAccess(uid);
+      }
+      // Returns are created by owner/manager/cashier as part of the
+      // billing flow; the rows are thereafter immutable records
+      // (owner keeps full write, as before v3).
+      match /returns/{returnId} {
+        allow read: if canAccess(uid);
+        allow create: if hasRole(uid, ['owner', 'manager', 'cashier']) && createInOpenPeriod(uid);
+        allow update, delete: if isOwner(uid);
+      }
+      match /adjustments/{adjustmentId} {
+        allow read: if canAccess(uid);
+        allow write: if hasRole(uid, ['owner', 'manager']);
+      }
+      // Cash-book rows carry capital/drawings AND inter-account
+      // transfers — owner/manager/accountant per the matrix.
+      match /cashEntries/{entryId} {
+        allow read: if canAccess(uid);
+        allow create: if hasRole(uid, ['owner', 'manager', 'accountant']) && createInOpenPeriod(uid);
+        allow update, delete: if hasRole(uid, ['owner', 'manager', 'accountant']);
+      }
+      // Day closes are performed by owner/manager/cashier; every
+      // role may read the history. A recorded close is a record —
+      // only the owner may amend/remove one.
+      match /dayCloses/{closeId} {
+        allow read: if canAccess(uid);
+        allow create: if hasRole(uid, ['owner', 'manager', 'cashier']);
+        allow update, delete: if isOwner(uid);
+      }
+
+      // Money accounts (Phase A · A2): names and method defaults are
+      // needed at every desk, so owner + staff may read; creating,
+      // renaming, archiving and re-pointing defaults is owner-only.
+      // Accounts are archived, never deleted — there is deliberately
+      // no delete allowance.
+      match /accounts/{accountId} {
+        allow read: if canAccess(uid);
+        allow create, update: if isOwner(uid);
+      }
+
+      // Tax slabs (Phase A · A4 surface, rules landed with v3):
+      // readable by every role (desks resolve slabs at posting);
+      // managed by the owner only.
+      match /taxSlabs/{slabId} {
+        allow read: if canAccess(uid);
+        allow write: if isOwner(uid);
+      }
+
+      // Period close/reopen audit trail (Phase A · A5 surface, rules
+      // landed with v3): readable by every role; written by the
+      // owner only (the enforcement value `lockedThrough` lives on
+      // the owner doc, which is likewise owner-write only).
+      match /periods/{periodId} {
+        allow read: if canAccess(uid);
+        allow write: if isOwner(uid);
+      }
+
+      // Phase B · B1 documents (additive; these blocks publish with
+      // the NEXT rules release, not v3): quotations and sale orders
+      // are NON-POSTING documents — they never write journal, stock
+      // or credit rows (design §2.2), so there is deliberately NO
+      // period guard here: a quotation issued in a locked month is
+      // still just paper. Writes follow the RBAC matrix
+      // (owner/manager/cashier full; the accountant is read-only).
+      match /quotations/{quotationId} {
+        allow read: if canAccess(uid);
+        allow write: if hasRole(uid, ['owner', 'manager', 'cashier']);
+      }
+
+      match /saleOrders/{orderId} {
+        allow read: if canAccess(uid);
+        allow write: if hasRole(uid, ['owner', 'manager', 'cashier']);
+      }
+
+      // Phase B · B2 (additive, same release as the B1 blocks):
+      // delivery challans are NON-POSTING documents like the two
+      // above — no period guard. They ride the saleOrders matrix
+      // row (design G-1: Phase A gave the sales-side document chain
+      // one row), so the write roles are identical to saleOrders.
+      match /deliveryChallans/{challanId} {
+        allow read: if canAccess(uid);
+        allow write: if hasRole(uid, ['owner', 'manager', 'cashier']);
+      }
+
+      // Phase B · B3 (additive): purchase orders are NON-POSTING
+      // documents like the three above — they never write journal,
+      // stock or payable rows (goods receipts post through the
+      // purchases collection, which has its own guards) — so there
+      // is deliberately NO period guard here either. Writes follow
+      // the purchaseOrders matrix row: owner/manager full, the
+      // cashier has no access, the accountant is read-only.
+      match /purchaseOrders/{poId} {
+        allow read: if canAccess(uid);
+        allow write: if hasRole(uid, ['owner', 'manager']);
+      }
+
+      // Phase B · B4 (additive): formal credit/debit notes and the
+      // purchase-return records the debit notes wrap. Unlike the
+      // documents above these ARE posting-linked — a note is born
+      // posted alongside its journal entry, and a purchase return
+      // moves stock + payables in the same batch — so their creates
+      // carry the A5 period backstop (createInOpenPeriod), exactly
+      // like `returns`. Creates follow the creditDebitNotes matrix
+      // row (owner / manager / accountant): note issuance is NOT
+      // the `returns` row — the accountant issues notes, the
+      // cashier never does (design G-2). The rows are thereafter
+      // immutable records; corrections are compensating documents,
+      // never rewrites, so update/delete stay owner-only (mirrors
+      // the `returns` posture).
+      match /notes/{noteId} {
+        allow read: if canAccess(uid);
+        allow create: if hasRole(uid, ['owner', 'manager', 'accountant']) && createInOpenPeriod(uid);
+        allow update, delete: if isOwner(uid);
+      }
+
+      match /purchaseReturns/{purchaseReturnId} {
+        allow read: if canAccess(uid);
+        allow create: if hasRole(uid, ['owner', 'manager', 'accountant']) && createInOpenPeriod(uid);
+        allow update, delete: if isOwner(uid);
+      }
+
+      // Phase B · B5: the cheque registry (design §4 + G-3). A
+      // registry doc is born INSIDE a host money event's batch —
+      // a bill, a repayment, a supplier payment, an expense —
+      // alongside its journal entry, so creates carry the A5
+      // period backstop (createInOpenPeriod) like every other
+      // posting-linked create. CREATE is canAccess — DELIBERATELY
+      // wider than the `cheques` matrix row (owner / manager /
+      // accountant): a cashier taking a cheque at the billing
+      // desk writes the registry doc inside the bill's own batch,
+      // and rules cannot decompose a batch to see which doc is
+      // "the cheque part"; narrowing create would break cashier
+      // billing, not protect anything (risk R-B6 — do not
+      // "tighten" this later by mistake). What the matrix row
+      // DOES govern is the lifecycle: status transitions
+      // (deposit / clear / bounce / return) and the registry
+      // surface itself are owner / manager / accountant only,
+      // enforced here on update and in the client on view/write.
+      // Delete stays owner-only, mirroring the notes posture.
+      match /cheques/{chequeId} {
+        allow read: if canAccess(uid);
+        allow create: if canAccess(uid) && createInOpenPeriod(uid);
+        allow update: if hasRole(uid, ['owner', 'manager', 'accountant']);
+        allow delete: if isOwner(uid);
+      }
+
+      // Phase C · C1: warehouses (design §1.9). Master data —
+      // creating, renaming, archiving or re-pointing the default
+      // warehouse writes NO journal entry and moves NO stock, so
+      // there is no period backstop here. READ is canAccess on
+      // purpose: warehouse NAMES are reference data every desk
+      // picker needs (the cashier picks the warehouse for every
+      // bill even though the `warehouses` matrix row grants them
+      // no surface — G-C1). Create/update follow the matrix row
+      // (owner / manager); delete stays owner-only.
+      match /warehouses/{warehouseId} {
+        allow read: if canAccess(uid);
+        allow create, update: if hasRole(uid, ['owner', 'manager']);
+        allow delete: if isOwner(uid);
+      }
+
+      // Phase C · C1: stock levels — the per-warehouse quantity
+      // rows (design §1.9). A row is written inside EVERY
+      // stock-moving batch — bills, counter sales, purchases,
+      // returns, adjustments, imports, the stockV1 migration — by
+      // whichever role legitimately runs that desk, so create/
+      // update are canAccess, DELIBERATELY wider than the
+      // `warehouses` matrix row: rules cannot decompose a batch
+      // to see which doc is "the stock part", and narrowing this
+      // would break cashier billing, not protect anything (risk
+      // R-B6 — do not "tighten" this later by mistake). Rows are
+      // quantity-only operational detail; the journal above
+      // remains the financial record. Delete stays owner-only
+      // (the store zeroes rows, it never deletes them).
+      match /stockLevels/{levelId} {
+        allow read: if canAccess(uid);
+        allow create, update: if canAccess(uid);
+        allow delete: if isOwner(uid);
+      }
+
+      // Phase C · C2: stock transfers (design §2 + §6.2) — the
+      // movement documents between the shop's own warehouses.
+      // Read is canAccess (desks resolve transfer state like any
+      // reference data); create/update/delete follow the
+      // `warehouses` matrix row (owner / manager) — the cashier
+      // and the accountant never run transfers. There is NO
+      // period backstop here on purpose: dispatch / receive /
+      // return post NOTHING, and the one posting a transfer can
+      // produce — the close-short loss — is a JOURNAL create,
+      // guarded at the journal match like every entry (§2.5).
+      match /stockTransfers/{transferId} {
+        allow read: if canAccess(uid);
+        allow create, update: if hasRole(uid, ['owner', 'manager']);
+        allow delete: if hasRole(uid, ['owner', 'manager']);
+      }
+
+      // Phase C · C3 — BOM recipes (design §3/§6.2): read = any
+      // signed-in role (the desks resolve recipe data; the surface
+      // itself gates on the `manufacturing` matrix row in the
+      // client), write = owner/manager, mirroring that row
+      // (F/F/N/R). A BOM posts NOTHING — it is a recipe document,
+      // versioned by the client (an edit writes a NEW doc and
+      // deactivates the old one) — so there is NO period backstop
+      // here, exactly as for transfers (§7).
+      match /boms/{bomId} {
+        allow read: if canAccess(uid);
+        allow create, update, delete: if hasRole(uid, ['owner', 'manager']);
+      }
+
+      // Phase C · C4 — production orders (design §4.2/§6.2):
+      // read = any signed-in role (the desks resolve order data;
+      // the surface itself gates on the `manufacturing` matrix
+      // row in the client), write = owner/manager, mirroring
+      // that row (F/F/N/R). Events append to the order doc via
+      // update — rules cannot validate array appends; the
+      // posture is the role gate + store discipline, the same
+      // honesty class as bills' returnedQty (§6.2). The events'
+      // journal entries are guarded creates at the journal
+      // match, as always — so there is NO period backstop on
+      // this doc itself.
+      match /productionOrders/{orderId} {
+        allow read: if canAccess(uid);
+        allow create, update, delete: if hasRole(uid, ['owner', 'manager']);
+      }
+
+      // Phase C · C5 — jobs / work orders (design §5/§6.2):
+      // read = any signed-in role (the desks resolve job data;
+      // the surface itself gates on the `jobTracker` matrix row
+      // in the client), write = owner/manager, mirroring that
+      // row exactly as pre-declared (owner/manager full, cashier
+      // and accountant read — the matrix stands as-is, §6.2).
+      // Material events append to the job doc via update —
+      // rules cannot validate array appends; the posture is the
+      // role gate + store discipline, the same honesty class as
+      // bills' returnedQty (§6.2). The events' journal entries
+      // are guarded creates at the journal match, as always —
+      // so there is NO period backstop on this doc itself.
+      // Advances write no job state at all: they are ordinary
+      // repayments in the credits collection, citing the job by
+      // note (§5.3) — nothing extra to gate here.
+      match /jobs/{jobId} {
+        allow read: if canAccess(uid);
+        allow create, update, delete: if hasRole(uid, ['owner', 'manager']);
+      }
+
+      // Phase D · D1 — employees (design §1.1/§6.2): the staff
+      // directory — identity + current pay terms. READ is
+      // NARROWED to owner / manager / accountant, deliberately
+      // NOT canAccess: salary terms are not counter data, and
+      // the cashier is excluded server-side, not merely
+      // UI-hidden (risk R-D9) — the journal read gate is the
+      // precedent. Write follows the `staffDirectory` matrix row
+      // (owner / manager); the accountant READS the terms their
+      // payroll runs snapshot but never sets them (the
+      // separation of duties, G-D3). There is NO period backstop
+      // here on purpose: a directory doc posts nothing and
+      // asserts no money fact (§7).
+      match /employees/{employeeId} {
+        allow read: if hasRole(uid, ['owner', 'manager', 'accountant']);
+        allow create, update, delete: if hasRole(uid, ['owner', 'manager']);
+      }
+
+      // Phase D · D1 — attendance (design §1.3/§6.2): one doc
+      // per employee-month, the tap-to-mark register. Same
+      // narrowed read as the directory (a colleague's register
+      // is salary-adjacent data); marking follows the
+      // `staffDirectory` row (owner / manager — G-D1: the
+      // matrix stands as approved). Attendance posts NOTHING,
+      // ever, so no period backstop applies either: editing a
+      // past month's marks asserts no money fact, and a posted
+      // run's slips already snapshotted their counts (§7).
+      match /attendance/{attendanceId} {
+        allow read: if hasRole(uid, ['owner', 'manager', 'accountant']);
+        allow create, update, delete: if hasRole(uid, ['owner', 'manager']);
+      }
+
+      // Phase D · D2 — payroll runs (design §2.3/§6.2): the
+      // run doc is a mutable diary (draft lines, payment events,
+      // the cached status) whose MONEY lives in the journal.
+      // Read is narrowed like the directory's (salary figures
+      // are not counter data); the manager reads — they hand
+      // out the slips (G-D2) — but cannot write. Create/update
+      // follow the `payroll` matrix row (owner / accountant:
+      // the separation of duties, G-D3 — the accountant runs
+      // payroll over terms the owner/manager set). Create
+      // carries the period backstop: a run doc is created in
+      // the same batch as nothing else, but its finalise batch
+      // creates the accrual — gated at the journal leg — and
+      // the draft's own create is held to the same standard for
+      // symmetry with every other dated doc. Payment events are
+      // UPDATES (never period-gated, per doctrine): their
+      // journal entries are creates that pass the journal
+      // guard, so a payment dated into a locked period fails
+      // its whole batch at the journal leg (§6.2's note).
+      // Delete is owner-only and the store enforces drafts-only
+      // — posted runs are corrected by reversal, never removed.
+      match /payrollRuns/{runId} {
+        allow read: if hasRole(uid, ['owner', 'manager', 'accountant']);
+        allow create: if hasRole(uid, ['owner', 'accountant']) && createInOpenPeriod(uid);
+        allow update: if hasRole(uid, ['owner', 'accountant']);
+        allow delete: if isOwner(uid);
+      }
+
+      // Expenses: the operational record may be edited/deleted by
+      // owner/manager/accountant (the cashier never touches
+      // expenses), but every edit/delete is paired with reversing
+      // + corrected journal entries by the client, so the ledger
+      // history (below) is never rewritten.
+      match /expenses/{expenseId} {
+        allow read: if canAccess(uid);
+        allow create: if hasRole(uid, ['owner', 'manager', 'accountant']) && createInOpenPeriod(uid);
+        allow update, delete: if hasRole(uid, ['owner', 'manager', 'accountant']);
+      }
+
+      // Bills: created/updated by owner/manager/cashier (the
+      // accountant never sells). Deletes are allowed ONLY for held
+      // drafts (never posted any money); a posted bill can never
+      // disappear.
+      match /bills/{billId} {
+        allow read: if canAccess(uid);
+        allow create: if hasRole(uid, ['owner', 'manager', 'cashier']) && createInOpenPeriod(uid);
+        allow update: if hasRole(uid, ['owner', 'manager', 'cashier']);
+        allow delete: if hasRole(uid, ['owner', 'manager', 'cashier'])
+          && resource.data.status == 'held';
+      }
+
+      // Append-only sales history. Created by the selling roles.
+      match /sales/{saleId} {
+        allow read: if canAccess(uid);
+        allow create: if hasRole(uid, ['owner', 'manager', 'cashier']) && createInOpenPeriod(uid);
+        allow update, delete: if false;
+      }
+
+      // Append-only double-entry journal. Every role legitimately
+      // POSTS entries (cashier bills, accountant expenses/payments),
+      // so create stays canAccess; READING the ledger is restricted
+      // to owner/manager/accountant — the cashier does not browse
+      // the books. Corrections are reversing entries; no client may
+      // ever edit or delete an entry.
+      match /journal/{entryId} {
+        allow read: if hasRole(uid, ['owner', 'manager', 'accountant']);
+        allow create: if canAccess(uid) && journalCreateInOpenPeriod(uid);
+        allow update, delete: if false;
+      }
+    }
+
+    // Everything else — including the legacy top-level /products and
+    // /sales collections — is closed.
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

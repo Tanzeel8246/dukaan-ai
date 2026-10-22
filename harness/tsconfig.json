@@ -1,0 +1,34 @@
+{
+  "compilerOptions": {
+    "target": "es2021",
+    "module": "commonjs",
+    "moduleResolution": "node",
+    "outDir": "/home/hatch/workspace/ai-dukaan-ai/harness/out",
+    "rootDir": "/home/hatch/workspace/ai-dukaan-ai/web/lib",
+    "resolveJsonModule": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "strict": false,
+    "forceConsistentCasingInFileNames": true
+  },
+  "include": [
+    "/home/hatch/workspace/ai-dukaan-ai/web/lib/types.ts",
+    "/home/hatch/workspace/ai-dukaan-ai/web/lib/ledger.ts",
+    "/home/hatch/workspace/ai-dukaan-ai/web/lib/seed.ts",
+    "/home/hatch/workspace/ai-dukaan-ai/web/lib/coa.ts",
+    "/home/hatch/workspace/ai-dukaan-ai/web/lib/permissions.ts",
+    "/home/hatch/workspace/ai-dukaan-ai/web/lib/tax.ts",
+    "/home/hatch/workspace/ai-dukaan-ai/web/lib/periods.ts",
+    "/home/hatch/workspace/ai-dukaan-ai/web/lib/documents.ts",
+    "/home/hatch/workspace/ai-dukaan-ai/web/lib/selectors.ts",
+    "/home/hatch/workspace/ai-dukaan-ai/web/lib/search.ts",
+    "/home/hatch/workspace/ai-dukaan-ai/web/lib/cheques.ts",
+    "/home/hatch/workspace/ai-dukaan-ai/web/lib/reports.ts",
+    "/home/hatch/workspace/ai-dukaan-ai/web/lib/stock.ts",
+    "/home/hatch/workspace/ai-dukaan-ai/web/lib/transfers.ts",
+    "/home/hatch/workspace/ai-dukaan-ai/web/lib/boms.ts",
+    "/home/hatch/workspace/ai-dukaan-ai/web/lib/production.ts",
+    "/home/hatch/workspace/ai-dukaan-ai/web/lib/jobs.ts",
+    "/home/hatch/workspace/ai-dukaan-ai/web/lib/payroll.ts"
+  ]
+}

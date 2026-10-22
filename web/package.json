@@ -1,0 +1,28 @@
+{
+  "dependencies": {
+    "firebase": "^11.10.0",
+    "next": "16.4.2",
+    "react": "19.3.0",
+    "react-dom": "19.3.0"
+  },
+  "description": "Dukaan AI \u2014 kiryana/retail shop intelligence (Next.js; server build for Vercel + static export demo).",
+  "devDependencies": {
+    "@types/node": "^20",
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
+    "eslint": "^9",
+    "eslint-config-next": "16.4.2",
+    "typescript": "^5"
+  },
+  "name": "dukaan-ai-web",
+  "private": true,
+  "scripts": {
+    "build": "next build",
+    "dev": "next dev",
+    "gen-seed": "node tools/gen-seed.mjs",
+    "lint": "eslint",
+    "start": "next start",
+    "build:static": "node tools/build-static.mjs"
+  },
+  "version": "1.0.0"
+}

@@ -1,0 +1,1 @@
+{"fieldOverrides":[],"indexes":[{"collectionGroup":"sales","fields":[{"fieldPath":"productId","order":"ASCENDING"},{"fieldPath":"ts","order":"DESCENDING"}],"queryScope":"COLLECTION"},{"collectionGroup":"sales","fields":[{"fieldPath":"dayOffset","order":"ASCENDING"},{"fieldPath":"ts","order":"DESCENDING"}],"queryScope":"COLLECTION"}]}

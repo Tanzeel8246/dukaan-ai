@@ -1,0 +1,3712 @@
+{
+  "generatedAt": "2026-10-19T19:14:16.447Z",
+  "note": "Dukaan AI demo seed: 25 kiryana products (PKR) + 14 days of sample sales. All fictional.",
+  "products": [
+    {
+      "id": "p01",
+      "sku": "DLD-OIL-5L",
+      "name": "Dalda Cooking Oil 5L",
+      "urduName": "ڈالڈا کوکنگ آئل 5 لیٹر",
+      "category": "Cooking Essentials",
+      "unit": "pcs",
+      "costPrice": 2450,
+      "salePrice": 2600,
+      "stockQty": 14,
+      "reorderLevel": 5,
+      "keywords": [
+        "oil",
+        "dalda",
+        "cooking oil",
+        "تیل",
+        "ڈالڈا"
+      ]
+    },
+    {
+      "id": "p02",
+      "sku": "RICE-SKB-1K",
+      "name": "Super Kernel Basmati Rice 1kg",
+      "urduName": "سپر کرنل باسمتی چاول 1 کلو",
+      "category": "Rice & Grains",
+      "unit": "pcs",
+      "costPrice": 390,
+      "salePrice": 430,
+      "stockQty": 42,
+      "reorderLevel": 10,
+      "keywords": [
+        "rice",
+        "basmati",
+        "super kernel",
+        "چاول",
+        "باسمتی"
+      ]
+    },
+    {
+      "id": "p03",
+      "sku": "SALT-NTL-800",
+      "name": "National Salt 800g",
+      "urduName": "نیشنل نمک 800 گرام",
+      "category": "Cooking Essentials",
+      "unit": "pcs",
+      "costPrice": 78,
+      "salePrice": 95,
+      "stockQty": 60,
+      "reorderLevel": 15,
+      "keywords": [
+        "salt",
+        "نمک"
+      ]
+    },
+    {
+      "id": "p04",
+      "sku": "TEA-TPL-475",
+      "name": "Tapal Danedar Tea 475g",
+      "urduName": "تپال دانے دار چائے 475 گرام",
+      "category": "Beverages",
+      "unit": "pcs",
+      "costPrice": 980,
+      "salePrice": 1050,
+      "stockQty": 18,
+      "reorderLevel": 6,
+      "keywords": [
+        "tea",
+        "tapal",
+        "danedar",
+        "چائے",
+        "تپال"
+      ]
+    },
+    {
+      "id": "p05",
+      "sku": "SHN-BIR-50",
+      "name": "Shan Chicken Biryani Masala 50g",
+      "urduName": "شان چکن بریانی مصالحہ 50 گرام",
+      "category": "Spices",
+      "unit": "pcs",
+      "costPrice": 105,
+      "salePrice": 125,
+      "stockQty": 120,
+      "reorderLevel": 30,
+      "keywords": [
+        "biryani",
+        "masala",
+        "shan",
+        "بریانی",
+        "مصالحہ",
+        "شان"
+      ]
+    },
+    {
+      "id": "p06",
+      "sku": "ATTA-CHK-20K",
+      "name": "Fresh Chakki Atta 20kg",
+      "urduName": "تازہ چکی آٹا 20 کلو",
+      "category": "Rice & Grains",
+      "unit": "bag",
+      "costPrice": 2750,
+      "salePrice": 2900,
+      "stockQty": 8,
+      "reorderLevel": 4,
+      "keywords": [
+        "atta",
+        "flour",
+        "آٹا"
+      ]
+    },
+    {
+      "id": "p07",
+      "sku": "DAL-MNG-1K",
+      "name": "Dal Moong (Washed) 1kg",
+      "urduName": "دال مونگ دھلی 1 کلو",
+      "category": "Lentils & Pulses",
+      "unit": "kg",
+      "costPrice": 340,
+      "salePrice": 380,
+      "stockQty": 25,
+      "reorderLevel": 8,
+      "keywords": [
+        "moong",
+        "دال مونگ",
+        "مونگ"
+      ]
+    },
+    {
+      "id": "p08",
+      "sku": "DAL-CHN-1K",
+      "name": "Dal Chana 1kg",
+      "urduName": "دال چنا 1 کلو",
+      "category": "Lentils & Pulses",
+      "unit": "kg",
+      "costPrice": 280,
+      "salePrice": 320,
+      "stockQty": 22,
+      "reorderLevel": 8,
+      "keywords": [
+        "chana",
+        "دال چنا",
+        "چنا"
+      ]
+    },
+    {
+      "id": "p09",
+      "sku": "DAL-MSR-1K",
+      "name": "Dal Masoor (Red Lentils) 1kg",
+      "urduName": "دال مسور 1 کلو",
+      "category": "Lentils & Pulses",
+      "unit": "kg",
+      "costPrice": 300,
+      "salePrice": 340,
+      "stockQty": 20,
+      "reorderLevel": 8,
+      "keywords": [
+        "masoor",
+        "red lentil",
+        "دال مسور",
+        "مسور"
+      ]
+    },
+    {
+      "id": "p10",
+      "sku": "SUGAR-5K",
+      "name": "Sugar 5kg",
+      "urduName": "چینی 5 کلو",
+      "category": "Cooking Essentials",
+      "unit": "bag",
+      "costPrice": 690,
+      "salePrice": 750,
+      "stockQty": 30,
+      "reorderLevel": 10,
+      "keywords": [
+        "sugar",
+        "چینی"
+      ]
+    },
+    {
+      "id": "p11",
+      "sku": "MLK-MLP-1L",
+      "name": "Nestlé Milkpak 1L",
+      "urduName": "نیسلے ملک پیک 1 لیٹر",
+      "category": "Dairy",
+      "unit": "pcs",
+      "costPrice": 235,
+      "salePrice": 260,
+      "stockQty": 48,
+      "reorderLevel": 12,
+      "keywords": [
+        "milk",
+        "milkpak",
+        "دودھ",
+        "ملک پیک"
+      ]
+    },
+    {
+      "id": "p12",
+      "sku": "MLK-OLP-15L",
+      "name": "Olper's Full Cream Milk 1.5L",
+      "urduName": "اولپرز فل کریم دودھ 1.5 لیٹر",
+      "category": "Dairy",
+      "unit": "pcs",
+      "costPrice": 395,
+      "salePrice": 430,
+      "stockQty": 24,
+      "reorderLevel": 8,
+      "keywords": [
+        "olpers",
+        "دودھ",
+        "اولپرز"
+      ]
+    },
+    {
+      "id": "p13",
+      "sku": "SHN-HLM-60",
+      "name": "Shan Haleem Mix 60g",
+      "urduName": "شان حلیم مکس 60 گرام",
+      "category": "Spices",
+      "unit": "pcs",
+      "costPrice": 90,
+      "salePrice": 110,
+      "stockQty": 45,
+      "reorderLevel": 12,
+      "keywords": [
+        "haleem",
+        "حلیم"
+      ]
+    },
+    {
+      "id": "p14",
+      "sku": "KNR-CUB-20",
+      "name": "Knorr Chicken Cubes 20g",
+      "urduName": "کنور چکن کیوبز 20 گرام",
+      "category": "Cooking Essentials",
+      "unit": "pcs",
+      "costPrice": 115,
+      "salePrice": 135,
+      "stockQty": 55,
+      "reorderLevel": 15,
+      "keywords": [
+        "knorr",
+        "cube",
+        "کیوب",
+        "کنور"
+      ]
+    },
+    {
+      "id": "p15",
+      "sku": "VIM-BAR-200",
+      "name": "Vim Dishwashing Bar 200g",
+      "urduName": "وم ڈش واشنگ بار 200 گرام",
+      "category": "Household",
+      "unit": "pcs",
+      "costPrice": 85,
+      "salePrice": 105,
+      "stockQty": 40,
+      "reorderLevel": 12,
+      "keywords": [
+        "vim",
+        "dishwash",
+        "bar",
+        "وم",
+        "برتن"
+      ]
+    },
+    {
+      "id": "p16",
+      "sku": "SRF-EXL-1K",
+      "name": "Surf Excel 1kg",
+      "urduName": "سرف ایکسل 1 کلو",
+      "category": "Household",
+      "unit": "pcs",
+      "costPrice": 420,
+      "salePrice": 460,
+      "stockQty": 16,
+      "reorderLevel": 6,
+      "keywords": [
+        "surf",
+        "detergent",
+        "سرف",
+        "ایکسل"
+      ]
+    },
+    {
+      "id": "p17",
+      "sku": "LFB-SOP-140",
+      "name": "Lifebuoy Soap 140g",
+      "urduName": "لائف بوائے صابن 140 گرام",
+      "category": "Personal Care",
+      "unit": "pcs",
+      "costPrice": 130,
+      "salePrice": 150,
+      "stockQty": 70,
+      "reorderLevel": 20,
+      "keywords": [
+        "soap",
+        "lifebuoy",
+        "صابن"
+      ]
+    },
+    {
+      "id": "p18",
+      "sku": "SNK-SHM-180",
+      "name": "Sunsilk Shampoo 180ml",
+      "urduName": "سن سلک شیمپو 180 ملی لیٹر",
+      "category": "Personal Care",
+      "unit": "pcs",
+      "costPrice": 380,
+      "salePrice": 420,
+      "stockQty": 22,
+      "reorderLevel": 8,
+      "keywords": [
+        "shampoo",
+        "sunsilk",
+        "شیمپو"
+      ]
+    },
+    {
+      "id": "p19",
+      "sku": "CLG-TP-90",
+      "name": "Colgate Toothpaste 90g",
+      "urduName": "کولگیٹ ٹوتھ پیسٹ 90 گرام",
+      "category": "Personal Care",
+      "unit": "pcs",
+      "costPrice": 260,
+      "salePrice": 290,
+      "stockQty": 35,
+      "reorderLevel": 10,
+      "keywords": [
+        "toothpaste",
+        "colgate",
+        "ٹوتھ پیسٹ",
+        "کولگیٹ"
+      ]
+    },
+    {
+      "id": "p20",
+      "sku": "PF-GLC-HR",
+      "name": "Peak Freans Gluco Biscuits (Half Roll)",
+      "urduName": "پیک فرینز گلوکو بسکٹ",
+      "category": "Snacks",
+      "unit": "pcs",
+      "costPrice": 145,
+      "salePrice": 170,
+      "stockQty": 50,
+      "reorderLevel": 15,
+      "keywords": [
+        "biscuit",
+        "gluco",
+        "بسکٹ",
+        "گلوکو"
+      ]
+    },
+    {
+      "id": "p21",
+      "sku": "CCL-15L",
+      "name": "Coca-Cola 1.5L",
+      "urduName": "کوکا کولا 1.5 لیٹر",
+      "category": "Beverages",
+      "unit": "pcs",
+      "costPrice": 195,
+      "salePrice": 230,
+      "stockQty": 60,
+      "reorderLevel": 20,
+      "keywords": [
+        "coke",
+        "cola",
+        "coca",
+        "کوک",
+        "کولا"
+      ]
+    },
+    {
+      "id": "p22",
+      "sku": "RAF-800",
+      "name": "Rooh Afza 800ml",
+      "urduName": "روح افزا 800 ملی لیٹر",
+      "category": "Beverages",
+      "unit": "pcs",
+      "costPrice": 640,
+      "salePrice": 700,
+      "stockQty": 12,
+      "reorderLevel": 5,
+      "keywords": [
+        "rooh afza",
+        "روح افزا"
+      ]
+    },
+    {
+      "id": "p23",
+      "sku": "EWD-WHT-12K",
+      "name": "Everyday Whitener 1.2kg",
+      "urduName": "ایوری ڈے وائٹنر 1.2 کلو",
+      "category": "Dairy",
+      "unit": "pcs",
+      "costPrice": 990,
+      "salePrice": 1080,
+      "stockQty": 10,
+      "reorderLevel": 4,
+      "keywords": [
+        "everyday",
+        "whitener",
+        "وائٹنر"
+      ]
+    },
+    {
+      "id": "p24",
+      "sku": "NTL-GRM-50",
+      "name": "National Garam Masala 50g",
+      "urduName": "نیشنل گرم مصالحہ 50 گرام",
+      "category": "Spices",
+      "unit": "pcs",
+      "costPrice": 120,
+      "salePrice": 145,
+      "stockQty": 65,
+      "reorderLevel": 18,
+      "keywords": [
+        "garam masala",
+        "گرم مصالحہ"
+      ]
+    },
+    {
+      "id": "p25",
+      "sku": "RICE-FLK-5K",
+      "name": "Falak Basmati Rice 5kg",
+      "urduName": "فلک باسمتی چاول 5 کلو",
+      "category": "Rice & Grains",
+      "unit": "bag",
+      "costPrice": 1950,
+      "salePrice": 2100,
+      "stockQty": 6,
+      "reorderLevel": 3,
+      "keywords": [
+        "falak",
+        "rice 5kg",
+        "چاول",
+        "فلک"
+      ]
+    }
+  ],
+  "sales": [
+    {
+      "id": "s-0001",
+      "productId": "p01",
+      "qty": 1,
+      "unitPrice": 2600,
+      "total": 2600,
+      "dayOffset": 13,
+      "ts": "2026-10-06T11:51:00+05:00"
+    },
+    {
+      "id": "s-0002",
+      "productId": "p02",
+      "qty": 5,
+      "unitPrice": 430,
+      "total": 2150,
+      "dayOffset": 13,
+      "ts": "2026-10-06T14:33:00+05:00"
+    },
+    {
+      "id": "s-0003",
+      "productId": "p03",
+      "qty": 3,
+      "unitPrice": 95,
+      "total": 285,
+      "dayOffset": 13,
+      "ts": "2026-10-06T12:03:00+05:00"
+    },
+    {
+      "id": "s-0004",
+      "productId": "p04",
+      "qty": 3,
+      "unitPrice": 1050,
+      "total": 3150,
+      "dayOffset": 13,
+      "ts": "2026-10-06T18:58:00+05:00"
+    },
+    {
+      "id": "s-0005",
+      "productId": "p05",
+      "qty": 7,
+      "unitPrice": 125,
+      "total": 875,
+      "dayOffset": 13,
+      "ts": "2026-10-06T12:09:00+05:00"
+    },
+    {
+      "id": "s-0006",
+      "productId": "p06",
+      "qty": 1,
+      "unitPrice": 2900,
+      "total": 2900,
+      "dayOffset": 13,
+      "ts": "2026-10-06T14:00:00+05:00"
+    },
+    {
+      "id": "s-0007",
+      "productId": "p07",
+      "qty": 2,
+      "unitPrice": 380,
+      "total": 760,
+      "dayOffset": 13,
+      "ts": "2026-10-06T18:45:00+05:00"
+    },
+    {
+      "id": "s-0008",
+      "productId": "p08",
+      "qty": 3,
+      "unitPrice": 320,
+      "total": 960,
+      "dayOffset": 13,
+      "ts": "2026-10-06T12:01:00+05:00"
+    },
+    {
+      "id": "s-0009",
+      "productId": "p09",
+      "qty": 2,
+      "unitPrice": 340,
+      "total": 680,
+      "dayOffset": 13,
+      "ts": "2026-10-06T18:57:00+05:00"
+    },
+    {
+      "id": "s-0010",
+      "productId": "p10",
+      "qty": 4,
+      "unitPrice": 750,
+      "total": 3000,
+      "dayOffset": 13,
+      "ts": "2026-10-06T20:57:00+05:00"
+    },
+    {
+      "id": "s-0011",
+      "productId": "p11",
+      "qty": 4,
+      "unitPrice": 260,
+      "total": 1040,
+      "dayOffset": 13,
+      "ts": "2026-10-06T17:51:00+05:00"
+    },
+    {
+      "id": "s-0012",
+      "productId": "p12",
+      "qty": 4,
+      "unitPrice": 430,
+      "total": 1720,
+      "dayOffset": 13,
+      "ts": "2026-10-06T09:25:00+05:00"
+    },
+    {
+      "id": "s-0013",
+      "productId": "p13",
+      "qty": 2,
+      "unitPrice": 110,
+      "total": 220,
+      "dayOffset": 13,
+      "ts": "2026-10-06T12:21:00+05:00"
+    },
+    {
+      "id": "s-0014",
+      "productId": "p14",
+      "qty": 4,
+      "unitPrice": 135,
+      "total": 540,
+      "dayOffset": 13,
+      "ts": "2026-10-06T15:09:00+05:00"
+    },
+    {
+      "id": "s-0015",
+      "productId": "p15",
+      "qty": 1,
+      "unitPrice": 105,
+      "total": 105,
+      "dayOffset": 13,
+      "ts": "2026-10-06T10:14:00+05:00"
+    },
+    {
+      "id": "s-0016",
+      "productId": "p16",
+      "qty": 2,
+      "unitPrice": 460,
+      "total": 920,
+      "dayOffset": 13,
+      "ts": "2026-10-06T16:31:00+05:00"
+    },
+    {
+      "id": "s-0017",
+      "productId": "p17",
+      "qty": 3,
+      "unitPrice": 150,
+      "total": 450,
+      "dayOffset": 13,
+      "ts": "2026-10-06T14:12:00+05:00"
+    },
+    {
+      "id": "s-0018",
+      "productId": "p18",
+      "qty": 2,
+      "unitPrice": 420,
+      "total": 840,
+      "dayOffset": 13,
+      "ts": "2026-10-06T10:30:00+05:00"
+    },
+    {
+      "id": "s-0019",
+      "productId": "p19",
+      "qty": 3,
+      "unitPrice": 290,
+      "total": 870,
+      "dayOffset": 13,
+      "ts": "2026-10-06T17:13:00+05:00"
+    },
+    {
+      "id": "s-0020",
+      "productId": "p20",
+      "qty": 4,
+      "unitPrice": 170,
+      "total": 680,
+      "dayOffset": 13,
+      "ts": "2026-10-06T11:49:00+05:00"
+    },
+    {
+      "id": "s-0021",
+      "productId": "p21",
+      "qty": 6,
+      "unitPrice": 230,
+      "total": 1380,
+      "dayOffset": 13,
+      "ts": "2026-10-06T19:04:00+05:00"
+    },
+    {
+      "id": "s-0022",
+      "productId": "p22",
+      "qty": 2,
+      "unitPrice": 700,
+      "total": 1400,
+      "dayOffset": 13,
+      "ts": "2026-10-06T10:39:00+05:00"
+    },
+    {
+      "id": "s-0023",
+      "productId": "p23",
+      "qty": 2,
+      "unitPrice": 1080,
+      "total": 2160,
+      "dayOffset": 13,
+      "ts": "2026-10-06T19:49:00+05:00"
+    },
+    {
+      "id": "s-0024",
+      "productId": "p24",
+      "qty": 3,
+      "unitPrice": 145,
+      "total": 435,
+      "dayOffset": 13,
+      "ts": "2026-10-06T11:46:00+05:00"
+    },
+    {
+      "id": "s-0025",
+      "productId": "p25",
+      "qty": 1,
+      "unitPrice": 2100,
+      "total": 2100,
+      "dayOffset": 13,
+      "ts": "2026-10-06T17:30:00+05:00"
+    },
+    {
+      "id": "s-0026",
+      "productId": "p01",
+      "qty": 1,
+      "unitPrice": 2600,
+      "total": 2600,
+      "dayOffset": 12,
+      "ts": "2026-10-07T19:27:00+05:00"
+    },
+    {
+      "id": "s-0027",
+      "productId": "p02",
+      "qty": 3,
+      "unitPrice": 430,
+      "total": 1290,
+      "dayOffset": 12,
+      "ts": "2026-10-07T19:15:00+05:00"
+    },
+    {
+      "id": "s-0028",
+      "productId": "p03",
+      "qty": 4,
+      "unitPrice": 95,
+      "total": 380,
+      "dayOffset": 12,
+      "ts": "2026-10-07T19:52:00+05:00"
+    },
+    {
+      "id": "s-0029",
+      "productId": "p04",
+      "qty": 3,
+      "unitPrice": 1050,
+      "total": 3150,
+      "dayOffset": 12,
+      "ts": "2026-10-07T19:55:00+05:00"
+    },
+    {
+      "id": "s-0030",
+      "productId": "p05",
+      "qty": 5,
+      "unitPrice": 125,
+      "total": 625,
+      "dayOffset": 12,
+      "ts": "2026-10-07T14:36:00+05:00"
+    },
+    {
+      "id": "s-0031",
+      "productId": "p06",
+      "qty": 1,
+      "unitPrice": 2900,
+      "total": 2900,
+      "dayOffset": 12,
+      "ts": "2026-10-07T09:13:00+05:00"
+    },
+    {
+      "id": "s-0032",
+      "productId": "p07",
+      "qty": 1,
+      "unitPrice": 380,
+      "total": 380,
+      "dayOffset": 12,
+      "ts": "2026-10-07T18:20:00+05:00"
+    },
+    {
+      "id": "s-0033",
+      "productId": "p08",
+      "qty": 3,
+      "unitPrice": 320,
+      "total": 960,
+      "dayOffset": 12,
+      "ts": "2026-10-07T09:10:00+05:00"
+    },
+    {
+      "id": "s-0034",
+      "productId": "p09",
+      "qty": 2,
+      "unitPrice": 340,
+      "total": 680,
+      "dayOffset": 12,
+      "ts": "2026-10-07T20:40:00+05:00"
+    },
+    {
+      "id": "s-0035",
+      "productId": "p10",
+      "qty": 3,
+      "unitPrice": 750,
+      "total": 2250,
+      "dayOffset": 12,
+      "ts": "2026-10-07T17:13:00+05:00"
+    },
+    {
+      "id": "s-0036",
+      "productId": "p11",
+      "qty": 8,
+      "unitPrice": 260,
+      "total": 2080,
+      "dayOffset": 12,
+      "ts": "2026-10-07T10:46:00+05:00"
+    },
+    {
+      "id": "s-0037",
+      "productId": "p12",
+      "qty": 3,
+      "unitPrice": 430,
+      "total": 1290,
+      "dayOffset": 12,
+      "ts": "2026-10-07T13:20:00+05:00"
+    },
+    {
+      "id": "s-0038",
+      "productId": "p13",
+      "qty": 2,
+      "unitPrice": 110,
+      "total": 220,
+      "dayOffset": 12,
+      "ts": "2026-10-07T14:03:00+05:00"
+    },
+    {
+      "id": "s-0039",
+      "productId": "p14",
+      "qty": 2,
+      "unitPrice": 135,
+      "total": 270,
+      "dayOffset": 12,
+      "ts": "2026-10-07T17:04:00+05:00"
+    },
+    {
+      "id": "s-0040",
+      "productId": "p15",
+      "qty": 1,
+      "unitPrice": 105,
+      "total": 105,
+      "dayOffset": 12,
+      "ts": "2026-10-07T09:30:00+05:00"
+    },
+    {
+      "id": "s-0041",
+      "productId": "p16",
+      "qty": 2,
+      "unitPrice": 460,
+      "total": 920,
+      "dayOffset": 12,
+      "ts": "2026-10-07T13:07:00+05:00"
+    },
+    {
+      "id": "s-0042",
+      "productId": "p17",
+      "qty": 6,
+      "unitPrice": 150,
+      "total": 900,
+      "dayOffset": 12,
+      "ts": "2026-10-07T13:05:00+05:00"
+    },
+    {
+      "id": "s-0043",
+      "productId": "p18",
+      "qty": 2,
+      "unitPrice": 420,
+      "total": 840,
+      "dayOffset": 12,
+      "ts": "2026-10-07T16:37:00+05:00"
+    },
+    {
+      "id": "s-0044",
+      "productId": "p19",
+      "qty": 2,
+      "unitPrice": 290,
+      "total": 580,
+      "dayOffset": 12,
+      "ts": "2026-10-07T15:54:00+05:00"
+    },
+    {
+      "id": "s-0045",
+      "productId": "p20",
+      "qty": 3,
+      "unitPrice": 170,
+      "total": 510,
+      "dayOffset": 12,
+      "ts": "2026-10-07T18:13:00+05:00"
+    },
+    {
+      "id": "s-0046",
+      "productId": "p21",
+      "qty": 5,
+      "unitPrice": 230,
+      "total": 1150,
+      "dayOffset": 12,
+      "ts": "2026-10-07T12:37:00+05:00"
+    },
+    {
+      "id": "s-0047",
+      "productId": "p22",
+      "qty": 2,
+      "unitPrice": 700,
+      "total": 1400,
+      "dayOffset": 12,
+      "ts": "2026-10-07T17:47:00+05:00"
+    },
+    {
+      "id": "s-0048",
+      "productId": "p23",
+      "qty": 1,
+      "unitPrice": 1080,
+      "total": 1080,
+      "dayOffset": 12,
+      "ts": "2026-10-07T18:13:00+05:00"
+    },
+    {
+      "id": "s-0049",
+      "productId": "p24",
+      "qty": 4,
+      "unitPrice": 145,
+      "total": 580,
+      "dayOffset": 12,
+      "ts": "2026-10-07T15:20:00+05:00"
+    },
+    {
+      "id": "s-0050",
+      "productId": "p25",
+      "qty": 1,
+      "unitPrice": 2100,
+      "total": 2100,
+      "dayOffset": 12,
+      "ts": "2026-10-07T11:51:00+05:00"
+    },
+    {
+      "id": "s-0051",
+      "productId": "p01",
+      "qty": 1,
+      "unitPrice": 2600,
+      "total": 2600,
+      "dayOffset": 11,
+      "ts": "2026-10-08T17:21:00+05:00"
+    },
+    {
+      "id": "s-0052",
+      "productId": "p02",
+      "qty": 5,
+      "unitPrice": 430,
+      "total": 2150,
+      "dayOffset": 11,
+      "ts": "2026-10-08T15:56:00+05:00"
+    },
+    {
+      "id": "s-0053",
+      "productId": "p03",
+      "qty": 3,
+      "unitPrice": 95,
+      "total": 285,
+      "dayOffset": 11,
+      "ts": "2026-10-08T10:27:00+05:00"
+    },
+    {
+      "id": "s-0054",
+      "productId": "p04",
+      "qty": 2,
+      "unitPrice": 1050,
+      "total": 2100,
+      "dayOffset": 11,
+      "ts": "2026-10-08T15:35:00+05:00"
+    },
+    {
+      "id": "s-0055",
+      "productId": "p05",
+      "qty": 6,
+      "unitPrice": 125,
+      "total": 750,
+      "dayOffset": 11,
+      "ts": "2026-10-08T12:00:00+05:00"
+    },
+    {
+      "id": "s-0056",
+      "productId": "p06",
+      "qty": 1,
+      "unitPrice": 2900,
+      "total": 2900,
+      "dayOffset": 11,
+      "ts": "2026-10-08T17:20:00+05:00"
+    },
+    {
+      "id": "s-0057",
+      "productId": "p07",
+      "qty": 2,
+      "unitPrice": 380,
+      "total": 760,
+      "dayOffset": 11,
+      "ts": "2026-10-08T20:21:00+05:00"
+    },
+    {
+      "id": "s-0058",
+      "productId": "p08",
+      "qty": 2,
+      "unitPrice": 320,
+      "total": 640,
+      "dayOffset": 11,
+      "ts": "2026-10-08T15:24:00+05:00"
+    },
+    {
+      "id": "s-0059",
+      "productId": "p09",
+      "qty": 3,
+      "unitPrice": 340,
+      "total": 1020,
+      "dayOffset": 11,
+      "ts": "2026-10-08T14:42:00+05:00"
+    },
+    {
+      "id": "s-0060",
+      "productId": "p10",
+      "qty": 3,
+      "unitPrice": 750,
+      "total": 2250,
+      "dayOffset": 11,
+      "ts": "2026-10-08T15:18:00+05:00"
+    },
+    {
+      "id": "s-0061",
+      "productId": "p11",
+      "qty": 5,
+      "unitPrice": 260,
+      "total": 1300,
+      "dayOffset": 11,
+      "ts": "2026-10-08T15:11:00+05:00"
+    },
+    {
+      "id": "s-0062",
+      "productId": "p12",
+      "qty": 2,
+      "unitPrice": 430,
+      "total": 860,
+      "dayOffset": 11,
+      "ts": "2026-10-08T13:40:00+05:00"
+    },
+    {
+      "id": "s-0063",
+      "productId": "p13",
+      "qty": 1,
+      "unitPrice": 110,
+      "total": 110,
+      "dayOffset": 11,
+      "ts": "2026-10-08T16:54:00+05:00"
+    },
+    {
+      "id": "s-0064",
+      "productId": "p14",
+      "qty": 2,
+      "unitPrice": 135,
+      "total": 270,
+      "dayOffset": 11,
+      "ts": "2026-10-08T13:02:00+05:00"
+    },
+    {
+      "id": "s-0065",
+      "productId": "p15",
+      "qty": 1,
+      "unitPrice": 105,
+      "total": 105,
+      "dayOffset": 11,
+      "ts": "2026-10-08T15:12:00+05:00"
+    },
+    {
+      "id": "s-0066",
+      "productId": "p16",
+      "qty": 1,
+      "unitPrice": 460,
+      "total": 460,
+      "dayOffset": 11,
+      "ts": "2026-10-08T15:13:00+05:00"
+    },
+    {
+      "id": "s-0067",
+      "productId": "p17",
+      "qty": 3,
+      "unitPrice": 150,
+      "total": 450,
+      "dayOffset": 11,
+      "ts": "2026-10-08T20:20:00+05:00"
+    },
+    {
+      "id": "s-0068",
+      "productId": "p18",
+      "qty": 2,
+      "unitPrice": 420,
+      "total": 840,
+      "dayOffset": 11,
+      "ts": "2026-10-08T12:50:00+05:00"
+    },
+    {
+      "id": "s-0069",
+      "productId": "p19",
+      "qty": 2,
+      "unitPrice": 290,
+      "total": 580,
+      "dayOffset": 11,
+      "ts": "2026-10-08T19:10:00+05:00"
+    },
+    {
+      "id": "s-0070",
+      "productId": "p20",
+      "qty": 5,
+      "unitPrice": 170,
+      "total": 850,
+      "dayOffset": 11,
+      "ts": "2026-10-08T19:41:00+05:00"
+    },
+    {
+      "id": "s-0071",
+      "productId": "p21",
+      "qty": 6,
+      "unitPrice": 230,
+      "total": 1380,
+      "dayOffset": 11,
+      "ts": "2026-10-08T15:55:00+05:00"
+    },
+    {
+      "id": "s-0072",
+      "productId": "p22",
+      "qty": 1,
+      "unitPrice": 700,
+      "total": 700,
+      "dayOffset": 11,
+      "ts": "2026-10-08T12:26:00+05:00"
+    },
+    {
+      "id": "s-0073",
+      "productId": "p23",
+      "qty": 2,
+      "unitPrice": 1080,
+      "total": 2160,
+      "dayOffset": 11,
+      "ts": "2026-10-08T20:05:00+05:00"
+    },
+    {
+      "id": "s-0074",
+      "productId": "p24",
+      "qty": 3,
+      "unitPrice": 145,
+      "total": 435,
+      "dayOffset": 11,
+      "ts": "2026-10-08T11:05:00+05:00"
+    },
+    {
+      "id": "s-0075",
+      "productId": "p25",
+      "qty": 1,
+      "unitPrice": 2100,
+      "total": 2100,
+      "dayOffset": 11,
+      "ts": "2026-10-08T16:45:00+05:00"
+    },
+    {
+      "id": "s-0076",
+      "productId": "p01",
+      "qty": 2,
+      "unitPrice": 2600,
+      "total": 5200,
+      "dayOffset": 10,
+      "ts": "2026-10-09T09:55:00+05:00"
+    },
+    {
+      "id": "s-0077",
+      "productId": "p02",
+      "qty": 7,
+      "unitPrice": 430,
+      "total": 3010,
+      "dayOffset": 10,
+      "ts": "2026-10-09T11:11:00+05:00"
+    },
+    {
+      "id": "s-0078",
+      "productId": "p03",
+      "qty": 5,
+      "unitPrice": 95,
+      "total": 475,
+      "dayOffset": 10,
+      "ts": "2026-10-09T11:32:00+05:00"
+    },
+    {
+      "id": "s-0079",
+      "productId": "p04",
+      "qty": 4,
+      "unitPrice": 1050,
+      "total": 4200,
+      "dayOffset": 10,
+      "ts": "2026-10-09T14:12:00+05:00"
+    },
+    {
+      "id": "s-0080",
+      "productId": "p05",
+      "qty": 7,
+      "unitPrice": 125,
+      "total": 875,
+      "dayOffset": 10,
+      "ts": "2026-10-09T10:32:00+05:00"
+    },
+    {
+      "id": "s-0081",
+      "productId": "p06",
+      "qty": 1,
+      "unitPrice": 2900,
+      "total": 2900,
+      "dayOffset": 10,
+      "ts": "2026-10-09T12:52:00+05:00"
+    },
+    {
+      "id": "s-0082",
+      "productId": "p07",
+      "qty": 2,
+      "unitPrice": 380,
+      "total": 760,
+      "dayOffset": 10,
+      "ts": "2026-10-09T10:14:00+05:00"
+    },
+    {
+      "id": "s-0083",
+      "productId": "p08",
+      "qty": 4,
+      "unitPrice": 320,
+      "total": 1280,
+      "dayOffset": 10,
+      "ts": "2026-10-09T20:11:00+05:00"
+    },
+    {
+      "id": "s-0084",
+      "productId": "p09",
+      "qty": 4,
+      "unitPrice": 340,
+      "total": 1360,
+      "dayOffset": 10,
+      "ts": "2026-10-09T11:09:00+05:00"
+    },
+    {
+      "id": "s-0085",
+      "productId": "p10",
+      "qty": 4,
+      "unitPrice": 750,
+      "total": 3000,
+      "dayOffset": 10,
+      "ts": "2026-10-09T11:02:00+05:00"
+    },
+    {
+      "id": "s-0086",
+      "productId": "p11",
+      "qty": 10,
+      "unitPrice": 260,
+      "total": 2600,
+      "dayOffset": 10,
+      "ts": "2026-10-09T12:28:00+05:00"
+    },
+    {
+      "id": "s-0087",
+      "productId": "p12",
+      "qty": 4,
+      "unitPrice": 430,
+      "total": 1720,
+      "dayOffset": 10,
+      "ts": "2026-10-09T19:32:00+05:00"
+    },
+    {
+      "id": "s-0088",
+      "productId": "p13",
+      "qty": 3,
+      "unitPrice": 110,
+      "total": 330,
+      "dayOffset": 10,
+      "ts": "2026-10-09T12:26:00+05:00"
+    },
+    {
+      "id": "s-0089",
+      "productId": "p14",
+      "qty": 2,
+      "unitPrice": 135,
+      "total": 270,
+      "dayOffset": 10,
+      "ts": "2026-10-09T16:11:00+05:00"
+    },
+    {
+      "id": "s-0090",
+      "productId": "p15",
+      "qty": 3,
+      "unitPrice": 105,
+      "total": 315,
+      "dayOffset": 10,
+      "ts": "2026-10-09T18:07:00+05:00"
+    },
+    {
+      "id": "s-0091",
+      "productId": "p16",
+      "qty": 1,
+      "unitPrice": 460,
+      "total": 460,
+      "dayOffset": 10,
+      "ts": "2026-10-09T10:19:00+05:00"
+    },
+    {
+      "id": "s-0092",
+      "productId": "p17",
+      "qty": 5,
+      "unitPrice": 150,
+      "total": 750,
+      "dayOffset": 10,
+      "ts": "2026-10-09T12:27:00+05:00"
+    },
+    {
+      "id": "s-0093",
+      "productId": "p18",
+      "qty": 2,
+      "unitPrice": 420,
+      "total": 840,
+      "dayOffset": 10,
+      "ts": "2026-10-09T18:57:00+05:00"
+    },
+    {
+      "id": "s-0094",
+      "productId": "p19",
+      "qty": 2,
+      "unitPrice": 290,
+      "total": 580,
+      "dayOffset": 10,
+      "ts": "2026-10-09T16:46:00+05:00"
+    },
+    {
+      "id": "s-0095",
+      "productId": "p20",
+      "qty": 8,
+      "unitPrice": 170,
+      "total": 1360,
+      "dayOffset": 10,
+      "ts": "2026-10-09T11:23:00+05:00"
+    },
+    {
+      "id": "s-0096",
+      "productId": "p21",
+      "qty": 4,
+      "unitPrice": 230,
+      "total": 920,
+      "dayOffset": 10,
+      "ts": "2026-10-09T15:26:00+05:00"
+    },
+    {
+      "id": "s-0097",
+      "productId": "p22",
+      "qty": 2,
+      "unitPrice": 700,
+      "total": 1400,
+      "dayOffset": 10,
+      "ts": "2026-10-09T18:13:00+05:00"
+    },
+    {
+      "id": "s-0098",
+      "productId": "p23",
+      "qty": 1,
+      "unitPrice": 1080,
+      "total": 1080,
+      "dayOffset": 10,
+      "ts": "2026-10-09T13:11:00+05:00"
+    },
+    {
+      "id": "s-0099",
+      "productId": "p24",
+      "qty": 3,
+      "unitPrice": 145,
+      "total": 435,
+      "dayOffset": 10,
+      "ts": "2026-10-09T20:10:00+05:00"
+    },
+    {
+      "id": "s-0100",
+      "productId": "p25",
+      "qty": 1,
+      "unitPrice": 2100,
+      "total": 2100,
+      "dayOffset": 10,
+      "ts": "2026-10-09T11:11:00+05:00"
+    },
+    {
+      "id": "s-0101",
+      "productId": "p01",
+      "qty": 1,
+      "unitPrice": 2600,
+      "total": 2600,
+      "dayOffset": 9,
+      "ts": "2026-10-10T18:13:00+05:00"
+    },
+    {
+      "id": "s-0102",
+      "productId": "p02",
+      "qty": 5,
+      "unitPrice": 430,
+      "total": 2150,
+      "dayOffset": 9,
+      "ts": "2026-10-10T15:16:00+05:00"
+    },
+    {
+      "id": "s-0103",
+      "productId": "p03",
+      "qty": 3,
+      "unitPrice": 95,
+      "total": 285,
+      "dayOffset": 9,
+      "ts": "2026-10-10T18:33:00+05:00"
+    },
+    {
+      "id": "s-0104",
+      "productId": "p04",
+      "qty": 2,
+      "unitPrice": 1050,
+      "total": 2100,
+      "dayOffset": 9,
+      "ts": "2026-10-10T12:44:00+05:00"
+    },
+    {
+      "id": "s-0105",
+      "productId": "p05",
+      "qty": 3,
+      "unitPrice": 125,
+      "total": 375,
+      "dayOffset": 9,
+      "ts": "2026-10-10T19:38:00+05:00"
+    },
+    {
+      "id": "s-0106",
+      "productId": "p06",
+      "qty": 1,
+      "unitPrice": 2900,
+      "total": 2900,
+      "dayOffset": 9,
+      "ts": "2026-10-10T20:06:00+05:00"
+    },
+    {
+      "id": "s-0107",
+      "productId": "p07",
+      "qty": 1,
+      "unitPrice": 380,
+      "total": 380,
+      "dayOffset": 9,
+      "ts": "2026-10-10T12:26:00+05:00"
+    },
+    {
+      "id": "s-0108",
+      "productId": "p08",
+      "qty": 2,
+      "unitPrice": 320,
+      "total": 640,
+      "dayOffset": 9,
+      "ts": "2026-10-10T14:11:00+05:00"
+    },
+    {
+      "id": "s-0109",
+      "productId": "p09",
+      "qty": 3,
+      "unitPrice": 340,
+      "total": 1020,
+      "dayOffset": 9,
+      "ts": "2026-10-10T17:33:00+05:00"
+    },
+    {
+      "id": "s-0110",
+      "productId": "p10",
+      "qty": 4,
+      "unitPrice": 750,
+      "total": 3000,
+      "dayOffset": 9,
+      "ts": "2026-10-10T14:27:00+05:00"
+    },
+    {
+      "id": "s-0111",
+      "productId": "p11",
+      "qty": 3,
+      "unitPrice": 260,
+      "total": 780,
+      "dayOffset": 9,
+      "ts": "2026-10-10T19:17:00+05:00"
+    },
+    {
+      "id": "s-0112",
+      "productId": "p12",
+      "qty": 3,
+      "unitPrice": 430,
+      "total": 1290,
+      "dayOffset": 9,
+      "ts": "2026-10-10T20:55:00+05:00"
+    },
+    {
+      "id": "s-0113",
+      "productId": "p13",
+      "qty": 2,
+      "unitPrice": 110,
+      "total": 220,
+      "dayOffset": 9,
+      "ts": "2026-10-10T20:39:00+05:00"
+    },
+    {
+      "id": "s-0114",
+      "productId": "p14",
+      "qty": 2,
+      "unitPrice": 135,
+      "total": 270,
+      "dayOffset": 9,
+      "ts": "2026-10-10T18:13:00+05:00"
+    },
+    {
+      "id": "s-0115",
+      "productId": "p15",
+      "qty": 3,
+      "unitPrice": 105,
+      "total": 315,
+      "dayOffset": 9,
+      "ts": "2026-10-10T09:30:00+05:00"
+    },
+    {
+      "id": "s-0116",
+      "productId": "p16",
+      "qty": 2,
+      "unitPrice": 460,
+      "total": 920,
+      "dayOffset": 9,
+      "ts": "2026-10-10T19:29:00+05:00"
+    },
+    {
+      "id": "s-0117",
+      "productId": "p17",
+      "qty": 6,
+      "unitPrice": 150,
+      "total": 900,
+      "dayOffset": 9,
+      "ts": "2026-10-10T19:07:00+05:00"
+    },
+    {
+      "id": "s-0118",
+      "productId": "p18",
+      "qty": 1,
+      "unitPrice": 420,
+      "total": 420,
+      "dayOffset": 9,
+      "ts": "2026-10-10T10:01:00+05:00"
+    },
+    {
+      "id": "s-0119",
+      "productId": "p19",
+      "qty": 1,
+      "unitPrice": 290,
+      "total": 290,
+      "dayOffset": 9,
+      "ts": "2026-10-10T17:47:00+05:00"
+    },
+    {
+      "id": "s-0120",
+      "productId": "p20",
+      "qty": 3,
+      "unitPrice": 170,
+      "total": 510,
+      "dayOffset": 9,
+      "ts": "2026-10-10T11:26:00+05:00"
+    },
+    {
+      "id": "s-0121",
+      "productId": "p21",
+      "qty": 5,
+      "unitPrice": 230,
+      "total": 1150,
+      "dayOffset": 9,
+      "ts": "2026-10-10T14:59:00+05:00"
+    },
+    {
+      "id": "s-0122",
+      "productId": "p22",
+      "qty": 2,
+      "unitPrice": 700,
+      "total": 1400,
+      "dayOffset": 9,
+      "ts": "2026-10-10T19:37:00+05:00"
+    },
+    {
+      "id": "s-0123",
+      "productId": "p23",
+      "qty": 1,
+      "unitPrice": 1080,
+      "total": 1080,
+      "dayOffset": 9,
+      "ts": "2026-10-10T19:31:00+05:00"
+    },
+    {
+      "id": "s-0124",
+      "productId": "p24",
+      "qty": 4,
+      "unitPrice": 145,
+      "total": 580,
+      "dayOffset": 9,
+      "ts": "2026-10-10T09:28:00+05:00"
+    },
+    {
+      "id": "s-0125",
+      "productId": "p25",
+      "qty": 1,
+      "unitPrice": 2100,
+      "total": 2100,
+      "dayOffset": 9,
+      "ts": "2026-10-10T12:47:00+05:00"
+    },
+    {
+      "id": "s-0126",
+      "productId": "p01",
+      "qty": 1,
+      "unitPrice": 2600,
+      "total": 2600,
+      "dayOffset": 8,
+      "ts": "2026-10-11T14:18:00+05:00"
+    },
+    {
+      "id": "s-0127",
+      "productId": "p02",
+      "qty": 3,
+      "unitPrice": 430,
+      "total": 1290,
+      "dayOffset": 8,
+      "ts": "2026-10-11T13:00:00+05:00"
+    },
+    {
+      "id": "s-0128",
+      "productId": "p03",
+      "qty": 4,
+      "unitPrice": 95,
+      "total": 380,
+      "dayOffset": 8,
+      "ts": "2026-10-11T10:02:00+05:00"
+    },
+    {
+      "id": "s-0129",
+      "productId": "p04",
+      "qty": 2,
+      "unitPrice": 1050,
+      "total": 2100,
+      "dayOffset": 8,
+      "ts": "2026-10-11T10:53:00+05:00"
+    },
+    {
+      "id": "s-0130",
+      "productId": "p05",
+      "qty": 4,
+      "unitPrice": 125,
+      "total": 500,
+      "dayOffset": 8,
+      "ts": "2026-10-11T18:16:00+05:00"
+    },
+    {
+      "id": "s-0131",
+      "productId": "p06",
+      "qty": 1,
+      "unitPrice": 2900,
+      "total": 2900,
+      "dayOffset": 8,
+      "ts": "2026-10-11T15:34:00+05:00"
+    },
+    {
+      "id": "s-0132",
+      "productId": "p07",
+      "qty": 2,
+      "unitPrice": 380,
+      "total": 760,
+      "dayOffset": 8,
+      "ts": "2026-10-11T14:47:00+05:00"
+    },
+    {
+      "id": "s-0133",
+      "productId": "p08",
+      "qty": 2,
+      "unitPrice": 320,
+      "total": 640,
+      "dayOffset": 8,
+      "ts": "2026-10-11T15:22:00+05:00"
+    },
+    {
+      "id": "s-0134",
+      "productId": "p09",
+      "qty": 2,
+      "unitPrice": 340,
+      "total": 680,
+      "dayOffset": 8,
+      "ts": "2026-10-11T20:32:00+05:00"
+    },
+    {
+      "id": "s-0135",
+      "productId": "p10",
+      "qty": 3,
+      "unitPrice": 750,
+      "total": 2250,
+      "dayOffset": 8,
+      "ts": "2026-10-11T14:28:00+05:00"
+    },
+    {
+      "id": "s-0136",
+      "productId": "p11",
+      "qty": 6,
+      "unitPrice": 260,
+      "total": 1560,
+      "dayOffset": 8,
+      "ts": "2026-10-11T13:41:00+05:00"
+    },
+    {
+      "id": "s-0137",
+      "productId": "p12",
+      "qty": 2,
+      "unitPrice": 430,
+      "total": 860,
+      "dayOffset": 8,
+      "ts": "2026-10-11T15:28:00+05:00"
+    },
+    {
+      "id": "s-0138",
+      "productId": "p13",
+      "qty": 1,
+      "unitPrice": 110,
+      "total": 110,
+      "dayOffset": 8,
+      "ts": "2026-10-11T12:31:00+05:00"
+    },
+    {
+      "id": "s-0139",
+      "productId": "p14",
+      "qty": 3,
+      "unitPrice": 135,
+      "total": 405,
+      "dayOffset": 8,
+      "ts": "2026-10-11T15:16:00+05:00"
+    },
+    {
+      "id": "s-0140",
+      "productId": "p15",
+      "qty": 3,
+      "unitPrice": 105,
+      "total": 315,
+      "dayOffset": 8,
+      "ts": "2026-10-11T20:06:00+05:00"
+    },
+    {
+      "id": "s-0141",
+      "productId": "p16",
+      "qty": 2,
+      "unitPrice": 460,
+      "total": 920,
+      "dayOffset": 8,
+      "ts": "2026-10-11T17:16:00+05:00"
+    },
+    {
+      "id": "s-0142",
+      "productId": "p17",
+      "qty": 3,
+      "unitPrice": 150,
+      "total": 450,
+      "dayOffset": 8,
+      "ts": "2026-10-11T16:13:00+05:00"
+    },
+    {
+      "id": "s-0143",
+      "productId": "p18",
+      "qty": 2,
+      "unitPrice": 420,
+      "total": 840,
+      "dayOffset": 8,
+      "ts": "2026-10-11T20:43:00+05:00"
+    },
+    {
+      "id": "s-0144",
+      "productId": "p19",
+      "qty": 2,
+      "unitPrice": 290,
+      "total": 580,
+      "dayOffset": 8,
+      "ts": "2026-10-11T13:51:00+05:00"
+    },
+    {
+      "id": "s-0145",
+      "productId": "p20",
+      "qty": 5,
+      "unitPrice": 170,
+      "total": 850,
+      "dayOffset": 8,
+      "ts": "2026-10-11T11:08:00+05:00"
+    },
+    {
+      "id": "s-0146",
+      "productId": "p21",
+      "qty": 4,
+      "unitPrice": 230,
+      "total": 920,
+      "dayOffset": 8,
+      "ts": "2026-10-11T09:02:00+05:00"
+    },
+    {
+      "id": "s-0147",
+      "productId": "p22",
+      "qty": 2,
+      "unitPrice": 700,
+      "total": 1400,
+      "dayOffset": 8,
+      "ts": "2026-10-11T18:22:00+05:00"
+    },
+    {
+      "id": "s-0148",
+      "productId": "p23",
+      "qty": 1,
+      "unitPrice": 1080,
+      "total": 1080,
+      "dayOffset": 8,
+      "ts": "2026-10-11T17:50:00+05:00"
+    },
+    {
+      "id": "s-0149",
+      "productId": "p24",
+      "qty": 4,
+      "unitPrice": 145,
+      "total": 580,
+      "dayOffset": 8,
+      "ts": "2026-10-11T13:20:00+05:00"
+    },
+    {
+      "id": "s-0150",
+      "productId": "p25",
+      "qty": 1,
+      "unitPrice": 2100,
+      "total": 2100,
+      "dayOffset": 8,
+      "ts": "2026-10-11T16:14:00+05:00"
+    },
+    {
+      "id": "s-0151",
+      "productId": "p01",
+      "qty": 2,
+      "unitPrice": 2600,
+      "total": 5200,
+      "dayOffset": 7,
+      "ts": "2026-10-12T11:30:00+05:00"
+    },
+    {
+      "id": "s-0152",
+      "productId": "p02",
+      "qty": 6,
+      "unitPrice": 430,
+      "total": 2580,
+      "dayOffset": 7,
+      "ts": "2026-10-12T10:06:00+05:00"
+    },
+    {
+      "id": "s-0153",
+      "productId": "p03",
+      "qty": 4,
+      "unitPrice": 95,
+      "total": 380,
+      "dayOffset": 7,
+      "ts": "2026-10-12T15:23:00+05:00"
+    },
+    {
+      "id": "s-0154",
+      "productId": "p04",
+      "qty": 2,
+      "unitPrice": 1050,
+      "total": 2100,
+      "dayOffset": 7,
+      "ts": "2026-10-12T10:54:00+05:00"
+    },
+    {
+      "id": "s-0155",
+      "productId": "p05",
+      "qty": 5,
+      "unitPrice": 125,
+      "total": 625,
+      "dayOffset": 7,
+      "ts": "2026-10-12T17:40:00+05:00"
+    },
+    {
+      "id": "s-0156",
+      "productId": "p06",
+      "qty": 1,
+      "unitPrice": 2900,
+      "total": 2900,
+      "dayOffset": 7,
+      "ts": "2026-10-12T19:12:00+05:00"
+    },
+    {
+      "id": "s-0157",
+      "productId": "p07",
+      "qty": 2,
+      "unitPrice": 380,
+      "total": 760,
+      "dayOffset": 7,
+      "ts": "2026-10-12T11:58:00+05:00"
+    },
+    {
+      "id": "s-0158",
+      "productId": "p08",
+      "qty": 3,
+      "unitPrice": 320,
+      "total": 960,
+      "dayOffset": 7,
+      "ts": "2026-10-12T20:32:00+05:00"
+    },
+    {
+      "id": "s-0159",
+      "productId": "p09",
+      "qty": 3,
+      "unitPrice": 340,
+      "total": 1020,
+      "dayOffset": 7,
+      "ts": "2026-10-12T11:26:00+05:00"
+    },
+    {
+      "id": "s-0160",
+      "productId": "p10",
+      "qty": 2,
+      "unitPrice": 750,
+      "total": 1500,
+      "dayOffset": 7,
+      "ts": "2026-10-12T10:26:00+05:00"
+    },
+    {
+      "id": "s-0161",
+      "productId": "p11",
+      "qty": 5,
+      "unitPrice": 260,
+      "total": 1300,
+      "dayOffset": 7,
+      "ts": "2026-10-12T15:42:00+05:00"
+    },
+    {
+      "id": "s-0162",
+      "productId": "p12",
+      "qty": 2,
+      "unitPrice": 430,
+      "total": 860,
+      "dayOffset": 7,
+      "ts": "2026-10-12T18:02:00+05:00"
+    },
+    {
+      "id": "s-0163",
+      "productId": "p13",
+      "qty": 3,
+      "unitPrice": 110,
+      "total": 330,
+      "dayOffset": 7,
+      "ts": "2026-10-12T18:38:00+05:00"
+    },
+    {
+      "id": "s-0164",
+      "productId": "p14",
+      "qty": 4,
+      "unitPrice": 135,
+      "total": 540,
+      "dayOffset": 7,
+      "ts": "2026-10-12T15:07:00+05:00"
+    },
+    {
+      "id": "s-0165",
+      "productId": "p15",
+      "qty": 2,
+      "unitPrice": 105,
+      "total": 210,
+      "dayOffset": 7,
+      "ts": "2026-10-12T17:23:00+05:00"
+    },
+    {
+      "id": "s-0166",
+      "productId": "p16",
+      "qty": 1,
+      "unitPrice": 460,
+      "total": 460,
+      "dayOffset": 7,
+      "ts": "2026-10-12T16:15:00+05:00"
+    },
+    {
+      "id": "s-0167",
+      "productId": "p17",
+      "qty": 3,
+      "unitPrice": 150,
+      "total": 450,
+      "dayOffset": 7,
+      "ts": "2026-10-12T11:40:00+05:00"
+    },
+    {
+      "id": "s-0168",
+      "productId": "p18",
+      "qty": 2,
+      "unitPrice": 420,
+      "total": 840,
+      "dayOffset": 7,
+      "ts": "2026-10-12T14:37:00+05:00"
+    },
+    {
+      "id": "s-0169",
+      "productId": "p19",
+      "qty": 2,
+      "unitPrice": 290,
+      "total": 580,
+      "dayOffset": 7,
+      "ts": "2026-10-12T11:12:00+05:00"
+    },
+    {
+      "id": "s-0170",
+      "productId": "p20",
+      "qty": 3,
+      "unitPrice": 170,
+      "total": 510,
+      "dayOffset": 7,
+      "ts": "2026-10-12T15:17:00+05:00"
+    },
+    {
+      "id": "s-0171",
+      "productId": "p21",
+      "qty": 7,
+      "unitPrice": 230,
+      "total": 1610,
+      "dayOffset": 7,
+      "ts": "2026-10-12T19:30:00+05:00"
+    },
+    {
+      "id": "s-0172",
+      "productId": "p22",
+      "qty": 1,
+      "unitPrice": 700,
+      "total": 700,
+      "dayOffset": 7,
+      "ts": "2026-10-12T13:45:00+05:00"
+    },
+    {
+      "id": "s-0173",
+      "productId": "p23",
+      "qty": 1,
+      "unitPrice": 1080,
+      "total": 1080,
+      "dayOffset": 7,
+      "ts": "2026-10-12T11:46:00+05:00"
+    },
+    {
+      "id": "s-0174",
+      "productId": "p24",
+      "qty": 4,
+      "unitPrice": 145,
+      "total": 580,
+      "dayOffset": 7,
+      "ts": "2026-10-12T11:23:00+05:00"
+    },
+    {
+      "id": "s-0175",
+      "productId": "p25",
+      "qty": 1,
+      "unitPrice": 2100,
+      "total": 2100,
+      "dayOffset": 7,
+      "ts": "2026-10-12T09:52:00+05:00"
+    },
+    {
+      "id": "s-0176",
+      "productId": "p01",
+      "qty": 1,
+      "unitPrice": 2600,
+      "total": 2600,
+      "dayOffset": 6,
+      "ts": "2026-10-13T19:24:00+05:00"
+    },
+    {
+      "id": "s-0177",
+      "productId": "p02",
+      "qty": 3,
+      "unitPrice": 430,
+      "total": 1290,
+      "dayOffset": 6,
+      "ts": "2026-10-13T13:21:00+05:00"
+    },
+    {
+      "id": "s-0178",
+      "productId": "p03",
+      "qty": 2,
+      "unitPrice": 95,
+      "total": 190,
+      "dayOffset": 6,
+      "ts": "2026-10-13T09:09:00+05:00"
+    },
+    {
+      "id": "s-0179",
+      "productId": "p04",
+      "qty": 3,
+      "unitPrice": 1050,
+      "total": 3150,
+      "dayOffset": 6,
+      "ts": "2026-10-13T19:28:00+05:00"
+    },
+    {
+      "id": "s-0180",
+      "productId": "p05",
+      "qty": 6,
+      "unitPrice": 125,
+      "total": 750,
+      "dayOffset": 6,
+      "ts": "2026-10-13T15:53:00+05:00"
+    },
+    {
+      "id": "s-0181",
+      "productId": "p06",
+      "qty": 1,
+      "unitPrice": 2900,
+      "total": 2900,
+      "dayOffset": 6,
+      "ts": "2026-10-13T09:46:00+05:00"
+    },
+    {
+      "id": "s-0182",
+      "productId": "p07",
+      "qty": 2,
+      "unitPrice": 380,
+      "total": 760,
+      "dayOffset": 6,
+      "ts": "2026-10-13T12:02:00+05:00"
+    },
+    {
+      "id": "s-0183",
+      "productId": "p08",
+      "qty": 1,
+      "unitPrice": 320,
+      "total": 320,
+      "dayOffset": 6,
+      "ts": "2026-10-13T13:07:00+05:00"
+    },
+    {
+      "id": "s-0184",
+      "productId": "p09",
+      "qty": 2,
+      "unitPrice": 340,
+      "total": 680,
+      "dayOffset": 6,
+      "ts": "2026-10-13T16:25:00+05:00"
+    },
+    {
+      "id": "s-0185",
+      "productId": "p10",
+      "qty": 4,
+      "unitPrice": 750,
+      "total": 3000,
+      "dayOffset": 6,
+      "ts": "2026-10-13T14:22:00+05:00"
+    },
+    {
+      "id": "s-0186",
+      "productId": "p11",
+      "qty": 5,
+      "unitPrice": 260,
+      "total": 1300,
+      "dayOffset": 6,
+      "ts": "2026-10-13T11:16:00+05:00"
+    },
+    {
+      "id": "s-0187",
+      "productId": "p12",
+      "qty": 2,
+      "unitPrice": 430,
+      "total": 860,
+      "dayOffset": 6,
+      "ts": "2026-10-13T10:55:00+05:00"
+    },
+    {
+      "id": "s-0188",
+      "productId": "p13",
+      "qty": 1,
+      "unitPrice": 110,
+      "total": 110,
+      "dayOffset": 6,
+      "ts": "2026-10-13T12:34:00+05:00"
+    },
+    {
+      "id": "s-0189",
+      "productId": "p14",
+      "qty": 2,
+      "unitPrice": 135,
+      "total": 270,
+      "dayOffset": 6,
+      "ts": "2026-10-13T16:01:00+05:00"
+    },
+    {
+      "id": "s-0190",
+      "productId": "p15",
+      "qty": 2,
+      "unitPrice": 105,
+      "total": 210,
+      "dayOffset": 6,
+      "ts": "2026-10-13T13:51:00+05:00"
+    },
+    {
+      "id": "s-0191",
+      "productId": "p16",
+      "qty": 3,
+      "unitPrice": 460,
+      "total": 1380,
+      "dayOffset": 6,
+      "ts": "2026-10-13T20:54:00+05:00"
+    },
+    {
+      "id": "s-0192",
+      "productId": "p17",
+      "qty": 3,
+      "unitPrice": 150,
+      "total": 450,
+      "dayOffset": 6,
+      "ts": "2026-10-13T15:45:00+05:00"
+    },
+    {
+      "id": "s-0193",
+      "productId": "p18",
+      "qty": 2,
+      "unitPrice": 420,
+      "total": 840,
+      "dayOffset": 6,
+      "ts": "2026-10-13T19:31:00+05:00"
+    },
+    {
+      "id": "s-0194",
+      "productId": "p19",
+      "qty": 3,
+      "unitPrice": 290,
+      "total": 870,
+      "dayOffset": 6,
+      "ts": "2026-10-13T16:44:00+05:00"
+    },
+    {
+      "id": "s-0195",
+      "productId": "p20",
+      "qty": 6,
+      "unitPrice": 170,
+      "total": 1020,
+      "dayOffset": 6,
+      "ts": "2026-10-13T17:09:00+05:00"
+    },
+    {
+      "id": "s-0196",
+      "productId": "p21",
+      "qty": 7,
+      "unitPrice": 230,
+      "total": 1610,
+      "dayOffset": 6,
+      "ts": "2026-10-13T14:38:00+05:00"
+    },
+    {
+      "id": "s-0197",
+      "productId": "p22",
+      "qty": 2,
+      "unitPrice": 700,
+      "total": 1400,
+      "dayOffset": 6,
+      "ts": "2026-10-13T14:25:00+05:00"
+    },
+    {
+      "id": "s-0198",
+      "productId": "p23",
+      "qty": 1,
+      "unitPrice": 1080,
+      "total": 1080,
+      "dayOffset": 6,
+      "ts": "2026-10-13T11:23:00+05:00"
+    },
+    {
+      "id": "s-0199",
+      "productId": "p24",
+      "qty": 4,
+      "unitPrice": 145,
+      "total": 580,
+      "dayOffset": 6,
+      "ts": "2026-10-13T13:13:00+05:00"
+    },
+    {
+      "id": "s-0200",
+      "productId": "p25",
+      "qty": 1,
+      "unitPrice": 2100,
+      "total": 2100,
+      "dayOffset": 6,
+      "ts": "2026-10-13T15:40:00+05:00"
+    },
+    {
+      "id": "s-0201",
+      "productId": "p01",
+      "qty": 1,
+      "unitPrice": 2600,
+      "total": 2600,
+      "dayOffset": 5,
+      "ts": "2026-10-14T17:58:00+05:00"
+    },
+    {
+      "id": "s-0202",
+      "productId": "p02",
+      "qty": 4,
+      "unitPrice": 430,
+      "total": 1720,
+      "dayOffset": 5,
+      "ts": "2026-10-14T13:16:00+05:00"
+    },
+    {
+      "id": "s-0203",
+      "productId": "p03",
+      "qty": 4,
+      "unitPrice": 95,
+      "total": 380,
+      "dayOffset": 5,
+      "ts": "2026-10-14T09:23:00+05:00"
+    },
+    {
+      "id": "s-0204",
+      "productId": "p04",
+      "qty": 1,
+      "unitPrice": 1050,
+      "total": 1050,
+      "dayOffset": 5,
+      "ts": "2026-10-14T13:36:00+05:00"
+    },
+    {
+      "id": "s-0205",
+      "productId": "p05",
+      "qty": 6,
+      "unitPrice": 125,
+      "total": 750,
+      "dayOffset": 5,
+      "ts": "2026-10-14T19:06:00+05:00"
+    },
+    {
+      "id": "s-0206",
+      "productId": "p06",
+      "qty": 1,
+      "unitPrice": 2900,
+      "total": 2900,
+      "dayOffset": 5,
+      "ts": "2026-10-14T20:09:00+05:00"
+    },
+    {
+      "id": "s-0207",
+      "productId": "p07",
+      "qty": 3,
+      "unitPrice": 380,
+      "total": 1140,
+      "dayOffset": 5,
+      "ts": "2026-10-14T20:29:00+05:00"
+    },
+    {
+      "id": "s-0208",
+      "productId": "p08",
+      "qty": 2,
+      "unitPrice": 320,
+      "total": 640,
+      "dayOffset": 5,
+      "ts": "2026-10-14T15:00:00+05:00"
+    },
+    {
+      "id": "s-0209",
+      "productId": "p09",
+      "qty": 3,
+      "unitPrice": 340,
+      "total": 1020,
+      "dayOffset": 5,
+      "ts": "2026-10-14T09:17:00+05:00"
+    },
+    {
+      "id": "s-0210",
+      "productId": "p10",
+      "qty": 2,
+      "unitPrice": 750,
+      "total": 1500,
+      "dayOffset": 5,
+      "ts": "2026-10-14T12:38:00+05:00"
+    },
+    {
+      "id": "s-0211",
+      "productId": "p11",
+      "qty": 4,
+      "unitPrice": 260,
+      "total": 1040,
+      "dayOffset": 5,
+      "ts": "2026-10-14T12:16:00+05:00"
+    },
+    {
+      "id": "s-0212",
+      "productId": "p12",
+      "qty": 3,
+      "unitPrice": 430,
+      "total": 1290,
+      "dayOffset": 5,
+      "ts": "2026-10-14T09:24:00+05:00"
+    },
+    {
+      "id": "s-0213",
+      "productId": "p13",
+      "qty": 2,
+      "unitPrice": 110,
+      "total": 220,
+      "dayOffset": 5,
+      "ts": "2026-10-14T13:25:00+05:00"
+    },
+    {
+      "id": "s-0214",
+      "productId": "p14",
+      "qty": 2,
+      "unitPrice": 135,
+      "total": 270,
+      "dayOffset": 5,
+      "ts": "2026-10-14T11:30:00+05:00"
+    },
+    {
+      "id": "s-0215",
+      "productId": "p15",
+      "qty": 3,
+      "unitPrice": 105,
+      "total": 315,
+      "dayOffset": 5,
+      "ts": "2026-10-14T15:24:00+05:00"
+    },
+    {
+      "id": "s-0216",
+      "productId": "p16",
+      "qty": 2,
+      "unitPrice": 460,
+      "total": 920,
+      "dayOffset": 5,
+      "ts": "2026-10-14T09:23:00+05:00"
+    },
+    {
+      "id": "s-0217",
+      "productId": "p17",
+      "qty": 6,
+      "unitPrice": 150,
+      "total": 900,
+      "dayOffset": 5,
+      "ts": "2026-10-14T13:14:00+05:00"
+    },
+    {
+      "id": "s-0218",
+      "productId": "p18",
+      "qty": 1,
+      "unitPrice": 420,
+      "total": 420,
+      "dayOffset": 5,
+      "ts": "2026-10-14T12:58:00+05:00"
+    },
+    {
+      "id": "s-0219",
+      "productId": "p19",
+      "qty": 2,
+      "unitPrice": 290,
+      "total": 580,
+      "dayOffset": 5,
+      "ts": "2026-10-14T16:13:00+05:00"
+    },
+    {
+      "id": "s-0220",
+      "productId": "p20",
+      "qty": 5,
+      "unitPrice": 170,
+      "total": 850,
+      "dayOffset": 5,
+      "ts": "2026-10-14T11:13:00+05:00"
+    },
+    {
+      "id": "s-0221",
+      "productId": "p21",
+      "qty": 6,
+      "unitPrice": 230,
+      "total": 1380,
+      "dayOffset": 5,
+      "ts": "2026-10-14T17:01:00+05:00"
+    },
+    {
+      "id": "s-0222",
+      "productId": "p22",
+      "qty": 2,
+      "unitPrice": 700,
+      "total": 1400,
+      "dayOffset": 5,
+      "ts": "2026-10-14T09:57:00+05:00"
+    },
+    {
+      "id": "s-0223",
+      "productId": "p23",
+      "qty": 1,
+      "unitPrice": 1080,
+      "total": 1080,
+      "dayOffset": 5,
+      "ts": "2026-10-14T09:22:00+05:00"
+    },
+    {
+      "id": "s-0224",
+      "productId": "p24",
+      "qty": 2,
+      "unitPrice": 145,
+      "total": 290,
+      "dayOffset": 5,
+      "ts": "2026-10-14T09:47:00+05:00"
+    },
+    {
+      "id": "s-0225",
+      "productId": "p25",
+      "qty": 1,
+      "unitPrice": 2100,
+      "total": 2100,
+      "dayOffset": 5,
+      "ts": "2026-10-14T11:51:00+05:00"
+    },
+    {
+      "id": "s-0226",
+      "productId": "p01",
+      "qty": 1,
+      "unitPrice": 2600,
+      "total": 2600,
+      "dayOffset": 4,
+      "ts": "2026-10-15T17:57:00+05:00"
+    },
+    {
+      "id": "s-0227",
+      "productId": "p02",
+      "qty": 4,
+      "unitPrice": 430,
+      "total": 1720,
+      "dayOffset": 4,
+      "ts": "2026-10-15T16:51:00+05:00"
+    },
+    {
+      "id": "s-0228",
+      "productId": "p03",
+      "qty": 3,
+      "unitPrice": 95,
+      "total": 285,
+      "dayOffset": 4,
+      "ts": "2026-10-15T13:15:00+05:00"
+    },
+    {
+      "id": "s-0229",
+      "productId": "p04",
+      "qty": 2,
+      "unitPrice": 1050,
+      "total": 2100,
+      "dayOffset": 4,
+      "ts": "2026-10-15T15:59:00+05:00"
+    },
+    {
+      "id": "s-0230",
+      "productId": "p05",
+      "qty": 4,
+      "unitPrice": 125,
+      "total": 500,
+      "dayOffset": 4,
+      "ts": "2026-10-15T14:00:00+05:00"
+    },
+    {
+      "id": "s-0231",
+      "productId": "p06",
+      "qty": 1,
+      "unitPrice": 2900,
+      "total": 2900,
+      "dayOffset": 4,
+      "ts": "2026-10-15T17:20:00+05:00"
+    },
+    {
+      "id": "s-0232",
+      "productId": "p07",
+      "qty": 2,
+      "unitPrice": 380,
+      "total": 760,
+      "dayOffset": 4,
+      "ts": "2026-10-15T18:35:00+05:00"
+    },
+    {
+      "id": "s-0233",
+      "productId": "p08",
+      "qty": 3,
+      "unitPrice": 320,
+      "total": 960,
+      "dayOffset": 4,
+      "ts": "2026-10-15T10:51:00+05:00"
+    },
+    {
+      "id": "s-0234",
+      "productId": "p09",
+      "qty": 2,
+      "unitPrice": 340,
+      "total": 680,
+      "dayOffset": 4,
+      "ts": "2026-10-15T12:37:00+05:00"
+    },
+    {
+      "id": "s-0235",
+      "productId": "p10",
+      "qty": 3,
+      "unitPrice": 750,
+      "total": 2250,
+      "dayOffset": 4,
+      "ts": "2026-10-15T14:00:00+05:00"
+    },
+    {
+      "id": "s-0236",
+      "productId": "p11",
+      "qty": 7,
+      "unitPrice": 260,
+      "total": 1820,
+      "dayOffset": 4,
+      "ts": "2026-10-15T10:57:00+05:00"
+    },
+    {
+      "id": "s-0237",
+      "productId": "p12",
+      "qty": 3,
+      "unitPrice": 430,
+      "total": 1290,
+      "dayOffset": 4,
+      "ts": "2026-10-15T10:08:00+05:00"
+    },
+    {
+      "id": "s-0238",
+      "productId": "p13",
+      "qty": 2,
+      "unitPrice": 110,
+      "total": 220,
+      "dayOffset": 4,
+      "ts": "2026-10-15T11:16:00+05:00"
+    },
+    {
+      "id": "s-0239",
+      "productId": "p14",
+      "qty": 3,
+      "unitPrice": 135,
+      "total": 405,
+      "dayOffset": 4,
+      "ts": "2026-10-15T11:02:00+05:00"
+    },
+    {
+      "id": "s-0240",
+      "productId": "p15",
+      "qty": 3,
+      "unitPrice": 105,
+      "total": 315,
+      "dayOffset": 4,
+      "ts": "2026-10-15T17:07:00+05:00"
+    },
+    {
+      "id": "s-0241",
+      "productId": "p16",
+      "qty": 2,
+      "unitPrice": 460,
+      "total": 920,
+      "dayOffset": 4,
+      "ts": "2026-10-15T09:41:00+05:00"
+    },
+    {
+      "id": "s-0242",
+      "productId": "p17",
+      "qty": 5,
+      "unitPrice": 150,
+      "total": 750,
+      "dayOffset": 4,
+      "ts": "2026-10-15T19:02:00+05:00"
+    },
+    {
+      "id": "s-0243",
+      "productId": "p18",
+      "qty": 2,
+      "unitPrice": 420,
+      "total": 840,
+      "dayOffset": 4,
+      "ts": "2026-10-15T16:55:00+05:00"
+    },
+    {
+      "id": "s-0244",
+      "productId": "p19",
+      "qty": 3,
+      "unitPrice": 290,
+      "total": 870,
+      "dayOffset": 4,
+      "ts": "2026-10-15T14:40:00+05:00"
+    },
+    {
+      "id": "s-0245",
+      "productId": "p20",
+      "qty": 7,
+      "unitPrice": 170,
+      "total": 1190,
+      "dayOffset": 4,
+      "ts": "2026-10-15T14:06:00+05:00"
+    },
+    {
+      "id": "s-0246",
+      "productId": "p21",
+      "qty": 7,
+      "unitPrice": 230,
+      "total": 1610,
+      "dayOffset": 4,
+      "ts": "2026-10-15T15:22:00+05:00"
+    },
+    {
+      "id": "s-0247",
+      "productId": "p22",
+      "qty": 1,
+      "unitPrice": 700,
+      "total": 700,
+      "dayOffset": 4,
+      "ts": "2026-10-15T14:34:00+05:00"
+    },
+    {
+      "id": "s-0248",
+      "productId": "p23",
+      "qty": 1,
+      "unitPrice": 1080,
+      "total": 1080,
+      "dayOffset": 4,
+      "ts": "2026-10-15T10:04:00+05:00"
+    },
+    {
+      "id": "s-0249",
+      "productId": "p24",
+      "qty": 2,
+      "unitPrice": 145,
+      "total": 290,
+      "dayOffset": 4,
+      "ts": "2026-10-15T18:16:00+05:00"
+    },
+    {
+      "id": "s-0250",
+      "productId": "p25",
+      "qty": 1,
+      "unitPrice": 2100,
+      "total": 2100,
+      "dayOffset": 4,
+      "ts": "2026-10-15T10:01:00+05:00"
+    },
+    {
+      "id": "s-0251",
+      "productId": "p01",
+      "qty": 1,
+      "unitPrice": 2600,
+      "total": 2600,
+      "dayOffset": 3,
+      "ts": "2026-10-16T19:45:00+05:00"
+    },
+    {
+      "id": "s-0252",
+      "productId": "p02",
+      "qty": 5,
+      "unitPrice": 430,
+      "total": 2150,
+      "dayOffset": 3,
+      "ts": "2026-10-16T09:01:00+05:00"
+    },
+    {
+      "id": "s-0253",
+      "productId": "p03",
+      "qty": 5,
+      "unitPrice": 95,
+      "total": 475,
+      "dayOffset": 3,
+      "ts": "2026-10-16T17:05:00+05:00"
+    },
+    {
+      "id": "s-0254",
+      "productId": "p04",
+      "qty": 3,
+      "unitPrice": 1050,
+      "total": 3150,
+      "dayOffset": 3,
+      "ts": "2026-10-16T10:43:00+05:00"
+    },
+    {
+      "id": "s-0255",
+      "productId": "p05",
+      "qty": 8,
+      "unitPrice": 125,
+      "total": 1000,
+      "dayOffset": 3,
+      "ts": "2026-10-16T19:24:00+05:00"
+    },
+    {
+      "id": "s-0256",
+      "productId": "p06",
+      "qty": 1,
+      "unitPrice": 2900,
+      "total": 2900,
+      "dayOffset": 3,
+      "ts": "2026-10-16T11:47:00+05:00"
+    },
+    {
+      "id": "s-0257",
+      "productId": "p07",
+      "qty": 4,
+      "unitPrice": 380,
+      "total": 1520,
+      "dayOffset": 3,
+      "ts": "2026-10-16T19:22:00+05:00"
+    },
+    {
+      "id": "s-0258",
+      "productId": "p08",
+      "qty": 2,
+      "unitPrice": 320,
+      "total": 640,
+      "dayOffset": 3,
+      "ts": "2026-10-16T18:20:00+05:00"
+    },
+    {
+      "id": "s-0259",
+      "productId": "p09",
+      "qty": 3,
+      "unitPrice": 340,
+      "total": 1020,
+      "dayOffset": 3,
+      "ts": "2026-10-16T19:25:00+05:00"
+    },
+    {
+      "id": "s-0260",
+      "productId": "p10",
+      "qty": 2,
+      "unitPrice": 750,
+      "total": 1500,
+      "dayOffset": 3,
+      "ts": "2026-10-16T11:46:00+05:00"
+    },
+    {
+      "id": "s-0261",
+      "productId": "p11",
+      "qty": 5,
+      "unitPrice": 260,
+      "total": 1300,
+      "dayOffset": 3,
+      "ts": "2026-10-16T18:09:00+05:00"
+    },
+    {
+      "id": "s-0262",
+      "productId": "p12",
+      "qty": 5,
+      "unitPrice": 430,
+      "total": 2150,
+      "dayOffset": 3,
+      "ts": "2026-10-16T17:34:00+05:00"
+    },
+    {
+      "id": "s-0263",
+      "productId": "p13",
+      "qty": 3,
+      "unitPrice": 110,
+      "total": 330,
+      "dayOffset": 3,
+      "ts": "2026-10-16T16:42:00+05:00"
+    },
+    {
+      "id": "s-0264",
+      "productId": "p14",
+      "qty": 4,
+      "unitPrice": 135,
+      "total": 540,
+      "dayOffset": 3,
+      "ts": "2026-10-16T09:26:00+05:00"
+    },
+    {
+      "id": "s-0265",
+      "productId": "p15",
+      "qty": 3,
+      "unitPrice": 105,
+      "total": 315,
+      "dayOffset": 3,
+      "ts": "2026-10-16T14:03:00+05:00"
+    },
+    {
+      "id": "s-0266",
+      "productId": "p16",
+      "qty": 1,
+      "unitPrice": 460,
+      "total": 460,
+      "dayOffset": 3,
+      "ts": "2026-10-16T16:31:00+05:00"
+    },
+    {
+      "id": "s-0267",
+      "productId": "p17",
+      "qty": 6,
+      "unitPrice": 150,
+      "total": 900,
+      "dayOffset": 3,
+      "ts": "2026-10-16T20:04:00+05:00"
+    },
+    {
+      "id": "s-0268",
+      "productId": "p18",
+      "qty": 2,
+      "unitPrice": 420,
+      "total": 840,
+      "dayOffset": 3,
+      "ts": "2026-10-16T11:00:00+05:00"
+    },
+    {
+      "id": "s-0269",
+      "productId": "p19",
+      "qty": 4,
+      "unitPrice": 290,
+      "total": 1160,
+      "dayOffset": 3,
+      "ts": "2026-10-16T13:59:00+05:00"
+    },
+    {
+      "id": "s-0270",
+      "productId": "p20",
+      "qty": 6,
+      "unitPrice": 170,
+      "total": 1020,
+      "dayOffset": 3,
+      "ts": "2026-10-16T09:24:00+05:00"
+    },
+    {
+      "id": "s-0271",
+      "productId": "p21",
+      "qty": 6,
+      "unitPrice": 230,
+      "total": 1380,
+      "dayOffset": 3,
+      "ts": "2026-10-16T13:50:00+05:00"
+    },
+    {
+      "id": "s-0272",
+      "productId": "p22",
+      "qty": 2,
+      "unitPrice": 700,
+      "total": 1400,
+      "dayOffset": 3,
+      "ts": "2026-10-16T10:13:00+05:00"
+    },
+    {
+      "id": "s-0273",
+      "productId": "p23",
+      "qty": 1,
+      "unitPrice": 1080,
+      "total": 1080,
+      "dayOffset": 3,
+      "ts": "2026-10-16T20:00:00+05:00"
+    },
+    {
+      "id": "s-0274",
+      "productId": "p24",
+      "qty": 2,
+      "unitPrice": 145,
+      "total": 290,
+      "dayOffset": 3,
+      "ts": "2026-10-16T09:16:00+05:00"
+    },
+    {
+      "id": "s-0275",
+      "productId": "p25",
+      "qty": 1,
+      "unitPrice": 2100,
+      "total": 2100,
+      "dayOffset": 3,
+      "ts": "2026-10-16T20:45:00+05:00"
+    },
+    {
+      "id": "s-0276",
+      "productId": "p01",
+      "qty": 1,
+      "unitPrice": 2600,
+      "total": 2600,
+      "dayOffset": 2,
+      "ts": "2026-10-17T12:34:00+05:00"
+    },
+    {
+      "id": "s-0277",
+      "productId": "p02",
+      "qty": 6,
+      "unitPrice": 430,
+      "total": 2580,
+      "dayOffset": 2,
+      "ts": "2026-10-17T17:54:00+05:00"
+    },
+    {
+      "id": "s-0278",
+      "productId": "p03",
+      "qty": 2,
+      "unitPrice": 95,
+      "total": 190,
+      "dayOffset": 2,
+      "ts": "2026-10-17T12:56:00+05:00"
+    },
+    {
+      "id": "s-0279",
+      "productId": "p04",
+      "qty": 2,
+      "unitPrice": 1050,
+      "total": 2100,
+      "dayOffset": 2,
+      "ts": "2026-10-17T18:19:00+05:00"
+    },
+    {
+      "id": "s-0280",
+      "productId": "p05",
+      "qty": 9,
+      "unitPrice": 125,
+      "total": 1125,
+      "dayOffset": 2,
+      "ts": "2026-10-17T15:32:00+05:00"
+    },
+    {
+      "id": "s-0281",
+      "productId": "p06",
+      "qty": 1,
+      "unitPrice": 2900,
+      "total": 2900,
+      "dayOffset": 2,
+      "ts": "2026-10-17T20:23:00+05:00"
+    },
+    {
+      "id": "s-0282",
+      "productId": "p07",
+      "qty": 3,
+      "unitPrice": 380,
+      "total": 1140,
+      "dayOffset": 2,
+      "ts": "2026-10-17T09:42:00+05:00"
+    },
+    {
+      "id": "s-0283",
+      "productId": "p08",
+      "qty": 3,
+      "unitPrice": 320,
+      "total": 960,
+      "dayOffset": 2,
+      "ts": "2026-10-17T20:15:00+05:00"
+    },
+    {
+      "id": "s-0284",
+      "productId": "p09",
+      "qty": 3,
+      "unitPrice": 340,
+      "total": 1020,
+      "dayOffset": 2,
+      "ts": "2026-10-17T10:06:00+05:00"
+    },
+    {
+      "id": "s-0285",
+      "productId": "p10",
+      "qty": 4,
+      "unitPrice": 750,
+      "total": 3000,
+      "dayOffset": 2,
+      "ts": "2026-10-17T20:15:00+05:00"
+    },
+    {
+      "id": "s-0286",
+      "productId": "p11",
+      "qty": 6,
+      "unitPrice": 260,
+      "total": 1560,
+      "dayOffset": 2,
+      "ts": "2026-10-17T18:07:00+05:00"
+    },
+    {
+      "id": "s-0287",
+      "productId": "p12",
+      "qty": 3,
+      "unitPrice": 430,
+      "total": 1290,
+      "dayOffset": 2,
+      "ts": "2026-10-17T10:25:00+05:00"
+    },
+    {
+      "id": "s-0288",
+      "productId": "p13",
+      "qty": 2,
+      "unitPrice": 110,
+      "total": 220,
+      "dayOffset": 2,
+      "ts": "2026-10-17T12:20:00+05:00"
+    },
+    {
+      "id": "s-0289",
+      "productId": "p14",
+      "qty": 4,
+      "unitPrice": 135,
+      "total": 540,
+      "dayOffset": 2,
+      "ts": "2026-10-17T11:55:00+05:00"
+    },
+    {
+      "id": "s-0290",
+      "productId": "p15",
+      "qty": 3,
+      "unitPrice": 105,
+      "total": 315,
+      "dayOffset": 2,
+      "ts": "2026-10-17T09:09:00+05:00"
+    },
+    {
+      "id": "s-0291",
+      "productId": "p16",
+      "qty": 1,
+      "unitPrice": 460,
+      "total": 460,
+      "dayOffset": 2,
+      "ts": "2026-10-17T18:54:00+05:00"
+    },
+    {
+      "id": "s-0292",
+      "productId": "p17",
+      "qty": 4,
+      "unitPrice": 150,
+      "total": 600,
+      "dayOffset": 2,
+      "ts": "2026-10-17T13:05:00+05:00"
+    },
+    {
+      "id": "s-0293",
+      "productId": "p18",
+      "qty": 1,
+      "unitPrice": 420,
+      "total": 420,
+      "dayOffset": 2,
+      "ts": "2026-10-17T14:02:00+05:00"
+    },
+    {
+      "id": "s-0294",
+      "productId": "p19",
+      "qty": 3,
+      "unitPrice": 290,
+      "total": 870,
+      "dayOffset": 2,
+      "ts": "2026-10-17T13:21:00+05:00"
+    },
+    {
+      "id": "s-0295",
+      "productId": "p20",
+      "qty": 3,
+      "unitPrice": 170,
+      "total": 510,
+      "dayOffset": 2,
+      "ts": "2026-10-17T18:19:00+05:00"
+    },
+    {
+      "id": "s-0296",
+      "productId": "p21",
+      "qty": 5,
+      "unitPrice": 230,
+      "total": 1150,
+      "dayOffset": 2,
+      "ts": "2026-10-17T10:36:00+05:00"
+    },
+    {
+      "id": "s-0297",
+      "productId": "p22",
+      "qty": 2,
+      "unitPrice": 700,
+      "total": 1400,
+      "dayOffset": 2,
+      "ts": "2026-10-17T14:15:00+05:00"
+    },
+    {
+      "id": "s-0298",
+      "productId": "p23",
+      "qty": 1,
+      "unitPrice": 1080,
+      "total": 1080,
+      "dayOffset": 2,
+      "ts": "2026-10-17T11:56:00+05:00"
+    },
+    {
+      "id": "s-0299",
+      "productId": "p24",
+      "qty": 3,
+      "unitPrice": 145,
+      "total": 435,
+      "dayOffset": 2,
+      "ts": "2026-10-17T12:57:00+05:00"
+    },
+    {
+      "id": "s-0300",
+      "productId": "p25",
+      "qty": 1,
+      "unitPrice": 2100,
+      "total": 2100,
+      "dayOffset": 2,
+      "ts": "2026-10-17T18:36:00+05:00"
+    },
+    {
+      "id": "s-0301",
+      "productId": "p01",
+      "qty": 1,
+      "unitPrice": 2600,
+      "total": 2600,
+      "dayOffset": 1,
+      "ts": "2026-10-18T14:40:00+05:00"
+    },
+    {
+      "id": "s-0302",
+      "productId": "p02",
+      "qty": 4,
+      "unitPrice": 430,
+      "total": 1720,
+      "dayOffset": 1,
+      "ts": "2026-10-18T20:32:00+05:00"
+    },
+    {
+      "id": "s-0303",
+      "productId": "p03",
+      "qty": 4,
+      "unitPrice": 95,
+      "total": 380,
+      "dayOffset": 1,
+      "ts": "2026-10-18T09:21:00+05:00"
+    },
+    {
+      "id": "s-0304",
+      "productId": "p04",
+      "qty": 1,
+      "unitPrice": 1050,
+      "total": 1050,
+      "dayOffset": 1,
+      "ts": "2026-10-18T15:41:00+05:00"
+    },
+    {
+      "id": "s-0305",
+      "productId": "p05",
+      "qty": 3,
+      "unitPrice": 125,
+      "total": 375,
+      "dayOffset": 1,
+      "ts": "2026-10-18T09:55:00+05:00"
+    },
+    {
+      "id": "s-0306",
+      "productId": "p06",
+      "qty": 1,
+      "unitPrice": 2900,
+      "total": 2900,
+      "dayOffset": 1,
+      "ts": "2026-10-18T17:02:00+05:00"
+    },
+    {
+      "id": "s-0307",
+      "productId": "p07",
+      "qty": 2,
+      "unitPrice": 380,
+      "total": 760,
+      "dayOffset": 1,
+      "ts": "2026-10-18T18:18:00+05:00"
+    },
+    {
+      "id": "s-0308",
+      "productId": "p08",
+      "qty": 3,
+      "unitPrice": 320,
+      "total": 960,
+      "dayOffset": 1,
+      "ts": "2026-10-18T12:56:00+05:00"
+    },
+    {
+      "id": "s-0309",
+      "productId": "p09",
+      "qty": 3,
+      "unitPrice": 340,
+      "total": 1020,
+      "dayOffset": 1,
+      "ts": "2026-10-18T13:40:00+05:00"
+    },
+    {
+      "id": "s-0310",
+      "productId": "p10",
+      "qty": 3,
+      "unitPrice": 750,
+      "total": 2250,
+      "dayOffset": 1,
+      "ts": "2026-10-18T12:04:00+05:00"
+    },
+    {
+      "id": "s-0311",
+      "productId": "p11",
+      "qty": 5,
+      "unitPrice": 260,
+      "total": 1300,
+      "dayOffset": 1,
+      "ts": "2026-10-18T20:19:00+05:00"
+    },
+    {
+      "id": "s-0312",
+      "productId": "p12",
+      "qty": 2,
+      "unitPrice": 430,
+      "total": 860,
+      "dayOffset": 1,
+      "ts": "2026-10-18T16:43:00+05:00"
+    },
+    {
+      "id": "s-0313",
+      "productId": "p13",
+      "qty": 2,
+      "unitPrice": 110,
+      "total": 220,
+      "dayOffset": 1,
+      "ts": "2026-10-18T18:30:00+05:00"
+    },
+    {
+      "id": "s-0314",
+      "productId": "p14",
+      "qty": 2,
+      "unitPrice": 135,
+      "total": 270,
+      "dayOffset": 1,
+      "ts": "2026-10-18T15:17:00+05:00"
+    },
+    {
+      "id": "s-0315",
+      "productId": "p15",
+      "qty": 2,
+      "unitPrice": 105,
+      "total": 210,
+      "dayOffset": 1,
+      "ts": "2026-10-18T15:49:00+05:00"
+    },
+    {
+      "id": "s-0316",
+      "productId": "p16",
+      "qty": 2,
+      "unitPrice": 460,
+      "total": 920,
+      "dayOffset": 1,
+      "ts": "2026-10-18T10:05:00+05:00"
+    },
+    {
+      "id": "s-0317",
+      "productId": "p17",
+      "qty": 2,
+      "unitPrice": 150,
+      "total": 300,
+      "dayOffset": 1,
+      "ts": "2026-10-18T14:06:00+05:00"
+    },
+    {
+      "id": "s-0318",
+      "productId": "p18",
+      "qty": 2,
+      "unitPrice": 420,
+      "total": 840,
+      "dayOffset": 1,
+      "ts": "2026-10-18T11:59:00+05:00"
+    },
+    {
+      "id": "s-0319",
+      "productId": "p19",
+      "qty": 3,
+      "unitPrice": 290,
+      "total": 870,
+      "dayOffset": 1,
+      "ts": "2026-10-18T18:54:00+05:00"
+    },
+    {
+      "id": "s-0320",
+      "productId": "p20",
+      "qty": 7,
+      "unitPrice": 170,
+      "total": 1190,
+      "dayOffset": 1,
+      "ts": "2026-10-18T10:08:00+05:00"
+    },
+    {
+      "id": "s-0321",
+      "productId": "p21",
+      "qty": 6,
+      "unitPrice": 230,
+      "total": 1380,
+      "dayOffset": 1,
+      "ts": "2026-10-18T16:08:00+05:00"
+    },
+    {
+      "id": "s-0322",
+      "productId": "p22",
+      "qty": 2,
+      "unitPrice": 700,
+      "total": 1400,
+      "dayOffset": 1,
+      "ts": "2026-10-18T09:07:00+05:00"
+    },
+    {
+      "id": "s-0323",
+      "productId": "p23",
+      "qty": 1,
+      "unitPrice": 1080,
+      "total": 1080,
+      "dayOffset": 1,
+      "ts": "2026-10-18T20:53:00+05:00"
+    },
+    {
+      "id": "s-0324",
+      "productId": "p24",
+      "qty": 4,
+      "unitPrice": 145,
+      "total": 580,
+      "dayOffset": 1,
+      "ts": "2026-10-18T16:07:00+05:00"
+    },
+    {
+      "id": "s-0325",
+      "productId": "p25",
+      "qty": 1,
+      "unitPrice": 2100,
+      "total": 2100,
+      "dayOffset": 1,
+      "ts": "2026-10-18T15:55:00+05:00"
+    },
+    {
+      "id": "s-0326",
+      "productId": "p02",
+      "qty": 2,
+      "unitPrice": 430,
+      "total": 860,
+      "dayOffset": 0,
+      "ts": "2026-10-19T12:13:00+05:00"
+    },
+    {
+      "id": "s-0327",
+      "productId": "p03",
+      "qty": 2,
+      "unitPrice": 95,
+      "total": 190,
+      "dayOffset": 0,
+      "ts": "2026-10-19T09:36:00+05:00"
+    },
+    {
+      "id": "s-0328",
+      "productId": "p04",
+      "qty": 1,
+      "unitPrice": 1050,
+      "total": 1050,
+      "dayOffset": 0,
+      "ts": "2026-10-19T10:45:00+05:00"
+    },
+    {
+      "id": "s-0329",
+      "productId": "p05",
+      "qty": 2,
+      "unitPrice": 125,
+      "total": 250,
+      "dayOffset": 0,
+      "ts": "2026-10-19T11:07:00+05:00"
+    },
+    {
+      "id": "s-0330",
+      "productId": "p06",
+      "qty": 1,
+      "unitPrice": 2900,
+      "total": 2900,
+      "dayOffset": 0,
+      "ts": "2026-10-19T20:02:00+05:00"
+    },
+    {
+      "id": "s-0331",
+      "productId": "p07",
+      "qty": 1,
+      "unitPrice": 380,
+      "total": 380,
+      "dayOffset": 0,
+      "ts": "2026-10-19T10:05:00+05:00"
+    },
+    {
+      "id": "s-0332",
+      "productId": "p08",
+      "qty": 1,
+      "unitPrice": 320,
+      "total": 320,
+      "dayOffset": 0,
+      "ts": "2026-10-19T12:53:00+05:00"
+    },
+    {
+      "id": "s-0333",
+      "productId": "p09",
+      "qty": 1,
+      "unitPrice": 340,
+      "total": 340,
+      "dayOffset": 0,
+      "ts": "2026-10-19T11:36:00+05:00"
+    },
+    {
+      "id": "s-0334",
+      "productId": "p10",
+      "qty": 2,
+      "unitPrice": 750,
+      "total": 1500,
+      "dayOffset": 0,
+      "ts": "2026-10-19T20:18:00+05:00"
+    },
+    {
+      "id": "s-0335",
+      "productId": "p11",
+      "qty": 2,
+      "unitPrice": 260,
+      "total": 520,
+      "dayOffset": 0,
+      "ts": "2026-10-19T15:13:00+05:00"
+    },
+    {
+      "id": "s-0336",
+      "productId": "p12",
+      "qty": 1,
+      "unitPrice": 430,
+      "total": 430,
+      "dayOffset": 0,
+      "ts": "2026-10-19T16:28:00+05:00"
+    },
+    {
+      "id": "s-0337",
+      "productId": "p13",
+      "qty": 1,
+      "unitPrice": 110,
+      "total": 110,
+      "dayOffset": 0,
+      "ts": "2026-10-19T20:31:00+05:00"
+    },
+    {
+      "id": "s-0338",
+      "productId": "p14",
+      "qty": 1,
+      "unitPrice": 135,
+      "total": 135,
+      "dayOffset": 0,
+      "ts": "2026-10-19T11:38:00+05:00"
+    },
+    {
+      "id": "s-0339",
+      "productId": "p15",
+      "qty": 1,
+      "unitPrice": 105,
+      "total": 105,
+      "dayOffset": 0,
+      "ts": "2026-10-19T16:05:00+05:00"
+    },
+    {
+      "id": "s-0340",
+      "productId": "p16",
+      "qty": 1,
+      "unitPrice": 460,
+      "total": 460,
+      "dayOffset": 0,
+      "ts": "2026-10-19T14:48:00+05:00"
+    },
+    {
+      "id": "s-0341",
+      "productId": "p17",
+      "qty": 2,
+      "unitPrice": 150,
+      "total": 300,
+      "dayOffset": 0,
+      "ts": "2026-10-19T20:32:00+05:00"
+    },
+    {
+      "id": "s-0342",
+      "productId": "p18",
+      "qty": 1,
+      "unitPrice": 420,
+      "total": 420,
+      "dayOffset": 0,
+      "ts": "2026-10-19T10:45:00+05:00"
+    },
+    {
+      "id": "s-0343",
+      "productId": "p19",
+      "qty": 1,
+      "unitPrice": 290,
+      "total": 290,
+      "dayOffset": 0,
+      "ts": "2026-10-19T16:04:00+05:00"
+    },
+    {
+      "id": "s-0344",
+      "productId": "p20",
+      "qty": 2,
+      "unitPrice": 170,
+      "total": 340,
+      "dayOffset": 0,
+      "ts": "2026-10-19T10:59:00+05:00"
+    },
+    {
+      "id": "s-0345",
+      "productId": "p21",
+      "qty": 1,
+      "unitPrice": 230,
+      "total": 230,
+      "dayOffset": 0,
+      "ts": "2026-10-19T19:24:00+05:00"
+    },
+    {
+      "id": "s-0346",
+      "productId": "p24",
+      "qty": 1,
+      "unitPrice": 145,
+      "total": 145,
+      "dayOffset": 0,
+      "ts": "2026-10-19T09:55:00+05:00"
+    },
+    {
+      "id": "s-0347",
+      "productId": "p25",
+      "qty": 1,
+      "unitPrice": 2100,
+      "total": 2100,
+      "dayOffset": 0,
+      "ts": "2026-10-19T14:29:00+05:00"
+    }
+  ],
+  "customers": [
+    {
+      "id": "cu-1",
+      "name": "Haji Muhammad Saleem",
+      "phone": "0300-1112233",
+      "address": "House 12, Street 3, Mohalla Rajgarh",
+      "note": "Monthly udhaar customer — settles on the 1st.",
+      "ts": "2026-10-05T10:00:00+05:00"
+    },
+    {
+      "id": "cu-2",
+      "name": "Fatima Bibi",
+      "phone": "0321-4455667",
+      "address": "Near Jamia Masjid, Main Bazaar",
+      "note": "Regular — usually pays cash.",
+      "ts": "2026-10-08T10:00:00+05:00"
+    },
+    {
+      "id": "cu-3",
+      "name": "Chaudhry Imran Ali",
+      "phone": "0333-9876543",
+      "address": "Village Chak 42, Tehsil Road",
+      "note": "Buys monthly ration in bulk.",
+      "ts": "2026-10-11T10:00:00+05:00"
+    }
+  ],
+  "suppliers": [
+    {
+      "id": "sup-1",
+      "name": "Malik Traders",
+      "phone": "0300-7654321",
+      "company": "Malik Traders — Wholesale Grocery, Shah Alam Market",
+      "notes": "Main supplier for oil, atta and sugar. Delivers Tue/Fri.",
+      "ts": "2026-10-03T09:00:00+05:00"
+    },
+    {
+      "id": "sup-2",
+      "name": "Lahore Tea & Spices Co.",
+      "phone": "0322-1122998",
+      "company": "Lahore Tea & Spices Co.",
+      "notes": "Tea and masala supplier. 15-day credit terms.",
+      "ts": "2026-10-04T09:00:00+05:00"
+    }
+  ],
+  "purchases": [
+    {
+      "id": "pur-1",
+      "supplierId": "sup-1",
+      "items": [
+        {
+          "productId": "p01",
+          "name": "Dalda Cooking Oil 5L",
+          "qty": 10,
+          "unitCost": 2450,
+          "total": 24500
+        },
+        {
+          "productId": "p06",
+          "name": "Fresh Chakki Atta 20kg",
+          "qty": 6,
+          "unitCost": 2750,
+          "total": 16500
+        },
+        {
+          "productId": "p10",
+          "name": "Sugar 5kg",
+          "qty": 10,
+          "unitCost": 690,
+          "total": 6900
+        }
+      ],
+      "total": 47900,
+      "note": "Weekly restock — oil, atta, sugar.",
+      "dayOffset": 3,
+      "ts": "2026-10-16T12:30:00+05:00"
+    }
+  ],
+  "supplierPayments": [
+    {
+      "id": "spay-1",
+      "supplierId": "sup-1",
+      "amount": 20000,
+      "method": "bank",
+      "note": "Part payment against weekly restock bill.",
+      "dayOffset": 2,
+      "ts": "2026-10-17T11:00:00+05:00"
+    }
+  ],
+  "expenses": [
+    {
+      "id": "exp-1",
+      "category": "electricity",
+      "amount": 8450,
+      "method": "cash",
+      "note": "LESCO bill — September.",
+      "dayOffset": 0,
+      "ts": "2026-10-19T09:15:00+05:00"
+    },
+    {
+      "id": "exp-2",
+      "category": "rent",
+      "amount": 25000,
+      "method": "bank",
+      "note": "Shop rent — October.",
+      "dayOffset": 12,
+      "ts": "2026-10-07T10:00:00+05:00"
+    }
+  ],
+  "credits": [
+    {
+      "id": "cr-1",
+      "customerId": "cu-1",
+      "customerName": "Haji Muhammad Saleem",
+      "customerPhone": "0300-1112233",
+      "kind": "credit",
+      "amount": 8500,
+      "note": "Monthly ration on udhaar.",
+      "billId": null,
+      "dayOffset": 5,
+      "ts": "2026-10-14T18:20:00+05:00"
+    },
+    {
+      "id": "cr-2",
+      "customerId": "cu-1",
+      "customerName": "Haji Muhammad Saleem",
+      "customerPhone": "0300-1112233",
+      "kind": "repayment",
+      "amount": 3000,
+      "method": "cash",
+      "note": "Part repayment.",
+      "billId": null,
+      "dayOffset": 1,
+      "ts": "2026-10-18T12:05:00+05:00"
+    }
+  ],
+  "settings": {
+    "shopName": "Madina General Store",
+    "address": "Main Bazaar Road, Near Jamia Masjid",
+    "phone": "0301-2345678",
+    "staffEmails": []
+  }
+}
