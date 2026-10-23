@@ -503,6 +503,45 @@ service cloud.firestore {
         allow delete: if isOwner(uid);
       }
 
+      // Phase D · D3: the loans register (design §6.2). Reads
+      // follow the `loans` matrix row and are NARROWED like
+      // payroll's (owner / manager / accountant — a loan's terms
+      // are not counter data, so the cashier is excluded
+      // server-side, not merely UI-hidden). Create carries the
+      // period backstop: a loan is born in the same batch as its
+      // drawdown entry, and the entry itself passes the journal
+      // guard. Charge accruals and repayments are UPDATES of the
+      // diary (never period-gated, per doctrine): their journal
+      // entries are creates that pass the journal guard, so an
+      // event dated into a locked period fails its whole batch
+      // at the journal leg. Delete is owner-only and the store
+      // enforces never-used (no diary events) — a loan that
+      // moved money is a posted record, corrected by reversal,
+      // never removed.
+      match /loans/{loanId} {
+        allow read: if hasRole(uid, ['owner', 'manager', 'accountant']);
+        allow create: if hasRole(uid, ['owner', 'accountant']) && createInOpenPeriod(uid);
+        allow update: if hasRole(uid, ['owner', 'accountant']);
+        allow delete: if isOwner(uid);
+      }
+
+      // Phase E · E2 — brand assets (design §2.1/§5): one doc
+      // per asset kind (logo / letterhead header + footer /
+      // stamp / signature / bank-issued Raast QR image), its
+      // payload a compressed data-URL written by the client's
+      // capped pipeline. READ is canAccess on purpose: every
+      // desk prints branded paper — a cashier's bill carries
+      // the logo and the stamp — the `accounts` precedent.
+      // CREATE / UPDATE / DELETE are owner-only: assets ride in
+      // Settings, an owner-only surface, and the rules make it
+      // real. There is NO period backstop here: an asset
+      // asserts no money fact, and replacing one rewrites no
+      // history (past prints are paper, not data).
+      match /branding/{kind} {
+        allow read: if canAccess(uid);
+        allow create, update, delete: if isOwner(uid);
+      }
+
       // Expenses: the operational record may be edited/deleted by
       // owner/manager/accountant (the cashier never touches
       // expenses), but every edit/delete is paired with reversing
