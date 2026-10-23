@@ -1,70 +1,74 @@
-# Dukaan AI — Flutter app (offline-first)
+# Dukaan AI — Flutter app (Phase F · F1 counter release)
 
-The mobile companion to the Dukaan AI web app: a kiryana shopkeeper's
-pocket dashboard. **Fully functional offline** — sqflite is the source of
-truth on-device; Firestore sync is an optional layer on top.
+The native client for the Dukaan AI ERP: Android + Windows, ONE
+backend with the web app (Firebase project `dukan-8246`), the same
+`users/{uid}/…` namespace, the same document shapes, and the same
+journal contract — the Dart finance core in `lib/core/` is a
+faithful port of the web's `lib/` posting machinery, proven equal
+by golden fixtures (see below). **Firestore with persistent cache
+is the only on-device store**; the app never seeds and never keeps
+a second database.
 
-## Screens
+Package id: `com.codehubb.dukaanai` · min Android API 24 ·
+version 6.0.0+1 (X.Y follows the ERP phase lineage).
 
-| Tab | What it does |
-|---|---|
-| Dashboard | KPI cards (stock value, low-stock alerts, today's sales/profit), 7-day revenue bars, low-stock preview |
-| Inventory | Searchable product list with **+/- stock steppers**, low-stock filter, highlighted alert rows |
-| Sales | Record a sale (product picker + quantity stepper) — works offline, queued and synced later; today's counter + sales list |
-| Alerts | Low-stock alerts with days-of-stock meter and reorder suggestions (7-day moving average, same math as the web app) |
+## What F1 ships
 
-## Architecture
+- **Core (fixture-proven):** `makeEntry`/`preparePosting` guard,
+  COA, tax engine, ledger selectors, hardened numbering
+  (max+1 + server re-read + `originDevice` + duplicate detector),
+  PIN lock (PBKDF2-HMAC-SHA256, 150k iterations, E4 friction, E5
+  sensitive-action gates), RBAC matrix (generated from the web).
+- **Screens:** login (email/password + staffIndex role resolution),
+  shell with header account cluster + sync chip, PIN gate,
+  dashboard, billing/POS (type → one tap adds, sticky cart,
+  hold/resume, instant receipt modal, returns, PIN-gated void),
+  sales counter, inventory (add/edit/adjust/CSV import),
+  customers + udhaar ledger, day close, sync centre with the
+  rejected-write tray.
+- **Printing:** one receipt renderer for screen/PDF/thermal —
+  system print as PDF image-pages; ESC/POS raster bytes for 80mm
+  via share; plain-text/WhatsApp share. The receipt honours the
+  owner's saved web print design (E1). Direct Bluetooth/USB
+  transport is deferred to F5 (needs the owner's printer model).
+- **Themes:** the web's five calm themes, same tokens (pinned by
+  test against `web/app/globals.css`).
 
-```
-lib/
-  main.dart                 # app shell, warm Material 3 theme, bottom nav
-  models/                   # Product, Sale (toMap/fromMap)
-  services/
-    database_service.dart   # sqflite: products / sales / meta tables + indexes
-    sync_service.dart       # Firestore: offline persistence + queued-write retry
-  providers/
-    store_provider.dart     # ChangeNotifier: state, selectors, mutations, demo seed
-  screens/                  # dashboard / inventory / sales / alerts
-  widgets/                  # kpi_card, product_tile (stepper)
-```
+## Generated artifacts — never hand-edit
 
-**Offline-first design:**
-- First launch seeds 25 demo products + 14 days of sales into sqflite
-  (deterministic seed, same catalogue as the web demo).
-- `recordSale()` writes locally with `synced = 0`; `SyncService.syncNow()`
-  pushes queued sales and merges products (last-write-wins on `updatedAt`)
-  whenever Firebase is available.
-- No `google-services.json` / `GoogleService-Info.plist`? The app simply
-  runs in offline demo mode — the cloud icon in the app bar shows the state.
+- `lib/l10n/strings*.{dart,json}` + `lib/core/permissions_data.dart`
+  are GENERATED from the web dictionary/matrix:
+  `node tools/gen_l10n.mjs` (CI runs it with `--check` as a drift
+  gate).
+- `../harness/fixtures/f1-core.json` is exported from the TS
+  harness (`node ../harness/fixtures-export.js` after recompiling
+  the harness); `test/f1_fixtures_test.dart` asserts the Dart
+  composers reproduce it byte-for-byte.
 
-## Build the APK (cloud only)
+## Firebase config
 
-There is no Android SDK in this workspace, so **analyze and APK builds happen
-in CI** — never claimed as done locally:
+`lib/data/firebase_options.dart` carries PLACEHOLDERS in the repo
+(the web's discipline). CI injects the real options from the
+`FIREBASE_OPTIONS_DART` secret; the Android/Windows apps must be
+registered in the Firebase console for project `dukan-8246` first.
 
-- **Codemagic:** `codemagic.yaml` — `flutter analyze` + `flutter build apk --release` on push.
-- **GitHub Actions:** `.github/workflows/build-apk.yml` — manual or on push; APK uploaded as an artifact.
+## Verify locally
 
-To build locally you need the [Flutter SDK](https://docs.flutter.dev/get-started/install)
-(3.4+), then:
-
-```bash
-cd flutter-app
+```sh
 flutter pub get
-flutter analyze
-flutter run            # or: flutter build apk --release
+flutter analyze          # expect: No issues found
+flutter test             # 38 tests: core, golden fixtures, themes
 ```
 
-## Enable Firebase sync (optional)
+## CI / releases
 
-1. Create the Firebase project (see `../firebase/SETUP.md`).
-2. Add Android/iOS apps with package `com.codehubb.dukaanai`; download
-   `google-services.json` → `android/app/` and `GoogleService-Info.plist` →
-   `ios/Runner/`.
-3. Run — the app detects Firebase and starts syncing. Firestore rules in
-   `../firebase/firestore.rules` apply.
+Repo-root workflows: `.github/workflows/app-ci.yml` (analyze +
+tests + fixture freshness + i18n drift gate + TS harness) and
+`app-release.yml` (Android APK — debug-signed and labelled
+INTERNAL until keystore secrets exist; Windows via Inno Setup,
+script in `windows/installer/dukaan_ai.iss`).
 
-## What's fictional
-
-All products, PKR prices, stock levels and sales history are invented demo
-data for a fictional kiryana store.
+Local-build note (this dev VM only): pub.dev and Gradle downloads
+are slow through the sandbox egress proxy, and the Gradle daemon's
+local socket is restricted in the VM, so APK builds run in CI;
+the Dart test/analyze suites run locally as above.
