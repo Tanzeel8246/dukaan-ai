@@ -70,7 +70,7 @@ jobs:
       - name: Fixture freshness (web ≡ Dart contract)
         working-directory: web
         run: |
-          npx tsc -p ../harness/tsconfig.json
+          npx -p typescript tsc -p ../harness/tsconfig.json
           node ../harness/fixtures-export.js
           node ../harness/fixtures-export-f2.js
           node ../harness/fixtures-export-f3.js
