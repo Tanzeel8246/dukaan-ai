@@ -37,6 +37,8 @@ export function fmt1(n: number): string {
 const UNIT_LABELS: Record<Lang, Record<string, string>> = {
   en: { pcs: "pcs", kg: "kg", L: "L", dozen: "dozen", packet: "packet", bag: "bag" },
   ur: { pcs: "پیس", kg: "کلو", L: "لیٹر", dozen: "درجن", packet: "پیکٹ", bag: "تھیلا" },
+  ps: { pcs: "پیس", kg: "کيلو", L: "ليټر", dozen: "درځن", packet: "پاکټ", bag: "بوجۍ" },
+  fa: { pcs: "دانه", kg: "کیلو", L: "لیتر", dozen: "درجن", packet: "پاکت", bag: "بوجی" },
 };
 
 /** Unit label in the active language; unknown units pass through raw. */

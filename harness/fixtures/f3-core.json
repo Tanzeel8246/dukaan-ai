@@ -1,0 +1,1503 @@
+{
+ "version": 3,
+ "source": "web/lib via harness/out (stock, transfers, boms, production, jobs) — the real Phase C composition + derivation functions",
+ "accounts": [
+  {
+   "id": "acct-till",
+   "name": "Main Till",
+   "kind": "cash",
+   "method": "cash",
+   "legacyFor": "cash",
+   "archived": false,
+   "sortOrder": 0,
+   "ts": "2026-01-01T00:00:00.000Z"
+  },
+  {
+   "id": "acct-wallet",
+   "name": "Wallet & Bank",
+   "kind": "wallet",
+   "method": null,
+   "legacyFor": "wallet",
+   "archived": false,
+   "sortOrder": 1,
+   "ts": "2026-01-01T00:00:00.000Z"
+  },
+  {
+   "id": "acct-jazz",
+   "name": "JazzCash",
+   "kind": "wallet",
+   "method": "jazzcash",
+   "legacyFor": null,
+   "archived": false,
+   "sortOrder": 2,
+   "ts": "2026-01-01T00:00:00.000Z"
+  }
+ ],
+ "products": [
+  {
+   "id": "p-tea",
+   "sku": "TEA-475",
+   "name": "Tapal Danedar Tea 475g",
+   "urduName": "چائے",
+   "category": "Grocery",
+   "unit": "pcs",
+   "costPrice": 800,
+   "salePrice": 1050,
+   "stockQty": 50,
+   "reorderLevel": 5,
+   "keywords": [],
+   "taxSlabId": null,
+   "taxExempt": false,
+   "stockClass": null
+  },
+  {
+   "id": "p-sugar",
+   "sku": "SUG-1KG",
+   "name": "Sugar 1kg",
+   "urduName": "چینی",
+   "category": "Grocery",
+   "unit": "kg",
+   "costPrice": 130,
+   "salePrice": 145,
+   "stockQty": 100,
+   "reorderLevel": 10,
+   "keywords": [],
+   "taxSlabId": null,
+   "taxExempt": false,
+   "stockClass": null
+  },
+  {
+   "id": "p-raw",
+   "sku": "RAW-LEAF",
+   "name": "Raw Tea Leaf 1kg",
+   "urduName": "کچی پتی",
+   "category": "Raw",
+   "unit": "kg",
+   "costPrice": 500,
+   "salePrice": 600,
+   "stockQty": 40,
+   "reorderLevel": 5,
+   "keywords": [],
+   "taxSlabId": null,
+   "taxExempt": false,
+   "stockClass": "raw"
+  },
+  {
+   "id": "p-oil",
+   "sku": "OIL-5L",
+   "name": "Cooking Oil 5L",
+   "urduName": "تیل",
+   "category": "Grocery",
+   "unit": "pcs",
+   "costPrice": 1000,
+   "salePrice": 1200,
+   "stockQty": 20,
+   "reorderLevel": 3,
+   "keywords": [],
+   "taxSlabId": "slab-gst-ex",
+   "taxExempt": false,
+   "stockClass": null
+  },
+  {
+   "id": "p-ghee",
+   "sku": "GHEE-1KG",
+   "name": "Desi Ghee 1kg",
+   "urduName": "گھی",
+   "category": "Grocery",
+   "unit": "kg",
+   "costPrice": 900,
+   "salePrice": 1170,
+   "stockQty": 15,
+   "reorderLevel": 3,
+   "keywords": [],
+   "taxSlabId": "slab-gst-in",
+   "taxExempt": false,
+   "stockClass": null
+  },
+  {
+   "id": "p-pack",
+   "name": "Packing Box",
+   "salePrice": 40,
+   "costPrice": 20,
+   "stockQty": 100,
+   "reorderLevel": 10,
+   "stockClass": null
+  },
+  {
+   "id": "p-blend",
+   "name": "House Tea Blend 500g",
+   "salePrice": 950,
+   "costPrice": 0,
+   "stockQty": 0,
+   "reorderLevel": 5,
+   "stockClass": null
+  }
+ ],
+ "warehouses": [
+  {
+   "id": "wh-main",
+   "name": "Main Warehouse",
+   "note": "",
+   "isDefault": true,
+   "archived": false,
+   "sortOrder": 0,
+   "ts": "2026-01-01T00:00:00.000Z"
+  },
+  {
+   "id": "wh-godown",
+   "name": "Godown — Shahdara",
+   "note": "",
+   "isDefault": false,
+   "archived": false,
+   "sortOrder": 1,
+   "ts": "2026-01-01T00:00:00.000Z"
+  }
+ ],
+ "bom": {
+  "id": "bom-1",
+  "outputProductId": "p-blend",
+  "outputName": "House Tea Blend 500g",
+  "outputQty": 10,
+  "version": 1,
+  "lines": [
+   {
+    "productId": "p-raw",
+    "name": "Raw Tea Leaf 1kg",
+    "qty": 8
+   },
+   {
+    "productId": "p-sugar",
+    "name": "Sugar 1kg",
+    "qty": 2
+   },
+   {
+    "productId": "p-pack",
+    "name": "Packing Box",
+    "qty": 10
+   }
+  ],
+  "labourCost": 300,
+  "overheadCost": 100,
+  "active": true,
+  "note": "",
+  "ts": "2026-01-02T00:00:00.000Z"
+ },
+ "customer": {
+  "id": "cust-1",
+  "name": "Ahmed Traders",
+  "phone": "03001234567"
+ },
+ "scenarios": [
+  {
+   "id": "transfer-loss-goods",
+   "title": "Close-short of a goods line posts Dr inventory_loss / Cr inventory",
+   "docs": {
+    "transfer": {
+     "id": "tr-1",
+     "number": "TR-1",
+     "fromWarehouseId": "wh-main",
+     "toWarehouseId": "wh-godown",
+     "lines": [
+      {
+       "productId": "p-sugar",
+       "name": "Sugar 1kg",
+       "qtySent": 10,
+       "qtyReceived": 9
+      }
+     ],
+     "note": "",
+     "status": "partially_received",
+     "dayOffset": 0,
+     "ts": "2026-10-23T08:00:00.000Z"
+    },
+    "shortages": [
+     {
+      "productId": "p-sugar",
+      "name": "Sugar 1kg",
+      "qty": 1
+     }
+    ],
+    "lossValue": 130,
+    "inTransitBefore": {
+     "p-sugar": 1
+    }
+   },
+   "entries": [
+    {
+     "memo": "Transfer loss — TR-1 (1 unit short on receipt)",
+     "refType": "transfer_loss",
+     "refId": "tr-1",
+     "reversesId": null,
+     "lines": [
+      {
+       "account": "inventory_loss",
+       "debit": 130,
+       "credit": 0,
+       "ref": null
+      },
+      {
+       "account": "inventory",
+       "debit": 0,
+       "credit": 130,
+       "ref": null
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "transfer-loss-raw",
+   "title": "Close-short of a raw line credits inventory_raw",
+   "docs": {
+    "transfer": {
+     "id": "tr-2",
+     "number": "TR-2",
+     "fromWarehouseId": "wh-main",
+     "toWarehouseId": "wh-godown",
+     "lines": [
+      {
+       "productId": "p-raw",
+       "name": "Raw Tea Leaf 1kg",
+       "qtySent": 4,
+       "qtyReceived": 3
+      }
+     ],
+     "note": "",
+     "status": "partially_received",
+     "dayOffset": 0,
+     "ts": "2026-10-23T08:30:00.000Z"
+    },
+    "shortages": [
+     {
+      "productId": "p-raw",
+      "name": "Raw Tea Leaf 1kg",
+      "qty": 1
+     }
+    ],
+    "lossValue": 500
+   },
+   "entries": [
+    {
+     "memo": "Transfer loss — TR-2 (1 unit short on receipt)",
+     "refType": "transfer_loss",
+     "refId": "tr-2",
+     "reversesId": null,
+     "lines": [
+      {
+       "account": "inventory_loss",
+       "debit": 500,
+       "credit": 0,
+       "ref": null
+      },
+      {
+       "account": "inventory_raw",
+       "debit": 0,
+       "credit": 500,
+       "ref": null
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "production-cycle-paid",
+   "title": "Issue (paid) → partial completion → scrap → final completion absorbs the pool to exactly zero",
+   "docs": {
+    "steps": [
+     {
+      "kind": "issue",
+      "entry": {
+       "memo": "Production issue — PR-1 · House Tea Blend 500g",
+       "refType": "production_issue",
+       "refId": "pr-1",
+       "reversesId": null,
+       "lines": [
+        {
+         "account": "wip",
+         "debit": 9720,
+         "credit": 0,
+         "ref": "pr-1"
+        },
+        {
+         "account": "inventory_raw",
+         "debit": 0,
+         "credit": 8000,
+         "ref": "p-raw"
+        },
+        {
+         "account": "inventory",
+         "debit": 0,
+         "credit": 520,
+         "ref": "p-sugar"
+        },
+        {
+         "account": "inventory",
+         "debit": 0,
+         "credit": 400,
+         "ref": "p-pack"
+        },
+        {
+         "account": "cash",
+         "debit": 0,
+         "credit": 800,
+         "ref": "acct-till"
+        }
+       ]
+      },
+      "event": {
+       "kind": "issue",
+       "qty": 0,
+       "lines": [
+        {
+         "productId": "p-raw",
+         "name": "Raw Tea Leaf 1kg",
+         "qty": 16,
+         "unitCost": 500,
+         "value": 8000
+        },
+        {
+         "productId": "p-sugar",
+         "name": "Sugar 1kg",
+         "qty": 4,
+         "unitCost": 130,
+         "value": 520
+        },
+        {
+         "productId": "p-pack",
+         "name": "Packing Box",
+         "qty": 20,
+         "unitCost": 20,
+         "value": 400
+        }
+       ],
+       "labourCost": 600,
+       "overheadCost": 200,
+       "paidFromAccountId": "acct-till",
+       "value": 9720,
+       "entryId": "e0"
+      },
+      "poolAfter": 9720,
+      "producedAfter": 0,
+      "statusAfter": "open"
+     },
+     {
+      "kind": "completion",
+      "entry": {
+       "memo": "Production completion — PR-1 · House Tea Blend 500g (12 units)",
+       "refType": "production_complete",
+       "refId": "pr-1",
+       "reversesId": null,
+       "lines": [
+        {
+         "account": "inventory",
+         "debit": 5832,
+         "credit": 0,
+         "ref": "pr-1"
+        },
+        {
+         "account": "wip",
+         "debit": 0,
+         "credit": 5832,
+         "ref": "pr-1"
+        }
+       ]
+      },
+      "event": {
+       "kind": "completion",
+       "qty": 12,
+       "lines": null,
+       "labourCost": null,
+       "overheadCost": null,
+       "paidFromAccountId": null,
+       "value": 5832,
+       "entryId": "e1"
+      },
+      "value": 5832,
+      "unitCost": 486,
+      "poolAfter": 3888,
+      "producedAfter": 12,
+      "statusAfter": "open"
+     },
+     {
+      "kind": "scrap",
+      "entry": {
+       "memo": "Production scrap — PR-1 · House Tea Blend 500g (2 units)",
+       "refType": "production_scrap",
+       "refId": "pr-1",
+       "reversesId": null,
+       "lines": [
+        {
+         "account": "inventory_loss",
+         "debit": 972,
+         "credit": 0,
+         "ref": null
+        },
+        {
+         "account": "wip",
+         "debit": 0,
+         "credit": 972,
+         "ref": "pr-1"
+        }
+       ]
+      },
+      "event": {
+       "kind": "scrap",
+       "qty": 2,
+       "lines": null,
+       "labourCost": null,
+       "overheadCost": null,
+       "paidFromAccountId": null,
+       "value": 972,
+       "entryId": "e2"
+      },
+      "value": 972,
+      "poolAfter": 2916,
+      "producedAfter": 12,
+      "statusAfter": "open"
+     },
+     {
+      "kind": "completion",
+      "entry": {
+       "memo": "Production completion — PR-1 · House Tea Blend 500g (8 units)",
+       "refType": "production_complete",
+       "refId": "pr-1",
+       "reversesId": null,
+       "lines": [
+        {
+         "account": "inventory",
+         "debit": 2916,
+         "credit": 0,
+         "ref": "pr-1"
+        },
+        {
+         "account": "wip",
+         "debit": 0,
+         "credit": 2916,
+         "ref": "pr-1"
+        }
+       ]
+      },
+      "event": {
+       "kind": "completion",
+       "qty": 8,
+       "lines": null,
+       "labourCost": null,
+       "overheadCost": null,
+       "paidFromAccountId": null,
+       "value": 2916,
+       "entryId": "e3"
+      },
+      "value": 2916,
+      "unitCost": 364.5,
+      "poolAfter": 0,
+      "producedAfter": 20,
+      "statusAfter": "completed"
+     }
+    ],
+    "finalOrder": {
+     "id": "pr-1",
+     "number": "PR-1",
+     "bomId": "bom-1",
+     "bomVersion": 1,
+     "bomSnapshot": {
+      "outputQty": 10,
+      "lines": [
+       {
+        "productId": "p-raw",
+        "name": "Raw Tea Leaf 1kg",
+        "qty": 8
+       },
+       {
+        "productId": "p-sugar",
+        "name": "Sugar 1kg",
+        "qty": 2
+       },
+       {
+        "productId": "p-pack",
+        "name": "Packing Box",
+        "qty": 10
+       }
+      ],
+      "labourCost": 300,
+      "overheadCost": 100
+     },
+     "outputProductId": "p-blend",
+     "outputName": "House Tea Blend 500g",
+     "warehouseId": "wh-main",
+     "plannedQty": 20,
+     "events": [
+      {
+       "kind": "issue",
+       "qty": 0,
+       "lines": [
+        {
+         "productId": "p-raw",
+         "name": "Raw Tea Leaf 1kg",
+         "qty": 16,
+         "unitCost": 500,
+         "value": 8000
+        },
+        {
+         "productId": "p-sugar",
+         "name": "Sugar 1kg",
+         "qty": 4,
+         "unitCost": 130,
+         "value": 520
+        },
+        {
+         "productId": "p-pack",
+         "name": "Packing Box",
+         "qty": 20,
+         "unitCost": 20,
+         "value": 400
+        }
+       ],
+       "labourCost": 600,
+       "overheadCost": 200,
+       "paidFromAccountId": "acct-till",
+       "value": 9720,
+       "entryId": "e0"
+      },
+      {
+       "kind": "completion",
+       "qty": 12,
+       "lines": null,
+       "labourCost": null,
+       "overheadCost": null,
+       "paidFromAccountId": null,
+       "value": 5832,
+       "entryId": "e1"
+      },
+      {
+       "kind": "scrap",
+       "qty": 2,
+       "lines": null,
+       "labourCost": null,
+       "overheadCost": null,
+       "paidFromAccountId": null,
+       "value": 972,
+       "entryId": "e2"
+      },
+      {
+       "kind": "completion",
+       "qty": 8,
+       "lines": null,
+       "labourCost": null,
+       "overheadCost": null,
+       "paidFromAccountId": null,
+       "value": 2916,
+       "entryId": "e3"
+      }
+     ],
+     "note": "",
+     "status": "completed",
+     "dayOffset": 0,
+     "ts": "2026-10-23T09:00:00.000Z"
+    }
+   },
+   "entries": [
+    {
+     "memo": "Production issue — PR-1 · House Tea Blend 500g",
+     "refType": "production_issue",
+     "refId": "pr-1",
+     "reversesId": null,
+     "lines": [
+      {
+       "account": "wip",
+       "debit": 9720,
+       "credit": 0,
+       "ref": "pr-1"
+      },
+      {
+       "account": "inventory_raw",
+       "debit": 0,
+       "credit": 8000,
+       "ref": "p-raw"
+      },
+      {
+       "account": "inventory",
+       "debit": 0,
+       "credit": 520,
+       "ref": "p-sugar"
+      },
+      {
+       "account": "inventory",
+       "debit": 0,
+       "credit": 400,
+       "ref": "p-pack"
+      },
+      {
+       "account": "cash",
+       "debit": 0,
+       "credit": 800,
+       "ref": "acct-till"
+      }
+     ]
+    },
+    {
+     "memo": "Production completion — PR-1 · House Tea Blend 500g (12 units)",
+     "refType": "production_complete",
+     "refId": "pr-1",
+     "reversesId": null,
+     "lines": [
+      {
+       "account": "inventory",
+       "debit": 5832,
+       "credit": 0,
+       "ref": "pr-1"
+      },
+      {
+       "account": "wip",
+       "debit": 0,
+       "credit": 5832,
+       "ref": "pr-1"
+      }
+     ]
+    },
+    {
+     "memo": "Production scrap — PR-1 · House Tea Blend 500g (2 units)",
+     "refType": "production_scrap",
+     "refId": "pr-1",
+     "reversesId": null,
+     "lines": [
+      {
+       "account": "inventory_loss",
+       "debit": 972,
+       "credit": 0,
+       "ref": null
+      },
+      {
+       "account": "wip",
+       "debit": 0,
+       "credit": 972,
+       "ref": "pr-1"
+      }
+     ]
+    },
+    {
+     "memo": "Production completion — PR-1 · House Tea Blend 500g (8 units)",
+     "refType": "production_complete",
+     "refId": "pr-1",
+     "reversesId": null,
+     "lines": [
+      {
+       "account": "inventory",
+       "debit": 2916,
+       "credit": 0,
+       "ref": "pr-1"
+      },
+      {
+       "account": "wip",
+       "debit": 0,
+       "credit": 2916,
+       "ref": "pr-1"
+      }
+     ]
+    }
+   ],
+   "wipIdentity": {
+    "glWip": null,
+    "sumPools": 0
+   }
+  },
+  {
+   "id": "production-accrue-overproduce",
+   "title": "Issue accrued to salary_payable; producing past the plan is a final completion spreading the whole pool",
+   "docs": {
+    "steps": [
+     {
+      "kind": "issue",
+      "entry": {
+       "memo": "Production issue — PR-2 · House Tea Blend 500g",
+       "refType": "production_issue",
+       "refId": "pr-2",
+       "reversesId": null,
+       "lines": [
+        {
+         "account": "wip",
+         "debit": 4860,
+         "credit": 0,
+         "ref": "pr-2"
+        },
+        {
+         "account": "inventory_raw",
+         "debit": 0,
+         "credit": 4000,
+         "ref": "p-raw"
+        },
+        {
+         "account": "inventory",
+         "debit": 0,
+         "credit": 260,
+         "ref": "p-sugar"
+        },
+        {
+         "account": "inventory",
+         "debit": 0,
+         "credit": 200,
+         "ref": "p-pack"
+        },
+        {
+         "account": "salary_payable",
+         "debit": 0,
+         "credit": 400,
+         "ref": null
+        }
+       ]
+      },
+      "event": {
+       "kind": "issue",
+       "qty": 0,
+       "lines": [
+        {
+         "productId": "p-raw",
+         "name": "Raw Tea Leaf 1kg",
+         "qty": 8,
+         "unitCost": 500,
+         "value": 4000
+        },
+        {
+         "productId": "p-sugar",
+         "name": "Sugar 1kg",
+         "qty": 2,
+         "unitCost": 130,
+         "value": 260
+        },
+        {
+         "productId": "p-pack",
+         "name": "Packing Box",
+         "qty": 10,
+         "unitCost": 20,
+         "value": 200
+        }
+       ],
+       "labourCost": 300,
+       "overheadCost": 100,
+       "paidFromAccountId": "accrue",
+       "value": 4860,
+       "entryId": "e0"
+      },
+      "poolAfter": 4860,
+      "producedAfter": 0,
+      "statusAfter": "open"
+     },
+     {
+      "kind": "completion",
+      "entry": {
+       "memo": "Production completion — PR-2 · House Tea Blend 500g (12 units)",
+       "refType": "production_complete",
+       "refId": "pr-2",
+       "reversesId": null,
+       "lines": [
+        {
+         "account": "inventory",
+         "debit": 4860,
+         "credit": 0,
+         "ref": "pr-2"
+        },
+        {
+         "account": "wip",
+         "debit": 0,
+         "credit": 4860,
+         "ref": "pr-2"
+        }
+       ]
+      },
+      "event": {
+       "kind": "completion",
+       "qty": 12,
+       "lines": null,
+       "labourCost": null,
+       "overheadCost": null,
+       "paidFromAccountId": null,
+       "value": 4860,
+       "entryId": "e1"
+      },
+      "value": 4860,
+      "unitCost": 405,
+      "poolAfter": 0,
+      "producedAfter": 12,
+      "statusAfter": "completed"
+     }
+    ],
+    "finalPool": 0,
+    "finalProduced": 12,
+    "finalStatus": "completed"
+   },
+   "entries": [
+    {
+     "memo": "Production issue — PR-2 · House Tea Blend 500g",
+     "refType": "production_issue",
+     "refId": "pr-2",
+     "reversesId": null,
+     "lines": [
+      {
+       "account": "wip",
+       "debit": 4860,
+       "credit": 0,
+       "ref": "pr-2"
+      },
+      {
+       "account": "inventory_raw",
+       "debit": 0,
+       "credit": 4000,
+       "ref": "p-raw"
+      },
+      {
+       "account": "inventory",
+       "debit": 0,
+       "credit": 260,
+       "ref": "p-sugar"
+      },
+      {
+       "account": "inventory",
+       "debit": 0,
+       "credit": 200,
+       "ref": "p-pack"
+      },
+      {
+       "account": "salary_payable",
+       "debit": 0,
+       "credit": 400,
+       "ref": null
+      }
+     ]
+    },
+    {
+     "memo": "Production completion — PR-2 · House Tea Blend 500g (12 units)",
+     "refType": "production_complete",
+     "refId": "pr-2",
+     "reversesId": null,
+     "lines": [
+      {
+       "account": "inventory",
+       "debit": 4860,
+       "credit": 0,
+       "ref": "pr-2"
+      },
+      {
+       "account": "wip",
+       "debit": 0,
+       "credit": 4860,
+       "ref": "pr-2"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "production-closeout",
+   "title": "A half-produced order closes: the residual WIP pool posts to inventory_loss exactly",
+   "docs": {
+    "steps": [
+     {
+      "kind": "issue",
+      "entry": {
+       "memo": "Production issue — PR-3 · House Tea Blend 500g",
+       "refType": "production_issue",
+       "refId": "pr-3",
+       "reversesId": null,
+       "lines": [
+        {
+         "account": "wip",
+         "debit": 4860,
+         "credit": 0,
+         "ref": "pr-3"
+        },
+        {
+         "account": "inventory_raw",
+         "debit": 0,
+         "credit": 4000,
+         "ref": "p-raw"
+        },
+        {
+         "account": "inventory",
+         "debit": 0,
+         "credit": 260,
+         "ref": "p-sugar"
+        },
+        {
+         "account": "inventory",
+         "debit": 0,
+         "credit": 200,
+         "ref": "p-pack"
+        },
+        {
+         "account": "wallet",
+         "debit": 0,
+         "credit": 400,
+         "ref": "acct-jazz"
+        }
+       ]
+      },
+      "event": {
+       "kind": "issue",
+       "qty": 0,
+       "lines": [
+        {
+         "productId": "p-raw",
+         "name": "Raw Tea Leaf 1kg",
+         "qty": 8,
+         "unitCost": 500,
+         "value": 4000
+        },
+        {
+         "productId": "p-sugar",
+         "name": "Sugar 1kg",
+         "qty": 2,
+         "unitCost": 130,
+         "value": 260
+        },
+        {
+         "productId": "p-pack",
+         "name": "Packing Box",
+         "qty": 10,
+         "unitCost": 20,
+         "value": 200
+        }
+       ],
+       "labourCost": 300,
+       "overheadCost": 100,
+       "paidFromAccountId": "acct-jazz",
+       "value": 4860,
+       "entryId": "e0"
+      },
+      "poolAfter": 4860,
+      "producedAfter": 0,
+      "statusAfter": "open"
+     },
+     {
+      "kind": "completion",
+      "entry": {
+       "memo": "Production completion — PR-3 · House Tea Blend 500g (4 units)",
+       "refType": "production_complete",
+       "refId": "pr-3",
+       "reversesId": null,
+       "lines": [
+        {
+         "account": "inventory",
+         "debit": 1944,
+         "credit": 0,
+         "ref": "pr-3"
+        },
+        {
+         "account": "wip",
+         "debit": 0,
+         "credit": 1944,
+         "ref": "pr-3"
+        }
+       ]
+      },
+      "event": {
+       "kind": "completion",
+       "qty": 4,
+       "lines": null,
+       "labourCost": null,
+       "overheadCost": null,
+       "paidFromAccountId": null,
+       "value": 1944,
+       "entryId": "e1"
+      },
+      "value": 1944,
+      "unitCost": 486,
+      "poolAfter": 2916,
+      "producedAfter": 4,
+      "statusAfter": "open"
+     },
+     {
+      "kind": "closeout",
+      "entry": {
+       "memo": "Production close-out — PR-3 · House Tea Blend 500g (residual WIP written off)",
+       "refType": "production_scrap",
+       "refId": "pr-3",
+       "reversesId": null,
+       "lines": [
+        {
+         "account": "inventory_loss",
+         "debit": 2916,
+         "credit": 0,
+         "ref": null
+        },
+        {
+         "account": "wip",
+         "debit": 0,
+         "credit": 2916,
+         "ref": "pr-3"
+        }
+       ]
+      },
+      "event": {
+       "kind": "closeout",
+       "qty": 0,
+       "lines": null,
+       "labourCost": null,
+       "overheadCost": null,
+       "paidFromAccountId": null,
+       "value": 2916,
+       "entryId": "e2"
+      },
+      "value": 2916,
+      "poolAfter": 0,
+      "producedAfter": 4,
+      "statusAfter": "completed"
+     }
+    ],
+    "finalPool": 0,
+    "finalStatus": "completed"
+   },
+   "entries": [
+    {
+     "memo": "Production issue — PR-3 · House Tea Blend 500g",
+     "refType": "production_issue",
+     "refId": "pr-3",
+     "reversesId": null,
+     "lines": [
+      {
+       "account": "wip",
+       "debit": 4860,
+       "credit": 0,
+       "ref": "pr-3"
+      },
+      {
+       "account": "inventory_raw",
+       "debit": 0,
+       "credit": 4000,
+       "ref": "p-raw"
+      },
+      {
+       "account": "inventory",
+       "debit": 0,
+       "credit": 260,
+       "ref": "p-sugar"
+      },
+      {
+       "account": "inventory",
+       "debit": 0,
+       "credit": 200,
+       "ref": "p-pack"
+      },
+      {
+       "account": "wallet",
+       "debit": 0,
+       "credit": 400,
+       "ref": "acct-jazz"
+      }
+     ]
+    },
+    {
+     "memo": "Production completion — PR-3 · House Tea Blend 500g (4 units)",
+     "refType": "production_complete",
+     "refId": "pr-3",
+     "reversesId": null,
+     "lines": [
+      {
+       "account": "inventory",
+       "debit": 1944,
+       "credit": 0,
+       "ref": "pr-3"
+      },
+      {
+       "account": "wip",
+       "debit": 0,
+       "credit": 1944,
+       "ref": "pr-3"
+      }
+     ]
+    },
+    {
+     "memo": "Production close-out — PR-3 · House Tea Blend 500g (residual WIP written off)",
+     "refType": "production_scrap",
+     "refId": "pr-3",
+     "reversesId": null,
+     "lines": [
+      {
+       "account": "inventory_loss",
+       "debit": 2916,
+       "credit": 0,
+       "ref": null
+      },
+      {
+       "account": "wip",
+       "debit": 0,
+       "credit": 2916,
+       "ref": "pr-3"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "job-materials-cycle",
+   "title": "Job material issue (two class legs) + partial return mirror; profit derived per §5.5",
+   "docs": {
+    "job": {
+     "id": "job-1",
+     "number": "JB-1",
+     "customerId": "cust-1",
+     "customerName": "Ahmed Traders",
+     "customerPhone": "03001234567",
+     "title": "Wedding cards × 500",
+     "description": "",
+     "stage": "In Progress",
+     "status": "in_progress",
+     "dueDateISO": null,
+     "warehouseId": "wh-main",
+     "materialEvents": [
+      {
+       "kind": "issue",
+       "productId": "p-sugar",
+       "name": "Sugar 1kg",
+       "qty": 5,
+       "unitCost": 130,
+       "value": 650,
+       "entryId": "e0"
+      },
+      {
+       "kind": "issue",
+       "productId": "p-pack",
+       "name": "Packing Box",
+       "qty": 10,
+       "unitCost": 20,
+       "value": 200,
+       "entryId": "e0"
+      },
+      {
+       "kind": "issue",
+       "productId": "p-raw",
+       "name": "Raw Tea Leaf 1kg",
+       "qty": 1,
+       "unitCost": 500,
+       "value": 500,
+       "entryId": "e0"
+      },
+      {
+       "kind": "return",
+       "productId": "p-sugar",
+       "name": "Sugar 1kg",
+       "qty": 2,
+       "unitCost": 130,
+       "value": 260,
+       "entryId": "e1"
+      }
+     ],
+     "labourCost": 1000,
+     "note": "",
+     "dayOffset": 0,
+     "ts": "2026-10-23T09:30:00.000Z"
+    },
+    "issueValue": 1350,
+    "returnValue": 260,
+    "materialsCost": 1090,
+    "netQty": {
+     "p-sugar": 3,
+     "p-pack": 10,
+     "p-raw": 1
+    },
+    "advanceTotal": 2000,
+    "credits": [
+     {
+      "id": "cr-adv-1",
+      "customerId": "cust-1",
+      "kind": "repayment",
+      "amount": 2000,
+      "note": "Advance — Job JB-1"
+     },
+     {
+      "id": "cr-adv-2",
+      "customerId": "cust-1",
+      "kind": "repayment",
+      "amount": 500,
+      "note": "Advance — Job JB-9"
+     },
+     {
+      "id": "cr-cr-1",
+      "customerId": "cust-1",
+      "kind": "credit",
+      "amount": 700,
+      "note": "Advance — Job JB-1"
+     }
+    ],
+    "citingBill": {
+     "id": "bill-job-1",
+     "billNo": 41,
+     "sourceType": "job",
+     "sourceId": "job-1",
+     "status": "paid",
+     "total": 5000,
+     "ts": "2026-10-23T11:00:00.000Z",
+     "items": [
+      {
+       "productId": "p-blend",
+       "name": "House Tea Blend 500g",
+       "qty": 10,
+       "unitPrice": 500,
+       "unitCost": 405,
+       "total": 5000
+      }
+     ]
+    },
+    "profit": {
+     "revenue": 5000,
+     "materials": 1090,
+     "billCogs": 4050,
+     "labour": 1000,
+     "profit": -1140
+    }
+   },
+   "entries": [
+    {
+     "memo": "Job materials — JB-1 · Wedding cards × 500",
+     "refType": "job_material",
+     "refId": "job-1",
+     "reversesId": null,
+     "lines": [
+      {
+       "account": "cogs",
+       "debit": 1350,
+       "credit": 0,
+       "ref": "job-1"
+      },
+      {
+       "account": "inventory",
+       "debit": 0,
+       "credit": 650,
+       "ref": "p-sugar"
+      },
+      {
+       "account": "inventory",
+       "debit": 0,
+       "credit": 200,
+       "ref": "p-pack"
+      },
+      {
+       "account": "inventory_raw",
+       "debit": 0,
+       "credit": 500,
+       "ref": "p-raw"
+      }
+     ]
+    },
+    {
+     "memo": "Job materials returned — JB-1 · Wedding cards × 500",
+     "refType": "job_material_return",
+     "refId": "job-1",
+     "reversesId": null,
+     "lines": [
+      {
+       "account": "inventory",
+       "debit": 260,
+       "credit": 0,
+       "ref": "p-sugar"
+      },
+      {
+       "account": "cogs",
+       "debit": 0,
+       "credit": 260,
+       "ref": "job-1"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "class-reclass",
+   "title": "Class change with stock on hand moves the shelf value between class accounts in one entry",
+   "docs": {
+    "nullCases": [
+     true,
+     true
+    ]
+   },
+   "entries": [
+    {
+     "memo": "Stock class reclass — Cooking Oil 5L (goods → raw material)",
+     "refType": "reclass",
+     "refId": "p-oil",
+     "reversesId": null,
+     "lines": [
+      {
+       "account": "inventory_raw",
+       "debit": 20000,
+       "credit": 0,
+       "ref": null
+      },
+      {
+       "account": "inventory",
+       "debit": 0,
+       "credit": 20000,
+       "ref": null
+      }
+     ]
+    },
+    {
+     "memo": "Stock class reclass — Raw Tea Leaf 1kg (raw material → goods)",
+     "refType": "reclass",
+     "refId": "p-raw",
+     "reversesId": null,
+     "lines": [
+      {
+       "account": "inventory",
+       "debit": 20000,
+       "credit": 0,
+       "ref": null
+      },
+      {
+       "account": "inventory_raw",
+       "debit": 0,
+       "credit": 20000,
+       "ref": null
+      }
+     ]
+    }
+   ]
+  }
+ ],
+ "ops": {
+  "stock": {
+   "noRows": {
+    "atDefault": 50,
+    "atGodown": 0
+   },
+   "withRows": {
+    "atDefault": 0,
+    "atGodown": 5
+   },
+   "v1Rows": [
+    {
+     "id": "wh-main__p-tea",
+     "productId": "p-tea",
+     "warehouseId": "wh-main",
+     "qty": 50
+    }
+   ],
+   "availMain": {
+    "onHand": 45,
+    "promised": 3,
+    "available": 42
+   },
+   "availGodown": {
+    "onHand": 5,
+    "promised": 6,
+    "available": -1
+   }
+  },
+  "transit": {
+   "byProduct": {
+    "p-tea": 5
+   },
+   "total": 5,
+   "between": 5,
+   "incomingGodown": {
+    "p-tea": 5
+   }
+  },
+  "drift": [
+   {
+    "productId": "p-tea",
+    "rowsTotal": 47,
+    "inTransit": 5,
+    "stockQty": 50,
+    "drift": 2
+   }
+  ],
+  "recounted": {
+   "repaired": 1,
+   "levels": [
+    {
+     "id": "wh-main__p-tea",
+     "productId": "p-tea",
+     "warehouseId": "wh-main",
+     "qty": 40
+    },
+    {
+     "id": "wh-godown__p-tea",
+     "productId": "p-tea",
+     "warehouseId": "wh-godown",
+     "qty": 5
+    }
+   ]
+  },
+  "composed": [
+   {
+    "productId": "p-sugar",
+    "name": "Sugar 1kg",
+    "qtySent": 5,
+    "qtyReceived": 0
+   },
+   {
+    "productId": "p-tea",
+    "name": "Tapal Danedar Tea 475g",
+    "qtySent": 1,
+    "qtyReceived": 0
+   }
+  ],
+  "overReceiptNull": true,
+  "okReceipt": [
+   {
+    "productId": "p-tea",
+    "qty": 5
+   }
+  ],
+  "statusCases": {
+   "none": "dispatched",
+   "partial": "partially_received",
+   "full": "received"
+  },
+  "bom": {
+   "forOutput": [
+    1,
+    2
+   ],
+   "activeVersion": 1,
+   "nextVersion": 3,
+   "batchMaterialCost": 4460,
+   "unitCost": 486,
+   "problems": {
+    "outputRaw": "output_raw",
+    "selfComponent": "self_component",
+    "emptyLines": "empty_lines",
+    "badQty": "bad_qty",
+    "ok": null
+   }
+  },
+  "prodDefaults": {
+   "issueLines5": [
+    {
+     "productId": "p-raw",
+     "qty": 4
+    },
+    {
+     "productId": "p-sugar",
+     "qty": 1
+    },
+    {
+     "productId": "p-pack",
+     "qty": 5
+    }
+   ],
+   "conversion5": {
+    "labourCost": 150,
+    "overheadCost": 50
+   }
+  },
+  "jobStages": {
+   "effective": [
+    "Intake",
+    "Press",
+    "Done"
+   ],
+   "firstIs": "open",
+   "lastIs": "ready",
+   "midIs": "in_progress",
+   "deliveredSticky": "delivered",
+   "renamedWithEvents": "in_progress",
+   "defaults": [
+    "Received",
+    "In Progress",
+    "Ready",
+    "Delivered"
+   ],
+   "advanceNote": "Advance — Job JB-7"
+  }
+ }
+}

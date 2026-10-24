@@ -50,6 +50,177 @@ rules_version = '2';
 // closed-period documents are today-dated reversing entries, never
 // backdated rewrites, so the operational row must stay editable.
 
+// ---- Phase G · G1: rules v9 header note (START) ----
+// v9 — ERP Phase G · G1 (tenancy foundation; PART 1 of rules v9).
+//
+// v9 vs v8: the platform collections (businesses, businessMembers,
+// businessInvites, userMemberships, businessCounters,
+// platformAdmins, businessEvents) are ADDED as one delimited
+// block before the catch-all; a delimited block of G1 helper
+// functions is added after the A5 helpers; and amendment #1
+// (design §6.2, delimited where it sits) gives access resolution
+// a MEMBERSHIP leg ahead of the legacy staffIndex leg, which is
+// retained verbatim as the fallback. Nothing else in the v8 text
+// changes: the G1 harness suite strips every G1 span and
+// re-hashes the remainder to the v8 file byte-for-byte. There is
+// NO plan gating in part 1 — the plan snapshot on a businesses
+// doc is descriptive only; amendment #2 (the plan-postable
+// posting legs + the `enforce` switch) lands with G2.
+// Publishing order (the standing discipline): v9 rules FIRST,
+// then the G1 clients. Pre-G clients keep working against v9:
+// the membership leg is an OR, staffIndex resolution is
+// untouched, and a business with no registry doc is treated
+// exactly as v8 treated it.
+// ---- Phase G · G1: rules v9 header note (END) ----
+// ---- Phase G · G2: rules v9 part 2 header note (START) ----
+// v9 part 2 — ERP Phase G · G2 (plans, counters, enforcement).
+//
+// Part 2 vs part 1: amendment #2 (design §6.2) lands. A delimited
+// block of G2 helpers follows the G1 helpers (the derived plan
+// state, the plan-postable gate, the tier gates, the §4.2 counter
+// pairing); the create legs that already carry the A5 backstop
+// each gain the plan-postable condition inside their own
+// delimited span; the bills create/update legs gain the invoice
+// counter pairing; the tier-checked operational creates (boms,
+// productionOrders, jobs, employees) are split out of their
+// combined legs; and three blocks inside the G1 platform span
+// are amended in place — businessCounters takes its batch-paired
+// arithmetic update leg, businessInvites/businessMembers take
+// the seat pairing + the claim-leg user cap, and the §4.3 trial
+// window (± a day around +14d) completes inside businessBirthOk.
+// The harness strips every G2 span and re-hashes: minus G2 spans
+// the file is part 1 byte-for-byte; minus G1 spans too it is v8.
+// Enforcement is STAGED (§6.3): every plan leg observes and
+// passes while the business's `enforce` is false, and no
+// business is born or migrated with it true — the flip is a
+// platform act (G3), per business, after its counters have been
+// watched tracking its postings. Reads are never plan-gated
+// (§3.7's data rights): no `allow read` line in this file names
+// a plan function, and none ever may.
+// ---- Phase G · G2: rules v9 part 2 header note (END) ----
+// ---- Phase H · H3: rules v10 header note (START) ----
+// v10 — ERP Phase H · H3 (the online storefront; design §2/§5.2).
+//
+// v10 vs v9: PURE ADDITIONS plus ONE named amendment, all in
+// delimited H3 spans — the harness strips every H3 span and
+// re-hashes the remainder to the v9 FINAL file byte-for-byte.
+//   * A delimited block of H3 helpers follows the G2 helpers:
+//     the storefront public-read derivation (§2.6) and the
+//     store-order create validation (§2.4).
+//   * Two new top-level blocks after the G3 platform span:
+//     `storefronts` (the published snapshot — owner write,
+//     member read, and the product's ONE deliberate public read,
+//     gated by the §2.6 derivation) and `storeOrders` (the
+//     create-only public order inbox — member read, and the
+//     state leg that makes conversion exactly-once).
+//   * NAMED AMENDMENT (§5.2 amendment 1): the journal tier
+//     gate's Standard list gains `loyalty_expire` — H1's earn
+//     family completes its rules side here, exactly where
+//     lib/plans' REFTYPE_MIN_TIER already points. (Amendment 2
+//     needs no text: the A5 backstop's journal leg is refType-
+//     blind by construction — every journal create, loyalty's
+//     included, already passes journalCreateInOpenPeriod.)
+// Publishing order (the standing discipline): v10 rules FIRST,
+// then the H3 clients. Pre-H clients keep working against v10:
+// every H3 leg is additive or an OR, and no existing leg moved.
+// ---- Phase H · H3: rules v10 header note (END) ----
+// ---- Phase H · WhatsApp: rules v10 header note (START) ----
+// v10 amendment — ERP Phase H · WhatsApp (design §3/§5.2).
+//
+// v10-as-amended vs the H3-final v10: PURE ADDITIONS in two
+// delimited WhatsApp spans — this note, and one block inside
+// users/{uid} after the journal match carrying the module's
+// three tenant collections (waTemplates, waCampaigns, waSends).
+// The harness strips both WhatsApp spans and re-hashes the
+// remainder to the H3-final v10 file byte-for-byte, and strips
+// the H3 spans too, back to v9 FINAL.
+//   * READS are narrowed to owner/manager/accountant — the
+//     `whatsapp` matrix row, the payroll-narrowing precedent:
+//     campaign data is not counter data, so the cashier is
+//     excluded server-side, not merely UI-hidden.
+//   * WRITES are owner/manager. Deletes: templates only — a
+//     campaign and its send log are the shop's marketing
+//     record, and history is not deleted (delete: false).
+//   * NO period leg and NO plan leg: these docs assert no
+//     money fact and move no money (no journal leg exists for
+//     this module, by design); plan gating runs through the
+//     client-side assignment-snapshot gates, the paper-doc
+//     precedent, exactly as the store does for sending.
+// Publishing order (the standing discipline): amended rules
+// FIRST, then the WhatsApp clients. Pre-WhatsApp clients keep
+// working: every leg below is additive and no existing leg
+// moved.
+// ---- Phase H · WhatsApp: rules v10 header note (END) ----
+// ---- Phase H · H6: rules v10 amendment note (START) ----
+// Phase H · H6 (release-audit fix 2): ONE key joins the storefront
+// order's exactly-keyed shape inside storeOrderCreateOk —
+// 'waOptIn', the customer's OWN consent tick on the public checkout
+// form. When present it may only ever be exactly true; an absent
+// key is an unticked box and reads as no consent everywhere, and
+// conversion stamps the WhatsApp consent (source "storefront")
+// from this flag alone — the desk no longer asserts consent on the
+// customer's behalf for storefront orders. Nothing else in v10
+// moves: strip the H6 amendment span (inside the H3 helpers) and
+// the WA spans and every earlier version returns byte-for-byte.
+// ---- Phase H · H6: rules v10 amendment note (END) ----
+// ---- Fix Round 2 · FR2: rules v11 header note (START) ----
+// v11 — Fix Round 2 (demo opt-in, clear-to-trash, multi-business).
+//
+// v11 vs v10: PURE ADDITIONS plus FIVE named one-line amendments,
+// all in delimited FR2 spans — the harness strips every FR2 span
+// and re-hashes the remainder to the v10 FINAL file byte-for-byte.
+//   * NEW HELPERS: isRegistryOwner (businesses/{bid}.ownerUid ==
+//     caller — the generated-business owner leg) and
+//     isBusinessOwner (the uid match OR the registry leg), plus
+//     isClearWindow (the owner doc's `clearing` flag — the
+//     deliberate, trash-backed window in which the append-only
+//     collections may be deleted, and ONLY then).
+//   * MULTI-BUSINESS: businessBirthOk's owner condition widens
+//     from ownerUid == businessId to ownerUid == caller AND
+//     (ownerUid == businessId OR planId == 'trial') — a generated
+//     business is born on the Free Trial rules only; the founding
+//     comp plan stays pinned to the §7.2 migration shape
+//     (businessId == ownerUid). canAccess/staffRole gain the
+//     registry-owner leg, so every tenant leg that reads them
+//     resolves a generated business's owner as "owner" without
+//     any leg moving. businesses/members/invites/counters/stats/
+//     events gain isRegistryOwner mirror legs; the businesses
+//     create leg widens to isSignedIn + businessBirthOk (the
+//     birth validation itself pins ownerUid == caller).
+//     Creation is two-phase by necessity: rules get() reads
+//     committed state, so phase 1 creates the registry alone
+//     and phase 2 (counters, skeleton, index) runs once the
+//     registry is committed and the registry leg holds.
+//   * CLEAR WINDOW: the append-only deletes (sales, journal,
+//     waCampaigns, waSends, posted bills) gain a parallel
+//     isClearWindow delete leg — default-deny stands; only an
+//     owner mid-clear (flag set, trash snapshot already written)
+//     may delete them, and the flag clears when the wipe ends.
+//   * TRASH: a new businessTrash block (owner-only read/write/
+//     delete) — the platform console gains NO leg into it.
+//   * STOREFRONT: storefrontWriteOk + the update leg read
+//     isBusinessOwner instead of the uid equality, so a
+//     generated business's owner can publish (a member's store
+//     was never publishable; that does not change).
+// Publishing order (the standing discipline): v11 rules FIRST,
+// then the FR2 clients. Pre-FR2 clients keep working against
+// v11: every leg is additive or an OR, and no existing leg moved.
+// ---- Fix Round 2 · FR2: rules v11 header note (END) ----
+// ---- BizCreateFix · v12 header note (START) ----
+// v12 — Business-creation fix (bizcreatefix).
+//
+// v12 vs v11: ONE named one-line amendment plus this note — the
+// money-accounts block gains an isRegistryOwner create/update leg
+// (mirroring the FR2 owner-doc amendment), so a generated
+// business's owner can write its skeleton accounts once the phase-1
+// registry is committed. Without it, fixing the client-side
+// Timestamp conversion alone would land the birth on setup-failed.
+// No other leg moved; the client-side conversion (AuthProvider's
+// applyPlatformWrites) ships in the same deploy.
+// Publishing order: v12 rules FIRST, then the bizcreatefix client.
+// Pre-bizcreatefix clients keep working against v12: the new leg
+// is additive (an OR alongside the existing isOwner leg).
+// ---- BizCreateFix · v12 header note (END) ----
 service cloud.firestore {
   match /databases/{database}/documents {
 
@@ -75,8 +246,49 @@ service cloud.firestore {
                .get('staffEmails', []);
     }
 
+    // ---- Phase G · G1 amendment #1 (START)
+    // The membership leg (design §6.2 amendment #1 — v9's only
+    // amendment to pre-existing v8 text in part 1). Access
+    // resolution gains a businessMembers leg AHEAD of the legacy
+    // staffIndex leg; isStaffOf above is untouched and remains
+    // the verbatim fallback. The harness strip restores this
+    // whole span to the v8 text and re-hashes to v8 byte-for-byte.
+
+    function memberDocPath(uid) {
+      return /databases/$(database)/documents/businessMembers/$(uid)/members/$(request.auth.uid);
+    }
+
+    function isPlatformAdmin() {
+      return isSignedIn()
+        && exists(/databases/$(database)/documents/platformAdmins/$(request.auth.uid));
+    }
+
+    // Membership (design §1.3): a businessMembers doc for the
+    // caller in shop {uid} AND the caller's email still present
+    // in the owner doc's staffEmails mirror — the same
+    // construction the legacy leg has always used, so a removal
+    // landing on the mirror cuts BOTH legs at once (risk R-G4:
+    // a deletion anywhere in the sanctioned write set cuts
+    // access). The exists() guard covers a shop whose owner doc
+    // is not yet created.
+    function isMemberOf(uid) {
+      return isSignedIn()
+        && request.auth.token.email != null
+        && exists(memberDocPath(uid))
+        && exists(/databases/$(database)/documents/users/$(uid))
+        && request.auth.token.email in
+             get(/databases/$(database)/documents/users/$(uid)).data
+               .get('staffEmails', []);
+    }
+
+    function membershipRole(uid) {
+      return get(memberDocPath(uid)).data.get('role', 'manager');
+    }
+
     function canAccess(uid) {
-      return isOwner(uid) || isStaffOf(uid);
+      // ---- Fix Round 2 · FR2 amendment (canAccess) (START) ----
+      return isBusinessOwner(uid) || isMemberOf(uid) || isStaffOf(uid);
+      // ---- Fix Round 2 · FR2 amendment (canAccess) (END) ----
     }
 
     // v3: the caller's role within shop {uid} — "owner", the role
@@ -84,14 +296,23 @@ service cloud.firestore {
     // access to this shop at all. A staffIndex doc WITHOUT a role
     // field yields "manager" (the legacy default; .get with default
     // also covers an explicit null).
+    // v9 (G1): a membership doc's role resolves BEFORE the legacy
+    // leg, read from the membership doc (same missing-role
+    // default); the owner is never a member of their own business
+    // (§1.3) — ownership is the uid match above.
     function staffRole(uid) {
-      return isOwner(uid)
+      // ---- Fix Round 2 · FR2 amendment (staffRole) (START) ----
+      return isBusinessOwner(uid)
+      // ---- Fix Round 2 · FR2 amendment (staffRole) (END) ----
         ? "owner"
-        : (isStaffOf(uid)
-            ? get(staffIndexPath(request.auth.token.email)).data
-                .get('role', 'manager')
-            : null);
+        : (isMemberOf(uid)
+            ? membershipRole(uid)
+            : (isStaffOf(uid)
+                ? get(staffIndexPath(request.auth.token.email)).data
+                    .get('role', 'manager')
+                : null));
     }
+    // ---- Phase G · G1 amendment #1 (END) ----
 
     function hasRole(uid, roles) {
       return staffRole(uid) in roles;
@@ -130,6 +351,404 @@ service cloud.firestore {
         || request.resource.data.get('dateISO', '9999-12-31') > lockedThrough(uid);
     }
 
+    // ---- Phase G · G1 helpers (START) ----
+    // Invite + birth-shape helpers for the platform blocks below
+    // (design §1.3/§4.3). Pure additions — the only amendment to
+    // pre-existing functions in part 1 is amendment #1 above.
+
+    function inviteDocPath(businessId, email) {
+      return /databases/$(database)/documents/businessInvites/$(businessId)/invites/$(email);
+    }
+
+    function hasPendingInvite(businessId) {
+      return isSignedIn()
+        && request.auth.token.email != null
+        && exists(inviteDocPath(businessId, request.auth.token.email))
+        && get(inviteDocPath(businessId, request.auth.token.email)).data
+             .get('status', '') == 'pending';
+    }
+
+    function roleOrManager(v) {
+      return v in ['manager', 'cashier', 'accountant'] ? v : 'manager';
+    }
+
+    // A membership SELF-claim (the invitee's own client creating
+    // their uid-keyed doc) is vouched by exactly one of: a pending
+    // invite for the caller's email carrying the same resolved
+    // role (the claim), or the legacy staffIndex leg pointing at
+    // this business with the same resolved role (the §7.2
+    // self-backfill). Roles compare RESOLVED (roleOrManager) so a
+    // legacy doc carrying an unrecognised role still backfills
+    // as "manager", exactly as the client resolves it. The owner
+    // creating membership docs is gated by the match block.
+    function selfClaimOk(businessId) {
+      return (hasPendingInvite(businessId)
+              && request.resource.data.get('source', '') == 'invite'
+              && roleOrManager(request.resource.data.get('role', 'manager'))
+                   == roleOrManager(get(inviteDocPath(businessId, request.auth.token.email)).data
+                        .get('role', 'manager')))
+          || (isStaffOf(businessId)
+              && request.resource.data.get('source', '') == 'staff'
+              && roleOrManager(request.resource.data.get('role', 'manager'))
+                   == roleOrManager(get(staffIndexPath(request.auth.token.email)).data
+                        .get('role', 'manager')));
+    }
+
+    // ---- Fix Round 2 · FR2 helpers (START) ----
+    // The generated-business owner leg: the caller owns business
+    // {uid} when the registry names them as ownerUid. For a
+    // legacy business (uid == businessId) this is the same fact
+    // the uid match already states; for a generated business it
+    // is the ONLY ownership fact. The exists() guard is load-
+    // bearing: a business with no registry doc (a pre-G shop)
+    // must not error the evaluation.
+    function isRegistryOwner(uid) {
+      return isSignedIn()
+        && exists(bizPath(uid))
+        && get(bizPath(uid)).data.get('ownerUid', '') == request.auth.uid;
+    }
+
+    // Ownership for FR2: the legacy uid match OR the registry
+    // leg. Every canAccess/staffRole consumer inherits it.
+    function isBusinessOwner(uid) {
+      return isOwner(uid) || isRegistryOwner(uid);
+    }
+
+    // The clear window (FR2 item 2): the owner doc's `clearing`
+    // flag, set by the owner immediately before the wipe (after
+    // the trash snapshot is written) and cleared when the wipe
+    // ends. Only the business owner may set it (the owner-doc
+    // write leg is owner-only), so this leg can never be
+    // reached by staff — and outside the window the
+    // append-only deletes stay denied exactly as before.
+    function isClearWindow(uid) {
+      return isBusinessOwner(uid)
+        && exists(/databases/$(database)/documents/users/$(uid))
+        && get(/databases/$(database)/documents/users/$(uid)).data
+             .get('clearing', null) != null;
+    }
+    // ---- Fix Round 2 · FR2 helpers (END) ----
+    // ---- Phase G · G2 amendment #2 (birth window) (START) ----
+    // Creation-time shape for a businesses doc (§4.3):
+    // the doc's own owner, born active with enforcement off, and
+    // a plan snapshot equal to one of the two legitimate birth
+    // shapes — trial (a new business: the trial tier's limits, a
+    // future trial end, no paid period) or founding (the §7.2
+    // migration of a shop whose namespace ALREADY exists:
+    // Advanced limits, no expiry of any kind). Anything else —
+    // a self-granted paid tier, a live enforce flag, somebody
+    // else's business — fails validation. G2 completes the
+    // trial-window tightness: the trial end must land within
+    // ± a day of +14 days from request.time (312h–360h) — a
+    // client cannot birth itself a longer trial.
+    function businessBirthOk(businessId) {
+      let d = request.resource.data;
+      let p = d.get('plan', {});
+      // ---- Fix Round 2 · FR2 amendment (birth owner) (START) ----
+      return d.get('ownerUid', '') == request.auth.uid
+        && (d.get('ownerUid', '') == businessId
+            || p.get('planId', '') == 'trial')
+      // ---- Fix Round 2 · FR2 amendment (birth owner) (END) ----
+        && d.get('status', '') == 'active'
+        && d.get('enforce', true) == false
+        && p.get('assignedBy', '') in ['signup', 'migration']
+        && (
+          (p.get('planId', '') == 'trial'
+            && p.get('usersLimit', 0) == 2
+            && p.get('invoiceLimit', 0) == 200
+            && p.get('modulesTier', '') == 'standard'
+            && p.get('trialEndsAt', null) is timestamp
+            && p.get('trialEndsAt', request.time) > request.time
+            && p.get('trialEndsAt', request.time)
+                 >= request.time + duration.value(312, 'h')
+            && p.get('trialEndsAt', request.time)
+                 <= request.time + duration.value(360, 'h')
+            && p.get('periodTo', null) == null)
+          || (p.get('planId', '') == 'founding'
+            && p.get('usersLimit', 0) == 10
+            && p.get('invoiceLimit', 0) == 10000
+            && p.get('modulesTier', '') == 'advanced'
+            && p.get('periodTo', null) == null
+            && p.get('trialEndsAt', null) == null
+            && exists(/databases/$(database)/documents/users/$(businessId)))
+        );
+    }
+    // ---- Phase G · G2 amendment #2 (birth window) (END) ----
+    // ---- Phase G · G1 helpers (END) ----
+    // ---- Phase G · G2 helpers (START) ----
+    // Plan state + counters (design §3.6/§4.1/§4.2/§6.2 amendment
+    // #2). Every function here leads with the enforcement check:
+    // while a business's `enforce` is false — and forever for a
+    // business with no registry doc at all (a pre-G shop) — the
+    // plan legs observe and pass, exactly v8's behaviour (§6.3).
+    // The derivations mirror lib/plans (derivePlanState,
+    // counterTransitionOk, invoiceEventAllowed, memberCapOk)
+    // expression for expression; the harness proves the TS side
+    // and pins these texts to it.
+
+    function bizPath(uid) {
+      return /databases/$(database)/documents/businesses/$(uid);
+    }
+
+    function counterPath(uid) {
+      return /databases/$(database)/documents/businessCounters/$(uid);
+    }
+
+    function planEnforced(uid) {
+      return exists(bizPath(uid))
+        && get(bizPath(uid)).data.get('enforce', false) == true;
+    }
+
+    // The derived plan state (§3.6): suspension overlays every
+    // state; founding never expires; the end instant itself
+    // belongs to the period; grace is the 30 days (720h) after
+    // the end; read-only thereafter. A paid-shaped snapshot
+    // without dates cannot be born (§4.3) — if one is ever read
+    // it resolves 'active' rather than bricking a trading shop.
+    function planState(uid) {
+      let b = get(bizPath(uid)).data;
+      let p = b.get('plan', {});
+      let end = p.get('periodTo', null) != null
+        ? p.get('periodTo', null) : p.get('trialEndsAt', null);
+      return b.get('status', 'active') == 'suspended'
+        ? 'suspended'
+        : (p.get('planId', '') == 'founding'
+          ? 'founding'
+          : (end == null
+            ? 'active'
+            : (request.time <= end
+              ? (p.get('periodTo', null) != null ? 'active' : 'trial')
+              : (request.time <= end + duration.value(720, 'h')
+                ? 'grace'
+                : 'readonly'))));
+    }
+
+    function planPostable(uid) {
+      return !planEnforced(uid)
+        || planState(uid) in ['trial', 'active', 'founding'];
+    }
+
+    function planModulesTier(uid) {
+      return get(bizPath(uid)).data.get('plan', {})
+        .get('modulesTier', 'core');
+    }
+
+    // Tier gate for the above-Core posting paths (§4.1).
+    function planTierOk(uid, minTier) {
+      return !planEnforced(uid)
+        || (minTier == 'standard'
+          ? planModulesTier(uid) in ['standard', 'advanced']
+          : planModulesTier(uid) == 'advanced');
+    }
+
+    // The journal leg's tier gate, by refType (§4.1): production /
+    // payroll / loans / fiscal-close refTypes need Advanced;
+    // job-material / transfer-loss / purchase-return / cheque-
+    // lifecycle refTypes need Standard (the Documents + Operations
+    // sets); every other refType is a Core posting and passes.
+    function planJournalTierOk(uid) {
+      let rt = request.resource.data.get('refType', '');
+      return !planEnforced(uid)
+        || (rt in ['production_issue', 'production_complete',
+                   'production_scrap', 'payroll_accrual',
+                   'payroll_payment', 'salary_advance', 'loan_drawdown',
+                   'loan_charge', 'loan_repayment', 'fy_close']
+          ? planModulesTier(uid) == 'advanced'
+          // ---- Phase H · H3 amendment (journal tier list) (START) ----
+          : (rt in ['job_material', 'job_material_return',
+                    'transfer_loss', 'purchase_return', 'cheque_clearing',
+                    'cheque_bounce', 'cheque_return', 'loyalty_expire']
+          // ---- Phase H · H3 amendment (journal tier list) (END) ----
+            ? planModulesTier(uid) in ['standard', 'advanced']
+            : true));
+    }
+
+    // §4.2's pairing, seen from an invoice-event leg: the SAME
+    // batch's counter write (getAfter) must be the legal invoice
+    // transition over the counter's prior state (get) — same
+    // month +1, or a forward month roll to 1, memberCount
+    // untouched — and the resulting count must fit the
+    // snapshot's invoiceLimit (0 = unlimited). In trial the
+    // limit is the TOTAL pool: a trial counter never rolls, so
+    // the accumulating count IS the pool consumption.
+    function invoiceCounterPaired(uid) {
+      let before = get(counterPath(uid)).data;
+      let after = getAfter(counterPath(uid)).data;
+      return after.get('memberCount', 0) == before.get('memberCount', 0)
+        && ((after.get('invoiceMonth', '') == before.get('invoiceMonth', '')
+             && after.get('invoiceCount', 0) == before.get('invoiceCount', 0) + 1)
+            || (after.get('invoiceMonth', '') > before.get('invoiceMonth', '')
+                && after.get('invoiceCount', 0) == 1));
+    }
+
+    function invoiceEventOk(uid) {
+      return !planEnforced(uid)
+        || (planPostable(uid)
+          && exists(counterPath(uid))
+          && existsAfter(counterPath(uid))
+          && invoiceCounterPaired(uid)
+          && (get(bizPath(uid)).data.get('plan', {})
+                .get('invoiceLimit', 0) == 0
+              || getAfter(counterPath(uid)).data.get('invoiceCount', 0)
+                   <= get(bizPath(uid)).data.get('plan', {})
+                        .get('invoiceLimit', 0)));
+    }
+
+    // The seat pairing on the invite/member legs (§4.2): the
+    // batch's counter write moved memberCount by exactly `delta`
+    // and left the invoice fields untouched.
+    function memberCounterPaired(businessId, delta) {
+      return exists(counterPath(businessId))
+        && existsAfter(counterPath(businessId))
+        && getAfter(counterPath(businessId)).data.get('memberCount', 0)
+             == get(counterPath(businessId)).data.get('memberCount', 0) + delta
+        && getAfter(counterPath(businessId)).data.get('invoiceCount', 0)
+             == get(counterPath(businessId)).data.get('invoiceCount', 0)
+        && getAfter(counterPath(businessId)).data.get('invoiceMonth', '')
+             == get(counterPath(businessId)).data.get('invoiceMonth', '');
+    }
+
+    // The user cap, checked on the invite-claim leg (§4.2): the
+    // seats (memberCount — the claimant's seat was counted when
+    // the invite created it) plus the owner must fit the
+    // snapshot's usersLimit (0 = unlimited). A business with no
+    // counter doc yet cannot be measured and is not blocked on
+    // a platform wart.
+    function memberCapOk(businessId) {
+      return !planEnforced(businessId)
+        || !exists(counterPath(businessId))
+        || get(bizPath(businessId)).data.get('plan', {})
+             .get('usersLimit', 0) == 0
+        || get(counterPath(businessId)).data.get('memberCount', 0) + 1
+             <= get(bizPath(businessId)).data.get('plan', {})
+                  .get('usersLimit', 0);
+    }
+
+    // The counter doc's own arithmetic (§4.2), validated on
+    // EVERY update in EVERY mode — observation-mode counters can
+    // never be corrupted into shapes the pairing legs would
+    // later reject. Exactly one counter family changes, by
+    // exactly the legal step, and nothing else changes (the
+    // migration baseline marker included).
+    function counterArithmeticOk(businessId) {
+      let b = resource.data;
+      let a = request.resource.data;
+      let keys = a.diff(b).affectedKeys();
+      return (keys.hasOnly(['invoiceMonth', 'invoiceCount'])
+              && a.get('memberCount', 0) == b.get('memberCount', 0)
+              && ((a.get('invoiceMonth', '') == b.get('invoiceMonth', '')
+                   && a.get('invoiceCount', 0) == b.get('invoiceCount', 0) + 1)
+                  || (a.get('invoiceMonth', '') > b.get('invoiceMonth', '')
+                      && a.get('invoiceCount', 0) == 1)))
+          || (keys.hasOnly(['memberCount'])
+              && a.get('invoiceMonth', '') == b.get('invoiceMonth', '')
+              && a.get('invoiceCount', 0) == b.get('invoiceCount', 0)
+              && (a.get('memberCount', 0) == b.get('memberCount', 0) + 1
+                  || (a.get('memberCount', 0) == b.get('memberCount', 0) - 1
+                      && a.get('memberCount', 0) >= 0)));
+    }
+    // ---- Phase G · G2 helpers (END) ----
+    // ---- Phase H · H3 helpers (START) ----
+    // Storefront derivations (design §2.4/§2.6). Pure additions —
+    // no pre-existing function changes here (the one H3
+    // amendment to an existing function is the delimited span
+    // inside planJournalTierOk above).
+
+    function storefrontPath(slug) {
+      return /databases/$(database)/documents/storefronts/$(slug);
+    }
+
+    // The §2.6 public-read derivation, in the §4 idiom: the
+    // snapshot is lit only while the business's ASSIGNMENT
+    // SNAPSHOT carries the Advanced module tier AND the derived
+    // plan state is active or founding. Trial derives 'trial'
+    // (and its snapshot is Standard's set besides) — dark.
+    // Grace, read-only and suspension — dark: the storefront is
+    // a selling surface, not the shopkeeper's data right (§3.7),
+    // and reads of the shop's OWN data are never plan-gated —
+    // the member read of this doc rides canAccess, not this.
+    function storefrontLit(businessId) {
+      return exists(bizPath(businessId))
+        && planModulesTier(businessId) == 'advanced'
+        && planState(businessId) in ['active', 'founding'];
+    }
+
+    // The §2.4 inbox create validation: the doc's key set is
+    // exactly the order shape (note optional), every scalar is
+    // in bounds, the order is born 'new' at request.time, and
+    // the cited storefront exists, is enabled, and belongs to
+    // the cited business — unpublishing therefore closes intake
+    // as well as the page. Per-LINE shape (each line exactly
+    // {productId, qty 1..999}) is enforced by the composing
+    // client lib (lib/storefront.storeOrderShapeOk): rules
+    // cannot iterate a list's elements, and the posture is the
+    // §2.4 one — a hand-crafted malformed line still lands as
+    // ONE dismissible inbox doc, and conversion re-validates
+    // every line against live products before anything posts.
+    function storeOrderCreateOk() {
+      let d = request.resource.data;
+      let keys = d.keys();
+      // ---- Phase H · H6 amendment (order consent key) (START) ----
+      return keys.hasOnly(['businessId', 'slug', 'customerName',
+                           'phone', 'lines', 'note', 'fulfilment',
+                           'createdAt', 'state', 'waOptIn'])
+        && keys.hasAll(['businessId', 'slug', 'customerName',
+                        'phone', 'lines', 'fulfilment', 'createdAt',
+                        'state'])
+        && (!keys.hasAny(['waOptIn']) || d.get('waOptIn', false) == true)
+      // ---- Phase H · H6 amendment (order consent key) (END) ----
+        && d.get('businessId', '') is string
+        && d.get('businessId', '') != ''
+        && d.get('customerName', '') is string
+        && d.get('customerName', '').size() >= 1
+        && d.get('customerName', '').size() <= 60
+        && d.get('phone', '') is string
+        && d.get('phone', '').size() >= 7
+        && d.get('phone', '').size() <= 16
+        && d.get('phone', '').matches('^\\+?[0-9][0-9 -]*$')
+        && d.get('note', '') is string
+        && d.get('note', '').size() <= 300
+        && d.get('fulfilment', '') in ['pickup', 'delivery']
+        && d.get('createdAt', null) == request.time
+        && d.get('state', '') == 'new'
+        && d.get('lines', []) is list
+        && d.get('lines', []).size() >= 1
+        && d.get('lines', []).size() <= 50
+        && exists(storefrontPath(d.get('slug', '')))
+        && get(storefrontPath(d.get('slug', ''))).data
+             .get('businessId', '') == d.get('businessId', '')
+        && get(storefrontPath(d.get('slug', ''))).data
+             .get('enabled', false) == true;
+    }
+
+    // The §2.2 publish shape: the writer is the business's owner
+    // (the doc's businessId IS the caller's uid — the public face
+    // of the shop is an owner act), the doc's slug field is its
+    // own id (immutable by construction: a rename would be a new
+    // doc, and the old slug is never recycled because delete is
+    // denied in the block below), the key set is the snapshot
+    // shape, and the catalogue is capped at the assembler's own
+    // limit. Product ENTRIES are maps the rules cannot iterate
+    // (the same posture as the order lines above); the assembler
+    // in lib/storefront is their only composer.
+    function storefrontWriteOk(slug) {
+      let d = request.resource.data;
+      // ---- Fix Round 2 · FR2 amendment (storefront owner) (START) ----
+      return isBusinessOwner(d.get('businessId', ''))
+      // ---- Fix Round 2 · FR2 amendment (storefront owner) (END) ----
+        && d.get('slug', '') == slug
+        && d.keys().hasOnly(['businessId', 'slug', 'shopName',
+                             'tagline', 'phone', 'city', 'logoRef',
+                             'enabled', 'publishedAt', 'updatedAt',
+                             'currency', 'products', 'notice'])
+        && d.get('shopName', '') is string
+        && d.get('phone', '') is string
+        && d.get('enabled', false) is bool
+        && d.get('currency', '') == 'PKR'
+        && d.get('products', []) is list
+        && d.get('products', []).size() <= 500;
+    }
+    // ---- Phase H · H3 helpers (END) ----
     // Staff invitations: staffIndex/{email} -> { ownerUid, email, addedAt, role }.
     // The owner creates/deletes invitations; the invited user may read
     // their own index doc (the app uses it to find the owner's shop
@@ -151,6 +770,9 @@ service cloud.firestore {
     match /users/{uid} {
       allow read: if canAccess(uid);
       allow write: if isOwner(uid);
+      // ---- Fix Round 2 · FR2 amendment (owner-doc write) (START) ----
+      allow write: if isRegistryOwner(uid);
+      // ---- Fix Round 2 · FR2 amendment (owner-doc write) (END) ----
 
       // Master data — v3: product writes are owner/manager (the
       // cashier sells from the shelf but never changes it; the
@@ -183,13 +805,17 @@ service cloud.firestore {
       }
       match /purchases/{purchaseId} {
         allow read: if canAccess(uid);
-        allow create: if hasRole(uid, ['owner', 'manager']) && createInOpenPeriod(uid);
+        // ---- Phase G · G2 amendment #2 (purchases) (START) ----
+        allow create: if hasRole(uid, ['owner', 'manager']) && createInOpenPeriod(uid) && planPostable(uid);
+        // ---- Phase G · G2 amendment #2 (purchases) (END) ----
         allow update, delete: if hasRole(uid, ['owner', 'manager']);
       }
       // Supplier payments may also be recorded by the accountant.
       match /supplierPayments/{paymentId} {
         allow read: if canAccess(uid);
-        allow create: if hasRole(uid, ['owner', 'manager', 'accountant']) && createInOpenPeriod(uid);
+        // ---- Phase G · G2 amendment #2 (supplierPayments) (START) ----
+        allow create: if hasRole(uid, ['owner', 'manager', 'accountant']) && createInOpenPeriod(uid) && planPostable(uid);
+        // ---- Phase G · G2 amendment #2 (supplierPayments) (END) ----
         allow update, delete: if hasRole(uid, ['owner', 'manager', 'accountant']);
       }
       // Credits (udhaar): rules grant write to all four roles — a
@@ -199,7 +825,9 @@ service cloud.firestore {
       // journal templates, as the design states honestly (§3.3).
       match /credits/{creditId} {
         allow read: if canAccess(uid);
-        allow create: if canAccess(uid) && createInOpenPeriod(uid);
+        // ---- Phase G · G2 amendment #2 (credits) (START) ----
+        allow create: if canAccess(uid) && createInOpenPeriod(uid) && planPostable(uid);
+        // ---- Phase G · G2 amendment #2 (credits) (END) ----
         allow update, delete: if canAccess(uid);
       }
       // Returns are created by owner/manager/cashier as part of the
@@ -207,8 +835,10 @@ service cloud.firestore {
       // (owner keeps full write, as before v3).
       match /returns/{returnId} {
         allow read: if canAccess(uid);
-        allow create: if hasRole(uid, ['owner', 'manager', 'cashier']) && createInOpenPeriod(uid);
-        allow update, delete: if isOwner(uid);
+        // ---- Phase G · G2 amendment #2 (returns) (START) ----
+        allow create: if hasRole(uid, ['owner', 'manager', 'cashier']) && createInOpenPeriod(uid) && planPostable(uid);
+        // ---- Phase G · G2 amendment #2 (returns) (END) ----
+        allow update, delete: if isBusinessOwner(uid);
       }
       match /adjustments/{adjustmentId} {
         allow read: if canAccess(uid);
@@ -218,7 +848,9 @@ service cloud.firestore {
       // transfers — owner/manager/accountant per the matrix.
       match /cashEntries/{entryId} {
         allow read: if canAccess(uid);
-        allow create: if hasRole(uid, ['owner', 'manager', 'accountant']) && createInOpenPeriod(uid);
+        // ---- Phase G · G2 amendment #2 (cashEntries) (START) ----
+        allow create: if hasRole(uid, ['owner', 'manager', 'accountant']) && createInOpenPeriod(uid) && planPostable(uid);
+        // ---- Phase G · G2 amendment #2 (cashEntries) (END) ----
         allow update, delete: if hasRole(uid, ['owner', 'manager', 'accountant']);
       }
       // Day closes are performed by owner/manager/cashier; every
@@ -227,7 +859,7 @@ service cloud.firestore {
       match /dayCloses/{closeId} {
         allow read: if canAccess(uid);
         allow create: if hasRole(uid, ['owner', 'manager', 'cashier']);
-        allow update, delete: if isOwner(uid);
+        allow update, delete: if isBusinessOwner(uid);
       }
 
       // Money accounts (Phase A · A2): names and method defaults are
@@ -238,6 +870,9 @@ service cloud.firestore {
       match /accounts/{accountId} {
         allow read: if canAccess(uid);
         allow create, update: if isOwner(uid);
+        // ---- BizCreateFix · v12 amendment (accounts) (START) ----
+        allow create, update: if isRegistryOwner(uid);
+        // ---- BizCreateFix · v12 amendment (accounts) (END) ----
       }
 
       // Tax slabs (Phase A · A4 surface, rules landed with v3):
@@ -245,7 +880,7 @@ service cloud.firestore {
       // managed by the owner only.
       match /taxSlabs/{slabId} {
         allow read: if canAccess(uid);
-        allow write: if isOwner(uid);
+        allow write: if isBusinessOwner(uid);
       }
 
       // Period close/reopen audit trail (Phase A · A5 surface, rules
@@ -254,7 +889,7 @@ service cloud.firestore {
       // the owner doc, which is likewise owner-write only).
       match /periods/{periodId} {
         allow read: if canAccess(uid);
-        allow write: if isOwner(uid);
+        allow write: if isBusinessOwner(uid);
       }
 
       // Phase B · B1 documents (additive; these blocks publish with
@@ -311,14 +946,18 @@ service cloud.firestore {
       // the `returns` posture).
       match /notes/{noteId} {
         allow read: if canAccess(uid);
-        allow create: if hasRole(uid, ['owner', 'manager', 'accountant']) && createInOpenPeriod(uid);
-        allow update, delete: if isOwner(uid);
+        // ---- Phase G · G2 amendment #2 (notes) (START) ----
+        allow create: if hasRole(uid, ['owner', 'manager', 'accountant']) && createInOpenPeriod(uid) && planPostable(uid);
+        // ---- Phase G · G2 amendment #2 (notes) (END) ----
+        allow update, delete: if isBusinessOwner(uid);
       }
 
       match /purchaseReturns/{purchaseReturnId} {
         allow read: if canAccess(uid);
-        allow create: if hasRole(uid, ['owner', 'manager', 'accountant']) && createInOpenPeriod(uid);
-        allow update, delete: if isOwner(uid);
+        // ---- Phase G · G2 amendment #2 (purchaseReturns) (START) ----
+        allow create: if hasRole(uid, ['owner', 'manager', 'accountant']) && createInOpenPeriod(uid) && planPostable(uid);
+        // ---- Phase G · G2 amendment #2 (purchaseReturns) (END) ----
+        allow update, delete: if isBusinessOwner(uid);
       }
 
       // Phase B · B5: the cheque registry (design §4 + G-3). A
@@ -341,9 +980,11 @@ service cloud.firestore {
       // Delete stays owner-only, mirroring the notes posture.
       match /cheques/{chequeId} {
         allow read: if canAccess(uid);
-        allow create: if canAccess(uid) && createInOpenPeriod(uid);
+        // ---- Phase G · G2 amendment #2 (cheques) (START) ----
+        allow create: if canAccess(uid) && createInOpenPeriod(uid) && planPostable(uid);
+        // ---- Phase G · G2 amendment #2 (cheques) (END) ----
         allow update: if hasRole(uid, ['owner', 'manager', 'accountant']);
-        allow delete: if isOwner(uid);
+        allow delete: if isBusinessOwner(uid);
       }
 
       // Phase C · C1: warehouses (design §1.9). Master data —
@@ -358,7 +999,7 @@ service cloud.firestore {
       match /warehouses/{warehouseId} {
         allow read: if canAccess(uid);
         allow create, update: if hasRole(uid, ['owner', 'manager']);
-        allow delete: if isOwner(uid);
+        allow delete: if isBusinessOwner(uid);
       }
 
       // Phase C · C1: stock levels — the per-warehouse quantity
@@ -377,7 +1018,7 @@ service cloud.firestore {
       match /stockLevels/{levelId} {
         allow read: if canAccess(uid);
         allow create, update: if canAccess(uid);
-        allow delete: if isOwner(uid);
+        allow delete: if isBusinessOwner(uid);
       }
 
       // Phase C · C2: stock transfers (design §2 + §6.2) — the
@@ -406,7 +1047,10 @@ service cloud.firestore {
       // here, exactly as for transfers (§7).
       match /boms/{bomId} {
         allow read: if canAccess(uid);
-        allow create, update, delete: if hasRole(uid, ['owner', 'manager']);
+        // ---- Phase G · G2 amendment #2 (boms) (START) ----
+        allow create: if hasRole(uid, ['owner', 'manager']) && planTierOk(uid, 'advanced');
+        allow update, delete: if hasRole(uid, ['owner', 'manager']);
+        // ---- Phase G · G2 amendment #2 (boms) (END) ----
       }
 
       // Phase C · C4 — production orders (design §4.2/§6.2):
@@ -422,7 +1066,10 @@ service cloud.firestore {
       // this doc itself.
       match /productionOrders/{orderId} {
         allow read: if canAccess(uid);
-        allow create, update, delete: if hasRole(uid, ['owner', 'manager']);
+        // ---- Phase G · G2 amendment #2 (productionOrders) (START) ----
+        allow create: if hasRole(uid, ['owner', 'manager']) && planTierOk(uid, 'advanced');
+        allow update, delete: if hasRole(uid, ['owner', 'manager']);
+        // ---- Phase G · G2 amendment #2 (productionOrders) (END) ----
       }
 
       // Phase C · C5 — jobs / work orders (design §5/§6.2):
@@ -442,7 +1089,10 @@ service cloud.firestore {
       // note (§5.3) — nothing extra to gate here.
       match /jobs/{jobId} {
         allow read: if canAccess(uid);
-        allow create, update, delete: if hasRole(uid, ['owner', 'manager']);
+        // ---- Phase G · G2 amendment #2 (jobs) (START) ----
+        allow create: if hasRole(uid, ['owner', 'manager']) && planTierOk(uid, 'standard');
+        allow update, delete: if hasRole(uid, ['owner', 'manager']);
+        // ---- Phase G · G2 amendment #2 (jobs) (END) ----
       }
 
       // Phase D · D1 — employees (design §1.1/§6.2): the staff
@@ -459,7 +1109,10 @@ service cloud.firestore {
       // asserts no money fact (§7).
       match /employees/{employeeId} {
         allow read: if hasRole(uid, ['owner', 'manager', 'accountant']);
-        allow create, update, delete: if hasRole(uid, ['owner', 'manager']);
+        // ---- Phase G · G2 amendment #2 (employees) (START) ----
+        allow create: if hasRole(uid, ['owner', 'manager']) && planTierOk(uid, 'advanced');
+        allow update, delete: if hasRole(uid, ['owner', 'manager']);
+        // ---- Phase G · G2 amendment #2 (employees) (END) ----
       }
 
       // Phase D · D1 — attendance (design §1.3/§6.2): one doc
@@ -498,9 +1151,11 @@ service cloud.firestore {
       // — posted runs are corrected by reversal, never removed.
       match /payrollRuns/{runId} {
         allow read: if hasRole(uid, ['owner', 'manager', 'accountant']);
-        allow create: if hasRole(uid, ['owner', 'accountant']) && createInOpenPeriod(uid);
+        // ---- Phase G · G2 amendment #2 (payrollRuns) (START) ----
+        allow create: if hasRole(uid, ['owner', 'accountant']) && createInOpenPeriod(uid) && planPostable(uid) && planTierOk(uid, 'advanced');
+        // ---- Phase G · G2 amendment #2 (payrollRuns) (END) ----
         allow update: if hasRole(uid, ['owner', 'accountant']);
-        allow delete: if isOwner(uid);
+        allow delete: if isBusinessOwner(uid);
       }
 
       // Phase D · D3: the loans register (design §6.2). Reads
@@ -520,9 +1175,11 @@ service cloud.firestore {
       // never removed.
       match /loans/{loanId} {
         allow read: if hasRole(uid, ['owner', 'manager', 'accountant']);
-        allow create: if hasRole(uid, ['owner', 'accountant']) && createInOpenPeriod(uid);
+        // ---- Phase G · G2 amendment #2 (loans) (START) ----
+        allow create: if hasRole(uid, ['owner', 'accountant']) && createInOpenPeriod(uid) && planPostable(uid) && planTierOk(uid, 'advanced');
+        // ---- Phase G · G2 amendment #2 (loans) (END) ----
         allow update: if hasRole(uid, ['owner', 'accountant']);
-        allow delete: if isOwner(uid);
+        allow delete: if isBusinessOwner(uid);
       }
 
       // Phase E · E2 — brand assets (design §2.1/§5): one doc
@@ -539,7 +1196,7 @@ service cloud.firestore {
       // history (past prints are paper, not data).
       match /branding/{kind} {
         allow read: if canAccess(uid);
-        allow create, update, delete: if isOwner(uid);
+        allow create, update, delete: if isBusinessOwner(uid);
       }
 
       // Expenses: the operational record may be edited/deleted by
@@ -549,7 +1206,9 @@ service cloud.firestore {
       // history (below) is never rewritten.
       match /expenses/{expenseId} {
         allow read: if canAccess(uid);
-        allow create: if hasRole(uid, ['owner', 'manager', 'accountant']) && createInOpenPeriod(uid);
+        // ---- Phase G · G2 amendment #2 (expenses) (START) ----
+        allow create: if hasRole(uid, ['owner', 'manager', 'accountant']) && createInOpenPeriod(uid) && planPostable(uid);
+        // ---- Phase G · G2 amendment #2 (expenses) (END) ----
         allow update, delete: if hasRole(uid, ['owner', 'manager', 'accountant']);
       }
 
@@ -559,17 +1218,46 @@ service cloud.firestore {
       // disappear.
       match /bills/{billId} {
         allow read: if canAccess(uid);
-        allow create: if hasRole(uid, ['owner', 'manager', 'cashier']) && createInOpenPeriod(uid);
-        allow update: if hasRole(uid, ['owner', 'manager', 'cashier']);
+        // ---- Phase G · G2 amendment #2 (bills) (START) ----
+        // An invoice event (§4.2): a create that is not born
+        // held, or a held -> posted transition. Both legs pair
+        // the batch's counter write (invoiceEventOk); a held
+        // create is paper and pairs nothing. A posted bill's
+        // later updates (void, returns) are not transitions and
+        // pair nothing — a voided bill KEEPS its count: the
+        // invoice was issued, and the counter admits no decrease
+        // except the month roll.
+        allow create: if hasRole(uid, ['owner', 'manager', 'cashier']) && createInOpenPeriod(uid) && planPostable(uid)
+          && (request.resource.data.get('status', '') == 'held' || invoiceEventOk(uid));
+        allow update: if hasRole(uid, ['owner', 'manager', 'cashier'])
+          && (!(resource.data.get('status', '') == 'held'
+                && request.resource.data.get('status', '') != 'held')
+              || invoiceEventOk(uid));
+        // ---- Phase G · G2 amendment #2 (bills) (END) ----
         allow delete: if hasRole(uid, ['owner', 'manager', 'cashier'])
           && resource.data.status == 'held';
+        // ---- Fix Round 2 · FR2 clear window (bills) (START) ----
+        allow delete: if isClearWindow(uid);
+        // ---- Fix Round 2 · FR2 clear window (bills) (END) ----
       }
 
       // Append-only sales history. Created by the selling roles.
       match /sales/{saleId} {
         allow read: if canAccess(uid);
-        allow create: if hasRole(uid, ['owner', 'manager', 'cashier']) && createInOpenPeriod(uid);
+        // ---- Phase G · G2 amendment #2 (sales) (START) ----
+        // A sales-row create is an invoice event ONLY when it
+        // is the counter sale's own record (no billId, kind
+        // 'sale'); a bill's rows cite their bill (the bills leg
+        // pairs for them) and return rows are kind 'return'.
+        allow create: if hasRole(uid, ['owner', 'manager', 'cashier']) && createInOpenPeriod(uid) && planPostable(uid)
+          && (!(request.resource.data.get('billId', null) == null
+                && request.resource.data.get('kind', 'sale') == 'sale')
+              || invoiceEventOk(uid));
+        // ---- Phase G · G2 amendment #2 (sales) (END) ----
         allow update, delete: if false;
+        // ---- Fix Round 2 · FR2 clear window (sales) (START) ----
+        allow delete: if isClearWindow(uid);
+        // ---- Fix Round 2 · FR2 clear window (sales) (END) ----
       }
 
       // Append-only double-entry journal. Every role legitimately
@@ -580,11 +1268,416 @@ service cloud.firestore {
       // ever edit or delete an entry.
       match /journal/{entryId} {
         allow read: if hasRole(uid, ['owner', 'manager', 'accountant']);
-        allow create: if canAccess(uid) && journalCreateInOpenPeriod(uid);
+        // ---- Phase G · G2 amendment #2 (journal) (START) ----
+        allow create: if canAccess(uid) && journalCreateInOpenPeriod(uid) && planPostable(uid) && planJournalTierOk(uid);
+        // ---- Phase G · G2 amendment #2 (journal) (END) ----
         allow update, delete: if false;
+        // ---- Fix Round 2 · FR2 clear window (journal) (START) ----
+        allow delete: if isClearWindow(uid);
+        // ---- Fix Round 2 · FR2 clear window (journal) (END) ----
       }
+      // ---- Phase H · WhatsApp: wa collections (START) ----
+      // Phase H · WhatsApp (design §3.3): the marketing
+      // module's three tenant collections. Reads follow the
+      // `whatsapp` matrix row and are NARROWED like payroll's
+      // (owner / manager / accountant — a campaign's audience
+      // and log are not counter data, so the cashier is
+      // excluded server-side, not merely UI-hidden). Writes
+      // are owner/manager. There is NO period backstop and NO
+      // plan leg here: these docs assert no money fact — a
+      // template, a campaign and a send-log row move no money,
+      // and no journal create ever pairs with them — while
+      // plan gating runs through the client-side snapshot
+      // gates (the paper-doc precedent).
+      match /waTemplates/{templateId} {
+        allow read: if hasRole(uid, ['owner', 'manager', 'accountant']);
+        allow create, update, delete: if hasRole(uid, ['owner', 'manager']);
+      }
+
+      // Campaigns are the shop's marketing record: editable
+      // while they run (draft -> sending -> done is a state
+      // update), never deleted — a finished campaign and its
+      // log stay readable as history.
+      match /waCampaigns/{campaignId} {
+        allow read: if hasRole(uid, ['owner', 'manager', 'accountant']);
+        allow create, update: if hasRole(uid, ['owner', 'manager']);
+        allow delete: if false;
+        // ---- Fix Round 2 · FR2 clear window (waCampaigns) (START) ----
+        allow delete: if isClearWindow(uid);
+        // ---- Fix Round 2 · FR2 clear window (waCampaigns) (END) ----
+      }
+
+      // The send log is append-and-advance: rows are created
+      // queued at launch and updated as the queue walks them
+      // (opened / sent / skipped states). A row is a fact
+      // about what the shopkeeper did — never deleted, never
+      // rewritten by anyone outside the writing roles.
+      match /waSends/{sendId} {
+        allow read: if hasRole(uid, ['owner', 'manager', 'accountant']);
+        allow create, update: if hasRole(uid, ['owner', 'manager']);
+        allow delete: if false;
+        // ---- Fix Round 2 · FR2 clear window (waSends) (START) ----
+        allow delete: if isClearWindow(uid);
+        // ---- Fix Round 2 · FR2 clear window (waSends) (END) ----
+      }
+      // ---- Phase H · WhatsApp: wa collections (END) ----
     }
 
+    // ---- Phase G · G1: platform collections (START) ----
+    // Phase G · G1 — the platform layer (design §1.2). Tenancy is
+    // metadata OUTSIDE the tenant namespace: these collections
+    // describe businesses, memberships and platform acts; none of
+    // them is a shop's data, and NO leg below grants the platform
+    // (platformAdmins) any access into users/{uid} — §2.3's
+    // privacy doctrine is structural here, not a policy.
+
+    // The business registry: one doc per business, keyed by the
+    // founding owner's uid (businessId ≡ ownerUid, §1.1). The
+    // owner edits the directory label fields only; plan/status
+    // writes are platform-admin acts (the G3 console).
+    match /businesses/{businessId} {
+      allow read: if isOwner(businessId) || isMemberOf(businessId) || isPlatformAdmin();
+      allow create: if isOwner(businessId) && businessBirthOk(businessId);
+      allow update: if isPlatformAdmin()
+        || (isOwner(businessId)
+            && request.resource.data.diff(resource.data).affectedKeys()
+                 .hasOnly(['name', 'phone', 'city']));
+      allow delete: if false;
+      // ---- Fix Round 2 · FR2 amendment (businesses) (START) ----
+      // The generated-business mirrors: the registry leg replaces
+      // the uid match for a business whose owner is not its id.
+      // The create leg drops the isOwner precondition because
+      // businessBirthOk itself pins ownerUid == caller (above).
+      allow read: if isRegistryOwner(businessId);
+      allow create: if isSignedIn() && businessBirthOk(businessId);
+      allow update: if isRegistryOwner(businessId)
+        && request.resource.data.diff(resource.data).affectedKeys()
+             .hasOnly(['name', 'phone', 'city']);
+      // ---- Fix Round 2 · FR2 amendment (businesses) (END) ----
+    }
+
+    // Memberships: uid-keyed docs under the business (§1.3). The
+    // owner manages them; a member reads their own docs in any
+    // business (powers the switcher), may create their own ONLY
+    // through the vouched self-claim (selfClaimOk), and may
+    // delete their own (leaving a business is self-service; the
+    // owner's mirror is what cuts shop access — see isMemberOf).
+    // ---- Phase G · G2 amendment (members) (START) ----
+    match /businessMembers/{businessId} {
+      match /members/{memberUid} {
+        allow read: if isOwner(businessId)
+          || request.auth.uid == memberUid
+          || isPlatformAdmin();
+        // ---- Fix Round 2 · FR2 amendment (members read) (START) ----
+        allow read: if isRegistryOwner(businessId);
+        // ---- Fix Round 2 · FR2 amendment (members read) (END) ----
+        allow create: if isOwner(businessId)
+          || (isSignedIn()
+              && request.auth.uid == memberUid
+              && request.resource.data.get('email', '') == request.auth.token.email
+              && selfClaimOk(businessId)
+              && memberCapOk(businessId));
+        // ---- Fix Round 2 · FR2 amendment (members create) (START) ----
+        allow create: if isRegistryOwner(businessId);
+        allow update: if isRegistryOwner(businessId);
+        // ---- Fix Round 2 · FR2 amendment (members create) (END) ----
+        allow update: if isOwner(businessId);
+        // G2: the owner's member DELETE is the removal write —
+        // its batch carries memberCount -1 (§4.2). A member
+        // deleting their OWN doc (leaving) carries no counter
+        // write: the seat is the owner's mirror entry, and it
+        // frees only when the owner removes it.
+        allow delete: if (isOwner(businessId)
+            && (!planEnforced(businessId) || memberCounterPaired(businessId, -1)))
+          || request.auth.uid == memberUid;
+        // ---- Fix Round 2 · FR2 amendment (members delete) (START) ----
+        allow delete: if isRegistryOwner(businessId)
+          && (!planEnforced(businessId) || memberCounterPaired(businessId, -1));
+        // ---- Fix Round 2 · FR2 amendment (members delete) (END) ----
+      }
+    }
+    // ---- Phase G · G2 amendment (members) (END) ----
+
+    // Invitations: email-keyed docs under the business (§1.3).
+    // The owner writes them; the invitee may read their own and
+    // mark it claimed (status/claimedBy/claimedAt ONLY, and
+    // claimedBy must be themselves). An unclaimed invite confers
+    // nothing: no access leg anywhere reads this collection.
+    // ---- Phase G · G2 amendment (invites) (START) ----
+    match /businessInvites/{businessId} {
+      match /invites/{inviteId} {
+        allow read: if isOwner(businessId)
+          || (isSignedIn() && resource.data.get('email', '') == request.auth.token.email)
+          || isPlatformAdmin();
+        // ---- Fix Round 2 · FR2 amendment (invites read) (START) ----
+        allow read: if isRegistryOwner(businessId);
+        // ---- Fix Round 2 · FR2 amendment (invites read) (END) ----
+        // G2: an invite CREATE is the seat-creating write — its
+        // batch carries memberCount +1 (§4.2), paired here.
+        allow create: if isOwner(businessId)
+          && request.resource.data.get('email', '') == inviteId
+          && request.resource.data.get('status', '') == 'pending'
+          && (!planEnforced(businessId) || memberCounterPaired(businessId, 1));
+        // ---- Fix Round 2 · FR2 amendment (invites create) (START) ----
+        allow create: if isRegistryOwner(businessId)
+          && request.resource.data.get('email', '') == inviteId
+          && request.resource.data.get('status', '') == 'pending'
+          && (!planEnforced(businessId) || memberCounterPaired(businessId, 1));
+        // ---- Fix Round 2 · FR2 amendment (invites create) (END) ----
+        allow update: if isOwner(businessId)
+          || (isSignedIn()
+              && resource.data.get('email', '') == request.auth.token.email
+              && request.resource.data.diff(resource.data).affectedKeys()
+                   .hasOnly(['status', 'claimedBy', 'claimedAt'])
+              && request.resource.data.get('status', '') == 'claimed'
+              && request.resource.data.get('claimedBy', '') == request.auth.uid);
+        // ---- Fix Round 2 · FR2 amendment (invites update) (START) ----
+        allow update: if isRegistryOwner(businessId);
+        // ---- Fix Round 2 · FR2 amendment (invites update) (END) ----
+        // G2: the owner's invite DELETE is half of the removal
+        // write — its batch carries memberCount -1 (§4.2). (A
+        // claimed member's removal fires the members delete leg
+        // too; both legs check the SAME net -1, so one counter
+        // write satisfies the batch.)
+        allow delete: if isOwner(businessId)
+          && (!planEnforced(businessId) || memberCounterPaired(businessId, -1));
+        // ---- Fix Round 2 · FR2 amendment (invites delete) (START) ----
+        allow delete: if isRegistryOwner(businessId)
+          && (!planEnforced(businessId) || memberCounterPaired(businessId, -1));
+        // ---- Fix Round 2 · FR2 amendment (invites delete) (END) ----
+      }
+    }
+    // ---- Phase G · G2 amendment (invites) (END) ----
+
+    // The switcher index: one doc per person — THEIR doc, read
+    // and written by the person alone (§1.2: admins never need
+    // it). It is a self-healing cache of memberships (§1.4),
+    // never a source of truth: no access leg reads it.
+    match /userMemberships/{memberUid} {
+      allow read, write: if isSignedIn() && request.auth.uid == memberUid;
+    }
+
+    // Hard counters (§2.3). G1 posture: born once (signup /
+    // migration) with non-negative counts, read by the owner and
+    // the platform, and NO client updates — G2 replaces this
+    // block's write legs with the batch-paired arithmetic of
+    // §4.2 (its own named amendment in v9 part 2). Until then a
+    // counter is a labelled baseline and nothing enforces
+    // against it.
+    // ---- Phase G · G2 amendment (counters) (START) ----
+    // G2 part 2 replaces the write legs (the amendment the G1
+    // comment above announced): updates are the batch-paired
+    // arithmetic of §4.2 — exactly one counter family moving by
+    // exactly the legal step (counterArithmeticOk), written by
+    // anyone with access to the business (the pairing legs on
+    // bills/sales/invites/members do the enforcing; this leg
+    // keeps the doc's shape honest in every mode). READ widens
+    // to canAccess: every posting role composes its counter
+    // write from the live doc, so every posting role must be
+    // able to read it — the count is the shop's own aggregate,
+    // already visible to the platform (§2.3).
+    match /businessCounters/{businessId} {
+      allow read: if canAccess(businessId) || isPlatformAdmin();
+      allow create: if isOwner(businessId)
+        && request.resource.data.get('invoiceCount', -1) >= 0
+        && request.resource.data.get('memberCount', -1) >= 0;
+      // ---- Fix Round 2 · FR2 amendment (counters) (START) ----
+      allow create: if isRegistryOwner(businessId)
+        && request.resource.data.get('invoiceCount', -1) >= 0
+        && request.resource.data.get('memberCount', -1) >= 0;
+      // ---- Fix Round 2 · FR2 amendment (counters) (END) ----
+      allow update: if canAccess(businessId) && counterArithmeticOk(businessId);
+      allow delete: if false;
+    }
+    // ---- Phase G · G2 amendment (counters) (END) ----
+
+    // The super-admin grant (§2.1) — structure only in G1; the
+    // console is G3. The FIRST doc is created by the owner by
+    // hand in the Firebase console (the console's own authority
+    // bypasses rules entirely — the exception lives outside the
+    // rules, stated plainly); thereafter only an existing admin
+    // can add or remove one. A client can never write its own
+    // uid in: create requires an existing admin.
+    match /platformAdmins/{adminUid} {
+      allow read: if isPlatformAdmin() || request.auth.uid == adminUid;
+      allow create, delete: if isPlatformAdmin();
+      allow update: if false;
+    }
+
+    // The append-only platform audit log (§1.2): platform acts
+    // land here at the moment of the act, written by their
+    // actor. Create-only for EVERYONE, admins included — an
+    // audit log an admin can edit is a diary, not a log. Reads:
+    // the platform, the business's owner, its members.
+    match /businessEvents/{eventId} {
+      allow read: if isPlatformAdmin()
+        || (isSignedIn() && resource.data.get('businessId', '') == request.auth.uid)
+        || (isSignedIn() && isMemberOf(resource.data.get('businessId', '')));
+      allow create: if isSignedIn()
+        && request.resource.data.get('actor', '') == request.auth.uid
+        && (request.resource.data.get('businessId', '') == request.auth.uid
+            || isMemberOf(request.resource.data.get('businessId', ''))
+            || hasPendingInvite(request.resource.data.get('businessId', ''))
+            || isPlatformAdmin());
+      allow update, delete: if false;
+      // ---- Fix Round 2 · FR2 amendment (events) (START) ----
+      allow read: if isSignedIn()
+        && isRegistryOwner(resource.data.get('businessId', ''));
+      allow create: if isSignedIn()
+        && request.resource.data.get('actor', '') == request.auth.uid
+        && isRegistryOwner(request.resource.data.get('businessId', ''));
+      // ---- Fix Round 2 · FR2 amendment (events) (END) ----
+    }
+    // ---- Phase G · G1: platform collections (END) ----
+    // ---- Phase G · G3: platform collections II (START) ----
+
+    // Phase G · G3 — the remaining §6.1 blocks, landed with the
+    // console that first reads them (G1 shipped the seven blocks
+    // its own flows used). Pure additions in one delimited span:
+    // the harness strips this span and re-hashes to the pre-G3
+    // v9 file byte-for-byte. The doctrine is unchanged — every
+    // grant below stays inside the platform layer; NO leg here
+    // (or anywhere) gives platformAdmins a path into users/{uid}.
+
+    // Soft telemetry (§2.3): best-effort figures the shop's own
+    // app reports about itself — last activity, last day close,
+    // approximate document counts, client versions seen. Written
+    // ONLY by the business's owner (owner-role sessions); read
+    // by the owner and the platform. Always labelled "reported
+    // by the shop's app" wherever shown — never billing truth
+    // (that is businessCounters, whose arithmetic rules verify).
+    match /businessStats/{businessId} {
+      allow read: if isOwner(businessId) || isPlatformAdmin();
+      allow create, update: if isOwner(businessId);
+      allow delete: if false;
+      // ---- Fix Round 2 · FR2 amendment (stats) (START) ----
+      allow read: if isRegistryOwner(businessId);
+      allow create, update: if isRegistryOwner(businessId);
+      // ---- Fix Round 2 · FR2 amendment (stats) (END) ----
+    }
+
+    // Renewal records (§3.5): the platform's operational book of
+    // who paid what for which period. The business's owner
+    // submits (born `submitted`, in their own name, for their
+    // own business — a client cannot mint itself a confirmed
+    // payment); a platform admin moves a submitted record to
+    // exactly `confirmed` or `rejected`, signing it with their
+    // own uid (the period extension + snapshot refresh ride the
+    // same batch through the businesses admin-update leg, and
+    // the act's businessEvents entry through the create-only
+    // log). Nothing here touches the paying shop's journal —
+    // platform revenue lives in the platform owner's own
+    // business, recorded like any shop's (§3.5's doctrine).
+    match /platformPayments/{paymentId} {
+      allow read: if isPlatformAdmin()
+        || (isSignedIn()
+            && resource.data.get('businessId', '') == request.auth.uid);
+      allow create: if isSignedIn()
+        && request.resource.data.get('businessId', '') == request.auth.uid
+        && request.resource.data.get('submittedBy', '') == request.auth.uid
+        && request.resource.data.get('state', '') == 'submitted';
+      allow update: if isPlatformAdmin()
+        && resource.data.get('state', '') == 'submitted'
+        && request.resource.data.get('state', '') in ['confirmed', 'rejected']
+        && request.resource.data.get('confirmedBy', '') == request.auth.uid
+        && request.resource.data.diff(resource.data).affectedKeys()
+             .hasOnly(['state', 'confirmedBy', 'confirmedAt', 'note']);
+      allow delete: if false;
+    }
+
+    // Platform display data (§6.1): the payment instructions and
+    // support contact the renewal surface shows — text the admin
+    // maintains. Read by any signed-in user (a shopkeeper reads
+    // it to pay); written by platform admins only.
+    match /platformConfig/{docId} {
+      allow read: if isSignedIn();
+      allow create, update: if isPlatformAdmin();
+      allow delete: if false;
+    }
+    // ---- Phase G · G3: platform collections II (END) ----
+    // ---- Phase H · H3: storefront blocks (START) ----
+    // Phase H · H3 — the online store (design §2). Two top-level
+    // collections, OUTSIDE the tenant namespace by the same
+    // reasoning as the platform layer: the snapshot's reader is
+    // the public and the inbox's writer is anonymous — neither
+    // can hold a membership leg into users/{uid}, and neither
+    // gets one. NO leg below grants anyone a path from these
+    // collections into a tenant namespace, a journal, or stock.
+
+    // The published snapshot: doc id = the shop's slug, so slug
+    // uniqueness is structural (create-only-if-absent is the
+    // claim) and a slug, once a shop's, is never recycled —
+    // delete is denied to everyone; unpublishing is the
+    // `enabled` flag, an owner write like every write here.
+    // READS: the product's ONE deliberate public read — any
+    // caller, signed in or not, while the doc is enabled and
+    // storefrontLit derives lit from the business's assignment
+    // snapshot (§2.6) — OR any member of the business
+    // (canAccess): the shop's own preview renders in every plan
+    // state, and the desk reads its snapshot through the same
+    // leg. The platform is granted NOTHING here (§2.3's closed
+    // list stands; a squatted slug is retired by console act
+    // outside these rules, R-H7).
+    match /storefronts/{slug} {
+      allow read: if (resource.data.get('enabled', false) == true
+                     && storefrontLit(resource.data.get('businessId', '')))
+        || canAccess(resource.data.get('businessId', ''));
+      allow create: if isSignedIn() && storefrontWriteOk(slug);
+      // Update additionally requires the EXISTING doc to be the
+      // caller's own — claiming a slug another business owns is
+      // an update of their doc, and it fails here, not politely.
+      allow update: if isSignedIn()
+        // ---- Fix Round 2 · FR2 amendment (storefront update) (START) ----
+        && isBusinessOwner(resource.data.get('businessId', ''))
+        // ---- Fix Round 2 · FR2 amendment (storefront update) (END) ----
+        && storefrontWriteOk(slug);
+      allow delete: if false;
+    }
+
+    // The order inbox: auto-id docs, create-only for the public
+    // (shape-validated by storeOrderCreateOk — an unauthenticated
+    // caller may create and NOTHING else: not read his own order
+    // back, not update, not delete). The shop side reads its own
+    // business's inbox through membership. The state leg is the
+    // exactly-once claim (§2.5): an update may only move a doc
+    // OUT of 'new', exactly once, into 'converted' or
+    // 'dismissed', stamping only the transition fields — a
+    // converted order cannot convert twice, a dismissed order
+    // stays dismissed, and the order's substance (customer,
+    // lines) is immutable paper from birth. Delete is denied:
+    // spam is dismissed with an actor + timestamp, never
+    // silently dropped.
+    match /storeOrders/{orderId} {
+      allow read: if canAccess(resource.data.get('businessId', ''));
+      allow create: if storeOrderCreateOk();
+      allow update: if canAccess(resource.data.get('businessId', ''))
+        && resource.data.get('state', '') == 'new'
+        && request.resource.data.get('state', '') in ['converted', 'dismissed']
+        && request.resource.data.diff(resource.data).affectedKeys()
+             .hasOnly(['state', 'convertedSoId', 'convertedBy',
+                       'convertedAt', 'dismissedBy', 'dismissedAt']);
+      allow delete: if false;
+    }
+    // ---- Phase H · H3: storefront blocks (END) ----
+    // ---- Fix Round 2 · FR2: trash blocks (START) ----
+    // Clear-to-trash (FR2 item 2): the trash snapshot of a
+    // business — its whole book in chunked JSON, restorable for
+    // 30 days. Owner-only in every leg: the trash IS tenant
+    // data that happens to live outside users/{bid}, so the
+    // platform console gets NO leg here (the §2.1 doctrine —
+    // no platform path into tenant data — extends to its
+    // trash by the same reasoning). Members cannot clear, so
+    // they cannot read trash either; the owner who cleared
+    // is the only reader, restorer and deleter.
+    match /businessTrash/{businessId} {
+      match /snapshots/{trashId} {
+        allow read, write, delete: if isBusinessOwner(businessId);
+        match /chunks/{chunkIndex} {
+          allow read, write, delete: if isBusinessOwner(businessId);
+        }
+      }
+    }
+    // ---- Fix Round 2 · FR2: trash blocks (END) ----
     // Everything else — including the legacy top-level /products and
     // /sales collections — is closed.
     match /{document=**} {

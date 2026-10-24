@@ -1,4 +1,8 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- USB host for the direct ESC/POS transport (F2 §8); not
+         required — most shop phones have it, tablets without it
+         keep the share-sheet path. -->
+    <uses-feature android:name="android.hardware.usb.host" android:required="false" />
     <application
         android:label="Dukaan AI"
         android:name="${applicationName}"

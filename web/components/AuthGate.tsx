@@ -17,7 +17,7 @@ import { useLang } from "./LangProvider";
 const PUBLIC_PATHS = ["/login", "/signup"];
 
 export default function AuthGate({ children }: { children: React.ReactNode }) {
-  const { mode, user, loading } = useAuth();
+  const { mode, user, loading, noAccess, signOut } = useAuth();
   const { t } = useLang();
   const pathname = usePathname() ?? "/";
   const router = useRouter();
@@ -38,6 +38,30 @@ export default function AuthGate({ children }: { children: React.ReactNode }) {
         <div className="section">
           <div className="container">
             <div className="empty">{t("shell.checkingSession")}</div>
+          </div>
+        </div>
+      );
+    }
+    // Phase G · G1: the session resolved to NO business — the
+    // person was removed from the only shop they belonged to
+    // (design §1.3: removal takes effect on the next read, this
+    // session included). A plain explanation + sign-out, never a
+    // shop shell over a namespace they may not read.
+    if (user && noAccess && !isPublic) {
+      return (
+        <div className="section">
+          <div className="container">
+            <div className="empty">
+              <h2>{t("biz.noAccessTitle")}</h2>
+              <p>{t("biz.noAccessBody")}</p>
+              <button
+                type="button"
+                className="btn"
+                onClick={() => void signOut()}
+              >
+                {t("action.logout")}
+              </button>
+            </div>
           </div>
         </div>
       );

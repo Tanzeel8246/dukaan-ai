@@ -3,6 +3,7 @@
 import { createContext, useContext, useEffect, useMemo, useState } from "react";
 import {
   LANG_STORAGE_KEY,
+  isRtlLang,
   translate,
   type I18nKey,
   type Lang,
@@ -20,7 +21,7 @@ const LangContext = createContext<LangValue | null>(null);
 
 function applyLang(l: Lang) {
   document.documentElement.lang = l;
-  document.documentElement.dir = l === "ur" ? "rtl" : "ltr";
+  document.documentElement.dir = isRtlLang(l) ? "rtl" : "ltr";
   setFormatLang(l);
 }
 
@@ -33,7 +34,8 @@ export function LangProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     try {
       const saved = localStorage.getItem(LANG_STORAGE_KEY);
-      if (saved === "ur" || saved === "en") setLangState(saved);
+      if (saved === "ur" || saved === "en" || saved === "ps" || saved === "fa")
+        setLangState(saved);
     } catch {
       /* keep default */
     }

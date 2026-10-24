@@ -20,6 +20,7 @@ import { useLang } from "./LangProvider";
 import type { I18nKey } from "@/lib/i18n";
 import { IconPlus, IconSearch, IconSend, SearchClear } from "./ui";
 import { fmtDate, fmtPKR } from "@/lib/format";
+import { brandingDataUrls } from "@/lib/branding";
 import { matchesAny } from "@/lib/search";
 import { can } from "@/lib/permissions";
 import {
@@ -979,7 +980,7 @@ export function QuotationsManager() {
           </div>
         )}
       </div>
-      {printDoc && <DocPrintSheet doc={printDoc} kind="quotation" settings={settings} />}
+      {printDoc && <DocPrintSheet doc={printDoc} kind="quotation" settings={settings} products={products} assets={brandingDataUrls(store.branding)} />}
     </div>
   );
 }
@@ -1402,6 +1403,8 @@ export function SaleOrdersManager() {
           doc={printDoc}
           kind="order"
           settings={settings}
+          products={products}
+          assets={brandingDataUrls(store.branding)}
           sourceLabel={sourceLabelFor(printDoc)}
         />
       )}
@@ -1959,6 +1962,7 @@ export function DeliveryChallansManager() {
         <ChallanPrintSheet
           doc={printDoc}
           settings={settings}
+          assets={brandingDataUrls(store.branding)}
           sourceOrderLabel={
             printDoc.orderId
               ? (sourceOrderFor(printDoc)?.number ?? undefined)
@@ -2554,7 +2558,7 @@ export function PurchaseOrdersManager() {
           </div>
         )}
       </div>
-      {printDoc && <PoPrintSheet doc={printDoc} settings={settings} />}
+      {printDoc && <PoPrintSheet doc={printDoc} settings={settings} assets={brandingDataUrls(store.branding)} />}
     </div>
   );
 }

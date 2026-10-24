@@ -39,6 +39,8 @@ export const enDc = {
   "dc.expectedJournal": "Expected per journal — {account}: {amount}",
   "dc.journalNote":
     "The saved expected cash is the journal figure for {account}; the counter summary above stays as a cross-check.",
+  "dc.backlog":
+    "Un-closed earlier days: {days} day(s) moved {amount} at the till — already inside today's opening balance; this close records today only.",
   "dc.diff.label": "Difference (counted − expected)",
   "dc.diff.match": "Exact match",
   "dc.diff.over": "Over by {amount}",
@@ -91,7 +93,9 @@ export const urDc: Record<keyof typeof enDc, string> = {
   "dc.expectedJournal": "جرنل کے مطابق متوقع — {account}: {amount}",
   "dc.journalNote":
     "محفوظ شدہ متوقع نقدی {account} کے جرنل سے آتی ہے؛ اوپر والا کاؤنٹر خلاصہ تصدیقی جائزے کے طور پر رہتا ہے۔",
-  "dc.diff.label": "فرق (گنی ہوئی − متوقع)",
+    "dc.backlog":
+    "پچھلے غیر بند دن: {days} دنوں میں کاؤنٹر پر {amount} کی آمد و رفت — یہ رقم آج کی ابتدائی بیلنس میں پہلے سے شامل ہے؛ یہ بندش صرف آج کی ریکارڈ کرتی ہے۔",
+"dc.diff.label": "فرق (گنی ہوئی − متوقع)",
   "dc.diff.match": "بالکل درست",
   "dc.diff.over": "{amount} زیادہ",
   "dc.diff.short": "{amount} کم",

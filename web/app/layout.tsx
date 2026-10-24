@@ -25,13 +25,13 @@ const SITE_URL = "https://dukaan-ai.codehubb.com";
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
   title: {
-    default: "Dukaan AI — Smart Kiryana Shop Intelligence",
+    default: "Dukaan AI — Complete ERP for Every Business",
     template: "%s | Dukaan AI",
   },
   description:
-    "Dukaan AI is a smart inventory, sales and demand-forecasting assistant for kiryana stores — with a bilingual Urdu/English AI chat that answers from your own shop data.",
+    "Dukaan AI is a complete ERP for every kind of business — smart inventory, sales and demand forecasting, with a bilingual Urdu/English AI chat that answers from your own business data.",
   keywords: [
-    "kiryana store software",
+    "business ERP software",
     "dukaan AI",
     "inventory management Pakistan",
     "demand forecasting",
@@ -47,15 +47,15 @@ export const metadata: Metadata = {
     locale: "en_US",
     url: SITE_URL,
     siteName: "Dukaan AI",
-    title: "Dukaan AI — Smart Kiryana Shop Intelligence",
+    title: "Dukaan AI — Complete ERP for Every Business",
     description:
-      "Inventory, sales tracking and demand forecasting for kiryana stores — with a bilingual AI assistant.",
+      "Inventory, sales tracking and demand forecasting for every kind of business — with a bilingual AI assistant.",
   },
   twitter: {
     card: "summary",
-    title: "Dukaan AI — Smart Kiryana Shop Intelligence",
+    title: "Dukaan AI — Complete ERP for Every Business",
     description:
-      "Inventory, sales tracking and demand forecasting for kiryana stores — with a bilingual AI assistant.",
+      "Inventory, sales tracking and demand forecasting for every kind of business — with a bilingual AI assistant.",
   },
 };
 
@@ -67,7 +67,7 @@ const softwareAppJsonLd = {
   applicationCategory: "BusinessApplication",
   operatingSystem: "Web",
   description:
-    "Smart inventory, sales tracking and demand forecasting for kiryana stores, with a bilingual Urdu/English AI assistant.",
+    "Smart inventory, sales tracking and demand forecasting for every kind of business, with a bilingual Urdu/English AI assistant.",
   creator: {
     "@type": "Organization",
     name: "CodeHubb",
@@ -89,14 +89,14 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         id="theme-init"
         strategy="beforeInteractive"
         dangerouslySetInnerHTML={{
-          __html: `(function(){try{var t=localStorage.getItem('dukaan-ai-theme');if(!t){t=window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';}document.documentElement.dataset.theme=t;}catch(e){document.documentElement.dataset.theme='light';}})();`,
+          __html: `(function(){try{var t=localStorage.getItem('dukaan-ai-theme');if(t==='light')t='emerald';if(t==='dark')t='midnight';if(['emerald','midnight','ocean','sand','dusk'].indexOf(t)<0){t=window.matchMedia('(prefers-color-scheme: dark)').matches?'midnight':'emerald';}document.documentElement.dataset.theme=t;}catch(e){document.documentElement.dataset.theme='emerald';}})();`,
         }}
       />
       <Script
         id="lang-init"
         strategy="beforeInteractive"
         dangerouslySetInnerHTML={{
-          __html: `(function(){try{var l=localStorage.getItem('dukaan-ai-lang');if(l!=='ur'&&l!=='en'){l='ur';}document.documentElement.lang=l;document.documentElement.dir=l==='ur'?'rtl':'ltr';}catch(e){document.documentElement.lang='ur';document.documentElement.dir='rtl';}})();`,
+          __html: `(function(){try{var l=localStorage.getItem('dukaan-ai-lang');if(l!=='ur'&&l!=='en'&&l!=='ps'&&l!=='fa'){l='ur';}document.documentElement.lang=l;document.documentElement.dir=(l==='ur'||l==='ps'||l==='fa')?'rtl':'ltr';}catch(e){document.documentElement.lang='ur';document.documentElement.dir='rtl';}})();`,
         }}
       />
       <body>

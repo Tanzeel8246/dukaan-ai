@@ -1,0 +1,3389 @@
+{
+ "version": 2,
+ "source": "web/lib via harness/out (makeEntry, tax, ledger, cheques, documents, reports, selectors) + StoreProvider F2 template transcriptions",
+ "accounts": [
+  {
+   "id": "acct-till",
+   "name": "Main Till",
+   "kind": "cash",
+   "method": "cash",
+   "legacyFor": "cash",
+   "archived": false,
+   "sortOrder": 0,
+   "ts": "2026-01-01T00:00:00.000Z"
+  },
+  {
+   "id": "acct-wallet",
+   "name": "Wallet & Bank",
+   "kind": "wallet",
+   "method": null,
+   "legacyFor": "wallet",
+   "archived": false,
+   "sortOrder": 1,
+   "ts": "2026-01-01T00:00:00.000Z"
+  },
+  {
+   "id": "acct-jazz",
+   "name": "JazzCash",
+   "kind": "wallet",
+   "method": "jazzcash",
+   "legacyFor": null,
+   "archived": false,
+   "sortOrder": 2,
+   "ts": "2026-01-01T00:00:00.000Z"
+  },
+  {
+   "id": "acct-bank",
+   "name": "Meezan Bank",
+   "kind": "bank",
+   "method": "bank",
+   "legacyFor": null,
+   "archived": false,
+   "sortOrder": 3,
+   "ts": "2026-01-01T00:00:00.000Z"
+  }
+ ],
+ "products": [
+  {
+   "id": "p-tea",
+   "sku": "TEA-475",
+   "name": "Tapal Danedar Tea 475g",
+   "urduName": "چائے",
+   "category": "Grocery",
+   "unit": "pcs",
+   "costPrice": 800,
+   "salePrice": 1050,
+   "stockQty": 50,
+   "reorderLevel": 5,
+   "keywords": [],
+   "taxSlabId": null,
+   "taxExempt": false,
+   "stockClass": null
+  },
+  {
+   "id": "p-sugar",
+   "sku": "SUG-1KG",
+   "name": "Sugar 1kg",
+   "urduName": "چینی",
+   "category": "Grocery",
+   "unit": "kg",
+   "costPrice": 130,
+   "salePrice": 145,
+   "stockQty": 100,
+   "reorderLevel": 10,
+   "keywords": [],
+   "taxSlabId": null,
+   "taxExempt": false,
+   "stockClass": null
+  },
+  {
+   "id": "p-raw",
+   "sku": "RAW-LEAF",
+   "name": "Raw Tea Leaf 1kg",
+   "urduName": "کچی پتی",
+   "category": "Raw",
+   "unit": "kg",
+   "costPrice": 500,
+   "salePrice": 600,
+   "stockQty": 40,
+   "reorderLevel": 5,
+   "keywords": [],
+   "taxSlabId": null,
+   "taxExempt": false,
+   "stockClass": "raw"
+  },
+  {
+   "id": "p-oil",
+   "sku": "OIL-5L",
+   "name": "Cooking Oil 5L",
+   "urduName": "تیل",
+   "category": "Grocery",
+   "unit": "pcs",
+   "costPrice": 1000,
+   "salePrice": 1200,
+   "stockQty": 20,
+   "reorderLevel": 3,
+   "keywords": [],
+   "taxSlabId": "slab-gst-ex",
+   "taxExempt": false,
+   "stockClass": null
+  },
+  {
+   "id": "p-ghee",
+   "sku": "GHEE-1KG",
+   "name": "Desi Ghee 1kg",
+   "urduName": "گھی",
+   "category": "Grocery",
+   "unit": "kg",
+   "costPrice": 900,
+   "salePrice": 1170,
+   "stockQty": 15,
+   "reorderLevel": 3,
+   "keywords": [],
+   "taxSlabId": "slab-gst-in",
+   "taxExempt": false,
+   "stockClass": null
+  }
+ ],
+ "slabs": [
+  {
+   "id": "slab-gst-ex",
+   "name": "GST 17%",
+   "kind": "percent",
+   "rate": 17,
+   "appliesTo": "both",
+   "inclusive": false,
+   "isDefault": false,
+   "active": true,
+   "ts": "2026-01-01T00:00:00.000Z"
+  },
+  {
+   "id": "slab-gst-in",
+   "name": "GST 17% incl",
+   "kind": "percent",
+   "rate": 17,
+   "appliesTo": "both",
+   "inclusive": true,
+   "isDefault": false,
+   "active": true,
+   "ts": "2026-01-01T00:00:00.000Z"
+  }
+ ],
+ "settings": {
+  "defaultSalesTaxSlabId": null,
+  "defaultPurchaseTaxSlabId": null,
+  "docSeries": {}
+ },
+ "customer": {
+  "id": "cust-1",
+  "name": "Ahmed Traders",
+  "phone": "03001234567"
+ },
+ "supplier": {
+  "id": "sup-1",
+  "name": "Lahore Tea Co"
+ },
+ "scenarios": [
+  {
+   "id": "supplier-payment-cash",
+   "title": "Supplier payment in cash settles payables through the till",
+   "docs": {
+    "payment": {
+     "id": "spay-1",
+     "supplierId": "sup-1",
+     "amount": 4000,
+     "method": "cash",
+     "accountId": "acct-till",
+     "voucherNo": "PV-1",
+     "note": "Part payment",
+     "dayOffset": 0,
+     "ts": "2026-10-22T09:30:00.000Z"
+    }
+   },
+   "entries": [
+    {
+     "memo": "Supplier payment",
+     "refType": "supplier_payment",
+     "refId": "spay-1",
+     "reversesId": null,
+     "lines": [
+      {
+       "account": "payables",
+       "debit": 4000,
+       "credit": 0,
+       "ref": "sup-1"
+      },
+      {
+       "account": "cash",
+       "debit": 0,
+       "credit": 4000,
+       "ref": "acct-till"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "supplier-payment-bank",
+   "title": "Supplier payment by bank: wallet bucket, bank account ref",
+   "docs": {
+    "payment": {
+     "id": "spay-2",
+     "supplierId": "sup-1",
+     "amount": 2500,
+     "method": "bank",
+     "accountId": "acct-bank",
+     "voucherNo": "PV-2",
+     "note": "",
+     "dayOffset": 0,
+     "ts": "2026-10-22T09:35:00.000Z"
+    }
+   },
+   "entries": [
+    {
+     "memo": "Supplier payment",
+     "refType": "supplier_payment",
+     "refId": "spay-2",
+     "reversesId": null,
+     "lines": [
+      {
+       "account": "payables",
+       "debit": 2500,
+       "credit": 0,
+       "ref": "sup-1"
+      },
+      {
+       "account": "wallet",
+       "debit": 0,
+       "credit": 2500,
+       "ref": "acct-bank"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "supplier-payment-cheque",
+   "title": "Cheque payment settles the payable at issuance via cheques_issued",
+   "docs": {
+    "payment": {
+     "id": "spay-3",
+     "supplierId": "sup-1",
+     "amount": 6000,
+     "method": "bank",
+     "accountId": "acct-bank",
+     "instrument": "cheque",
+     "chequeId": "chq-out-1",
+     "voucherNo": "PV-3",
+     "note": "PDC",
+     "dayOffset": 0,
+     "ts": "2026-10-22T09:40:00.000Z"
+    },
+    "cheque": {
+     "id": "chq-out-1",
+     "direction": "out",
+     "chequeNo": "000123",
+     "bankName": "Meezan Bank",
+     "amount": 6000,
+     "issueDateISO": "2026-10-22",
+     "dueDateISO": "2026-10-29",
+     "partyId": "sup-1",
+     "partyName": "Lahore Tea Co",
+     "partyKind": "supplier",
+     "status": "issued",
+     "sourceType": "supplier_payment",
+     "sourceId": "spay-3",
+     "accountId": "acct-bank",
+     "chargesOnBounce": 0,
+     "entryIds": {
+      "captured": "ENTRY"
+     },
+     "note": "PDC",
+     "dayOffset": 0,
+     "ts": "2026-10-22T09:40:00.000Z"
+    }
+   },
+   "entries": [
+    {
+     "memo": "Supplier payment",
+     "refType": "supplier_payment",
+     "refId": "spay-3",
+     "reversesId": null,
+     "lines": [
+      {
+       "account": "payables",
+       "debit": 6000,
+       "credit": 0,
+       "ref": "sup-1"
+      },
+      {
+       "account": "cheques_issued",
+       "debit": 0,
+       "credit": 6000,
+       "ref": "chq-out-1"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "expense-cash",
+   "title": "Expense paid in cash from the till",
+   "docs": {
+    "expense": {
+     "id": "exp-1",
+     "category": "rent",
+     "amount": 15000,
+     "method": "cash",
+     "accountId": "acct-till",
+     "note": "October rent",
+     "dayOffset": 0,
+     "ts": "2026-10-22T08:00:00.000Z"
+    }
+   },
+   "entries": [
+    {
+     "memo": "Expense — rent",
+     "refType": "expense",
+     "refId": "exp-1",
+     "reversesId": null,
+     "lines": [
+      {
+       "account": "expense_rent",
+       "debit": 15000,
+       "credit": 0,
+       "ref": null
+      },
+      {
+       "account": "cash",
+       "debit": 0,
+       "credit": 15000,
+       "ref": "acct-till"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "expense-reversal",
+   "title": "Expense correction is a mirror entry citing the original (F-5)",
+   "docs": {
+    "expense": {
+     "id": "exp-1",
+     "category": "rent",
+     "amount": 15000,
+     "method": "cash",
+     "accountId": "acct-till",
+     "note": "October rent",
+     "dayOffset": 0,
+     "ts": "2026-10-22T08:00:00.000Z"
+    }
+   },
+   "entries": [
+    {
+     "memo": "Expense — rent",
+     "refType": "expense",
+     "refId": "exp-1",
+     "reversesId": null,
+     "lines": [
+      {
+       "account": "expense_rent",
+       "debit": 15000,
+       "credit": 0,
+       "ref": null
+      },
+      {
+       "account": "cash",
+       "debit": 0,
+       "credit": 15000,
+       "ref": "acct-till"
+      }
+     ]
+    },
+    {
+     "memo": "Expense reversal — rent",
+     "refType": "expense_reversal",
+     "refId": "exp-1",
+     "reversesId": "e0",
+     "lines": [
+      {
+       "account": "expense_rent",
+       "debit": 0,
+       "credit": 15000,
+       "ref": null
+      },
+      {
+       "account": "cash",
+       "debit": 15000,
+       "credit": 0,
+       "ref": "acct-till"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "expense-cheque",
+   "title": "Cheque expense credits the cheques_issued bridge, no money account",
+   "docs": {
+    "expense": {
+     "id": "exp-2",
+     "category": "other",
+     "amount": 3000,
+     "method": "bank",
+     "accountId": "acct-bank",
+     "instrument": "cheque",
+     "chequeId": "chq-out-2",
+     "note": "Printer repair",
+     "dayOffset": 0,
+     "ts": "2026-10-22T08:10:00.000Z"
+    },
+    "cheque": {
+     "id": "chq-out-2",
+     "direction": "out",
+     "chequeNo": "000124",
+     "bankName": "Meezan Bank",
+     "amount": 3000,
+     "issueDateISO": "2026-10-22",
+     "dueDateISO": "2026-10-25",
+     "partyId": null,
+     "partyName": "Printer repair",
+     "partyKind": "expense",
+     "status": "issued",
+     "sourceType": "expense",
+     "sourceId": "exp-2",
+     "accountId": "acct-bank",
+     "chargesOnBounce": 0,
+     "entryIds": {
+      "captured": "ENTRY"
+     },
+     "note": "Printer repair",
+     "dayOffset": 0,
+     "ts": "2026-10-22T08:10:00.000Z"
+    }
+   },
+   "entries": [
+    {
+     "memo": "Expense — other",
+     "refType": "expense",
+     "refId": "exp-2",
+     "reversesId": null,
+     "lines": [
+      {
+       "account": "expense_other",
+       "debit": 3000,
+       "credit": 0,
+       "ref": null
+      },
+      {
+       "account": "cheques_issued",
+       "debit": 0,
+       "credit": 3000,
+       "ref": "chq-out-2"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "cash-in-capital",
+   "title": "Manual cash in books owner capital",
+   "docs": {
+    "cashEntry": {
+     "id": "cash-1",
+     "kind": "in",
+     "amount": 50000,
+     "method": "cash",
+     "accountId": "acct-till",
+     "note": "Owner capital",
+     "dayOffset": 0,
+     "ts": "2026-10-22T08:20:00.000Z"
+    }
+   },
+   "entries": [
+    {
+     "memo": "Cash in — Owner capital",
+     "refType": "cashbook",
+     "refId": "cash-1",
+     "reversesId": null,
+     "lines": [
+      {
+       "account": "cash",
+       "debit": 50000,
+       "credit": 0,
+       "ref": "acct-till"
+      },
+      {
+       "account": "capital",
+       "debit": 0,
+       "credit": 50000,
+       "ref": null
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "cash-out-drawings",
+   "title": "Manual cash out books owner drawings",
+   "docs": {
+    "cashEntry": {
+     "id": "cash-2",
+     "kind": "out",
+     "amount": 8000,
+     "method": "wallet",
+     "accountId": "acct-wallet",
+     "note": "Owner drawings",
+     "dayOffset": 0,
+     "ts": "2026-10-22T08:25:00.000Z"
+    }
+   },
+   "entries": [
+    {
+     "memo": "Cash out — Owner drawings",
+     "refType": "cashbook",
+     "refId": "cash-2",
+     "reversesId": null,
+     "lines": [
+      {
+       "account": "drawings",
+       "debit": 8000,
+       "credit": 0,
+       "ref": null
+      },
+      {
+       "account": "wallet",
+       "debit": 0,
+       "credit": 8000,
+       "ref": "acct-wallet"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "transfer-cross-bucket",
+   "title": "Transfer between buckets moves both GL accounts",
+   "docs": {
+    "cashEntry": {
+     "id": "cash-3",
+     "kind": "transfer",
+     "amount": 5000,
+     "method": "wallet",
+     "accountId": null,
+     "fromAccountId": "acct-wallet",
+     "toAccountId": "acct-till",
+     "note": "Till top-up",
+     "dayOffset": 0,
+     "ts": "2026-10-22T08:30:00.000Z"
+    }
+   },
+   "entries": [
+    {
+     "memo": "Transfer — Wallet & Bank → Main Till",
+     "refType": "transfer",
+     "refId": "cash-3",
+     "reversesId": null,
+     "lines": [
+      {
+       "account": "cash",
+       "debit": 5000,
+       "credit": 0,
+       "ref": "acct-till"
+      },
+      {
+       "account": "wallet",
+       "debit": 0,
+       "credit": 5000,
+       "ref": "acct-wallet"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "transfer-same-bucket",
+   "title": "Same-bucket transfer: two wallet lines, bucket total unmoved",
+   "docs": {
+    "cashEntry": {
+     "id": "cash-4",
+     "kind": "transfer",
+     "amount": 2000,
+     "method": "wallet",
+     "accountId": null,
+     "fromAccountId": "acct-jazz",
+     "toAccountId": "acct-wallet",
+     "note": "Sweep",
+     "dayOffset": 0,
+     "ts": "2026-10-22T08:35:00.000Z"
+    }
+   },
+   "entries": [
+    {
+     "memo": "Transfer — JazzCash → Wallet & Bank",
+     "refType": "transfer",
+     "refId": "cash-4",
+     "reversesId": null,
+     "lines": [
+      {
+       "account": "wallet",
+       "debit": 2000,
+       "credit": 0,
+       "ref": "acct-wallet"
+      },
+      {
+       "account": "wallet",
+       "debit": 0,
+       "credit": 2000,
+       "ref": "acct-jazz"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "tax-payment",
+   "title": "Tax payment is capped at taxPosition.netPayable of the journal before it",
+   "docs": {
+    "bill": {
+     "id": "bill-tax-1",
+     "billNo": 21,
+     "customerId": null,
+     "customerName": "",
+     "customerPhone": "",
+     "items": [
+      {
+       "productId": "p-oil",
+       "name": "Cooking Oil 5L",
+       "qty": 2,
+       "unitPrice": 1200,
+       "unitCost": 1000,
+       "total": 2400,
+       "taxAmount": 408,
+       "taxSlabId": "slab-gst-ex",
+       "taxSlabName": "GST 17%",
+       "taxRate": 17,
+       "taxKind": "percent",
+       "taxInclusive": false
+      }
+     ],
+     "subtotal": 2400,
+     "discountType": "flat",
+     "discountValue": 0,
+     "discountAmount": 0,
+     "taxAmount": 408,
+     "total": 2808,
+     "payments": [
+      {
+       "method": "cash",
+       "amount": 2808,
+       "accountId": "acct-till"
+      }
+     ],
+     "status": "paid",
+     "returnedQty": {},
+     "dayOffset": 0,
+     "ts": "2026-10-22T10:00:00.000Z"
+    },
+    "cashEntry": {
+     "id": "cash-5",
+     "kind": "out",
+     "amount": 300,
+     "method": "cash",
+     "accountId": "acct-till",
+     "note": "Tax payment",
+     "dayOffset": 0,
+     "ts": "2026-10-22T12:40:00.000Z"
+    },
+    "taxDueBefore": 408
+   },
+   "entries": [
+    {
+     "memo": "Bill #21 — Walk-in customer",
+     "refType": "bill",
+     "refId": "bill-tax-1",
+     "reversesId": null,
+     "lines": [
+      {
+       "account": "cash",
+       "debit": 2808,
+       "credit": 0,
+       "ref": "acct-till"
+      },
+      {
+       "account": "cogs",
+       "debit": 2000,
+       "credit": 0,
+       "ref": null
+      },
+      {
+       "account": "sales_revenue",
+       "debit": 0,
+       "credit": 2400,
+       "ref": null
+      },
+      {
+       "account": "tax_payable",
+       "debit": 0,
+       "credit": 408,
+       "ref": null
+      },
+      {
+       "account": "inventory",
+       "debit": 0,
+       "credit": 2000,
+       "ref": null
+      }
+     ]
+    },
+    {
+     "memo": "Tax payment — government",
+     "refType": "tax_payment",
+     "refId": "cash-5",
+     "reversesId": null,
+     "lines": [
+      {
+       "account": "tax_payable",
+       "debit": 300,
+       "credit": 0,
+       "ref": null
+      },
+      {
+       "account": "cash",
+       "debit": 0,
+       "credit": 300,
+       "ref": "acct-till"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "purchase-return-offset",
+   "title": "Purchase return by payable offset: Dr payables / Cr inventory + tax_input; DN wraps it",
+   "docs": {
+    "purchase": {
+     "id": "pur-9",
+     "supplierId": "sup-1",
+     "items": [
+      {
+       "productId": "p-oil",
+       "name": "Cooking Oil 5L",
+       "qty": 5,
+       "unitCost": 1000,
+       "total": 5000,
+       "taxAmount": 850,
+       "taxSlabId": "slab-gst-ex",
+       "taxSlabName": "GST 17%",
+       "taxRate": 17,
+       "taxKind": "percent",
+       "taxInclusive": false
+      },
+      {
+       "productId": "p-raw",
+       "name": "Raw Tea Leaf 1kg",
+       "qty": 4,
+       "unitCost": 500,
+       "total": 2000,
+       "taxAmount": 0,
+       "taxSlabId": null,
+       "taxSlabName": null,
+       "taxRate": 0,
+       "taxKind": "percent",
+       "taxInclusive": false
+      }
+     ],
+     "total": 7850,
+     "netTotal": 7000,
+     "taxAmount": 850,
+     "note": "",
+     "dayOffset": 0,
+     "ts": "2026-10-22T09:00:00.000Z"
+    },
+    "purchaseReturn": {
+     "id": "pret-1",
+     "purchaseId": "pur-9",
+     "supplierId": "sup-1",
+     "items": [
+      {
+       "productId": "p-oil",
+       "name": "Cooking Oil 5L",
+       "qty": 2,
+       "unitCost": 1000,
+       "total": 2000,
+       "taxAmount": 340,
+       "taxSlabId": "slab-gst-ex",
+       "taxSlabName": "GST 17%",
+       "taxRate": 17,
+       "taxKind": "percent",
+       "taxInclusive": false
+      }
+     ],
+     "payableOffset": 2340,
+     "refundAmount": 0,
+     "method": null,
+     "accountId": null,
+     "dayOffset": 0,
+     "ts": "2026-10-22T12:30:00.000Z"
+    },
+    "note": {
+     "id": "note-pret-1",
+     "number": "DN-1",
+     "kind": "debit",
+     "returnId": "pret-1",
+     "billId": null,
+     "billNo": null,
+     "purchaseId": "pur-9",
+     "partyId": "sup-1",
+     "partyName": "Lahore Tea Co",
+     "items": [
+      {
+       "productId": "p-oil",
+       "name": "Cooking Oil 5L",
+       "qty": 2,
+       "unitPrice": 1000,
+       "unitCost": 1000,
+       "total": 2000,
+       "taxAmount": 340,
+       "taxSlabId": "slab-gst-ex",
+       "taxSlabName": "GST 17%",
+       "taxRate": 17,
+       "taxKind": "percent",
+       "taxInclusive": false
+      }
+     ],
+     "goodsAmount": 2000,
+     "taxAmount": 340,
+     "total": 2340,
+     "settlement": "payable_offset",
+     "journalEntryId": "ENTRY",
+     "reason": "Damaged stock",
+     "status": "posted",
+     "dayOffset": 0,
+     "ts": "2026-10-22T12:30:00.000Z"
+    }
+   },
+   "entries": [
+    {
+     "memo": "Purchase return — goods sent back",
+     "refType": "purchase_return",
+     "refId": "pret-1",
+     "reversesId": null,
+     "lines": [
+      {
+       "account": "payables",
+       "debit": 2340,
+       "credit": 0,
+       "ref": "sup-1"
+      },
+      {
+       "account": "inventory",
+       "debit": 0,
+       "credit": 2000,
+       "ref": null
+      },
+      {
+       "account": "tax_input",
+       "debit": 0,
+       "credit": 340,
+       "ref": null
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "purchase-return-refund",
+   "title": "Purchase return by cash refund: Dr cash / Cr inventory + tax_input",
+   "docs": {
+    "purchase": {
+     "id": "pur-10",
+     "supplierId": "sup-1",
+     "items": [
+      {
+       "productId": "p-oil",
+       "name": "Cooking Oil 5L",
+       "qty": 5,
+       "unitCost": 1000,
+       "total": 5000,
+       "taxAmount": 850,
+       "taxSlabId": "slab-gst-ex",
+       "taxSlabName": "GST 17%",
+       "taxRate": 17,
+       "taxKind": "percent",
+       "taxInclusive": false
+      }
+     ],
+     "total": 5850,
+     "netTotal": 5000,
+     "taxAmount": 850,
+     "note": "",
+     "dayOffset": 0,
+     "ts": "2026-10-22T09:00:00.000Z"
+    },
+    "purchaseReturn": {
+     "id": "pret-2",
+     "purchaseId": "pur-10",
+     "supplierId": "sup-1",
+     "items": [
+      {
+       "productId": "p-oil",
+       "name": "Cooking Oil 5L",
+       "qty": 1,
+       "unitCost": 1000,
+       "total": 1000,
+       "taxAmount": 170,
+       "taxSlabId": "slab-gst-ex",
+       "taxSlabName": "GST 17%",
+       "taxRate": 17,
+       "taxKind": "percent",
+       "taxInclusive": false
+      }
+     ],
+     "payableOffset": 0,
+     "refundAmount": 1170,
+     "method": "cash",
+     "accountId": "acct-till",
+     "dayOffset": 0,
+     "ts": "2026-10-22T12:30:00.000Z"
+    },
+    "note": {
+     "id": "note-pret-2",
+     "number": "DN-2",
+     "kind": "debit",
+     "returnId": "pret-2",
+     "billId": null,
+     "billNo": null,
+     "purchaseId": "pur-10",
+     "partyId": "sup-1",
+     "partyName": "Lahore Tea Co",
+     "items": [
+      {
+       "productId": "p-oil",
+       "name": "Cooking Oil 5L",
+       "qty": 1,
+       "unitPrice": 1000,
+       "unitCost": 1000,
+       "total": 1000,
+       "taxAmount": 170,
+       "taxSlabId": "slab-gst-ex",
+       "taxSlabName": "GST 17%",
+       "taxRate": 17,
+       "taxKind": "percent",
+       "taxInclusive": false
+      }
+     ],
+     "goodsAmount": 1000,
+     "taxAmount": 170,
+     "total": 1170,
+     "settlement": "cash_refund",
+     "journalEntryId": "ENTRY",
+     "reason": "Damaged stock",
+     "status": "posted",
+     "dayOffset": 0,
+     "ts": "2026-10-22T12:30:00.000Z"
+    }
+   },
+   "entries": [
+    {
+     "memo": "Purchase return — goods sent back",
+     "refType": "purchase_return",
+     "refId": "pret-2",
+     "reversesId": null,
+     "lines": [
+      {
+       "account": "cash",
+       "debit": 1170,
+       "credit": 0,
+       "ref": "acct-till"
+      },
+      {
+       "account": "inventory",
+       "debit": 0,
+       "credit": 1000,
+       "ref": null
+      },
+      {
+       "account": "tax_input",
+       "debit": 0,
+       "credit": 170,
+       "ref": null
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "cheque-clear-in",
+   "title": "IN clearing: Dr deposit account bucket / Cr cheques_in_hand",
+   "docs": {
+    "cheque": {
+     "id": "chq-in-1",
+     "direction": "in",
+     "chequeNo": "A-778",
+     "bankName": "HBL",
+     "amount": 5000,
+     "issueDateISO": "2026-10-20",
+     "dueDateISO": "2026-10-22",
+     "partyId": "cust-1",
+     "partyName": "Ahmed Traders",
+     "partyKind": "customer",
+     "status": "deposited",
+     "sourceType": "repayment",
+     "sourceId": "cr-x",
+     "accountId": "acct-wallet",
+     "chargesOnBounce": 0,
+     "entryIds": {
+      "captured": "EXT"
+     },
+     "note": "",
+     "dayOffset": 0,
+     "ts": "2026-10-20T10:00:00.000Z"
+    }
+   },
+   "entries": [
+    {
+     "memo": "Cheque A-778 cleared — Ahmed Traders",
+     "refType": "cheque_clearing",
+     "refId": "chq-in-1",
+     "reversesId": null,
+     "lines": [
+      {
+       "account": "wallet",
+       "debit": 5000,
+       "credit": 0,
+       "ref": "acct-wallet"
+      },
+      {
+       "account": "cheques_in_hand",
+       "debit": 0,
+       "credit": 5000,
+       "ref": "chq-in-1"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "cheque-bounce-in",
+   "title": "IN bounce restores the receivable; charges are a separate entry; compensating credit row re-opens the khata",
+   "docs": {
+    "cheque": {
+     "id": "chq-in-2",
+     "direction": "in",
+     "chequeNo": "A-779",
+     "bankName": "HBL",
+     "amount": 7000,
+     "issueDateISO": "2026-10-19",
+     "dueDateISO": "2026-10-21",
+     "partyId": "cust-1",
+     "partyName": "Ahmed Traders",
+     "partyKind": "customer",
+     "status": "deposited",
+     "sourceType": "bill",
+     "sourceId": "bill-x",
+     "accountId": "acct-wallet",
+     "chargesOnBounce": 0,
+     "entryIds": {
+      "captured": "EXT"
+     },
+     "note": "",
+     "dayOffset": 0,
+     "ts": "2026-10-19T10:00:00.000Z"
+    },
+    "creditRow": {
+     "id": "cr-comp-1",
+     "customerId": "cust-1",
+     "customerName": "Ahmed Traders",
+     "customerPhone": "03001234567",
+     "kind": "credit",
+     "amount": 7000,
+     "instrument": "cheque",
+     "chequeId": "chq-in-2",
+     "note": "Cheque bounced — HBL A-779",
+     "billId": "bill-x",
+     "dayOffset": 0,
+     "ts": "2026-10-22T13:05:00.000Z"
+    }
+   },
+   "entries": [
+    {
+     "memo": "Cheque A-779 bounced — Ahmed Traders",
+     "refType": "cheque_bounce",
+     "refId": "chq-in-2",
+     "reversesId": null,
+     "lines": [
+      {
+       "account": "receivables",
+       "debit": 7000,
+       "credit": 0,
+       "ref": "cust-1"
+      },
+      {
+       "account": "cheques_in_hand",
+       "debit": 0,
+       "credit": 7000,
+       "ref": "chq-in-2"
+      }
+     ]
+    },
+    {
+     "memo": "Bank charges — cheque A-779 bounced",
+     "refType": "cheque_bounce",
+     "refId": "chq-in-2",
+     "reversesId": null,
+     "lines": [
+      {
+       "account": "expense_finance",
+       "debit": 150,
+       "credit": 0,
+       "ref": null
+      },
+      {
+       "account": "wallet",
+       "debit": 0,
+       "credit": 150,
+       "ref": "acct-wallet"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "cheque-return-in",
+   "title": "IN return (undeposited) mirrors capture and re-opens the khata",
+   "docs": {
+    "cheque": {
+     "id": "chq-in-3",
+     "direction": "in",
+     "chequeNo": "A-780",
+     "bankName": "UBL",
+     "amount": 2200,
+     "issueDateISO": "2026-10-21",
+     "dueDateISO": "2026-10-28",
+     "partyId": "cust-1",
+     "partyName": "Ahmed Traders",
+     "partyKind": "customer",
+     "status": "received",
+     "sourceType": "repayment",
+     "sourceId": "cr-y",
+     "accountId": null,
+     "chargesOnBounce": 0,
+     "entryIds": {
+      "captured": "EXT"
+     },
+     "note": "",
+     "dayOffset": 0,
+     "ts": "2026-10-21T10:00:00.000Z"
+    },
+    "creditRow": {
+     "id": "cr-comp-2",
+     "customerId": "cust-1",
+     "customerName": "Ahmed Traders",
+     "customerPhone": "03001234567",
+     "kind": "credit",
+     "amount": 2200,
+     "instrument": "cheque",
+     "chequeId": "chq-in-3",
+     "note": "Cheque returned — UBL A-780",
+     "billId": null,
+     "dayOffset": 0,
+     "ts": "2026-10-22T13:10:00.000Z"
+    }
+   },
+   "entries": [
+    {
+     "memo": "Cheque A-780 returned — Ahmed Traders",
+     "refType": "cheque_return",
+     "refId": "chq-in-3",
+     "reversesId": null,
+     "lines": [
+      {
+       "account": "receivables",
+       "debit": 2200,
+       "credit": 0,
+       "ref": "cust-1"
+      },
+      {
+       "account": "cheques_in_hand",
+       "debit": 0,
+       "credit": 2200,
+       "ref": "chq-in-3"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "cheque-clear-out",
+   "title": "OUT clearing: Dr cheques_issued / Cr drawn-on account bucket",
+   "docs": {
+    "cheque": {
+     "id": "chq-out-1",
+     "direction": "out",
+     "chequeNo": "000123",
+     "bankName": "Meezan Bank",
+     "amount": 6000,
+     "issueDateISO": "2026-10-22",
+     "dueDateISO": "2026-10-29",
+     "partyId": "sup-1",
+     "partyName": "Lahore Tea Co",
+     "partyKind": "supplier",
+     "status": "issued",
+     "sourceType": "supplier_payment",
+     "sourceId": "spay-3",
+     "accountId": "acct-bank",
+     "chargesOnBounce": 0,
+     "entryIds": {
+      "captured": "EXT"
+     },
+     "note": "PDC",
+     "dayOffset": 0,
+     "ts": "2026-10-22T09:40:00.000Z"
+    }
+   },
+   "entries": [
+    {
+     "memo": "Cheque 000123 cleared — Lahore Tea Co",
+     "refType": "cheque_clearing",
+     "refId": "chq-out-1",
+     "reversesId": null,
+     "lines": [
+      {
+       "account": "cheques_issued",
+       "debit": 6000,
+       "credit": 0,
+       "ref": "chq-out-1"
+      },
+      {
+       "account": "wallet",
+       "debit": 0,
+       "credit": 6000,
+       "ref": "acct-bank"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "cheque-bounce-out",
+   "title": "OUT bounce: Dr cheques_issued / Cr payables; reversal row nets supplierPaid",
+   "docs": {
+    "cheque": {
+     "id": "chq-out-1",
+     "direction": "out",
+     "chequeNo": "000123",
+     "bankName": "Meezan Bank",
+     "amount": 6000,
+     "issueDateISO": "2026-10-22",
+     "dueDateISO": "2026-10-29",
+     "partyId": "sup-1",
+     "partyName": "Lahore Tea Co",
+     "partyKind": "supplier",
+     "status": "issued",
+     "sourceType": "supplier_payment",
+     "sourceId": "spay-3",
+     "accountId": "acct-bank",
+     "chargesOnBounce": 0,
+     "entryIds": {
+      "captured": "EXT"
+     },
+     "note": "PDC",
+     "dayOffset": 0,
+     "ts": "2026-10-22T09:40:00.000Z"
+    },
+    "paymentRow": {
+     "id": "spay-rev-1",
+     "supplierId": "sup-1",
+     "amount": 6000,
+     "method": "bank",
+     "accountId": "acct-bank",
+     "kind": "reversal",
+     "instrument": "cheque",
+     "chequeId": "chq-out-1",
+     "note": "Cheque bounced — Meezan Bank 000123",
+     "dayOffset": 0,
+     "ts": "2026-10-22T13:20:00.000Z"
+    }
+   },
+   "entries": [
+    {
+     "memo": "Cheque 000123 bounced — Lahore Tea Co",
+     "refType": "cheque_bounce",
+     "refId": "chq-out-1",
+     "reversesId": null,
+     "lines": [
+      {
+       "account": "cheques_issued",
+       "debit": 6000,
+       "credit": 0,
+       "ref": "chq-out-1"
+      },
+      {
+       "account": "payables",
+       "debit": 0,
+       "credit": 6000,
+       "ref": "sup-1"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "bill-cheque-capture",
+   "title": "Cheque part debits cheques_in_hand inside the bill entry; registry doc is born received",
+   "docs": {
+    "bill": {
+     "id": "bill-8",
+     "billNo": 8,
+     "customerId": "cust-1",
+     "customerName": "Ahmed Traders",
+     "customerPhone": "03001234567",
+     "items": [
+      {
+       "productId": "p-tea",
+       "name": "Tapal Danedar Tea 475g",
+       "qty": 1,
+       "unitPrice": 1050,
+       "unitCost": 800,
+       "total": 1050,
+       "taxAmount": 0,
+       "taxSlabId": null,
+       "taxSlabName": null,
+       "taxRate": 0,
+       "taxKind": "percent",
+       "taxInclusive": false
+      }
+     ],
+     "subtotal": 1050,
+     "discountType": "flat",
+     "discountValue": 0,
+     "discountAmount": 0,
+     "taxAmount": 0,
+     "total": 1050,
+     "payments": [
+      {
+       "method": "bank",
+       "amount": 1050,
+       "accountId": null,
+       "instrument": "cheque",
+       "chequeId": "chq-in-9"
+      }
+     ],
+     "status": "paid",
+     "returnedQty": {},
+     "dayOffset": 0,
+     "ts": "2026-10-22T10:00:00.000Z"
+    },
+    "cheque": {
+     "id": "chq-in-9",
+     "direction": "in",
+     "chequeNo": "B-100",
+     "bankName": "MCB",
+     "amount": 1050,
+     "issueDateISO": "2026-10-22",
+     "dueDateISO": "2026-10-24",
+     "partyId": "cust-1",
+     "partyName": "Ahmed Traders",
+     "partyKind": "customer",
+     "status": "received",
+     "sourceType": "bill",
+     "sourceId": "bill-8",
+     "accountId": null,
+     "chargesOnBounce": 0,
+     "entryIds": {
+      "captured": "ENTRY"
+     },
+     "note": "",
+     "dayOffset": 0,
+     "ts": "2026-10-22T10:00:00.000Z"
+    }
+   },
+   "entries": [
+    {
+     "memo": "Bill #8 — Ahmed Traders",
+     "refType": "bill",
+     "refId": "bill-8",
+     "reversesId": null,
+     "lines": [
+      {
+       "account": "cheques_in_hand",
+       "debit": 1050,
+       "credit": 0,
+       "ref": "chq-in-9"
+      },
+      {
+       "account": "cogs",
+       "debit": 800,
+       "credit": 0,
+       "ref": null
+      },
+      {
+       "account": "sales_revenue",
+       "debit": 0,
+       "credit": 1050,
+       "ref": null
+      },
+      {
+       "account": "inventory",
+       "debit": 0,
+       "credit": 800,
+       "ref": null
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "void-cheque-handback",
+   "title": "Void hands a still-in-hand cheque back: Cr cheques_in_hand, registry closes returned",
+   "docs": {
+    "bill": {
+     "id": "bill-8",
+     "billNo": 8,
+     "customerId": "cust-1",
+     "customerName": "Ahmed Traders",
+     "customerPhone": "03001234567",
+     "items": [
+      {
+       "productId": "p-tea",
+       "name": "Tapal Danedar Tea 475g",
+       "qty": 1,
+       "unitPrice": 1050,
+       "unitCost": 800,
+       "total": 1050,
+       "taxAmount": 0,
+       "taxSlabId": null,
+       "taxSlabName": null,
+       "taxRate": 0,
+       "taxKind": "percent",
+       "taxInclusive": false
+      }
+     ],
+     "subtotal": 1050,
+     "discountType": "flat",
+     "discountValue": 0,
+     "discountAmount": 0,
+     "taxAmount": 0,
+     "total": 1050,
+     "payments": [
+      {
+       "method": "bank",
+       "amount": 1050,
+       "accountId": null,
+       "instrument": "cheque",
+       "chequeId": "chq-in-9"
+      }
+     ],
+     "status": "paid",
+     "returnedQty": {},
+     "dayOffset": 0,
+     "ts": "2026-10-22T10:00:00.000Z"
+    },
+    "cheque": {
+     "id": "chq-in-9",
+     "direction": "in",
+     "chequeNo": "B-100",
+     "bankName": "MCB",
+     "amount": 1050,
+     "issueDateISO": "2026-10-22",
+     "dueDateISO": "2026-10-24",
+     "partyId": "cust-1",
+     "partyName": "Ahmed Traders",
+     "partyKind": "customer",
+     "status": "received",
+     "sourceType": "bill",
+     "sourceId": "bill-8",
+     "accountId": null,
+     "chargesOnBounce": 0,
+     "entryIds": {
+      "captured": "ENTRY"
+     },
+     "note": "",
+     "dayOffset": 0,
+     "ts": "2026-10-22T10:00:00.000Z"
+    }
+   },
+   "entries": [
+    {
+     "memo": "Bill #8 voided",
+     "refType": "bill_void",
+     "refId": "bill-8",
+     "reversesId": null,
+     "lines": [
+      {
+       "account": "sales_revenue",
+       "debit": 1050,
+       "credit": 0,
+       "ref": null
+      },
+      {
+       "account": "inventory",
+       "debit": 800,
+       "credit": 0,
+       "ref": null
+      },
+      {
+       "account": "cheques_in_hand",
+       "debit": 0,
+       "credit": 1050,
+       "ref": "chq-in-9"
+      },
+      {
+       "account": "cogs",
+       "debit": 0,
+       "credit": 800,
+       "ref": null
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "repayment-cheque",
+   "title": "Cheque repayment settles the receivable now, value in cheques_in_hand",
+   "docs": {
+    "creditRow": {
+     "id": "cr-repay-chq",
+     "customerId": "cust-1",
+     "customerName": "Ahmed Traders",
+     "customerPhone": "03001234567",
+     "kind": "repayment",
+     "amount": 4500,
+     "method": "bank",
+     "accountId": null,
+     "instrument": "cheque",
+     "chequeId": "chq-in-10",
+     "voucherNo": "RV-9",
+     "note": "",
+     "billId": null,
+     "dayOffset": 0,
+     "ts": "2026-10-22T14:05:00.000Z"
+    },
+    "cheque": {
+     "id": "chq-in-10",
+     "direction": "in",
+     "chequeNo": "B-101",
+     "bankName": "MCB",
+     "amount": 4500,
+     "issueDateISO": "2026-10-22",
+     "dueDateISO": "2026-10-26",
+     "partyId": "cust-1",
+     "partyName": "Ahmed Traders",
+     "partyKind": "customer",
+     "status": "received",
+     "sourceType": "repayment",
+     "sourceId": "cr-repay-chq",
+     "accountId": null,
+     "chargesOnBounce": 0,
+     "entryIds": {
+      "captured": "ENTRY"
+     },
+     "note": "",
+     "dayOffset": 0,
+     "ts": "2026-10-22T14:05:00.000Z"
+    }
+   },
+   "entries": [
+    {
+     "memo": "Udhaar repayment — Ahmed Traders",
+     "refType": "repayment",
+     "refId": "cr-repay-chq",
+     "reversesId": null,
+     "lines": [
+      {
+       "account": "cheques_in_hand",
+       "debit": 4500,
+       "credit": 0,
+       "ref": "chq-in-10"
+      },
+      {
+       "account": "receivables",
+       "debit": 0,
+       "credit": 4500,
+       "ref": "cust-1"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "return-with-note",
+   "title": "Credit note figures EQUAL the return engine's figures by construction",
+   "docs": {
+    "bill": {
+     "id": "bill-9",
+     "billNo": 9,
+     "customerId": "cust-1",
+     "customerName": "Ahmed Traders",
+     "customerPhone": "03001234567",
+     "items": [
+      {
+       "productId": "p-tea",
+       "name": "Tapal Danedar Tea 475g",
+       "qty": 1,
+       "unitPrice": 1050,
+       "unitCost": 800,
+       "total": 1050,
+       "taxAmount": 0,
+       "taxSlabId": null,
+       "taxSlabName": null,
+       "taxRate": 0,
+       "taxKind": "percent",
+       "taxInclusive": false
+      },
+      {
+       "productId": "p-sugar",
+       "name": "Sugar 1kg",
+       "qty": 2,
+       "unitPrice": 145,
+       "unitCost": 130,
+       "total": 290,
+       "taxAmount": 0,
+       "taxSlabId": null,
+       "taxSlabName": null,
+       "taxRate": 0,
+       "taxKind": "percent",
+       "taxInclusive": false
+      }
+     ],
+     "subtotal": 1340,
+     "discountType": "flat",
+     "discountValue": 40,
+     "discountAmount": 40,
+     "taxAmount": 0,
+     "total": 1300,
+     "payments": [
+      {
+       "method": "cash",
+       "amount": 500,
+       "accountId": "acct-till"
+      },
+      {
+       "method": "credit",
+       "amount": 800,
+       "accountId": null
+      }
+     ],
+     "status": "paid",
+     "returnedQty": {},
+     "dayOffset": 0,
+     "ts": "2026-10-22T10:00:00.000Z"
+    },
+    "saleReturn": {
+     "id": "ret-bill-9-note",
+     "billId": "bill-9",
+     "billNo": 9,
+     "items": [
+      {
+       "productId": "p-sugar",
+       "name": "Sugar 1kg",
+       "qty": 1,
+       "unitPrice": 145,
+       "unitCost": 130,
+       "total": 145,
+       "taxAmount": 0,
+       "taxSlabId": null,
+       "taxSlabName": null,
+       "taxRate": 0,
+       "taxKind": "percent",
+       "taxInclusive": false
+      }
+     ],
+     "refundAmount": 0,
+     "creditReduction": 141,
+     "method": "cash",
+     "accountId": "acct-till",
+     "dayOffset": 0,
+     "ts": "2026-10-22T11:00:00.000Z"
+    },
+    "note": {
+     "id": "note-ret-1",
+     "number": "CN-1",
+     "kind": "credit",
+     "returnId": "ret-bill-9-note",
+     "billId": "bill-9",
+     "billNo": 9,
+     "purchaseId": null,
+     "partyId": "cust-1",
+     "partyName": "Ahmed Traders",
+     "items": [
+      {
+       "productId": "p-sugar",
+       "name": "Sugar 1kg",
+       "qty": 1,
+       "unitPrice": 145,
+       "unitCost": 130,
+       "total": 145,
+       "taxAmount": 0,
+       "taxSlabId": null,
+       "taxSlabName": null,
+       "taxRate": 0,
+       "taxKind": "percent",
+       "taxInclusive": false
+      }
+     ],
+     "goodsAmount": 141,
+     "taxAmount": 0,
+     "total": 141,
+     "settlement": "credit_reduction",
+     "journalEntryId": "ENTRY",
+     "reason": "Customer request",
+     "status": "posted",
+     "dayOffset": 0,
+     "ts": "2026-10-22T11:00:00.000Z"
+    }
+   },
+   "entries": [
+    {
+     "memo": "Return against Bill #9",
+     "refType": "return",
+     "refId": "bill-9",
+     "reversesId": null,
+     "lines": [
+      {
+       "account": "sales_revenue",
+       "debit": 145,
+       "credit": 0,
+       "ref": null
+      },
+      {
+       "account": "inventory",
+       "debit": 130,
+       "credit": 0,
+       "ref": null
+      },
+      {
+       "account": "sales_discount",
+       "debit": 0,
+       "credit": 4,
+       "ref": null
+      },
+      {
+       "account": "receivables",
+       "debit": 0,
+       "credit": 141,
+       "ref": "cust-1"
+      },
+      {
+       "account": "cogs",
+       "debit": 0,
+       "credit": 130,
+       "ref": null
+      }
+     ]
+    }
+   ]
+  }
+ ],
+ "documents": {
+  "quotation": {
+   "id": "qt-1",
+   "number": "QT-1",
+   "customerId": "cust-1",
+   "customerName": "Ahmed Traders",
+   "customerPhone": "03001234567",
+   "lines": [
+    {
+     "productId": "p-tea",
+     "name": "Tapal Danedar Tea 475g",
+     "qty": 10,
+     "unitPrice": 1000,
+     "total": 10000,
+     "sourceProductId": "p-tea"
+    },
+    {
+     "productId": "p-sugar",
+     "name": "Sugar 1kg",
+     "qty": 5,
+     "unitPrice": 140,
+     "total": 700,
+     "sourceProductId": "p-sugar"
+    }
+   ],
+   "subtotal": 10700,
+   "discountType": "flat",
+   "discountValue": 0,
+   "discountAmount": 0,
+   "estimatedTax": 0,
+   "total": 10700,
+   "validUntil": null,
+   "note": "",
+   "status": "accepted",
+   "issuedTs": "2026-10-18T09:00:00.000Z",
+   "dayOffset": 0,
+   "ts": "2026-10-18T09:00:00.000Z"
+  },
+  "orders": [
+   {
+    "id": "so-1",
+    "number": "SO-1",
+    "customerId": "cust-1",
+    "customerName": "Ahmed Traders",
+    "customerPhone": "03001234567",
+    "lines": [
+     {
+      "productId": "p-tea",
+      "name": "Tapal Danedar Tea 475g",
+      "qty": 4,
+      "unitPrice": 1000,
+      "total": 4000,
+      "sourceProductId": "p-tea"
+     }
+    ],
+    "subtotal": 4000,
+    "discountType": "flat",
+    "discountValue": 0,
+    "discountAmount": 0,
+    "estimatedTax": 0,
+    "total": 4000,
+    "source": {
+     "type": "quotation",
+     "id": "qt-1"
+    },
+    "expectedDate": null,
+    "note": "",
+    "status": "open",
+    "dayOffset": 0,
+    "ts": "2026-10-19T09:00:00.000Z"
+   },
+   {
+    "id": "so-2",
+    "number": "SO-2",
+    "customerId": "cust-1",
+    "customerName": "Ahmed Traders",
+    "customerPhone": "03001234567",
+    "lines": [
+     {
+      "productId": "p-tea",
+      "name": "Tapal Danedar Tea 475g",
+      "qty": 3,
+      "unitPrice": 1050,
+      "total": 3150,
+      "sourceProductId": "p-tea"
+     },
+     {
+      "productId": "p-sugar",
+      "name": "Sugar 1kg",
+      "qty": 5,
+      "unitPrice": 145,
+      "total": 725,
+      "sourceProductId": "p-sugar"
+     }
+    ],
+    "subtotal": 3875,
+    "discountType": "flat",
+    "discountValue": 0,
+    "discountAmount": 0,
+    "estimatedTax": 0,
+    "total": 3875,
+    "source": null,
+    "expectedDate": null,
+    "note": "",
+    "status": "open",
+    "dayOffset": 0,
+    "ts": "2026-10-19T10:00:00.000Z"
+   }
+  ],
+  "challans": [
+   {
+    "id": "dc-1",
+    "number": "DC-1",
+    "orderId": "so-2",
+    "customerId": "cust-1",
+    "customerName": "Ahmed Traders",
+    "customerPhone": "03001234567",
+    "lines": [
+     {
+      "productId": "p-tea",
+      "name": "Tapal Danedar Tea 475g",
+      "qty": 2,
+      "unitPrice": 1050,
+      "total": 2100,
+      "sourceProductId": "p-tea"
+     }
+    ],
+    "vehicleNo": "LEA-123",
+    "driverName": "Driver",
+    "note": "",
+    "status": "dispatched",
+    "dayOffset": 0,
+    "ts": "2026-10-20T09:00:00.000Z"
+   }
+  ],
+  "bills": [
+   {
+    "id": "bill-a",
+    "billNo": 31,
+    "customerId": "cust-1",
+    "customerName": "Ahmed Traders",
+    "customerPhone": "03001234567",
+    "items": [
+     {
+      "productId": "p-sugar",
+      "name": "Sugar 1kg",
+      "qty": 5,
+      "unitPrice": 145,
+      "unitCost": 130,
+      "total": 725,
+      "sourceProductId": "p-sugar",
+      "taxAmount": 0,
+      "taxSlabId": null,
+      "taxSlabName": null,
+      "taxRate": 0,
+      "taxKind": "percent",
+      "taxInclusive": false
+     }
+    ],
+    "subtotal": 725,
+    "discountType": "flat",
+    "discountValue": 0,
+    "discountAmount": 0,
+    "taxAmount": 0,
+    "total": 725,
+    "payments": [
+     {
+      "method": "cash",
+      "amount": 725,
+      "accountId": "acct-till"
+     }
+    ],
+    "status": "paid",
+    "returnedQty": {},
+    "sourceType": "order",
+    "sourceId": "so-2",
+    "dayOffset": 0,
+    "ts": "2026-10-21T09:00:00.000Z"
+   },
+   {
+    "id": "bill-b",
+    "billNo": 32,
+    "customerId": "cust-1",
+    "customerName": "Ahmed Traders",
+    "customerPhone": "03001234567",
+    "items": [
+     {
+      "productId": "p-tea",
+      "name": "Tapal Danedar Tea 475g",
+      "qty": 1,
+      "unitPrice": 1050,
+      "unitCost": 800,
+      "total": 1050,
+      "sourceProductId": "p-tea",
+      "taxAmount": 0,
+      "taxSlabId": null,
+      "taxSlabName": null,
+      "taxRate": 0,
+      "taxKind": "percent",
+      "taxInclusive": false
+     }
+    ],
+    "subtotal": 1050,
+    "discountType": "flat",
+    "discountValue": 0,
+    "discountAmount": 0,
+    "taxAmount": 0,
+    "total": 1050,
+    "payments": [
+     {
+      "method": "cash",
+      "amount": 1050,
+      "accountId": "acct-till"
+     }
+    ],
+    "status": "paid",
+    "returnedQty": {},
+    "sourceType": "challan",
+    "sourceId": "dc-1",
+    "dayOffset": 0,
+    "ts": "2026-10-21T09:00:00.000Z"
+   },
+   {
+    "id": "bill-c",
+    "billNo": 33,
+    "customerId": "cust-1",
+    "customerName": "Ahmed Traders",
+    "customerPhone": "03001234567",
+    "items": [
+     {
+      "productId": "p-sugar",
+      "name": "Sugar 1kg",
+      "qty": 2,
+      "unitPrice": 145,
+      "unitCost": 130,
+      "total": 290,
+      "sourceProductId": "p-sugar",
+      "taxAmount": 0,
+      "taxSlabId": null,
+      "taxSlabName": null,
+      "taxRate": 0,
+      "taxKind": "percent",
+      "taxInclusive": false
+     }
+    ],
+    "subtotal": 290,
+    "discountType": "flat",
+    "discountValue": 0,
+    "discountAmount": 0,
+    "taxAmount": 0,
+    "total": 290,
+    "payments": [
+     {
+      "method": "cash",
+      "amount": 290,
+      "accountId": "acct-till"
+     }
+    ],
+    "status": "paid",
+    "returnedQty": {},
+    "sourceType": "quotation",
+    "sourceId": "qt-1",
+    "dayOffset": 0,
+    "ts": "2026-10-21T09:00:00.000Z"
+   }
+  ],
+  "purchaseOrder": {
+   "id": "po-1",
+   "number": "PO-1",
+   "supplierId": "sup-1",
+   "supplierName": "Lahore Tea Co",
+   "lines": [
+    {
+     "productId": "p-tea",
+     "name": "Tapal Danedar Tea 475g",
+     "qty": 20,
+     "unitCost": 800,
+     "total": 16000
+    },
+    {
+     "productId": "p-oil",
+     "name": "Cooking Oil 5L",
+     "qty": 4,
+     "unitCost": 1000,
+     "total": 4000
+    }
+   ],
+   "total": 20000,
+   "expectedDate": null,
+   "note": "",
+   "status": "issued",
+   "dayOffset": 0,
+   "ts": "2026-10-18T08:00:00.000Z"
+  },
+  "purchases": [
+   {
+    "id": "pur-x",
+    "supplierId": "sup-1",
+    "items": [
+     {
+      "productId": "p-tea",
+      "name": "Tapal Danedar Tea 475g",
+      "qty": 8,
+      "unitCost": 800,
+      "total": 6400,
+      "taxAmount": 0
+     }
+    ],
+    "total": 6400,
+    "netTotal": 6400,
+    "taxAmount": 0,
+    "note": "",
+    "sourcePoId": "po-1",
+    "dayOffset": 0,
+    "ts": "2026-10-20T08:00:00.000Z"
+   }
+  ],
+  "expected": {
+   "quotationConvertedQty": {
+    "p-tea": 4
+   },
+   "quotationConvertedTotalQty": {
+    "p-sugar": 2,
+    "p-tea": 4
+   },
+   "orderBilledQtySo2": {
+    "p-sugar": 5,
+    "p-tea": 1
+   },
+   "orderDeliveredQtySo2": {
+    "p-tea": 2
+   },
+   "challanBilledQtyDc1": {
+    "p-tea": 1
+   },
+   "deriveOrderStatusSo2": "partially_fulfilled",
+   "deriveQuotationStatusQt1": "accepted",
+   "deriveChallanStatusDc1": "partially_billed",
+   "poReceivedQty": {
+    "p-tea": 8
+   },
+   "derivePoStatus": "partially_received",
+   "poReceiptOk": [
+    {
+     "productId": "p-tea",
+     "qty": 5,
+     "unitCost": 800
+    },
+    {
+     "productId": "p-oil",
+     "qty": 4,
+     "unitCost": 990
+    }
+   ],
+   "poReceiptOver": null,
+   "promised": {
+    "p-tea": 6
+   },
+   "estimateTotalsQt1": {
+    "subtotal": 10700,
+    "discountAmount": 0,
+    "estimatedTax": 0,
+    "total": 10700
+   },
+   "voucherRv": {
+    "kind": "receipt",
+    "number": "RV-3",
+    "ts": "2026-10-21T11:00:00.000Z",
+    "partyName": "Ahmed Traders",
+    "partyPhone": "03001234567",
+    "amount": 1200,
+    "method": "cash",
+    "instrument": null,
+    "accountName": "Main Till",
+    "chequeNo": null,
+    "chequeBank": null,
+    "chequeDueDateISO": null,
+    "note": "Part",
+    "balanceAfter": 3400
+   },
+   "voucherPv": {
+    "kind": "payment",
+    "number": "PV-1",
+    "ts": "2026-10-21T11:05:00.000Z",
+    "partyName": "Lahore Tea Co",
+    "partyPhone": "",
+    "amount": 4000,
+    "method": "cash",
+    "instrument": null,
+    "accountName": "Main Till",
+    "chequeNo": null,
+    "chequeBank": null,
+    "chequeDueDateISO": null,
+    "note": "Part payment",
+    "balanceAfter": 2600
+   }
+  }
+ },
+ "reports": {
+  "range": {
+   "fromDate": "2026-10-01",
+   "toDate": "2026-10-31",
+   "fromTs": "2026-09-30T19:00:00.000Z",
+   "toTs": "2026-10-31T19:00:00.000Z"
+  },
+  "dataset": {
+   "journal": [
+    {
+     "memo": "Purchase — stock received",
+     "refType": "purchase",
+     "refId": "pur-r1",
+     "reversesId": null,
+     "lines": [
+      {
+       "account": "purchases",
+       "debit": 8000,
+       "credit": 0,
+       "ref": null
+      },
+      {
+       "account": "inventory",
+       "debit": 8000,
+       "credit": 0,
+       "ref": null
+      },
+      {
+       "account": "purchases",
+       "debit": 0,
+       "credit": 8000,
+       "ref": null
+      },
+      {
+       "account": "payables",
+       "debit": 0,
+       "credit": 8000,
+       "ref": "sup-1"
+      }
+     ],
+     "ts": "2026-10-03T09:00:00.000Z",
+     "dayOffset": 0
+    },
+    {
+     "memo": "Purchase return — goods sent back",
+     "refType": "purchase_return",
+     "refId": "pret-r1",
+     "reversesId": null,
+     "lines": [
+      {
+       "account": "payables",
+       "debit": 800,
+       "credit": 0,
+       "ref": "sup-1"
+      },
+      {
+       "account": "inventory",
+       "debit": 0,
+       "credit": 800,
+       "ref": null
+      }
+     ],
+     "ts": "2026-10-07T09:00:00.000Z",
+     "dayOffset": 0
+    },
+    {
+     "memo": "Bill #41 — Ahmed Traders",
+     "refType": "bill",
+     "refId": "bill-r1",
+     "reversesId": null,
+     "lines": [
+      {
+       "account": "cash",
+       "debit": 1300,
+       "credit": 0,
+       "ref": "acct-till"
+      },
+      {
+       "account": "receivables",
+       "debit": 800,
+       "credit": 0,
+       "ref": "cust-1"
+      },
+      {
+       "account": "cogs",
+       "debit": 1600,
+       "credit": 0,
+       "ref": null
+      },
+      {
+       "account": "sales_revenue",
+       "debit": 0,
+       "credit": 2100,
+       "ref": null
+      },
+      {
+       "account": "inventory",
+       "debit": 0,
+       "credit": 1600,
+       "ref": null
+      }
+     ],
+     "ts": "2026-10-05T10:00:00.000Z",
+     "dayOffset": 0
+    },
+    {
+     "memo": "Bill #42 — Walk-in customer",
+     "refType": "bill",
+     "refId": "bill-r2",
+     "reversesId": null,
+     "lines": [
+      {
+       "account": "cash",
+       "debit": 1404,
+       "credit": 0,
+       "ref": "acct-till"
+      },
+      {
+       "account": "cogs",
+       "debit": 1000,
+       "credit": 0,
+       "ref": null
+      },
+      {
+       "account": "sales_revenue",
+       "debit": 0,
+       "credit": 1200,
+       "ref": null
+      },
+      {
+       "account": "tax_payable",
+       "debit": 0,
+       "credit": 204,
+       "ref": null
+      },
+      {
+       "account": "inventory",
+       "debit": 0,
+       "credit": 1000,
+       "ref": null
+      }
+     ],
+     "ts": "2026-10-06T10:00:00.000Z",
+     "dayOffset": 0
+    },
+    {
+     "memo": "Counter sale — Sugar 1kg × 3",
+     "refType": "sale",
+     "refId": "sale-r3",
+     "reversesId": null,
+     "lines": [
+      {
+       "account": "cash",
+       "debit": 435,
+       "credit": 0,
+       "ref": "acct-till"
+      },
+      {
+       "account": "cogs",
+       "debit": 390,
+       "credit": 0,
+       "ref": null
+      },
+      {
+       "account": "sales_revenue",
+       "debit": 0,
+       "credit": 435,
+       "ref": null
+      },
+      {
+       "account": "inventory",
+       "debit": 0,
+       "credit": 390,
+       "ref": null
+      }
+     ],
+     "ts": "2026-10-06T11:00:00.000Z",
+     "dayOffset": 0
+    },
+    {
+     "memo": "Expense — rent",
+     "refType": "expense",
+     "refId": "exp-r1",
+     "reversesId": null,
+     "lines": [
+      {
+       "account": "expense_rent",
+       "debit": 15000,
+       "credit": 0,
+       "ref": null
+      },
+      {
+       "account": "cash",
+       "debit": 0,
+       "credit": 15000,
+       "ref": "acct-till"
+      }
+     ],
+     "ts": "2026-10-04T08:00:00.000Z",
+     "dayOffset": 0
+    },
+    {
+     "memo": "Supplier payment",
+     "refType": "supplier_payment",
+     "refId": "spay-r1",
+     "reversesId": null,
+     "lines": [
+      {
+       "account": "payables",
+       "debit": 4000,
+       "credit": 0,
+       "ref": "sup-1"
+      },
+      {
+       "account": "cash",
+       "debit": 0,
+       "credit": 4000,
+       "ref": "acct-till"
+      }
+     ],
+     "ts": "2026-10-09T09:00:00.000Z",
+     "dayOffset": 0
+    },
+    {
+     "memo": "Udhaar repayment — Ahmed Traders",
+     "refType": "repayment",
+     "refId": "cr-r2",
+     "reversesId": null,
+     "lines": [
+      {
+       "account": "cash",
+       "debit": 300,
+       "credit": 0,
+       "ref": "acct-till"
+      },
+      {
+       "account": "receivables",
+       "debit": 0,
+       "credit": 300,
+       "ref": "cust-1"
+      }
+     ],
+     "ts": "2026-10-08T09:00:00.000Z",
+     "dayOffset": 0
+    }
+   ],
+   "bills": [
+    {
+     "id": "bill-r1",
+     "billNo": 41,
+     "customerId": "cust-1",
+     "customerName": "Ahmed Traders",
+     "customerPhone": "03001234567",
+     "items": [
+      {
+       "productId": "p-tea",
+       "name": "Tapal Danedar Tea 475g",
+       "qty": 2,
+       "unitPrice": 1050,
+       "unitCost": 800,
+       "total": 2100,
+       "taxAmount": 0,
+       "taxSlabId": null,
+       "taxSlabName": null,
+       "taxRate": 0,
+       "taxKind": "percent",
+       "taxInclusive": false
+      }
+     ],
+     "subtotal": 2100,
+     "discountType": "flat",
+     "discountValue": 0,
+     "discountAmount": 0,
+     "taxAmount": 0,
+     "total": 2100,
+     "payments": [
+      {
+       "method": "cash",
+       "amount": 1300,
+       "accountId": "acct-till"
+      },
+      {
+       "method": "credit",
+       "amount": 800,
+       "accountId": null
+      }
+     ],
+     "status": "paid",
+     "returnedQty": {},
+     "dayOffset": 0,
+     "ts": "2026-10-05T10:00:00.000Z"
+    },
+    {
+     "id": "bill-r2",
+     "billNo": 42,
+     "customerId": null,
+     "customerName": "",
+     "customerPhone": "",
+     "items": [
+      {
+       "productId": "p-oil",
+       "name": "Cooking Oil 5L",
+       "qty": 1,
+       "unitPrice": 1200,
+       "unitCost": 1000,
+       "total": 1200,
+       "taxAmount": 204,
+       "taxSlabId": "slab-gst-ex",
+       "taxSlabName": "GST 17%",
+       "taxRate": 17,
+       "taxKind": "percent",
+       "taxInclusive": false
+      }
+     ],
+     "subtotal": 1200,
+     "discountType": "flat",
+     "discountValue": 0,
+     "discountAmount": 0,
+     "taxAmount": 204,
+     "total": 1404,
+     "payments": [
+      {
+       "method": "cash",
+       "amount": 1404,
+       "accountId": "acct-till"
+      }
+     ],
+     "status": "paid",
+     "returnedQty": {},
+     "dayOffset": 0,
+     "ts": "2026-10-06T10:00:00.000Z"
+    }
+   ],
+   "sales": [
+    {
+     "id": "bill-r1-s0",
+     "productId": "p-tea",
+     "qty": 2,
+     "unitPrice": 1050,
+     "unitCost": 800,
+     "total": 2100,
+     "billId": "bill-r1",
+     "kind": "sale",
+     "dayOffset": 2,
+     "ts": "2026-10-05T10:00:00.000Z"
+    },
+    {
+     "id": "bill-r2-s0",
+     "productId": "p-oil",
+     "qty": 1,
+     "unitPrice": 1200,
+     "unitCost": 1000,
+     "total": 1200,
+     "billId": "bill-r2",
+     "kind": "sale",
+     "dayOffset": 1,
+     "ts": "2026-10-06T10:00:00.000Z"
+    },
+    {
+     "id": "sale-r3",
+     "productId": "p-sugar",
+     "qty": 3,
+     "unitPrice": 145,
+     "unitCost": 130,
+     "total": 435,
+     "billId": null,
+     "kind": "sale",
+     "dayOffset": 0,
+     "ts": "2026-10-06T11:00:00.000Z"
+    }
+   ],
+   "purchases": [
+    {
+     "id": "pur-r1",
+     "supplierId": "sup-1",
+     "items": [
+      {
+       "productId": "p-tea",
+       "name": "Tapal Danedar Tea 475g",
+       "qty": 10,
+       "unitCost": 800,
+       "total": 8000,
+       "taxAmount": 0,
+       "taxSlabId": null,
+       "taxSlabName": null,
+       "taxRate": 0,
+       "taxKind": "percent",
+       "taxInclusive": false
+      }
+     ],
+     "total": 8000,
+     "netTotal": 8000,
+     "taxAmount": 0,
+     "note": "",
+     "dayOffset": 0,
+     "ts": "2026-10-03T09:00:00.000Z"
+    }
+   ],
+   "purchaseReturns": [
+    {
+     "id": "pret-r1",
+     "purchaseId": "pur-r1",
+     "supplierId": "sup-1",
+     "items": [
+      {
+       "productId": "p-tea",
+       "name": "Tapal Danedar Tea 475g",
+       "qty": 1,
+       "unitCost": 800,
+       "total": 800,
+       "taxAmount": 0,
+       "taxSlabId": null,
+       "taxSlabName": null,
+       "taxRate": 0,
+       "taxKind": "percent",
+       "taxInclusive": false
+      }
+     ],
+     "payableOffset": 800,
+     "refundAmount": 0,
+     "method": null,
+     "accountId": null,
+     "dayOffset": 0,
+     "ts": "2026-10-07T09:00:00.000Z"
+    }
+   ],
+   "credits": [
+    {
+     "id": "cr-r1",
+     "customerId": "cust-1",
+     "customerName": "Ahmed Traders",
+     "customerPhone": "03001234567",
+     "kind": "credit",
+     "amount": 800,
+     "note": "Bill #41 — part payment on udhaar",
+     "billId": "bill-r1",
+     "dayOffset": 40,
+     "ts": "2026-10-05T10:00:00.000Z"
+    },
+    {
+     "id": "cr-r2",
+     "customerId": "cust-1",
+     "customerName": "Ahmed Traders",
+     "customerPhone": "03001234567",
+     "kind": "repayment",
+     "amount": 300,
+     "method": "cash",
+     "accountId": "acct-till",
+     "voucherNo": "RV-5",
+     "note": "",
+     "billId": null,
+     "dayOffset": 5,
+     "ts": "2026-10-08T09:00:00.000Z"
+    }
+   ],
+   "payments": [
+    {
+     "id": "spay-r1",
+     "supplierId": "sup-1",
+     "amount": 4000,
+     "method": "cash",
+     "accountId": "acct-till",
+     "voucherNo": "PV-5",
+     "note": "",
+     "dayOffset": 0,
+     "ts": "2026-10-09T09:00:00.000Z"
+    }
+   ],
+   "expenses": [
+    {
+     "id": "exp-r1",
+     "category": "rent",
+     "amount": 15000,
+     "method": "cash",
+     "accountId": "acct-till",
+     "note": "October rent",
+     "dayOffset": 0,
+     "ts": "2026-10-04T08:00:00.000Z"
+    }
+   ],
+   "cheques": [
+    {
+     "id": "chq-r1",
+     "direction": "in",
+     "chequeNo": "C-55",
+     "bankName": "HBL",
+     "amount": 1170,
+     "issueDateISO": "2026-10-06",
+     "dueDateISO": "2026-10-09",
+     "partyId": "cust-1",
+     "partyName": "Ahmed Traders",
+     "partyKind": "customer",
+     "status": "received",
+     "sourceType": "bill",
+     "sourceId": "bill-r2",
+     "accountId": null,
+     "chargesOnBounce": 0,
+     "entryIds": {},
+     "note": "",
+     "dayOffset": 0,
+     "ts": "2026-10-06T10:30:00.000Z"
+    }
+   ],
+   "notes": [
+    {
+     "id": "note-pret-r1",
+     "number": "DN-7",
+     "kind": "debit",
+     "returnId": "pret-r1",
+     "billId": null,
+     "billNo": null,
+     "purchaseId": "pur-r1",
+     "partyId": "sup-1",
+     "partyName": "Lahore Tea Co",
+     "items": [
+      {
+       "productId": "p-tea",
+       "name": "Tapal Danedar Tea 475g",
+       "qty": 1,
+       "unitPrice": 800,
+       "unitCost": 800,
+       "total": 800,
+       "taxAmount": 0,
+       "taxSlabId": null,
+       "taxSlabName": null,
+       "taxRate": 0,
+       "taxKind": "percent",
+       "taxInclusive": false
+      }
+     ],
+     "goodsAmount": 800,
+     "taxAmount": 0,
+     "total": 800,
+     "settlement": "payable_offset",
+     "journalEntryId": "ENTRY",
+     "reason": "Damaged stock",
+     "status": "posted",
+     "dayOffset": 0,
+     "ts": "2026-10-07T09:00:00.000Z"
+    }
+   ],
+   "suppliers": [
+    {
+     "id": "sup-1",
+     "name": "Lahore Tea Co",
+     "phone": "",
+     "company": "",
+     "notes": "",
+     "ts": "2026-01-01T00:00:00.000Z"
+    }
+   ],
+   "dayCloses": [
+    {
+     "id": "dc-r1",
+     "dateISO": "2026-10-05",
+     "accountId": "acct-till",
+     "openingCash": 1000,
+     "salesByMethod": {
+      "cash": 1300,
+      "credit": 800
+     },
+     "expensesTotal": 0,
+     "creditGiven": 800,
+     "creditReceived": 0,
+     "supplierPaid": 0,
+     "expectedCash": 2300,
+     "countedCash": 2300,
+     "difference": 0,
+     "note": "",
+     "dayOffset": 0,
+     "ts": "2026-10-05T20:00:00.000Z"
+    }
+   ]
+  },
+  "expected": {
+   "sales": {
+    "grossSales": 3735,
+    "returnsTotal": 0,
+    "revenue": 3735,
+    "discounts": 0,
+    "netSales": 3735,
+    "otherRevenue": 0,
+    "plNetRevenue": 3735,
+    "netUnits": 6,
+    "grossProfit": 745,
+    "byProduct": [
+     {
+      "productId": "p-tea",
+      "name": "Tapal Danedar Tea 475g",
+      "qty": 2,
+      "amount": 2100,
+      "profit": 500
+     },
+     {
+      "productId": "p-oil",
+      "name": "Cooking Oil 5L",
+      "qty": 1,
+      "amount": 1200,
+      "profit": 200
+     },
+     {
+      "productId": "p-sugar",
+      "name": "Sugar 1kg",
+      "qty": 3,
+      "amount": 435,
+      "profit": 45
+     }
+    ],
+    "byCustomer": [
+     {
+      "key": "cust-1",
+      "name": "Ahmed Traders",
+      "qty": 2,
+      "amount": 2100
+     },
+     {
+      "key": "name:|",
+      "name": "",
+      "qty": 1,
+      "amount": 1200
+     },
+     {
+      "key": "walk-in",
+      "name": "",
+      "qty": 3,
+      "amount": 435
+     }
+    ]
+   },
+   "purchase": {
+    "rows": [
+     {
+      "id": "pur-r1",
+      "supplierId": "sup-1",
+      "items": [
+       {
+        "productId": "p-tea",
+        "name": "Tapal Danedar Tea 475g",
+        "qty": 10,
+        "unitCost": 800,
+        "total": 8000,
+        "taxAmount": 0,
+        "taxSlabId": null,
+        "taxSlabName": null,
+        "taxRate": 0,
+        "taxKind": "percent",
+        "taxInclusive": false
+       }
+      ],
+      "total": 8000,
+      "netTotal": 8000,
+      "taxAmount": 0,
+      "note": "",
+      "dayOffset": 0,
+      "ts": "2026-10-03T09:00:00.000Z"
+     }
+    ],
+    "gross": 8000,
+    "goodsNet": 8000,
+    "taxTotal": 0,
+    "returnsGross": 800,
+    "net": 7200,
+    "bySupplier": [
+     {
+      "supplierId": "sup-1",
+      "name": "Lahore Tea Co",
+      "gross": 8000,
+      "returns": 800,
+      "net": 7200
+     }
+    ],
+    "byProduct": [
+     {
+      "productId": "p-tea",
+      "name": "Tapal Danedar Tea 475g",
+      "qty": 10,
+      "amount": 8000
+     }
+    ]
+   },
+   "stock": {
+    "totalValue": 106500,
+    "retailValue": 132550,
+    "lowCount": 0,
+    "expiringCount": 0
+   },
+   "pl": {
+    "revenue": 3735,
+    "discounts": 0,
+    "netRevenue": 3735,
+    "cogs": 2990,
+    "grossProfit": 745,
+    "expensesByCategory": {
+     "rent": 15000,
+     "electricity": 0,
+     "salary": 0,
+     "transport": 0,
+     "other": 0
+    },
+    "expensesTotal": 15000,
+    "stockLoss": 0,
+    "net": -14255
+   },
+   "plIdentity": {
+    "plNetRevenue": 3735,
+    "salesNetPlusOther": 3735
+   },
+   "trialBalance": {
+    "rows": [
+     {
+      "account": "cash",
+      "debitTotal": 3439,
+      "creditTotal": 19000,
+      "closing": -15561,
+      "closingSide": "credit"
+     },
+     {
+      "account": "sales_revenue",
+      "debitTotal": 0,
+      "creditTotal": 3735,
+      "closing": 3735,
+      "closingSide": "credit"
+     },
+     {
+      "account": "cogs",
+      "debitTotal": 2990,
+      "creditTotal": 0,
+      "closing": 2990,
+      "closingSide": "debit"
+     },
+     {
+      "account": "inventory",
+      "debitTotal": 8000,
+      "creditTotal": 3790,
+      "closing": 4210,
+      "closingSide": "debit"
+     },
+     {
+      "account": "purchases",
+      "debitTotal": 8000,
+      "creditTotal": 8000,
+      "closing": 0,
+      "closingSide": "debit"
+     },
+     {
+      "account": "expense_rent",
+      "debitTotal": 15000,
+      "creditTotal": 0,
+      "closing": 15000,
+      "closingSide": "debit"
+     },
+     {
+      "account": "receivables",
+      "debitTotal": 800,
+      "creditTotal": 300,
+      "closing": 500,
+      "closingSide": "debit"
+     },
+     {
+      "account": "payables",
+      "debitTotal": 4800,
+      "creditTotal": 8000,
+      "closing": 3200,
+      "closingSide": "credit"
+     },
+     {
+      "account": "tax_payable",
+      "debitTotal": 0,
+      "creditTotal": 204,
+      "closing": 204,
+      "closingSide": "credit"
+     }
+    ],
+    "totalDebits": 43029,
+    "totalCredits": 43029,
+    "difference": 0,
+    "closingDebits": 22700,
+    "closingCredits": 22700,
+    "closingDifference": 0,
+    "balanced": true
+   },
+   "accountStatementTill": {
+    "opening": 0,
+    "closing": -15561,
+    "totalIn": 3439,
+    "totalOut": 19000,
+    "rows": [
+     {
+      "entryId": "e5",
+      "ts": "2026-10-04T08:00:00.000Z",
+      "memo": "Expense — rent",
+      "bucket": null,
+      "inAmount": 0,
+      "outAmount": 15000,
+      "balance": -15000
+     },
+     {
+      "entryId": "e2",
+      "ts": "2026-10-05T10:00:00.000Z",
+      "memo": "Bill #41 — Ahmed Traders",
+      "bucket": null,
+      "inAmount": 1300,
+      "outAmount": 0,
+      "balance": -13700
+     },
+     {
+      "entryId": "e3",
+      "ts": "2026-10-06T10:00:00.000Z",
+      "memo": "Bill #42 — Walk-in customer",
+      "bucket": null,
+      "inAmount": 1404,
+      "outAmount": 0,
+      "balance": -12296
+     },
+     {
+      "entryId": "e4",
+      "ts": "2026-10-06T11:00:00.000Z",
+      "memo": "Counter sale — Sugar 1kg × 3",
+      "bucket": null,
+      "inAmount": 435,
+      "outAmount": 0,
+      "balance": -11861
+     },
+     {
+      "entryId": "e7",
+      "ts": "2026-10-08T09:00:00.000Z",
+      "memo": "Udhaar repayment — Ahmed Traders",
+      "bucket": null,
+      "inAmount": 300,
+      "outAmount": 0,
+      "balance": -11561
+     },
+     {
+      "entryId": "e6",
+      "ts": "2026-10-09T09:00:00.000Z",
+      "memo": "Supplier payment",
+      "bucket": null,
+      "inAmount": 0,
+      "outAmount": 4000,
+      "balance": -15561
+     }
+    ]
+   },
+   "accountStatementCombined": {
+    "opening": null,
+    "closing": null,
+    "totalIn": 3439,
+    "totalOut": 19000,
+    "rows": [
+     {
+      "entryId": "e5",
+      "ts": "2026-10-04T08:00:00.000Z",
+      "memo": "Expense — rent",
+      "bucket": "cash",
+      "inAmount": 0,
+      "outAmount": 15000,
+      "balance": -15000
+     },
+     {
+      "entryId": "e2",
+      "ts": "2026-10-05T10:00:00.000Z",
+      "memo": "Bill #41 — Ahmed Traders",
+      "bucket": "cash",
+      "inAmount": 1300,
+      "outAmount": 0,
+      "balance": -13700
+     },
+     {
+      "entryId": "e3",
+      "ts": "2026-10-06T10:00:00.000Z",
+      "memo": "Bill #42 — Walk-in customer",
+      "bucket": "cash",
+      "inAmount": 1404,
+      "outAmount": 0,
+      "balance": -12296
+     },
+     {
+      "entryId": "e4",
+      "ts": "2026-10-06T11:00:00.000Z",
+      "memo": "Counter sale — Sugar 1kg × 3",
+      "bucket": "cash",
+      "inAmount": 435,
+      "outAmount": 0,
+      "balance": -11861
+     },
+     {
+      "entryId": "e7",
+      "ts": "2026-10-08T09:00:00.000Z",
+      "memo": "Udhaar repayment — Ahmed Traders",
+      "bucket": "cash",
+      "inAmount": 300,
+      "outAmount": 0,
+      "balance": -11561
+     },
+     {
+      "entryId": "e6",
+      "ts": "2026-10-09T09:00:00.000Z",
+      "memo": "Supplier payment",
+      "bucket": "cash",
+      "inAmount": 0,
+      "outAmount": 4000,
+      "balance": -15561
+     }
+    ]
+   },
+   "tax": {
+    "rows": [
+     {
+      "name": "GST 17%",
+      "rate": 17,
+      "kind": "percent",
+      "inclusive": false,
+      "amount": 0,
+      "output": 204,
+      "input": 0
+     }
+    ],
+    "outputTotal": 204,
+    "inputTotal": 0,
+    "net": 204
+   },
+   "taxPosition": {
+    "outputTax": 204,
+    "inputTax": 0,
+    "netPayable": 204,
+    "outputThisMonth": 204,
+    "inputThisMonth": 0
+   },
+   "customerStatement": {
+    "key": "cust-1",
+    "opening": 0,
+    "closing": 500,
+    "givenInPeriod": 800,
+    "repaidInPeriod": 300,
+    "rows": [
+     {
+      "entry": {
+       "id": "cr-r1",
+       "customerId": "cust-1",
+       "customerName": "Ahmed Traders",
+       "customerPhone": "03001234567",
+       "kind": "credit",
+       "amount": 800,
+       "note": "Bill #41 — part payment on udhaar",
+       "billId": "bill-r1",
+       "dayOffset": 40,
+       "ts": "2026-10-05T10:00:00.000Z"
+      },
+      "signed": 800,
+      "balance": 800
+     },
+     {
+      "entry": {
+       "id": "cr-r2",
+       "customerId": "cust-1",
+       "customerName": "Ahmed Traders",
+       "customerPhone": "03001234567",
+       "kind": "repayment",
+       "amount": 300,
+       "method": "cash",
+       "accountId": "acct-till",
+       "voucherNo": "RV-5",
+       "note": "",
+       "billId": null,
+       "dayOffset": 5,
+       "ts": "2026-10-08T09:00:00.000Z"
+      },
+      "signed": -300,
+      "balance": 500
+     }
+    ]
+   },
+   "supplierStatement": {
+    "supplierId": "sup-1",
+    "opening": 0,
+    "closing": 3200,
+    "purchasedInPeriod": 8000,
+    "paidInPeriod": 4000,
+    "returnedInPeriod": 800,
+    "events": [
+     {
+      "ts": "2026-10-03T09:00:00.000Z",
+      "kind": "purchase",
+      "amount": 8000,
+      "effect": 8000,
+      "note": "",
+      "balance": 8000
+     },
+     {
+      "ts": "2026-10-07T09:00:00.000Z",
+      "kind": "return",
+      "amount": 800,
+      "effect": -800,
+      "note": "",
+      "returnGross": 800,
+      "refundAmount": 0,
+      "balance": 7200
+     },
+     {
+      "ts": "2026-10-09T09:00:00.000Z",
+      "kind": "payment",
+      "amount": 4000,
+      "effect": -4000,
+      "note": "",
+      "balance": 3200
+     }
+    ]
+   },
+   "aging": {
+    "receivables": {
+     "current": 0,
+     "mid": 500,
+     "old": 0,
+     "total": 500
+    },
+    "payables": {
+     "current": 3200,
+     "mid": 0,
+     "old": 0,
+     "total": 3200
+    }
+   },
+   "expenses": {
+    "rows": [
+     {
+      "id": "exp-r1",
+      "category": "rent",
+      "amount": 15000,
+      "method": "cash",
+      "accountId": "acct-till",
+      "note": "October rent",
+      "dayOffset": 0,
+      "ts": "2026-10-04T08:00:00.000Z"
+     }
+    ],
+    "total": 15000,
+    "byCategory": [
+     {
+      "category": "rent",
+      "amount": 15000,
+      "count": 1
+     }
+    ]
+   },
+   "cheques": {
+    "groups": [
+     {
+      "id": "drawer",
+      "rows": [
+       {
+        "id": "chq-r1",
+        "direction": "in",
+        "chequeNo": "C-55",
+        "bankName": "HBL",
+        "amount": 1170,
+        "issueDateISO": "2026-10-06",
+        "dueDateISO": "2026-10-09",
+        "partyId": "cust-1",
+        "partyName": "Ahmed Traders",
+        "partyKind": "customer",
+        "status": "received",
+        "sourceType": "bill",
+        "sourceId": "bill-r2",
+        "accountId": null,
+        "chargesOnBounce": 0,
+        "entryIds": {},
+        "note": "",
+        "dayOffset": 0,
+        "ts": "2026-10-06T10:30:00.000Z"
+       }
+      ],
+      "total": 1170
+     },
+     {
+      "id": "atBank",
+      "rows": [],
+      "total": 0
+     },
+     {
+      "id": "issued",
+      "rows": [],
+      "total": 0
+     },
+     {
+      "id": "cleared",
+      "rows": [],
+      "total": 0
+     },
+     {
+      "id": "bounced",
+      "rows": [],
+      "total": 0
+     },
+     {
+      "id": "returned",
+      "rows": [],
+      "total": 0
+     }
+    ],
+    "totalCaptured": 1170
+   },
+   "dayClose": {
+    "rows": [
+     {
+      "close": {
+       "id": "dc-r1",
+       "dateISO": "2026-10-05",
+       "accountId": "acct-till",
+       "openingCash": 1000,
+       "salesByMethod": {
+        "cash": 1300,
+        "credit": 800
+       },
+       "expensesTotal": 0,
+       "creditGiven": 800,
+       "creditReceived": 0,
+       "supplierPaid": 0,
+       "expectedCash": 2300,
+       "countedCash": 2300,
+       "difference": 0,
+       "note": "",
+       "dayOffset": 0,
+       "ts": "2026-10-05T20:00:00.000Z"
+      },
+      "salesTotal": 2100
+     }
+    ],
+    "totals": {
+     "sales": 2100,
+     "expenses": 0,
+     "creditGiven": 800,
+     "creditReceived": 0,
+     "supplierPaid": 0,
+     "expected": 2300,
+     "counted": 2300,
+     "difference": 0
+    }
+   },
+   "notes": {
+    "rows": [
+     {
+      "id": "note-pret-r1",
+      "number": "DN-7",
+      "kind": "debit",
+      "returnId": "pret-r1",
+      "billId": null,
+      "billNo": null,
+      "purchaseId": "pur-r1",
+      "partyId": "sup-1",
+      "partyName": "Lahore Tea Co",
+      "items": [
+       {
+        "productId": "p-tea",
+        "name": "Tapal Danedar Tea 475g",
+        "qty": 1,
+        "unitPrice": 800,
+        "unitCost": 800,
+        "total": 800,
+        "taxAmount": 0,
+        "taxSlabId": null,
+        "taxSlabName": null,
+        "taxRate": 0,
+        "taxKind": "percent",
+        "taxInclusive": false
+       }
+      ],
+      "goodsAmount": 800,
+      "taxAmount": 0,
+      "total": 800,
+      "settlement": "payable_offset",
+      "journalEntryId": "ENTRY",
+      "reason": "Damaged stock",
+      "status": "posted",
+      "dayOffset": 0,
+      "ts": "2026-10-07T09:00:00.000Z"
+     }
+    ],
+    "credit": {
+     "count": 0,
+     "goods": 0,
+     "tax": 0,
+     "total": 0
+    },
+    "debit": {
+     "count": 1,
+     "goods": 800,
+     "tax": 0,
+     "total": 800
+    }
+   },
+   "forecast": [
+    {
+     "productId": "p-oil",
+     "avgDaily": 0.14285714285714285,
+     "daysOfStock": 140,
+     "suggestedReorder": 0,
+     "status": "ok"
+    },
+    {
+     "productId": "p-tea",
+     "avgDaily": 0.2857142857142857,
+     "daysOfStock": 175,
+     "suggestedReorder": 0,
+     "status": "ok"
+    },
+    {
+     "productId": "p-sugar",
+     "avgDaily": 0.42857142857142855,
+     "daysOfStock": 233.33333333333334,
+     "suggestedReorder": 0,
+     "status": "ok"
+    },
+    {
+     "productId": "p-raw",
+     "avgDaily": 0,
+     "daysOfStock": null,
+     "suggestedReorder": 0,
+     "status": "ok"
+    },
+    {
+     "productId": "p-ghee",
+     "avgDaily": 0,
+     "daysOfStock": null,
+     "suggestedReorder": 0,
+     "status": "ok"
+    }
+   ],
+   "supplierBalance": 3200,
+   "payablesGL": 3200,
+   "receivablesGL": 500
+  }
+ }
+}

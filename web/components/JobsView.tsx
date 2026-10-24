@@ -37,6 +37,7 @@ import {
 } from "./ChequeCapture";
 import { fmtDate, fmtNum, fmtPKR, fmtUnit } from "@/lib/format";
 import { can } from "@/lib/permissions";
+import { brandingDataUrls } from "@/lib/branding";
 import { matchesAny } from "@/lib/search";
 import {
   DEFAULT_WAREHOUSE_ID,
@@ -554,6 +555,7 @@ export default function JobsView() {
           <JobPrintSheet
             job={printJob}
             settings={settings}
+            assets={brandingDataUrls(store.branding)}
             warehouseName={whName(printJob.warehouseId)}
           />
         </>

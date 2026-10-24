@@ -117,6 +117,20 @@ export function employeeMatches(
   return matchesAny(rawQuery, [e.name, e.phone, e.designation]);
 }
 
+/* ---------------- loans (Phase D · D3) ---------------- */
+
+/**
+ * Loan match: number / party name / note. Same null-safe
+ * discipline — a legacy loan doc missing any field must not
+ * throw on the register's first keystroke.
+ */
+export function loanMatches(
+  l: { number?: unknown; partyName?: unknown; note?: unknown },
+  rawQuery: string
+): boolean {
+  return matchesAny(rawQuery, [l.number, l.partyName, l.note]);
+}
+
 /* ---------------- suppliers ---------------- */
 
 /**

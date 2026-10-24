@@ -1,0 +1,3716 @@
+{
+ "version": 1,
+ "source": "harness/fixtures-export-f4.js — composed through compiled web/lib Phase D functions",
+ "scenarios": [
+  {
+   "id": "payroll-cycle",
+   "title": "Advance → accrued production labour (bucket) → PAY-1 accrual → partial pay → bucket settle → full settle; §2.2 identity at every step",
+   "docs": {
+    "employees": [
+     {
+      "id": "emp-a",
+      "name": "Muhammad Aslam",
+      "phone": "03011111111",
+      "designation": "Counter in-charge",
+      "linkedUserEmail": null,
+      "joinDateISO": "2025-03-01",
+      "payBasis": "monthly",
+      "baseAmount": 30000,
+      "allowances": [
+       {
+        "label": "Transport",
+        "amount": 2000
+       }
+      ],
+      "paidLeaveDays": 2,
+      "active": true,
+      "note": "",
+      "ts": "2026-01-05T09:00:00.000Z"
+     },
+     {
+      "id": "emp-b",
+      "name": "Bilal Ahmed",
+      "phone": "03022222222",
+      "designation": "Loader",
+      "linkedUserEmail": null,
+      "joinDateISO": "2026-01-10",
+      "payBasis": "daily",
+      "baseAmount": 800,
+      "allowances": [],
+      "paidLeaveDays": 0,
+      "active": true,
+      "note": "",
+      "ts": "2026-01-05T09:00:00.000Z"
+     },
+     {
+      "id": "emp-c",
+      "name": "Left Worker",
+      "phone": "",
+      "designation": "",
+      "linkedUserEmail": null,
+      "joinDateISO": null,
+      "payBasis": "monthly",
+      "baseAmount": 45000,
+      "allowances": [],
+      "paidLeaveDays": 0,
+      "active": false,
+      "note": "left in August",
+      "ts": "2026-01-05T09:00:00.000Z"
+     }
+    ],
+    "attendance": [
+     {
+      "id": "emp-a__2026-09",
+      "employeeId": "emp-a",
+      "month": "2026-09",
+      "days": {
+       "1": "present",
+       "2": "present",
+       "3": "present",
+       "4": "present",
+       "5": "present",
+       "6": "present",
+       "7": "present",
+       "8": "present",
+       "9": "present",
+       "10": "present",
+       "11": "present",
+       "12": "present",
+       "13": "present",
+       "14": "present",
+       "15": "present",
+       "16": "present",
+       "17": "present",
+       "18": "present",
+       "19": "present",
+       "20": "present",
+       "21": "present",
+       "22": "present",
+       "23": "present",
+       "24": "present",
+       "25": "absent",
+       "26": "absent",
+       "27": "absent",
+       "28": "half",
+       "29": "half",
+       "30": "leave"
+      },
+      "ts": "2026-09-30T18:00:00.000Z"
+     },
+     {
+      "id": "emp-b__2026-09",
+      "employeeId": "emp-b",
+      "month": "2026-09",
+      "days": {
+       "1": "present",
+       "2": "present",
+       "3": "present",
+       "4": "present",
+       "5": "present",
+       "6": "present",
+       "7": "present",
+       "8": "present",
+       "9": "present",
+       "10": "present",
+       "11": "present",
+       "12": "present",
+       "13": "present",
+       "14": "present",
+       "15": "present",
+       "16": "present",
+       "17": "present",
+       "18": "present",
+       "19": "present",
+       "20": "present",
+       "21": "half",
+       "22": "half",
+       "23": "half",
+       "24": "half",
+       "25": "absent",
+       "26": "absent",
+       "27": "absent",
+       "28": "absent",
+       "29": "absent",
+       "30": "absent"
+      },
+      "ts": "2026-09-30T18:00:00.000Z"
+     }
+    ],
+    "runDraft": {
+     "lines": [
+      {
+       "employeeId": "emp-a",
+       "name": "Muhammad Aslam",
+       "payBasis": "monthly",
+       "daysInMonth": 30,
+       "present": 24,
+       "absent": 3,
+       "half": 2,
+       "leave": 1,
+       "unpaidAbsent": 1,
+       "earnedBase": 29000,
+       "allowances": [
+        {
+         "label": "Transport",
+         "amount": 2000
+        }
+       ],
+       "deductions": [
+        {
+         "label": "EOBI",
+         "amount": 500
+        }
+       ],
+       "gross": 31000,
+       "netAccrued": 30500
+      },
+      {
+       "employeeId": "emp-b",
+       "name": "Bilal Ahmed",
+       "payBasis": "daily",
+       "daysInMonth": 30,
+       "present": 20,
+       "absent": 6,
+       "half": 4,
+       "leave": 0,
+       "unpaidAbsent": 0,
+       "earnedBase": 17600,
+       "allowances": [
+        {
+         "label": "Overtime",
+         "amount": 1200
+        }
+       ],
+       "deductions": [],
+       "gross": 18800,
+       "netAccrued": 18800
+      }
+     ],
+     "totals": {
+      "gross": 49800,
+      "deductions": 500,
+      "netAccrued": 49300
+     }
+    },
+    "runFinal": {
+     "id": "run-sep",
+     "number": "PAY-1",
+     "month": "2026-09",
+     "lines": [
+      {
+       "employeeId": "emp-a",
+       "name": "Muhammad Aslam",
+       "payBasis": "monthly",
+       "daysInMonth": 30,
+       "present": 24,
+       "absent": 3,
+       "half": 2,
+       "leave": 1,
+       "unpaidAbsent": 1,
+       "earnedBase": 29000,
+       "allowances": [
+        {
+         "label": "Transport",
+         "amount": 2000
+        }
+       ],
+       "deductions": [
+        {
+         "label": "EOBI",
+         "amount": 500
+        }
+       ],
+       "gross": 31000,
+       "netAccrued": 30500
+      },
+      {
+       "employeeId": "emp-b",
+       "name": "Bilal Ahmed",
+       "payBasis": "daily",
+       "daysInMonth": 30,
+       "present": 20,
+       "absent": 6,
+       "half": 4,
+       "leave": 0,
+       "unpaidAbsent": 0,
+       "earnedBase": 17600,
+       "allowances": [
+        {
+         "label": "Overtime",
+         "amount": 1200
+        }
+       ],
+       "deductions": [],
+       "gross": 18800,
+       "netAccrued": 18800
+      }
+     ],
+     "totals": {
+      "gross": 49800,
+      "deductions": 500,
+      "netAccrued": 49300
+     },
+     "payments": [
+      {
+       "employeeId": "emp-a",
+       "name": "Muhammad Aslam",
+       "amount": 10000,
+       "method": "cash",
+       "accountId": "acct-till",
+       "entryId": "e3",
+       "dayOffset": 0,
+       "ts": "2026-10-01T10:00:00.000Z"
+      },
+      {
+       "employeeId": null,
+       "name": "Production labour",
+       "amount": 400,
+       "method": "cash",
+       "accountId": "acct-till",
+       "entryId": "e4",
+       "dayOffset": 0,
+       "ts": "2026-10-01T10:05:00.000Z"
+      },
+      {
+       "employeeId": "emp-a",
+       "name": "Muhammad Aslam",
+       "amount": 5500,
+       "method": "cash",
+       "accountId": "acct-till",
+       "entryId": "e5",
+       "dayOffset": 0,
+       "ts": "2026-10-02T10:00:00.000Z"
+      },
+      {
+       "employeeId": "emp-b",
+       "name": "Bilal Ahmed",
+       "amount": 18800,
+       "method": "bank",
+       "accountId": "acct-wallet",
+       "entryId": "e6",
+       "dayOffset": 0,
+       "ts": "2026-10-02T10:05:00.000Z"
+      }
+     ],
+     "accrualEntryId": "e2",
+     "status": "posted",
+     "note": "",
+     "dayOffset": 0,
+     "ts": "2026-09-30T19:00:00.000Z"
+    },
+    "checkpoints": {
+     "afterAdvance": {
+      "glBalance": -15000,
+      "employees": [
+       {
+        "employeeId": "emp-a",
+        "position": 15000
+       }
+      ],
+      "owedToEmployees": 0,
+      "advancesOutstanding": 15000,
+      "unassignedAccrued": 0
+     },
+     "afterIssue": {
+      "glBalance": -14600,
+      "employees": [
+       {
+        "employeeId": "emp-a",
+        "position": 15000
+       }
+      ],
+      "owedToEmployees": 0,
+      "advancesOutstanding": 15000,
+      "unassignedAccrued": 400
+     },
+     "afterAccrual": {
+      "glBalance": 34700,
+      "employees": [
+       {
+        "employeeId": "emp-a",
+        "position": -15500
+       },
+       {
+        "employeeId": "emp-b",
+        "position": -18800
+       }
+      ],
+      "owedToEmployees": 34300,
+      "advancesOutstanding": 0,
+      "unassignedAccrued": 400
+     },
+     "figuresAfterAccrual": {
+      "emp-a": {
+       "netAccrued": 30500,
+       "advanceBefore": 15000,
+       "cashPaid": 0,
+       "advanceRecovered": 15000,
+       "stillOwed": 15500,
+       "advanceOutstanding": 0
+      },
+      "emp-b": {
+       "netAccrued": 18800,
+       "advanceBefore": 0,
+       "cashPaid": 0,
+       "advanceRecovered": 0,
+       "stillOwed": 18800,
+       "advanceOutstanding": 0
+      }
+     },
+     "figuresAfterPartialPay": {
+      "emp-a": {
+       "netAccrued": 30500,
+       "advanceBefore": 15000,
+       "cashPaid": 10000,
+       "advanceRecovered": 15000,
+       "stillOwed": 5500,
+       "advanceOutstanding": 0
+      }
+     },
+     "afterPartialPay": {
+      "glBalance": 24700,
+      "employees": [
+       {
+        "employeeId": "emp-a",
+        "position": -5500
+       },
+       {
+        "employeeId": "emp-b",
+        "position": -18800
+       }
+      ],
+      "owedToEmployees": 24300,
+      "advancesOutstanding": 0,
+      "unassignedAccrued": 400
+     },
+     "final": {
+      "glBalance": 0,
+      "employees": [
+       {
+        "employeeId": "emp-a",
+        "position": 0
+       },
+       {
+        "employeeId": "emp-b",
+        "position": 0
+       }
+      ],
+      "owedToEmployees": 0,
+      "advancesOutstanding": 0,
+      "unassignedAccrued": 0
+     },
+     "figuresFinal": {
+      "emp-a": {
+       "netAccrued": 30500,
+       "advanceBefore": 15000,
+       "cashPaid": 15500,
+       "advanceRecovered": 15000,
+       "stillOwed": 0,
+       "advanceOutstanding": 0
+      },
+      "emp-b": {
+       "netAccrued": 18800,
+       "advanceBefore": 0,
+       "cashPaid": 18800,
+       "advanceRecovered": 0,
+       "stillOwed": 0,
+       "advanceOutstanding": 0
+      }
+     },
+     "positions": {
+      "emp-a": 0,
+      "emp-b": 0
+     }
+    },
+    "accrualLabel": "e2"
+   },
+   "entries": [
+    {
+     "id": "e0",
+     "ts": "2026-09-05T10:00:00.000Z",
+     "dayOffset": 0,
+     "dateISO": null,
+     "memo": "Salary advance — Muhammad Aslam",
+     "refType": "salary_advance",
+     "refId": "emp-a",
+     "reversesId": null,
+     "lines": [
+      {
+       "account": "salary_payable",
+       "debit": 15000,
+       "credit": 0,
+       "ref": "emp-a"
+      },
+      {
+       "account": "cash",
+       "debit": 0,
+       "credit": 15000,
+       "ref": "acct-till"
+      }
+     ]
+    },
+    {
+     "id": "e1",
+     "ts": "2026-09-12T09:05:00.000Z",
+     "dayOffset": 0,
+     "dateISO": null,
+     "memo": "Production issue — PR-9 · House Tea Blend 500g",
+     "refType": "production_issue",
+     "refId": "pr-f4",
+     "reversesId": null,
+     "lines": [
+      {
+       "account": "wip",
+       "debit": 4860,
+       "credit": 0,
+       "ref": "pr-f4"
+      },
+      {
+       "account": "inventory_raw",
+       "debit": 0,
+       "credit": 4000,
+       "ref": "p-raw"
+      },
+      {
+       "account": "inventory",
+       "debit": 0,
+       "credit": 260,
+       "ref": "p-sugar"
+      },
+      {
+       "account": "inventory",
+       "debit": 0,
+       "credit": 200,
+       "ref": "p-pack"
+      },
+      {
+       "account": "salary_payable",
+       "debit": 0,
+       "credit": 400,
+       "ref": null
+      }
+     ]
+    },
+    {
+     "id": "e2",
+     "ts": "2026-09-30T19:05:00.000Z",
+     "dayOffset": 0,
+     "dateISO": null,
+     "memo": "Payroll PAY-1 — 2026-09",
+     "refType": "payroll_accrual",
+     "refId": "run-sep",
+     "reversesId": null,
+     "lines": [
+      {
+       "account": "expense_salary",
+       "debit": 30500,
+       "credit": 0,
+       "ref": "emp-a"
+      },
+      {
+       "account": "salary_payable",
+       "debit": 0,
+       "credit": 30500,
+       "ref": "emp-a"
+      },
+      {
+       "account": "expense_salary",
+       "debit": 18800,
+       "credit": 0,
+       "ref": "emp-b"
+      },
+      {
+       "account": "salary_payable",
+       "debit": 0,
+       "credit": 18800,
+       "ref": "emp-b"
+      }
+     ]
+    },
+    {
+     "id": "e3",
+     "ts": "2026-10-01T10:00:00.000Z",
+     "dayOffset": 0,
+     "dateISO": null,
+     "memo": "Salary payment PAY-1 — Muhammad Aslam",
+     "refType": "payroll_payment",
+     "refId": "run-sep",
+     "reversesId": null,
+     "lines": [
+      {
+       "account": "salary_payable",
+       "debit": 10000,
+       "credit": 0,
+       "ref": "emp-a"
+      },
+      {
+       "account": "cash",
+       "debit": 0,
+       "credit": 10000,
+       "ref": "acct-till"
+      }
+     ]
+    },
+    {
+     "id": "e4",
+     "ts": "2026-10-01T10:05:00.000Z",
+     "dayOffset": 0,
+     "dateISO": null,
+     "memo": "Salary payment PAY-1 — Production labour",
+     "refType": "payroll_payment",
+     "refId": "run-sep",
+     "reversesId": null,
+     "lines": [
+      {
+       "account": "salary_payable",
+       "debit": 400,
+       "credit": 0,
+       "ref": null
+      },
+      {
+       "account": "cash",
+       "debit": 0,
+       "credit": 400,
+       "ref": "acct-till"
+      }
+     ]
+    },
+    {
+     "id": "e5",
+     "ts": "2026-10-02T10:00:00.000Z",
+     "dayOffset": 0,
+     "dateISO": null,
+     "memo": "Salary payment PAY-1 — Muhammad Aslam",
+     "refType": "payroll_payment",
+     "refId": "run-sep",
+     "reversesId": null,
+     "lines": [
+      {
+       "account": "salary_payable",
+       "debit": 5500,
+       "credit": 0,
+       "ref": "emp-a"
+      },
+      {
+       "account": "cash",
+       "debit": 0,
+       "credit": 5500,
+       "ref": "acct-till"
+      }
+     ]
+    },
+    {
+     "id": "e6",
+     "ts": "2026-10-02T10:05:00.000Z",
+     "dayOffset": 0,
+     "dateISO": null,
+     "memo": "Salary payment PAY-1 — Bilal Ahmed",
+     "refType": "payroll_payment",
+     "refId": "run-sep",
+     "reversesId": null,
+     "lines": [
+      {
+       "account": "salary_payable",
+       "debit": 18800,
+       "credit": 0,
+       "ref": "emp-b"
+      },
+      {
+       "account": "wallet",
+       "debit": 0,
+       "credit": 18800,
+       "ref": "acct-wallet"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "payroll-reversal",
+   "title": "Posted run reversed by mirror — its payment stands as an advance; the re-run (PAY-2) absorbs it by derivation",
+   "docs": {
+    "employees": [
+     {
+      "id": "emp-a",
+      "name": "Muhammad Aslam",
+      "phone": "03011111111",
+      "designation": "Counter in-charge",
+      "linkedUserEmail": null,
+      "joinDateISO": "2025-03-01",
+      "payBasis": "monthly",
+      "baseAmount": 30000,
+      "allowances": [],
+      "paidLeaveDays": 0,
+      "active": true,
+      "note": "",
+      "ts": "2026-01-05T09:00:00.000Z"
+     }
+    ],
+    "attendance": [
+     {
+      "id": "emp-a__2026-08",
+      "employeeId": "emp-a",
+      "month": "2026-08",
+      "days": {
+       "1": "present",
+       "2": "present",
+       "3": "present",
+       "4": "present",
+       "5": "present",
+       "6": "present",
+       "7": "present",
+       "8": "present",
+       "9": "present",
+       "10": "present",
+       "11": "present",
+       "12": "present",
+       "13": "present",
+       "14": "present",
+       "15": "present",
+       "16": "present",
+       "17": "present",
+       "18": "present",
+       "19": "present",
+       "20": "present",
+       "21": "present",
+       "22": "present",
+       "23": "present",
+       "24": "present",
+       "25": "present",
+       "26": "present",
+       "27": "present",
+       "28": "present",
+       "29": "present",
+       "30": "present",
+       "31": "present"
+      },
+      "ts": "2026-08-31T18:00:00.000Z"
+     }
+    ],
+    "run1": {
+     "id": "run-aug",
+     "number": "PAY-1",
+     "month": "2026-08",
+     "lines": [
+      {
+       "employeeId": "emp-a",
+       "name": "Muhammad Aslam",
+       "payBasis": "monthly",
+       "daysInMonth": 31,
+       "present": 31,
+       "absent": 0,
+       "half": 0,
+       "leave": 0,
+       "unpaidAbsent": 0,
+       "earnedBase": 30000,
+       "allowances": [],
+       "deductions": [],
+       "gross": 30000,
+       "netAccrued": 30000
+      }
+     ],
+     "totals": {
+      "gross": 30000,
+      "deductions": 0,
+      "netAccrued": 30000
+     },
+     "payments": [
+      {
+       "employeeId": "emp-a",
+       "name": "Muhammad Aslam",
+       "amount": 20000,
+       "method": "cash",
+       "accountId": "acct-till",
+       "entryId": "e2",
+       "dayOffset": 0,
+       "ts": "2026-09-01T10:00:00.000Z"
+      }
+     ],
+     "accrualEntryId": "e1",
+     "status": "reversed",
+     "note": "",
+     "dayOffset": 0,
+     "ts": "2026-08-31T19:00:00.000Z"
+    },
+    "run2": {
+     "id": "run-aug-2",
+     "number": "PAY-2",
+     "month": "2026-08",
+     "lines": [
+      {
+       "employeeId": "emp-a",
+       "name": "Muhammad Aslam",
+       "payBasis": "monthly",
+       "daysInMonth": 31,
+       "present": 31,
+       "absent": 0,
+       "half": 0,
+       "leave": 0,
+       "unpaidAbsent": 0,
+       "earnedBase": 30000,
+       "allowances": [],
+       "deductions": [],
+       "gross": 30000,
+       "netAccrued": 30000
+      }
+     ],
+     "totals": {
+      "gross": 30000,
+      "deductions": 0,
+      "netAccrued": 30000
+     },
+     "payments": [],
+     "accrualEntryId": "e4",
+     "status": "posted",
+     "note": "",
+     "dayOffset": 0,
+     "ts": "2026-09-03T11:00:00.000Z"
+    },
+    "positionAfterReversal": 25000,
+    "figuresRun2": {
+     "netAccrued": 30000,
+     "advanceBefore": 25000,
+     "cashPaid": 0,
+     "advanceRecovered": 25000,
+     "stillOwed": 5000,
+     "advanceOutstanding": 0
+    }
+   },
+   "entries": [
+    {
+     "id": "e0",
+     "ts": "2026-08-10T10:00:00.000Z",
+     "dayOffset": 0,
+     "dateISO": null,
+     "memo": "Salary advance — Muhammad Aslam",
+     "refType": "salary_advance",
+     "refId": "emp-a",
+     "reversesId": null,
+     "lines": [
+      {
+       "account": "salary_payable",
+       "debit": 5000,
+       "credit": 0,
+       "ref": "emp-a"
+      },
+      {
+       "account": "cash",
+       "debit": 0,
+       "credit": 5000,
+       "ref": "acct-till"
+      }
+     ]
+    },
+    {
+     "id": "e1",
+     "ts": "2026-08-31T19:05:00.000Z",
+     "dayOffset": 0,
+     "dateISO": null,
+     "memo": "Payroll PAY-1 — 2026-08",
+     "refType": "payroll_accrual",
+     "refId": "run-aug",
+     "reversesId": null,
+     "lines": [
+      {
+       "account": "expense_salary",
+       "debit": 30000,
+       "credit": 0,
+       "ref": "emp-a"
+      },
+      {
+       "account": "salary_payable",
+       "debit": 0,
+       "credit": 30000,
+       "ref": "emp-a"
+      }
+     ]
+    },
+    {
+     "id": "e2",
+     "ts": "2026-09-01T10:00:00.000Z",
+     "dayOffset": 0,
+     "dateISO": null,
+     "memo": "Salary payment PAY-1 — Muhammad Aslam",
+     "refType": "payroll_payment",
+     "refId": "run-aug",
+     "reversesId": null,
+     "lines": [
+      {
+       "account": "salary_payable",
+       "debit": 20000,
+       "credit": 0,
+       "ref": "emp-a"
+      },
+      {
+       "account": "cash",
+       "debit": 0,
+       "credit": 20000,
+       "ref": "acct-till"
+      }
+     ]
+    },
+    {
+     "id": "e3",
+     "ts": "2026-09-03T10:00:00.000Z",
+     "dayOffset": 0,
+     "dateISO": null,
+     "memo": "Payroll reversal PAY-1 — 2026-08",
+     "refType": "payroll_accrual",
+     "refId": "run-aug",
+     "reversesId": "e1",
+     "lines": [
+      {
+       "account": "expense_salary",
+       "debit": 0,
+       "credit": 30000,
+       "ref": "emp-a"
+      },
+      {
+       "account": "salary_payable",
+       "debit": 30000,
+       "credit": 0,
+       "ref": "emp-a"
+      }
+     ]
+    },
+    {
+     "id": "e4",
+     "ts": "2026-09-03T11:05:00.000Z",
+     "dayOffset": 0,
+     "dateISO": null,
+     "memo": "Payroll PAY-2 — 2026-08",
+     "refType": "payroll_accrual",
+     "refId": "run-aug-2",
+     "reversesId": null,
+     "lines": [
+      {
+       "account": "expense_salary",
+       "debit": 30000,
+       "credit": 0,
+       "ref": "emp-a"
+      },
+      {
+       "account": "salary_payable",
+       "debit": 0,
+       "credit": 30000,
+       "ref": "emp-a"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "loan-lifecycle-payable-flat",
+   "title": "Drawdown → two ordinal charge accruals → charges-first repayment → instalment states → final repayment settles",
+   "docs": {
+    "loan": {
+     "id": "loan-1",
+     "number": "LN-1",
+     "direction": "payable",
+     "partyName": "Habib Bank — Gulberg",
+     "partyId": null,
+     "principal": 100000,
+     "chargeType": "flat",
+     "chargeRate": 10,
+     "chargeAmount": 10000,
+     "startDateISO": "2026-07-01",
+     "instalmentCount": 7,
+     "instalmentEvery": "month",
+     "firstDueISO": "2026-08-01",
+     "events": [
+      {
+       "kind": "drawdown",
+       "amount": 100000,
+       "principalPart": 100000,
+       "chargePart": 0,
+       "accountId": "acct-wallet",
+       "entryId": "e0",
+       "dayOffset": 0,
+       "ts": "2026-07-01T10:05:00.000Z"
+      },
+      {
+       "kind": "charge",
+       "amount": 1428.57,
+       "principalPart": 0,
+       "chargePart": 1428.57,
+       "accountId": null,
+       "entryId": "e1",
+       "dayOffset": 0,
+       "ts": "2026-08-01T09:00:00.000Z"
+      },
+      {
+       "kind": "charge",
+       "amount": 1428.57,
+       "principalPart": 0,
+       "chargePart": 1428.57,
+       "accountId": null,
+       "entryId": "e2",
+       "dayOffset": 0,
+       "ts": "2026-09-01T09:00:00.000Z"
+      },
+      {
+       "kind": "repayment",
+       "amount": 20000,
+       "principalPart": 17142.86,
+       "chargePart": 2857.14,
+       "accountId": "acct-wallet",
+       "entryId": "e3",
+       "dayOffset": 0,
+       "ts": "2026-09-10T10:00:00.000Z"
+      },
+      {
+       "kind": "repayment",
+       "amount": 82857.14,
+       "principalPart": 82857.14,
+       "chargePart": 0,
+       "accountId": "acct-wallet",
+       "entryId": "e4",
+       "dayOffset": 0,
+       "ts": "2026-09-20T10:00:00.000Z"
+      }
+     ],
+     "status": "settled",
+     "note": "",
+     "dayOffset": 0,
+     "ts": "2026-07-01T10:00:00.000Z"
+    },
+    "schedule": [
+     {
+      "n": 1,
+      "dueISO": "2026-08-01",
+      "principalPart": 14285.71,
+      "chargePart": 1428.57,
+      "total": 15714.28
+     },
+     {
+      "n": 2,
+      "dueISO": "2026-09-01",
+      "principalPart": 14285.72,
+      "chargePart": 1428.57,
+      "total": 15714.29
+     },
+     {
+      "n": 3,
+      "dueISO": "2026-10-01",
+      "principalPart": 14285.71,
+      "chargePart": 1428.57,
+      "total": 15714.28
+     },
+     {
+      "n": 4,
+      "dueISO": "2026-11-01",
+      "principalPart": 14285.72,
+      "chargePart": 1428.58,
+      "total": 15714.3
+     },
+     {
+      "n": 5,
+      "dueISO": "2026-12-01",
+      "principalPart": 14285.71,
+      "chargePart": 1428.57,
+      "total": 15714.28
+     },
+     {
+      "n": 6,
+      "dueISO": "2027-01-01",
+      "principalPart": 14285.72,
+      "chargePart": 1428.57,
+      "total": 15714.29
+     },
+     {
+      "n": 7,
+      "dueISO": "2027-02-01",
+      "principalPart": 14285.71,
+      "chargePart": 1428.57,
+      "total": 15714.28
+     }
+    ],
+    "positionSteps": [
+     {
+      "label": "drawdown",
+      "diary": {
+       "drawn": true,
+       "principalRepaid": 0,
+       "chargesAccrued": 0,
+       "chargesRepaid": 0,
+       "feesRecognised": 0,
+       "totalRepaid": 0,
+       "outstanding": 100000
+      },
+      "journal": 100000
+     },
+     {
+      "label": "charge1",
+      "diary": {
+       "drawn": true,
+       "principalRepaid": 0,
+       "chargesAccrued": 1428.57,
+       "chargesRepaid": 0,
+       "feesRecognised": 0,
+       "totalRepaid": 0,
+       "outstanding": 101428.57
+      },
+      "journal": 101428.57
+     },
+     {
+      "label": "charge2",
+      "diary": {
+       "drawn": true,
+       "principalRepaid": 0,
+       "chargesAccrued": 2857.14,
+       "chargesRepaid": 0,
+       "feesRecognised": 0,
+       "totalRepaid": 0,
+       "outstanding": 102857.14
+      },
+      "journal": 102857.14
+     },
+     {
+      "label": "repay1",
+      "diary": {
+       "drawn": true,
+       "principalRepaid": 17142.86,
+       "chargesAccrued": 2857.14,
+       "chargesRepaid": 2857.14,
+       "feesRecognised": 0,
+       "totalRepaid": 20000,
+       "outstanding": 82857.14
+      },
+      "journal": 82857.14
+     },
+     {
+      "label": "settled",
+      "diary": {
+       "drawn": true,
+       "principalRepaid": 100000,
+       "chargesAccrued": 2857.14,
+       "chargesRepaid": 2857.14,
+       "feesRecognised": 0,
+       "totalRepaid": 102857.14,
+       "outstanding": 0
+      },
+      "journal": 0
+     }
+    ],
+    "splits": [
+     {
+      "principalPart": 17142.86,
+      "chargePart": 2857.14
+     },
+     {
+      "principalPart": 82857.14,
+      "chargePart": 0
+     }
+    ],
+    "statesAfterFirstRepayment": [
+     {
+      "n": 1,
+      "dueISO": "2026-08-01",
+      "principalPart": 14285.71,
+      "chargePart": 1428.57,
+      "total": 15714.28,
+      "chargeAccrued": true,
+      "owed": 15714.28,
+      "paidAmount": 15714.28,
+      "state": "paid"
+     },
+     {
+      "n": 2,
+      "dueISO": "2026-09-01",
+      "principalPart": 14285.72,
+      "chargePart": 1428.57,
+      "total": 15714.29,
+      "chargeAccrued": true,
+      "owed": 15714.29,
+      "paidAmount": 4285.72,
+      "state": "partial"
+     },
+     {
+      "n": 3,
+      "dueISO": "2026-10-01",
+      "principalPart": 14285.71,
+      "chargePart": 1428.57,
+      "total": 15714.28,
+      "chargeAccrued": false,
+      "owed": 14285.71,
+      "paidAmount": 0,
+      "state": "upcoming"
+     },
+     {
+      "n": 4,
+      "dueISO": "2026-11-01",
+      "principalPart": 14285.72,
+      "chargePart": 1428.58,
+      "total": 15714.3,
+      "chargeAccrued": false,
+      "owed": 14285.72,
+      "paidAmount": 0,
+      "state": "upcoming"
+     },
+     {
+      "n": 5,
+      "dueISO": "2026-12-01",
+      "principalPart": 14285.71,
+      "chargePart": 1428.57,
+      "total": 15714.28,
+      "chargeAccrued": false,
+      "owed": 14285.71,
+      "paidAmount": 0,
+      "state": "upcoming"
+     },
+     {
+      "n": 6,
+      "dueISO": "2027-01-01",
+      "principalPart": 14285.72,
+      "chargePart": 1428.57,
+      "total": 15714.29,
+      "chargeAccrued": false,
+      "owed": 14285.72,
+      "paidAmount": 0,
+      "state": "upcoming"
+     },
+     {
+      "n": 7,
+      "dueISO": "2027-02-01",
+      "principalPart": 14285.71,
+      "chargePart": 1428.57,
+      "total": 15714.28,
+      "chargeAccrued": false,
+      "owed": 14285.71,
+      "paidAmount": 0,
+      "state": "upcoming"
+     }
+    ],
+    "nextDue": {
+     "instalment": {
+      "n": 2,
+      "dueISO": "2026-09-01",
+      "principalPart": 14285.72,
+      "chargePart": 1428.57,
+      "total": 15714.29,
+      "chargeAccrued": true,
+      "owed": 15714.29,
+      "paidAmount": 4285.72,
+      "state": "partial"
+     },
+     "overdueCount": 0
+    }
+   },
+   "entries": [
+    {
+     "id": "e0",
+     "ts": "2026-07-01T10:05:00.000Z",
+     "dayOffset": 0,
+     "dateISO": null,
+     "memo": "Loan drawdown LN-1 — Habib Bank — Gulberg",
+     "refType": "loan_drawdown",
+     "refId": "loan-1",
+     "reversesId": null,
+     "lines": [
+      {
+       "account": "wallet",
+       "debit": 100000,
+       "credit": 0,
+       "ref": "acct-wallet"
+      },
+      {
+       "account": "loans_payable",
+       "debit": 0,
+       "credit": 100000,
+       "ref": "loan-1"
+      }
+     ]
+    },
+    {
+     "id": "e1",
+     "ts": "2026-08-01T09:00:00.000Z",
+     "dayOffset": 0,
+     "dateISO": null,
+     "memo": "Loan charge LN-1 — instalment 1",
+     "refType": "loan_charge",
+     "refId": "loan-1",
+     "reversesId": null,
+     "lines": [
+      {
+       "account": "expense_finance",
+       "debit": 1428.57,
+       "credit": 0,
+       "ref": null
+      },
+      {
+       "account": "loans_payable",
+       "debit": 0,
+       "credit": 1428.57,
+       "ref": "loan-1"
+      }
+     ]
+    },
+    {
+     "id": "e2",
+     "ts": "2026-09-01T09:00:00.000Z",
+     "dayOffset": 0,
+     "dateISO": null,
+     "memo": "Loan charge LN-1 — instalment 2",
+     "refType": "loan_charge",
+     "refId": "loan-1",
+     "reversesId": null,
+     "lines": [
+      {
+       "account": "expense_finance",
+       "debit": 1428.57,
+       "credit": 0,
+       "ref": null
+      },
+      {
+       "account": "loans_payable",
+       "debit": 0,
+       "credit": 1428.57,
+       "ref": "loan-1"
+      }
+     ]
+    },
+    {
+     "id": "e3",
+     "ts": "2026-09-10T10:00:00.000Z",
+     "dayOffset": 0,
+     "dateISO": null,
+     "memo": "Loan repayment LN-1 — Habib Bank — Gulberg",
+     "refType": "loan_repayment",
+     "refId": "loan-1",
+     "reversesId": null,
+     "lines": [
+      {
+       "account": "loans_payable",
+       "debit": 20000,
+       "credit": 0,
+       "ref": "loan-1"
+      },
+      {
+       "account": "wallet",
+       "debit": 0,
+       "credit": 20000,
+       "ref": "acct-wallet"
+      }
+     ]
+    },
+    {
+     "id": "e4",
+     "ts": "2026-09-20T10:00:00.000Z",
+     "dayOffset": 0,
+     "dateISO": null,
+     "memo": "Loan repayment LN-1 — Habib Bank — Gulberg",
+     "refType": "loan_repayment",
+     "refId": "loan-1",
+     "reversesId": null,
+     "lines": [
+      {
+       "account": "loans_payable",
+       "debit": 82857.14,
+       "credit": 0,
+       "ref": "loan-1"
+      },
+      {
+       "account": "wallet",
+       "debit": 0,
+       "credit": 82857.14,
+       "ref": "acct-wallet"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "loan-fee-netted-drawdown",
+   "title": "fee_only drawdown: Dr cash (P−F) + Dr expense_finance F / Cr loans_payable P; fee never accrues to outstanding",
+   "docs": {
+    "loan": {
+     "id": "loan-fee",
+     "number": "LN-1",
+     "direction": "payable",
+     "partyName": "Micro Finance — Kasur",
+     "partyId": null,
+     "principal": 50000,
+     "chargeType": "fee_only",
+     "chargeRate": 0,
+     "chargeAmount": 1500,
+     "startDateISO": "2026-08-01",
+     "instalmentCount": 5,
+     "instalmentEvery": "month",
+     "firstDueISO": "2026-09-01",
+     "events": [
+      {
+       "kind": "drawdown",
+       "amount": 50000,
+       "principalPart": 50000,
+       "chargePart": 0,
+       "accountId": "acct-till",
+       "entryId": "e0",
+       "dayOffset": 0,
+       "ts": "2026-08-01T10:05:00.000Z"
+      },
+      {
+       "kind": "fee",
+       "amount": 1500,
+       "principalPart": 0,
+       "chargePart": 1500,
+       "accountId": "acct-till",
+       "entryId": "e0",
+       "dayOffset": 0,
+       "ts": "2026-08-01T10:05:00.000Z"
+      },
+      {
+       "kind": "repayment",
+       "amount": 50000,
+       "principalPart": 50000,
+       "chargePart": 0,
+       "accountId": "acct-till",
+       "entryId": "e1",
+       "dayOffset": 0,
+       "ts": "2026-12-01T10:00:00.000Z"
+      }
+     ],
+     "status": "settled",
+     "note": "",
+     "dayOffset": 0,
+     "ts": "2026-08-01T10:00:00.000Z"
+    },
+    "schedule": [
+     {
+      "n": 1,
+      "dueISO": "2026-09-01",
+      "principalPart": 10000,
+      "chargePart": 0,
+      "total": 10000
+     },
+     {
+      "n": 2,
+      "dueISO": "2026-10-01",
+      "principalPart": 10000,
+      "chargePart": 0,
+      "total": 10000
+     },
+     {
+      "n": 3,
+      "dueISO": "2026-11-01",
+      "principalPart": 10000,
+      "chargePart": 0,
+      "total": 10000
+     },
+     {
+      "n": 4,
+      "dueISO": "2026-12-01",
+      "principalPart": 10000,
+      "chargePart": 0,
+      "total": 10000
+     },
+     {
+      "n": 5,
+      "dueISO": "2027-01-01",
+      "principalPart": 10000,
+      "chargePart": 0,
+      "total": 10000
+     }
+    ],
+    "positionSteps": [
+     {
+      "label": "drawdown",
+      "diary": {
+       "drawn": true,
+       "principalRepaid": 0,
+       "chargesAccrued": 0,
+       "chargesRepaid": 0,
+       "feesRecognised": 1500,
+       "totalRepaid": 0,
+       "outstanding": 50000
+      },
+      "journal": 50000
+     },
+     {
+      "label": "settled",
+      "diary": {
+       "drawn": true,
+       "principalRepaid": 50000,
+       "chargesAccrued": 0,
+       "chargesRepaid": 0,
+       "feesRecognised": 1500,
+       "totalRepaid": 50000,
+       "outstanding": 0
+      },
+      "journal": 0
+     }
+    ]
+   },
+   "entries": [
+    {
+     "id": "e0",
+     "ts": "2026-08-01T10:05:00.000Z",
+     "dayOffset": 0,
+     "dateISO": null,
+     "memo": "Loan drawdown LN-1 — Micro Finance — Kasur",
+     "refType": "loan_drawdown",
+     "refId": "loan-fee",
+     "reversesId": null,
+     "lines": [
+      {
+       "account": "cash",
+       "debit": 48500,
+       "credit": 0,
+       "ref": "acct-till"
+      },
+      {
+       "account": "expense_finance",
+       "debit": 1500,
+       "credit": 0,
+       "ref": null
+      },
+      {
+       "account": "loans_payable",
+       "debit": 0,
+       "credit": 50000,
+       "ref": "loan-fee"
+      }
+     ]
+    },
+    {
+     "id": "e1",
+     "ts": "2026-12-01T10:00:00.000Z",
+     "dayOffset": 0,
+     "dateISO": null,
+     "memo": "Loan repayment LN-1 — Micro Finance — Kasur",
+     "refType": "loan_repayment",
+     "refId": "loan-fee",
+     "reversesId": null,
+     "lines": [
+      {
+       "account": "loans_payable",
+       "debit": 50000,
+       "credit": 0,
+       "ref": "loan-fee"
+      },
+      {
+       "account": "cash",
+       "debit": 0,
+       "credit": 50000,
+       "ref": "acct-till"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "loan-reducing",
+   "title": "Reducing charge schedule (1200/900/600/300 on 60,000 @ 2%); accrual #1, a charges-first repayment, accrual #2",
+   "docs": {
+    "loan": {
+     "id": "loan-red",
+     "number": "LN-1",
+     "direction": "payable",
+     "partyName": "Supplier Finance — Lahore",
+     "partyId": null,
+     "principal": 60000,
+     "chargeType": "reducing",
+     "chargeRate": 2,
+     "chargeAmount": 0,
+     "startDateISO": "2026-07-15",
+     "instalmentCount": 4,
+     "instalmentEvery": "month",
+     "firstDueISO": "2026-08-15",
+     "events": [
+      {
+       "kind": "drawdown",
+       "amount": 60000,
+       "principalPart": 60000,
+       "chargePart": 0,
+       "accountId": "acct-till",
+       "entryId": "e0",
+       "dayOffset": 0,
+       "ts": "2026-07-15T10:05:00.000Z"
+      },
+      {
+       "kind": "charge",
+       "amount": 1200,
+       "principalPart": 0,
+       "chargePart": 1200,
+       "accountId": null,
+       "entryId": "e1",
+       "dayOffset": 0,
+       "ts": "2026-08-15T09:00:00.000Z"
+      },
+      {
+       "kind": "repayment",
+       "amount": 16200,
+       "principalPart": 15000,
+       "chargePart": 1200,
+       "accountId": "acct-till",
+       "entryId": "e2",
+       "dayOffset": 0,
+       "ts": "2026-08-16T10:00:00.000Z"
+      },
+      {
+       "kind": "charge",
+       "amount": 900,
+       "principalPart": 0,
+       "chargePart": 900,
+       "accountId": null,
+       "entryId": "e3",
+       "dayOffset": 0,
+       "ts": "2026-09-15T09:00:00.000Z"
+      }
+     ],
+     "status": "active",
+     "note": "",
+     "dayOffset": 0,
+     "ts": "2026-07-15T10:00:00.000Z"
+    },
+    "schedule": [
+     {
+      "n": 1,
+      "dueISO": "2026-08-15",
+      "principalPart": 15000,
+      "chargePart": 1200,
+      "total": 16200
+     },
+     {
+      "n": 2,
+      "dueISO": "2026-09-15",
+      "principalPart": 15000,
+      "chargePart": 900,
+      "total": 15900
+     },
+     {
+      "n": 3,
+      "dueISO": "2026-10-15",
+      "principalPart": 15000,
+      "chargePart": 600,
+      "total": 15600
+     },
+     {
+      "n": 4,
+      "dueISO": "2026-11-15",
+      "principalPart": 15000,
+      "chargePart": 300,
+      "total": 15300
+     }
+    ],
+    "positionSteps": [
+     {
+      "label": "drawdown",
+      "diary": {
+       "drawn": true,
+       "principalRepaid": 0,
+       "chargesAccrued": 0,
+       "chargesRepaid": 0,
+       "feesRecognised": 0,
+       "totalRepaid": 0,
+       "outstanding": 60000
+      },
+      "journal": 60000
+     },
+     {
+      "label": "repay1",
+      "diary": {
+       "drawn": true,
+       "principalRepaid": 15000,
+       "chargesAccrued": 1200,
+       "chargesRepaid": 1200,
+       "feesRecognised": 0,
+       "totalRepaid": 16200,
+       "outstanding": 45000
+      },
+      "journal": 45000
+     },
+     {
+      "label": "charge2",
+      "diary": {
+       "drawn": true,
+       "principalRepaid": 15000,
+       "chargesAccrued": 2100,
+       "chargesRepaid": 1200,
+       "feesRecognised": 0,
+       "totalRepaid": 16200,
+       "outstanding": 45900
+      },
+      "journal": 45900
+     }
+    ],
+    "split": {
+     "principalPart": 15000,
+     "chargePart": 1200
+    }
+   },
+   "entries": [
+    {
+     "id": "e0",
+     "ts": "2026-07-15T10:05:00.000Z",
+     "dayOffset": 0,
+     "dateISO": null,
+     "memo": "Loan drawdown LN-1 — Supplier Finance — Lahore",
+     "refType": "loan_drawdown",
+     "refId": "loan-red",
+     "reversesId": null,
+     "lines": [
+      {
+       "account": "cash",
+       "debit": 60000,
+       "credit": 0,
+       "ref": "acct-till"
+      },
+      {
+       "account": "loans_payable",
+       "debit": 0,
+       "credit": 60000,
+       "ref": "loan-red"
+      }
+     ]
+    },
+    {
+     "id": "e1",
+     "ts": "2026-08-15T09:00:00.000Z",
+     "dayOffset": 0,
+     "dateISO": null,
+     "memo": "Loan charge LN-1 — instalment 1",
+     "refType": "loan_charge",
+     "refId": "loan-red",
+     "reversesId": null,
+     "lines": [
+      {
+       "account": "expense_finance",
+       "debit": 1200,
+       "credit": 0,
+       "ref": null
+      },
+      {
+       "account": "loans_payable",
+       "debit": 0,
+       "credit": 1200,
+       "ref": "loan-red"
+      }
+     ]
+    },
+    {
+     "id": "e2",
+     "ts": "2026-08-16T10:00:00.000Z",
+     "dayOffset": 0,
+     "dateISO": null,
+     "memo": "Loan repayment LN-1 — Supplier Finance — Lahore",
+     "refType": "loan_repayment",
+     "refId": "loan-red",
+     "reversesId": null,
+     "lines": [
+      {
+       "account": "loans_payable",
+       "debit": 16200,
+       "credit": 0,
+       "ref": "loan-red"
+      },
+      {
+       "account": "cash",
+       "debit": 0,
+       "credit": 16200,
+       "ref": "acct-till"
+      }
+     ]
+    },
+    {
+     "id": "e3",
+     "ts": "2026-09-15T09:00:00.000Z",
+     "dayOffset": 0,
+     "dateISO": null,
+     "memo": "Loan charge LN-1 — instalment 2",
+     "refType": "loan_charge",
+     "refId": "loan-red",
+     "reversesId": null,
+     "lines": [
+      {
+       "account": "expense_finance",
+       "debit": 900,
+       "credit": 0,
+       "ref": null
+      },
+      {
+       "account": "loans_payable",
+       "debit": 0,
+       "credit": 900,
+       "ref": "loan-red"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "loan-receivable",
+   "title": "Money lent out: Dr loans_receivable / Cr cash; a repayment mirrors back; no charges ever",
+   "docs": {
+    "loan": {
+     "id": "loan-rec",
+     "number": "LN-1",
+     "direction": "receivable",
+     "partyName": "Ahmed Traders",
+     "partyId": "cust-1",
+     "principal": 25000,
+     "chargeType": "none",
+     "chargeRate": 0,
+     "chargeAmount": 0,
+     "startDateISO": "2026-09-28",
+     "instalmentCount": 5,
+     "instalmentEvery": "week",
+     "firstDueISO": "2026-10-05",
+     "events": [
+      {
+       "kind": "drawdown",
+       "amount": 25000,
+       "principalPart": 25000,
+       "chargePart": 0,
+       "accountId": "acct-till",
+       "entryId": "e0",
+       "dayOffset": 0,
+       "ts": "2026-09-28T10:05:00.000Z"
+      },
+      {
+       "kind": "repayment",
+       "amount": 10000,
+       "principalPart": 10000,
+       "chargePart": 0,
+       "accountId": "acct-till",
+       "entryId": "e1",
+       "dayOffset": 0,
+       "ts": "2026-10-06T10:00:00.000Z"
+      }
+     ],
+     "status": "active",
+     "note": "",
+     "dayOffset": 0,
+     "ts": "2026-09-28T10:00:00.000Z"
+    },
+    "schedule": [
+     {
+      "n": 1,
+      "dueISO": "2026-10-05",
+      "principalPart": 5000,
+      "chargePart": 0,
+      "total": 5000
+     },
+     {
+      "n": 2,
+      "dueISO": "2026-10-12",
+      "principalPart": 5000,
+      "chargePart": 0,
+      "total": 5000
+     },
+     {
+      "n": 3,
+      "dueISO": "2026-10-19",
+      "principalPart": 5000,
+      "chargePart": 0,
+      "total": 5000
+     },
+     {
+      "n": 4,
+      "dueISO": "2026-10-26",
+      "principalPart": 5000,
+      "chargePart": 0,
+      "total": 5000
+     },
+     {
+      "n": 5,
+      "dueISO": "2026-11-02",
+      "principalPart": 5000,
+      "chargePart": 0,
+      "total": 5000
+     }
+    ],
+    "positionSteps": [
+     {
+      "label": "drawdown",
+      "diary": {
+       "drawn": true,
+       "principalRepaid": 0,
+       "chargesAccrued": 0,
+       "chargesRepaid": 0,
+       "feesRecognised": 0,
+       "totalRepaid": 0,
+       "outstanding": 25000
+      },
+      "journal": 25000
+     },
+     {
+      "label": "repay1",
+      "diary": {
+       "drawn": true,
+       "principalRepaid": 10000,
+       "chargesAccrued": 0,
+       "chargesRepaid": 0,
+       "feesRecognised": 0,
+       "totalRepaid": 10000,
+       "outstanding": 15000
+      },
+      "journal": 15000
+     }
+    ],
+    "split": {
+     "principalPart": 10000,
+     "chargePart": 0
+    }
+   },
+   "entries": [
+    {
+     "id": "e0",
+     "ts": "2026-09-28T10:05:00.000Z",
+     "dayOffset": 0,
+     "dateISO": null,
+     "memo": "Loan drawdown LN-1 — Ahmed Traders",
+     "refType": "loan_drawdown",
+     "refId": "loan-rec",
+     "reversesId": null,
+     "lines": [
+      {
+       "account": "loans_receivable",
+       "debit": 25000,
+       "credit": 0,
+       "ref": "loan-rec"
+      },
+      {
+       "account": "cash",
+       "debit": 0,
+       "credit": 25000,
+       "ref": "acct-till"
+      }
+     ]
+    },
+    {
+     "id": "e1",
+     "ts": "2026-10-06T10:00:00.000Z",
+     "dayOffset": 0,
+     "dateISO": null,
+     "memo": "Loan repayment LN-1 — Ahmed Traders",
+     "refType": "loan_repayment",
+     "refId": "loan-rec",
+     "reversesId": null,
+     "lines": [
+      {
+       "account": "cash",
+       "debit": 10000,
+       "credit": 0,
+       "ref": "acct-till"
+      },
+      {
+       "account": "loans_receivable",
+       "debit": 0,
+       "credit": 10000,
+       "ref": "loan-rec"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "fiscal-close-cycle",
+   "title": "Checklist (gates green, draft-payroll + WIP warnings) → close FY 2025-26 → §4.6 identity → reopen mirror → re-close → close FY 2026-27 → stack blocker",
+   "docs": {
+    "settings": {
+     "shopName": "Madina General Store",
+     "fiscalYearStartMonth": 7,
+     "fiscalYearStartDay": 1
+    },
+    "range": {
+     "startDate": "2025-07-01",
+     "endDate": "2026-06-30",
+     "fromTs": "2025-06-30T19:00:00.000Z",
+     "toTs": "2026-06-30T19:00:00.000Z"
+    },
+    "range2": {
+     "startDate": "2026-07-01",
+     "endDate": "2027-06-30",
+     "fromTs": "2026-06-30T19:00:00.000Z",
+     "toTs": "2027-06-30T19:00:00.000Z"
+    },
+    "checklist": {
+     "items": [
+      {
+       "id": "trialBalance",
+       "severity": "gate",
+       "triggered": false,
+       "value": 0
+      },
+      {
+       "id": "purchasesClearing",
+       "severity": "gate",
+       "triggered": false,
+       "value": 0
+      },
+      {
+       "id": "draftPayroll",
+       "severity": "warning",
+       "triggered": true,
+       "value": 1
+      },
+      {
+       "id": "productionPools",
+       "severity": "warning",
+       "triggered": true,
+       "value": 5000
+      },
+      {
+       "id": "salaryPayable",
+       "severity": "info",
+       "triggered": false,
+       "value": 30000
+      },
+      {
+       "id": "cheques",
+       "severity": "info",
+       "triggered": false,
+       "value": 7000
+      },
+      {
+       "id": "stock",
+       "severity": "info",
+       "triggered": false,
+       "value": -78500
+      },
+      {
+       "id": "lock",
+       "severity": "info",
+       "triggered": false,
+       "value": 0
+      }
+     ],
+     "hardGatesPass": true,
+     "warningIds": [
+      "draftPayroll",
+      "productionPools"
+     ],
+     "purchasesClearing": 0,
+     "draftPayrollRuns": 1,
+     "openProductionOrders": 1,
+     "openProductionPoolTotal": 5000,
+     "salary": {
+      "glBalance": 30000,
+      "employees": [
+       {
+        "employeeId": "emp-x",
+        "position": -30000
+       }
+      ],
+      "owedToEmployees": 30000,
+      "advancesOutstanding": 0,
+      "unassignedAccrued": 0
+     },
+     "chequesInHand": 7000,
+     "chequesIssued": 0,
+     "stockGl": 30000,
+     "stockShelf": 108500,
+     "stockDivergence": -78500,
+     "lockCoversFyEnd": false,
+     "tbClosingDifference": 0
+    },
+    "inputs": {
+     "draftRun": {
+      "id": "run-draft-may",
+      "number": null,
+      "month": "2026-05",
+      "lines": [],
+      "totals": {
+       "gross": 0,
+       "deductions": 0,
+       "netAccrued": 0
+      },
+      "payments": [],
+      "accrualEntryId": null,
+      "status": "draft",
+      "note": "",
+      "dayOffset": 0,
+      "ts": "2026-05-31T19:00:00.000Z"
+     },
+     "openOrder": {
+      "id": "pr-fy",
+      "number": "PR-FY",
+      "bomId": "bom-1",
+      "bomVersion": 1,
+      "bomSnapshot": {
+       "outputQty": 10,
+       "lines": [
+        {
+         "productId": "p-raw",
+         "name": "Raw Tea Leaf 1kg",
+         "qty": 8
+        },
+        {
+         "productId": "p-sugar",
+         "name": "Sugar 1kg",
+         "qty": 2
+        },
+        {
+         "productId": "p-pack",
+         "name": "Packing Box",
+         "qty": 10
+        }
+       ],
+       "labourCost": 300,
+       "overheadCost": 100
+      },
+      "outputProductId": "p-blend",
+      "outputName": "House Tea Blend 500g",
+      "warehouseId": "wh-main",
+      "plannedQty": 10,
+      "events": [
+       {
+        "kind": "issue",
+        "qty": 10,
+        "lines": [],
+        "labourCost": 0,
+        "overheadCost": 0,
+        "paidFromAccountId": null,
+        "value": 5000,
+        "entryId": "e7",
+        "dayOffset": 0,
+        "ts": "2026-04-10T09:00:00.000Z"
+       }
+      ],
+      "note": "",
+      "status": "in_progress",
+      "dayOffset": 0,
+      "ts": "2026-04-10T09:00:00.000Z"
+     },
+     "cheques": [
+      {
+       "id": "chq-1",
+       "direction": "in",
+       "chequeNo": "CHQ-100",
+       "bankName": "Meezan",
+       "amount": 7000,
+       "issueDateISO": "2026-05-01",
+       "dueDateISO": "2026-05-10",
+       "status": "received",
+       "partyName": "Ahmed Traders",
+       "partyId": "cust-1",
+       "entryIds": [],
+       "note": "",
+       "dayOffset": 0,
+       "ts": "2026-05-01T09:00:00.000Z"
+      }
+     ],
+     "products": [
+      {
+       "id": "p-tea",
+       "sku": "TEA-475",
+       "name": "Tapal Danedar Tea 475g",
+       "urduName": "چائے",
+       "category": "Grocery",
+       "unit": "pcs",
+       "costPrice": 800,
+       "salePrice": 1050,
+       "stockQty": 50,
+       "reorderLevel": 5,
+       "keywords": [],
+       "taxSlabId": null,
+       "taxExempt": false,
+       "stockClass": null
+      },
+      {
+       "id": "p-sugar",
+       "sku": "SUG-1KG",
+       "name": "Sugar 1kg",
+       "urduName": "چینی",
+       "category": "Grocery",
+       "unit": "kg",
+       "costPrice": 130,
+       "salePrice": 145,
+       "stockQty": 100,
+       "reorderLevel": 10,
+       "keywords": [],
+       "taxSlabId": null,
+       "taxExempt": false,
+       "stockClass": null
+      },
+      {
+       "id": "p-raw",
+       "sku": "RAW-LEAF",
+       "name": "Raw Tea Leaf 1kg",
+       "urduName": "کچی پتی",
+       "category": "Raw",
+       "unit": "kg",
+       "costPrice": 500,
+       "salePrice": 600,
+       "stockQty": 40,
+       "reorderLevel": 5,
+       "keywords": [],
+       "taxSlabId": null,
+       "taxExempt": false,
+       "stockClass": "raw"
+      },
+      {
+       "id": "p-oil",
+       "sku": "OIL-5L",
+       "name": "Cooking Oil 5L",
+       "urduName": "تیل",
+       "category": "Grocery",
+       "unit": "pcs",
+       "costPrice": 1000,
+       "salePrice": 1200,
+       "stockQty": 20,
+       "reorderLevel": 3,
+       "keywords": [],
+       "taxSlabId": "slab-gst-ex",
+       "taxExempt": false,
+       "stockClass": null
+      },
+      {
+       "id": "p-ghee",
+       "sku": "GHEE-1KG",
+       "name": "Desi Ghee 1kg",
+       "urduName": "گھی",
+       "category": "Grocery",
+       "unit": "kg",
+       "costPrice": 900,
+       "salePrice": 1170,
+       "stockQty": 15,
+       "reorderLevel": 3,
+       "keywords": [],
+       "taxSlabId": "slab-gst-in",
+       "taxExempt": false,
+       "stockClass": null
+      },
+      {
+       "id": "p-pack",
+       "name": "Packing Box",
+       "salePrice": 40,
+       "costPrice": 20,
+       "stockQty": 100,
+       "reorderLevel": 10,
+       "stockClass": null
+      },
+      {
+       "id": "p-blend",
+       "name": "House Tea Blend 500g",
+       "salePrice": 950,
+       "costPrice": 0,
+       "stockQty": 0,
+       "reorderLevel": 5,
+       "stockClass": null
+      }
+     ]
+    },
+    "plBefore": {
+     "revenue": 120000,
+     "cogs": 45000,
+     "expensesTotal": 42000,
+     "net": 33000
+    },
+    "periods": [
+     {
+      "id": "per-fy1",
+      "kind": "fiscal_year",
+      "from": "2025-06-30T19:00:00.000Z",
+      "to": "2026-06-30T18:59:59.999Z",
+      "action": "close",
+      "byUid": "owner-1",
+      "byEmail": "owner@example.com",
+      "ts": "2026-10-23T08:00:00.000Z",
+      "note": "",
+      "prevLockedThrough": "",
+      "entryId": "e9"
+     },
+     {
+      "id": "per-fy1-re",
+      "kind": "fiscal_year",
+      "from": "2025-06-30T19:00:00.000Z",
+      "to": "2026-06-30T18:59:59.999Z",
+      "action": "reopen",
+      "byUid": "owner-1",
+      "byEmail": "owner@example.com",
+      "ts": "2026-10-23T09:00:00.000Z",
+      "note": "Auditor query",
+      "prevLockedThrough": "2026-06-30T18:59:59.999Z",
+      "entryId": "e10",
+      "reopensPeriodId": "per-fy1"
+     },
+     {
+      "id": "per-fy1b",
+      "kind": "fiscal_year",
+      "from": "2025-06-30T19:00:00.000Z",
+      "to": "2026-06-30T18:59:59.999Z",
+      "action": "close",
+      "byUid": "owner-1",
+      "byEmail": "owner@example.com",
+      "ts": "2026-10-23T09:30:00.000Z",
+      "note": "",
+      "prevLockedThrough": "",
+      "entryId": "e11"
+     },
+     {
+      "id": "per-fy2",
+      "kind": "fiscal_year",
+      "from": "2026-06-30T19:00:00.000Z",
+      "to": "2027-06-30T18:59:59.999Z",
+      "action": "close",
+      "byUid": "owner-1",
+      "byEmail": "owner@example.com",
+      "ts": "2026-10-23T09:45:00.000Z",
+      "note": "",
+      "prevLockedThrough": "2026-06-30T18:59:59.999Z",
+      "entryId": "e12"
+     }
+    ],
+    "summary": {
+     "rows": [
+      {
+       "account": "sales_revenue",
+       "amount": 120000
+      },
+      {
+       "account": "cogs",
+       "amount": 45000
+      },
+      {
+       "account": "expense_rent",
+       "amount": 12000
+      },
+      {
+       "account": "expense_salary",
+       "amount": 30000
+      }
+     ],
+     "net": 33000
+    },
+    "stateAfterClose": {
+     "closed": true
+    },
+    "stateAfterReopen": {
+     "closed": false
+    },
+    "blockerId": "per-fy2",
+    "openings": [
+     {
+      "account": "cash",
+      "balance": 308000
+     },
+     {
+      "account": "inventory",
+      "balance": 30000
+     },
+     {
+      "account": "payables",
+      "balance": 80000
+     },
+     {
+      "account": "capital",
+      "balance": 200000
+     },
+     {
+      "account": "salary_payable",
+      "balance": 30000
+     },
+     {
+      "account": "wip",
+      "balance": 5000
+     },
+     {
+      "account": "retained_earnings",
+      "balance": 66000
+     }
+    ],
+    "closingLabels": {
+     "close1": "e9",
+     "mirror": "e10",
+     "close2": "e11",
+     "close3": "e12"
+    }
+   },
+   "entries": [
+    {
+     "id": "e0",
+     "ts": "2025-08-10T09:00:00.000Z",
+     "dayOffset": 0,
+     "dateISO": null,
+     "memo": "Owner capital",
+     "refType": "cashbook",
+     "refId": null,
+     "reversesId": null,
+     "lines": [
+      {
+       "account": "cash",
+       "debit": 200000,
+       "credit": 0,
+       "ref": "acct-till"
+      },
+      {
+       "account": "capital",
+       "debit": 0,
+       "credit": 200000,
+       "ref": null
+      }
+     ]
+    },
+    {
+     "id": "e1",
+     "ts": "2025-09-05T09:00:00.000Z",
+     "dayOffset": 0,
+     "dateISO": null,
+     "memo": "Purchase — stock",
+     "refType": "purchase",
+     "refId": "pur-1",
+     "reversesId": null,
+     "lines": [
+      {
+       "account": "purchases",
+       "debit": 80000,
+       "credit": 0,
+       "ref": null
+      },
+      {
+       "account": "payables",
+       "debit": 0,
+       "credit": 80000,
+       "ref": "sup-1"
+      }
+     ]
+    },
+    {
+     "id": "e2",
+     "ts": "2025-09-05T10:00:00.000Z",
+     "dayOffset": 0,
+     "dateISO": null,
+     "memo": "Goods received",
+     "refType": "purchase",
+     "refId": "pur-1",
+     "reversesId": null,
+     "lines": [
+      {
+       "account": "inventory",
+       "debit": 80000,
+       "credit": 0,
+       "ref": null
+      },
+      {
+       "account": "purchases",
+       "debit": 0,
+       "credit": 80000,
+       "ref": null
+      }
+     ]
+    },
+    {
+     "id": "e3",
+     "ts": "2025-11-20T09:00:00.000Z",
+     "dayOffset": 0,
+     "dateISO": null,
+     "memo": "Bill #11",
+     "refType": "bill",
+     "refId": "bill-fy1",
+     "reversesId": null,
+     "lines": [
+      {
+       "account": "cash",
+       "debit": 120000,
+       "credit": 0,
+       "ref": "acct-till"
+      },
+      {
+       "account": "sales_revenue",
+       "debit": 0,
+       "credit": 120000,
+       "ref": null
+      }
+     ]
+    },
+    {
+     "id": "e4",
+     "ts": "2025-11-20T09:01:00.000Z",
+     "dayOffset": 0,
+     "dateISO": null,
+     "memo": "Bill #11 — cost",
+     "refType": "bill",
+     "refId": "bill-fy1",
+     "reversesId": null,
+     "lines": [
+      {
+       "account": "cogs",
+       "debit": 45000,
+       "credit": 0,
+       "ref": null
+      },
+      {
+       "account": "inventory",
+       "debit": 0,
+       "credit": 45000,
+       "ref": null
+      }
+     ]
+    },
+    {
+     "id": "e5",
+     "ts": "2026-01-15T09:00:00.000Z",
+     "dayOffset": 0,
+     "dateISO": null,
+     "memo": "Shop rent — January",
+     "refType": "expense",
+     "refId": "exp-1",
+     "reversesId": null,
+     "lines": [
+      {
+       "account": "expense_rent",
+       "debit": 12000,
+       "credit": 0,
+       "ref": null
+      },
+      {
+       "account": "cash",
+       "debit": 0,
+       "credit": 12000,
+       "ref": "acct-till"
+      }
+     ]
+    },
+    {
+     "id": "e6",
+     "ts": "2026-03-31T19:05:00.000Z",
+     "dayOffset": 0,
+     "dateISO": null,
+     "memo": "Payroll PAY-9 — 2026-03",
+     "refType": "payroll_accrual",
+     "refId": "run-fy",
+     "reversesId": null,
+     "lines": [
+      {
+       "account": "expense_salary",
+       "debit": 30000,
+       "credit": 0,
+       "ref": "emp-x"
+      },
+      {
+       "account": "salary_payable",
+       "debit": 0,
+       "credit": 30000,
+       "ref": "emp-x"
+      }
+     ]
+    },
+    {
+     "id": "e7",
+     "ts": "2026-04-10T09:00:00.000Z",
+     "dayOffset": 0,
+     "dateISO": null,
+     "memo": "Production issue PR-FY",
+     "refType": "production_issue",
+     "refId": "pr-fy",
+     "reversesId": null,
+     "lines": [
+      {
+       "account": "wip",
+       "debit": 5000,
+       "credit": 0,
+       "ref": null
+      },
+      {
+       "account": "inventory",
+       "debit": 0,
+       "credit": 5000,
+       "ref": null
+      }
+     ]
+    },
+    {
+     "id": "e8",
+     "ts": "2026-07-15T09:00:00.000Z",
+     "dayOffset": 0,
+     "dateISO": null,
+     "memo": "Bill #12",
+     "refType": "bill",
+     "refId": "bill-fy2",
+     "reversesId": null,
+     "lines": [
+      {
+       "account": "cash",
+       "debit": 5000,
+       "credit": 0,
+       "ref": "acct-till"
+      },
+      {
+       "account": "sales_revenue",
+       "debit": 0,
+       "credit": 5000,
+       "ref": null
+      }
+     ]
+    },
+    {
+     "id": "e9",
+     "ts": "2026-06-30T18:59:59.999Z",
+     "dayOffset": 115,
+     "dateISO": null,
+     "memo": "Fiscal year close — FY 2025-26",
+     "refType": "fy_close",
+     "refId": "per-fy1",
+     "reversesId": null,
+     "lines": [
+      {
+       "account": "sales_revenue",
+       "debit": 120000,
+       "credit": 0,
+       "ref": null
+      },
+      {
+       "account": "cogs",
+       "debit": 0,
+       "credit": 45000,
+       "ref": null
+      },
+      {
+       "account": "expense_rent",
+       "debit": 0,
+       "credit": 12000,
+       "ref": null
+      },
+      {
+       "account": "expense_salary",
+       "debit": 0,
+       "credit": 30000,
+       "ref": null
+      },
+      {
+       "account": "retained_earnings",
+       "debit": 0,
+       "credit": 33000,
+       "ref": null
+      }
+     ]
+    },
+    {
+     "id": "e10",
+     "ts": "2026-10-23T09:00:00.000Z",
+     "dayOffset": 0,
+     "dateISO": null,
+     "memo": "Fiscal year reopened — closing entry reversed",
+     "refType": "fy_close",
+     "refId": "per-fy1",
+     "reversesId": "e9",
+     "lines": [
+      {
+       "account": "sales_revenue",
+       "debit": 0,
+       "credit": 120000,
+       "ref": null
+      },
+      {
+       "account": "cogs",
+       "debit": 45000,
+       "credit": 0,
+       "ref": null
+      },
+      {
+       "account": "expense_rent",
+       "debit": 12000,
+       "credit": 0,
+       "ref": null
+      },
+      {
+       "account": "expense_salary",
+       "debit": 30000,
+       "credit": 0,
+       "ref": null
+      },
+      {
+       "account": "retained_earnings",
+       "debit": 33000,
+       "credit": 0,
+       "ref": null
+      }
+     ]
+    },
+    {
+     "id": "e11",
+     "ts": "2026-06-30T18:59:59.999Z",
+     "dayOffset": 115,
+     "dateISO": null,
+     "memo": "Fiscal year close — FY 2025-26",
+     "refType": "fy_close",
+     "refId": "per-fy1b",
+     "reversesId": null,
+     "lines": [
+      {
+       "account": "sales_revenue",
+       "debit": 120000,
+       "credit": 0,
+       "ref": null
+      },
+      {
+       "account": "cogs",
+       "debit": 0,
+       "credit": 45000,
+       "ref": null
+      },
+      {
+       "account": "expense_rent",
+       "debit": 0,
+       "credit": 12000,
+       "ref": null
+      },
+      {
+       "account": "expense_salary",
+       "debit": 0,
+       "credit": 30000,
+       "ref": null
+      },
+      {
+       "account": "retained_earnings",
+       "debit": 0,
+       "credit": 33000,
+       "ref": null
+      }
+     ]
+    },
+    {
+     "id": "e12",
+     "ts": "2027-06-30T18:59:59.999Z",
+     "dayOffset": 0,
+     "dateISO": null,
+     "memo": "Fiscal year close — FY 2026-27",
+     "refType": "fy_close",
+     "refId": "per-fy2",
+     "reversesId": null,
+     "lines": [
+      {
+       "account": "sales_revenue",
+       "debit": 5000,
+       "credit": 0,
+       "ref": null
+      },
+      {
+       "account": "retained_earnings",
+       "debit": 0,
+       "credit": 5000,
+       "ref": null
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "tally-export",
+   "title": "Mixed journal → Tally model + XML + CSV: party ledgers, collision suffixes, openings, directional loan vouchers, FY-label voucher number",
+   "docs": {
+    "parties": {
+     "customers": [
+      {
+       "id": "cust-1",
+       "name": "Ahmed Raza",
+       "phone": "03010000001"
+      },
+      {
+       "id": "cust-2",
+       "name": "Ahmed Raza",
+       "phone": "03010000002"
+      }
+     ],
+     "suppliers": [
+      {
+       "id": "sup-1",
+       "name": "Karachi Traders",
+       "phone": "03020000001"
+      }
+     ],
+     "employees": [
+      {
+       "id": "emp-a",
+       "name": "Muhammad Aslam"
+      },
+      {
+       "id": "emp-b",
+       "name": "Muhammad Aslam"
+      }
+     ],
+     "accounts": [
+      {
+       "id": "acct-till",
+       "name": "Main Till",
+       "kind": "cash",
+       "method": "cash",
+       "legacyFor": "cash",
+       "archived": false,
+       "sortOrder": 0,
+       "ts": "2026-01-01T00:00:00.000Z"
+      },
+      {
+       "id": "acct-wallet",
+       "name": "Wallet & Bank",
+       "kind": "wallet",
+       "method": null,
+       "legacyFor": "wallet",
+       "archived": false,
+       "sortOrder": 1,
+       "ts": "2026-01-01T00:00:00.000Z"
+      },
+      {
+       "id": "acct-jazz",
+       "name": "JazzCash",
+       "kind": "wallet",
+       "method": "jazzcash",
+       "legacyFor": null,
+       "archived": false,
+       "sortOrder": 2,
+       "ts": "2026-01-01T00:00:00.000Z"
+      }
+     ],
+     "docNumbers": {
+      "bill-1": "42",
+      "rc-1": "RV-7",
+      "po-1": "PO-3",
+      "run-1": "PAY-1",
+      "loan-1": "LN-1",
+      "loan-2": "LN-2",
+      "bill-2": "43",
+      "bill-3": "44"
+     }
+    },
+    "settings": {
+     "shopName": "Madina General Store",
+     "fiscalYearStartMonth": 7,
+     "fiscalYearStartDay": 1,
+     "tallyLedgerNames": {
+      "cash": "Main Cash"
+     }
+    },
+    "range": {
+     "fromDate": "2026-07-01",
+     "toDate": "2026-09-30",
+     "fromTs": "2026-06-30T19:00:00.000Z",
+     "toTs": "2026-09-30T19:00:00.000Z"
+    },
+    "model": {
+     "company": "Madina General Store",
+     "fromDate": "2026-07-01",
+     "toDate": "2026-09-30",
+     "masters": [
+      {
+       "name": "Main Cash",
+       "group": "Cash-in-Hand",
+       "isParty": false,
+       "openingBalance": 0
+      },
+      {
+       "name": "Sales",
+       "group": "Sales Accounts",
+       "isParty": false,
+       "openingBalance": 4000
+      },
+      {
+       "name": "Purchases",
+       "group": "Purchase Accounts",
+       "isParty": false,
+       "openingBalance": 0
+      },
+      {
+       "name": "Salaries",
+       "group": "Indirect Expenses",
+       "isParty": false,
+       "openingBalance": 0
+      },
+      {
+       "name": "Loans Payable",
+       "group": "Loans (Liability)",
+       "isParty": false,
+       "openingBalance": 0
+      },
+      {
+       "name": "Retained Earnings",
+       "group": "Reserves & Surplus",
+       "isParty": false,
+       "openingBalance": 0
+      },
+      {
+       "name": "Loans Receivable",
+       "group": "Loans & Advances (Asset)",
+       "isParty": false,
+       "openingBalance": 0
+      },
+      {
+       "name": "Muhammad Aslam",
+       "group": "Current Liabilities",
+       "isParty": true,
+       "openingBalance": 0
+      },
+      {
+       "name": "Muhammad Aslam (2)",
+       "group": "Current Liabilities",
+       "isParty": true,
+       "openingBalance": 0
+      },
+      {
+       "name": "Karachi Traders",
+       "group": "Sundry Creditors",
+       "isParty": true,
+       "openingBalance": 0
+      },
+      {
+       "name": "Ahmed Raza",
+       "group": "Sundry Debtors",
+       "isParty": true,
+       "openingBalance": -4000
+      },
+      {
+       "name": "Ahmed Raza (2)",
+       "group": "Sundry Debtors",
+       "isParty": true,
+       "openingBalance": 0
+      },
+      {
+       "name": "cust-gone",
+       "group": "Sundry Debtors",
+       "isParty": true,
+       "openingBalance": 0
+      }
+     ],
+     "vouchers": [
+      {
+       "entryId": "e1",
+       "type": "Sales",
+       "dateISO": "2026-07-05",
+       "date": "20260705",
+       "narration": "Bill #42",
+       "number": "42",
+       "lines": [
+        {
+         "ledgerName": "Ahmed Raza",
+         "debit": 12000,
+         "credit": 0,
+         "isDeemedPositive": true,
+         "amount": -12000
+        },
+        {
+         "ledgerName": "Sales",
+         "debit": 0,
+         "credit": 12000,
+         "isDeemedPositive": false,
+         "amount": 12000
+        }
+       ],
+       "debitTotal": 12000,
+       "creditTotal": 12000
+      },
+      {
+       "entryId": "e2",
+       "type": "Receipt",
+       "dateISO": "2026-07-06",
+       "date": "20260706",
+       "narration": "Collection — Ahmed Raza",
+       "number": "RV-7",
+       "lines": [
+        {
+         "ledgerName": "Main Cash",
+         "debit": 12000,
+         "credit": 0,
+         "isDeemedPositive": true,
+         "amount": -12000
+        },
+        {
+         "ledgerName": "Ahmed Raza",
+         "debit": 0,
+         "credit": 12000,
+         "isDeemedPositive": false,
+         "amount": 12000
+        }
+       ],
+       "debitTotal": 12000,
+       "creditTotal": 12000
+      },
+      {
+       "entryId": "e3",
+       "type": "Purchase",
+       "dateISO": "2026-07-07",
+       "date": "20260707",
+       "narration": "Purchase — Karachi Traders",
+       "number": "PO-3",
+       "lines": [
+        {
+         "ledgerName": "Purchases",
+         "debit": 9000,
+         "credit": 0,
+         "isDeemedPositive": true,
+         "amount": -9000
+        },
+        {
+         "ledgerName": "Karachi Traders",
+         "debit": 0,
+         "credit": 9000,
+         "isDeemedPositive": false,
+         "amount": 9000
+        }
+       ],
+       "debitTotal": 9000,
+       "creditTotal": 9000
+      },
+      {
+       "entryId": "e4",
+       "type": "Journal",
+       "dateISO": "2026-08-01",
+       "date": "20260801",
+       "narration": "Payroll PAY-1 — 2026-07",
+       "number": "PAY-1",
+       "lines": [
+        {
+         "ledgerName": "Salaries",
+         "debit": 5000,
+         "credit": 0,
+         "isDeemedPositive": true,
+         "amount": -5000
+        },
+        {
+         "ledgerName": "Muhammad Aslam",
+         "debit": 0,
+         "credit": 5000,
+         "isDeemedPositive": false,
+         "amount": 5000
+        }
+       ],
+       "debitTotal": 5000,
+       "creditTotal": 5000
+      },
+      {
+       "entryId": "e5",
+       "type": "Journal",
+       "dateISO": "2026-08-01",
+       "date": "20260801",
+       "narration": "Salary — namesake",
+       "number": "PAY-1",
+       "lines": [
+        {
+         "ledgerName": "Salaries",
+         "debit": 3000,
+         "credit": 0,
+         "isDeemedPositive": true,
+         "amount": -3000
+        },
+        {
+         "ledgerName": "Muhammad Aslam (2)",
+         "debit": 0,
+         "credit": 3000,
+         "isDeemedPositive": false,
+         "amount": 3000
+        }
+       ],
+       "debitTotal": 3000,
+       "creditTotal": 3000
+      },
+      {
+       "entryId": "e6",
+       "type": "Contra",
+       "dateISO": "2026-08-01",
+       "date": "20260801",
+       "narration": "Loan drawdown LN-1 — Bank",
+       "number": "LN-1",
+       "lines": [
+        {
+         "ledgerName": "Main Cash",
+         "debit": 20000,
+         "credit": 0,
+         "isDeemedPositive": true,
+         "amount": -20000
+        },
+        {
+         "ledgerName": "Loans Payable",
+         "debit": 0,
+         "credit": 20000,
+         "isDeemedPositive": false,
+         "amount": 20000
+        }
+       ],
+       "debitTotal": 20000,
+       "creditTotal": 20000
+      },
+      {
+       "entryId": "e7",
+       "type": "Receipt",
+       "dateISO": "2026-08-02",
+       "date": "20260802",
+       "narration": "Loan drawdown LN-2 — Ahmed Raza",
+       "number": "LN-2",
+       "lines": [
+        {
+         "ledgerName": "Loans Receivable",
+         "debit": 8000,
+         "credit": 0,
+         "isDeemedPositive": true,
+         "amount": -8000
+        },
+        {
+         "ledgerName": "Main Cash",
+         "debit": 0,
+         "credit": 8000,
+         "isDeemedPositive": false,
+         "amount": 8000
+        }
+       ],
+       "debitTotal": 8000,
+       "creditTotal": 8000
+      },
+      {
+       "entryId": "e8",
+       "type": "Sales",
+       "dateISO": "2026-08-05",
+       "date": "20260805",
+       "narration": "Bill #43",
+       "number": "43",
+       "lines": [
+        {
+         "ledgerName": "Ahmed Raza (2)",
+         "debit": 3000,
+         "credit": 0,
+         "isDeemedPositive": true,
+         "amount": -3000
+        },
+        {
+         "ledgerName": "Sales",
+         "debit": 0,
+         "credit": 3000,
+         "isDeemedPositive": false,
+         "amount": 3000
+        }
+       ],
+       "debitTotal": 3000,
+       "creditTotal": 3000
+      },
+      {
+       "entryId": "e9",
+       "type": "Sales",
+       "dateISO": "2026-08-06",
+       "date": "20260806",
+       "narration": "Bill #44 — departed customer",
+       "number": "44",
+       "lines": [
+        {
+         "ledgerName": "cust-gone",
+         "debit": 1500,
+         "credit": 0,
+         "isDeemedPositive": true,
+         "amount": -1500
+        },
+        {
+         "ledgerName": "Sales",
+         "debit": 0,
+         "credit": 1500,
+         "isDeemedPositive": false,
+         "amount": 1500
+        }
+       ],
+       "debitTotal": 1500,
+       "creditTotal": 1500
+      },
+      {
+       "entryId": "e10",
+       "type": "Journal",
+       "dateISO": "2026-06-30",
+       "date": "20260630",
+       "narration": "Fiscal year close — FY 2025-26",
+       "number": "FY 2026-27",
+       "lines": [
+        {
+         "ledgerName": "Sales",
+         "debit": 3000,
+         "credit": 0,
+         "isDeemedPositive": true,
+         "amount": -3000
+        },
+        {
+         "ledgerName": "Retained Earnings",
+         "debit": 0,
+         "credit": 3000,
+         "isDeemedPositive": false,
+         "amount": 3000
+        }
+       ],
+       "debitTotal": 3000,
+       "creditTotal": 3000
+      }
+     ],
+     "totalDebits": 76500,
+     "totalCredits": 76500
+    },
+    "xml": "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<ENVELOPE>\n<HEADER><TALLYREQUEST>Import Data</TALLYREQUEST></HEADER>\n<BODY>\n<IMPORTDATA>\n<REQUESTDESC>\n<REPORTNAME>All Masters</REPORTNAME>\n<STATICVARIABLES>\n<SVCURRENTCOMPANY>Madina General Store</SVCURRENTCOMPANY>\n</STATICVARIABLES>\n</REQUESTDESC>\n<REQUESTDATA>\n<TALLYMESSAGE xmlns:UDF=\"TallyUDF\">\n<LEDGER NAME=\"Main Cash\" RESERVEDNAME=\"\">\n<PARENT>Cash-in-Hand</PARENT>\n</LEDGER>\n</TALLYMESSAGE>\n<TALLYMESSAGE xmlns:UDF=\"TallyUDF\">\n<LEDGER NAME=\"Sales\" RESERVEDNAME=\"\">\n<PARENT>Sales Accounts</PARENT>\n<OPENINGBALANCE>4000.00</OPENINGBALANCE>\n</LEDGER>\n</TALLYMESSAGE>\n<TALLYMESSAGE xmlns:UDF=\"TallyUDF\">\n<LEDGER NAME=\"Purchases\" RESERVEDNAME=\"\">\n<PARENT>Purchase Accounts</PARENT>\n</LEDGER>\n</TALLYMESSAGE>\n<TALLYMESSAGE xmlns:UDF=\"TallyUDF\">\n<LEDGER NAME=\"Salaries\" RESERVEDNAME=\"\">\n<PARENT>Indirect Expenses</PARENT>\n</LEDGER>\n</TALLYMESSAGE>\n<TALLYMESSAGE xmlns:UDF=\"TallyUDF\">\n<LEDGER NAME=\"Loans Payable\" RESERVEDNAME=\"\">\n<PARENT>Loans (Liability)</PARENT>\n</LEDGER>\n</TALLYMESSAGE>\n<TALLYMESSAGE xmlns:UDF=\"TallyUDF\">\n<LEDGER NAME=\"Retained Earnings\" RESERVEDNAME=\"\">\n<PARENT>Reserves &amp; Surplus</PARENT>\n</LEDGER>\n</TALLYMESSAGE>\n<TALLYMESSAGE xmlns:UDF=\"TallyUDF\">\n<LEDGER NAME=\"Loans Receivable\" RESERVEDNAME=\"\">\n<PARENT>Loans &amp; Advances (Asset)</PARENT>\n</LEDGER>\n</TALLYMESSAGE>\n<TALLYMESSAGE xmlns:UDF=\"TallyUDF\">\n<LEDGER NAME=\"Muhammad Aslam\" RESERVEDNAME=\"\">\n<PARENT>Current Liabilities</PARENT>\n</LEDGER>\n</TALLYMESSAGE>\n<TALLYMESSAGE xmlns:UDF=\"TallyUDF\">\n<LEDGER NAME=\"Muhammad Aslam (2)\" RESERVEDNAME=\"\">\n<PARENT>Current Liabilities</PARENT>\n</LEDGER>\n</TALLYMESSAGE>\n<TALLYMESSAGE xmlns:UDF=\"TallyUDF\">\n<LEDGER NAME=\"Karachi Traders\" RESERVEDNAME=\"\">\n<PARENT>Sundry Creditors</PARENT>\n</LEDGER>\n</TALLYMESSAGE>\n<TALLYMESSAGE xmlns:UDF=\"TallyUDF\">\n<LEDGER NAME=\"Ahmed Raza\" RESERVEDNAME=\"\">\n<PARENT>Sundry Debtors</PARENT>\n<OPENINGBALANCE>-4000.00</OPENINGBALANCE>\n</LEDGER>\n</TALLYMESSAGE>\n<TALLYMESSAGE xmlns:UDF=\"TallyUDF\">\n<LEDGER NAME=\"Ahmed Raza (2)\" RESERVEDNAME=\"\">\n<PARENT>Sundry Debtors</PARENT>\n</LEDGER>\n</TALLYMESSAGE>\n<TALLYMESSAGE xmlns:UDF=\"TallyUDF\">\n<LEDGER NAME=\"cust-gone\" RESERVEDNAME=\"\">\n<PARENT>Sundry Debtors</PARENT>\n</LEDGER>\n</TALLYMESSAGE>\n<TALLYMESSAGE xmlns:UDF=\"TallyUDF\">\n<VOUCHER VCHTYPE=\"Sales\" ACTION=\"Create\" OBJVIEW=\"Accounting Voucher View\">\n<DATE>20260705</DATE>\n<NARRATION>Bill #42</NARRATION>\n<VOUCHERTYPENAME>Sales</VOUCHERTYPENAME>\n<VOUCHERNUMBER>42</VOUCHERNUMBER>\n<ALLLEDGERENTRIES.LIST>\n<LEDGERNAME>Ahmed Raza</LEDGERNAME>\n<ISDEEMEDPOSITIVE>Yes</ISDEEMEDPOSITIVE>\n<AMOUNT>-12000.00</AMOUNT>\n</ALLLEDGERENTRIES.LIST>\n<ALLLEDGERENTRIES.LIST>\n<LEDGERNAME>Sales</LEDGERNAME>\n<ISDEEMEDPOSITIVE>No</ISDEEMEDPOSITIVE>\n<AMOUNT>12000.00</AMOUNT>\n</ALLLEDGERENTRIES.LIST>\n</VOUCHER>\n</TALLYMESSAGE>\n<TALLYMESSAGE xmlns:UDF=\"TallyUDF\">\n<VOUCHER VCHTYPE=\"Receipt\" ACTION=\"Create\" OBJVIEW=\"Accounting Voucher View\">\n<DATE>20260706</DATE>\n<NARRATION>Collection — Ahmed Raza</NARRATION>\n<VOUCHERTYPENAME>Receipt</VOUCHERTYPENAME>\n<VOUCHERNUMBER>RV-7</VOUCHERNUMBER>\n<ALLLEDGERENTRIES.LIST>\n<LEDGERNAME>Main Cash</LEDGERNAME>\n<ISDEEMEDPOSITIVE>Yes</ISDEEMEDPOSITIVE>\n<AMOUNT>-12000.00</AMOUNT>\n</ALLLEDGERENTRIES.LIST>\n<ALLLEDGERENTRIES.LIST>\n<LEDGERNAME>Ahmed Raza</LEDGERNAME>\n<ISDEEMEDPOSITIVE>No</ISDEEMEDPOSITIVE>\n<AMOUNT>12000.00</AMOUNT>\n</ALLLEDGERENTRIES.LIST>\n</VOUCHER>\n</TALLYMESSAGE>\n<TALLYMESSAGE xmlns:UDF=\"TallyUDF\">\n<VOUCHER VCHTYPE=\"Purchase\" ACTION=\"Create\" OBJVIEW=\"Accounting Voucher View\">\n<DATE>20260707</DATE>\n<NARRATION>Purchase — Karachi Traders</NARRATION>\n<VOUCHERTYPENAME>Purchase</VOUCHERTYPENAME>\n<VOUCHERNUMBER>PO-3</VOUCHERNUMBER>\n<ALLLEDGERENTRIES.LIST>\n<LEDGERNAME>Purchases</LEDGERNAME>\n<ISDEEMEDPOSITIVE>Yes</ISDEEMEDPOSITIVE>\n<AMOUNT>-9000.00</AMOUNT>\n</ALLLEDGERENTRIES.LIST>\n<ALLLEDGERENTRIES.LIST>\n<LEDGERNAME>Karachi Traders</LEDGERNAME>\n<ISDEEMEDPOSITIVE>No</ISDEEMEDPOSITIVE>\n<AMOUNT>9000.00</AMOUNT>\n</ALLLEDGERENTRIES.LIST>\n</VOUCHER>\n</TALLYMESSAGE>\n<TALLYMESSAGE xmlns:UDF=\"TallyUDF\">\n<VOUCHER VCHTYPE=\"Journal\" ACTION=\"Create\" OBJVIEW=\"Accounting Voucher View\">\n<DATE>20260801</DATE>\n<NARRATION>Payroll PAY-1 — 2026-07</NARRATION>\n<VOUCHERTYPENAME>Journal</VOUCHERTYPENAME>\n<VOUCHERNUMBER>PAY-1</VOUCHERNUMBER>\n<ALLLEDGERENTRIES.LIST>\n<LEDGERNAME>Salaries</LEDGERNAME>\n<ISDEEMEDPOSITIVE>Yes</ISDEEMEDPOSITIVE>\n<AMOUNT>-5000.00</AMOUNT>\n</ALLLEDGERENTRIES.LIST>\n<ALLLEDGERENTRIES.LIST>\n<LEDGERNAME>Muhammad Aslam</LEDGERNAME>\n<ISDEEMEDPOSITIVE>No</ISDEEMEDPOSITIVE>\n<AMOUNT>5000.00</AMOUNT>\n</ALLLEDGERENTRIES.LIST>\n</VOUCHER>\n</TALLYMESSAGE>\n<TALLYMESSAGE xmlns:UDF=\"TallyUDF\">\n<VOUCHER VCHTYPE=\"Journal\" ACTION=\"Create\" OBJVIEW=\"Accounting Voucher View\">\n<DATE>20260801</DATE>\n<NARRATION>Salary — namesake</NARRATION>\n<VOUCHERTYPENAME>Journal</VOUCHERTYPENAME>\n<VOUCHERNUMBER>PAY-1</VOUCHERNUMBER>\n<ALLLEDGERENTRIES.LIST>\n<LEDGERNAME>Salaries</LEDGERNAME>\n<ISDEEMEDPOSITIVE>Yes</ISDEEMEDPOSITIVE>\n<AMOUNT>-3000.00</AMOUNT>\n</ALLLEDGERENTRIES.LIST>\n<ALLLEDGERENTRIES.LIST>\n<LEDGERNAME>Muhammad Aslam (2)</LEDGERNAME>\n<ISDEEMEDPOSITIVE>No</ISDEEMEDPOSITIVE>\n<AMOUNT>3000.00</AMOUNT>\n</ALLLEDGERENTRIES.LIST>\n</VOUCHER>\n</TALLYMESSAGE>\n<TALLYMESSAGE xmlns:UDF=\"TallyUDF\">\n<VOUCHER VCHTYPE=\"Contra\" ACTION=\"Create\" OBJVIEW=\"Accounting Voucher View\">\n<DATE>20260801</DATE>\n<NARRATION>Loan drawdown LN-1 — Bank</NARRATION>\n<VOUCHERTYPENAME>Contra</VOUCHERTYPENAME>\n<VOUCHERNUMBER>LN-1</VOUCHERNUMBER>\n<ALLLEDGERENTRIES.LIST>\n<LEDGERNAME>Main Cash</LEDGERNAME>\n<ISDEEMEDPOSITIVE>Yes</ISDEEMEDPOSITIVE>\n<AMOUNT>-20000.00</AMOUNT>\n</ALLLEDGERENTRIES.LIST>\n<ALLLEDGERENTRIES.LIST>\n<LEDGERNAME>Loans Payable</LEDGERNAME>\n<ISDEEMEDPOSITIVE>No</ISDEEMEDPOSITIVE>\n<AMOUNT>20000.00</AMOUNT>\n</ALLLEDGERENTRIES.LIST>\n</VOUCHER>\n</TALLYMESSAGE>\n<TALLYMESSAGE xmlns:UDF=\"TallyUDF\">\n<VOUCHER VCHTYPE=\"Receipt\" ACTION=\"Create\" OBJVIEW=\"Accounting Voucher View\">\n<DATE>20260802</DATE>\n<NARRATION>Loan drawdown LN-2 — Ahmed Raza</NARRATION>\n<VOUCHERTYPENAME>Receipt</VOUCHERTYPENAME>\n<VOUCHERNUMBER>LN-2</VOUCHERNUMBER>\n<ALLLEDGERENTRIES.LIST>\n<LEDGERNAME>Loans Receivable</LEDGERNAME>\n<ISDEEMEDPOSITIVE>Yes</ISDEEMEDPOSITIVE>\n<AMOUNT>-8000.00</AMOUNT>\n</ALLLEDGERENTRIES.LIST>\n<ALLLEDGERENTRIES.LIST>\n<LEDGERNAME>Main Cash</LEDGERNAME>\n<ISDEEMEDPOSITIVE>No</ISDEEMEDPOSITIVE>\n<AMOUNT>8000.00</AMOUNT>\n</ALLLEDGERENTRIES.LIST>\n</VOUCHER>\n</TALLYMESSAGE>\n<TALLYMESSAGE xmlns:UDF=\"TallyUDF\">\n<VOUCHER VCHTYPE=\"Sales\" ACTION=\"Create\" OBJVIEW=\"Accounting Voucher View\">\n<DATE>20260805</DATE>\n<NARRATION>Bill #43</NARRATION>\n<VOUCHERTYPENAME>Sales</VOUCHERTYPENAME>\n<VOUCHERNUMBER>43</VOUCHERNUMBER>\n<ALLLEDGERENTRIES.LIST>\n<LEDGERNAME>Ahmed Raza (2)</LEDGERNAME>\n<ISDEEMEDPOSITIVE>Yes</ISDEEMEDPOSITIVE>\n<AMOUNT>-3000.00</AMOUNT>\n</ALLLEDGERENTRIES.LIST>\n<ALLLEDGERENTRIES.LIST>\n<LEDGERNAME>Sales</LEDGERNAME>\n<ISDEEMEDPOSITIVE>No</ISDEEMEDPOSITIVE>\n<AMOUNT>3000.00</AMOUNT>\n</ALLLEDGERENTRIES.LIST>\n</VOUCHER>\n</TALLYMESSAGE>\n<TALLYMESSAGE xmlns:UDF=\"TallyUDF\">\n<VOUCHER VCHTYPE=\"Sales\" ACTION=\"Create\" OBJVIEW=\"Accounting Voucher View\">\n<DATE>20260806</DATE>\n<NARRATION>Bill #44 — departed customer</NARRATION>\n<VOUCHERTYPENAME>Sales</VOUCHERTYPENAME>\n<VOUCHERNUMBER>44</VOUCHERNUMBER>\n<ALLLEDGERENTRIES.LIST>\n<LEDGERNAME>cust-gone</LEDGERNAME>\n<ISDEEMEDPOSITIVE>Yes</ISDEEMEDPOSITIVE>\n<AMOUNT>-1500.00</AMOUNT>\n</ALLLEDGERENTRIES.LIST>\n<ALLLEDGERENTRIES.LIST>\n<LEDGERNAME>Sales</LEDGERNAME>\n<ISDEEMEDPOSITIVE>No</ISDEEMEDPOSITIVE>\n<AMOUNT>1500.00</AMOUNT>\n</ALLLEDGERENTRIES.LIST>\n</VOUCHER>\n</TALLYMESSAGE>\n<TALLYMESSAGE xmlns:UDF=\"TallyUDF\">\n<VOUCHER VCHTYPE=\"Journal\" ACTION=\"Create\" OBJVIEW=\"Accounting Voucher View\">\n<DATE>20260630</DATE>\n<NARRATION>Fiscal year close — FY 2025-26</NARRATION>\n<VOUCHERTYPENAME>Journal</VOUCHERTYPENAME>\n<VOUCHERNUMBER>FY 2026-27</VOUCHERNUMBER>\n<ALLLEDGERENTRIES.LIST>\n<LEDGERNAME>Sales</LEDGERNAME>\n<ISDEEMEDPOSITIVE>Yes</ISDEEMEDPOSITIVE>\n<AMOUNT>-3000.00</AMOUNT>\n</ALLLEDGERENTRIES.LIST>\n<ALLLEDGERENTRIES.LIST>\n<LEDGERNAME>Retained Earnings</LEDGERNAME>\n<ISDEEMEDPOSITIVE>No</ISDEEMEDPOSITIVE>\n<AMOUNT>3000.00</AMOUNT>\n</ALLLEDGERENTRIES.LIST>\n</VOUCHER>\n</TALLYMESSAGE>\n</REQUESTDATA>\n</IMPORTDATA>\n</BODY>\n</ENVELOPE>\n",
+    "csv": "Date,Voucher No,Type,Account,Party/Ref,Debit,Credit,Narration\n2026-07-05,42,Sales,Ahmed Raza,Ahmed Raza,12000,,Bill #42\n2026-07-05,42,Sales,Sales,,,12000,Bill #42\n2026-07-06,RV-7,Receipt,Main Cash,Main Till,12000,,Collection — Ahmed Raza\n2026-07-06,RV-7,Receipt,Ahmed Raza,Ahmed Raza,,12000,Collection — Ahmed Raza\n2026-07-07,PO-3,Purchase,Purchases,,9000,,Purchase — Karachi Traders\n2026-07-07,PO-3,Purchase,Karachi Traders,Karachi Traders,,9000,Purchase — Karachi Traders\n2026-08-01,PAY-1,Journal,Salaries,emp-a,5000,,Payroll PAY-1 — 2026-07\n2026-08-01,PAY-1,Journal,Muhammad Aslam,Muhammad Aslam,,5000,Payroll PAY-1 — 2026-07\n2026-08-01,PAY-1,Journal,Salaries,emp-b,3000,,Salary — namesake\n2026-08-01,PAY-1,Journal,Muhammad Aslam (2),Muhammad Aslam,,3000,Salary — namesake\n2026-08-01,LN-1,Contra,Main Cash,Main Till,20000,,Loan drawdown LN-1 — Bank\n2026-08-01,LN-1,Contra,Loans Payable,loan-1,,20000,Loan drawdown LN-1 — Bank\n2026-08-02,LN-2,Receipt,Loans Receivable,loan-2,8000,,Loan drawdown LN-2 — Ahmed Raza\n2026-08-02,LN-2,Receipt,Main Cash,Main Till,,8000,Loan drawdown LN-2 — Ahmed Raza\n2026-08-05,43,Sales,Ahmed Raza (2),Ahmed Raza,3000,,Bill #43\n2026-08-05,43,Sales,Sales,,,3000,Bill #43\n2026-08-06,44,Sales,cust-gone,cust-gone,1500,,Bill #44 — departed customer\n2026-08-06,44,Sales,Sales,,,1500,Bill #44 — departed customer\n2026-06-30,FY 2026-27,Journal,Sales,,3000,,Fiscal year close — FY 2025-26\n2026-06-30,FY 2026-27,Journal,Retained Earnings,,,3000,Fiscal year close — FY 2025-26",
+    "tbTotals": {
+     "totalDebits": 76500,
+     "totalCredits": 76500
+    }
+   },
+   "entries": [
+    {
+     "id": "e0",
+     "ts": "2026-06-15T09:00:00.000Z",
+     "dayOffset": 0,
+     "dateISO": null,
+     "memo": "Opening sale — June",
+     "refType": "bill",
+     "refId": "bill-0",
+     "reversesId": null,
+     "lines": [
+      {
+       "account": "receivables",
+       "debit": 4000,
+       "credit": 0,
+       "ref": "cust-1"
+      },
+      {
+       "account": "sales_revenue",
+       "debit": 0,
+       "credit": 4000,
+       "ref": null
+      }
+     ]
+    },
+    {
+     "id": "e1",
+     "ts": "2026-07-05T09:00:00.000Z",
+     "dayOffset": 0,
+     "dateISO": null,
+     "memo": "Bill #42",
+     "refType": "bill",
+     "refId": "bill-1",
+     "reversesId": null,
+     "lines": [
+      {
+       "account": "receivables",
+       "debit": 12000,
+       "credit": 0,
+       "ref": "cust-1"
+      },
+      {
+       "account": "sales_revenue",
+       "debit": 0,
+       "credit": 12000,
+       "ref": null
+      }
+     ]
+    },
+    {
+     "id": "e2",
+     "ts": "2026-07-06T09:00:00.000Z",
+     "dayOffset": 0,
+     "dateISO": null,
+     "memo": "Collection — Ahmed Raza",
+     "refType": "repayment",
+     "refId": "rc-1",
+     "reversesId": null,
+     "lines": [
+      {
+       "account": "cash",
+       "debit": 12000,
+       "credit": 0,
+       "ref": "acct-till"
+      },
+      {
+       "account": "receivables",
+       "debit": 0,
+       "credit": 12000,
+       "ref": "cust-1"
+      }
+     ]
+    },
+    {
+     "id": "e3",
+     "ts": "2026-07-07T09:00:00.000Z",
+     "dayOffset": 0,
+     "dateISO": null,
+     "memo": "Purchase — Karachi Traders",
+     "refType": "purchase",
+     "refId": "po-1",
+     "reversesId": null,
+     "lines": [
+      {
+       "account": "purchases",
+       "debit": 9000,
+       "credit": 0,
+       "ref": null
+      },
+      {
+       "account": "payables",
+       "debit": 0,
+       "credit": 9000,
+       "ref": "sup-1"
+      }
+     ]
+    },
+    {
+     "id": "e4",
+     "ts": "2026-07-31T19:00:00.000Z",
+     "dayOffset": 0,
+     "dateISO": null,
+     "memo": "Payroll PAY-1 — 2026-07",
+     "refType": "payroll_accrual",
+     "refId": "run-1",
+     "reversesId": null,
+     "lines": [
+      {
+       "account": "expense_salary",
+       "debit": 5000,
+       "credit": 0,
+       "ref": "emp-a"
+      },
+      {
+       "account": "salary_payable",
+       "debit": 0,
+       "credit": 5000,
+       "ref": "emp-a"
+      }
+     ]
+    },
+    {
+     "id": "e5",
+     "ts": "2026-07-31T19:01:00.000Z",
+     "dayOffset": 0,
+     "dateISO": null,
+     "memo": "Salary — namesake",
+     "refType": "payroll_accrual",
+     "refId": "run-1",
+     "reversesId": null,
+     "lines": [
+      {
+       "account": "expense_salary",
+       "debit": 3000,
+       "credit": 0,
+       "ref": "emp-b"
+      },
+      {
+       "account": "salary_payable",
+       "debit": 0,
+       "credit": 3000,
+       "ref": "emp-b"
+      }
+     ]
+    },
+    {
+     "id": "e6",
+     "ts": "2026-08-01T09:00:00.000Z",
+     "dayOffset": 0,
+     "dateISO": null,
+     "memo": "Loan drawdown LN-1 — Bank",
+     "refType": "loan_drawdown",
+     "refId": "loan-1",
+     "reversesId": null,
+     "lines": [
+      {
+       "account": "cash",
+       "debit": 20000,
+       "credit": 0,
+       "ref": "acct-till"
+      },
+      {
+       "account": "loans_payable",
+       "debit": 0,
+       "credit": 20000,
+       "ref": "loan-1"
+      }
+     ]
+    },
+    {
+     "id": "e7",
+     "ts": "2026-08-02T09:00:00.000Z",
+     "dayOffset": 0,
+     "dateISO": null,
+     "memo": "Loan drawdown LN-2 — Ahmed Raza",
+     "refType": "loan_drawdown",
+     "refId": "loan-2",
+     "reversesId": null,
+     "lines": [
+      {
+       "account": "loans_receivable",
+       "debit": 8000,
+       "credit": 0,
+       "ref": "loan-2"
+      },
+      {
+       "account": "cash",
+       "debit": 0,
+       "credit": 8000,
+       "ref": "acct-till"
+      }
+     ]
+    },
+    {
+     "id": "e8",
+     "ts": "2026-08-05T09:00:00.000Z",
+     "dayOffset": 0,
+     "dateISO": null,
+     "memo": "Bill #43",
+     "refType": "bill",
+     "refId": "bill-2",
+     "reversesId": null,
+     "lines": [
+      {
+       "account": "receivables",
+       "debit": 3000,
+       "credit": 0,
+       "ref": "cust-2"
+      },
+      {
+       "account": "sales_revenue",
+       "debit": 0,
+       "credit": 3000,
+       "ref": null
+      }
+     ]
+    },
+    {
+     "id": "e9",
+     "ts": "2026-08-06T09:00:00.000Z",
+     "dayOffset": 0,
+     "dateISO": null,
+     "memo": "Bill #44 — departed customer",
+     "refType": "bill",
+     "refId": "bill-3",
+     "reversesId": null,
+     "lines": [
+      {
+       "account": "receivables",
+       "debit": 1500,
+       "credit": 0,
+       "ref": "cust-gone"
+      },
+      {
+       "account": "sales_revenue",
+       "debit": 0,
+       "credit": 1500,
+       "ref": null
+      }
+     ]
+    },
+    {
+     "id": "e10",
+     "ts": "2026-08-10T09:00:00.000Z",
+     "dayOffset": 0,
+     "dateISO": "2026-06-30",
+     "memo": "Fiscal year close — FY 2025-26",
+     "refType": "fy_close",
+     "refId": "per-1",
+     "reversesId": null,
+     "lines": [
+      {
+       "account": "sales_revenue",
+       "debit": 3000,
+       "credit": 0,
+       "ref": null
+      },
+      {
+       "account": "retained_earnings",
+       "debit": 0,
+       "credit": 3000,
+       "ref": null
+      }
+     ]
+    }
+   ]
+  }
+ ],
+ "ops": {
+  "termsErrors": [
+   "chargeReceivable",
+   "fee",
+   "rate",
+   "principal",
+   "party",
+   "instalments",
+   "fee",
+   null
+  ],
+  "termsCases": [
+   {
+    "direction": "receivable",
+    "partyName": "X",
+    "principal": 1000,
+    "chargeType": "flat",
+    "chargeRate": 5,
+    "feeAmount": 0,
+    "instalmentCount": 3
+   },
+   {
+    "direction": "payable",
+    "partyName": "X",
+    "principal": 1000,
+    "chargeType": "none",
+    "chargeRate": 0,
+    "feeAmount": 1000,
+    "instalmentCount": 3
+   },
+   {
+    "direction": "payable",
+    "partyName": "X",
+    "principal": 1000,
+    "chargeType": "reducing",
+    "chargeRate": 0,
+    "feeAmount": 0,
+    "instalmentCount": 3
+   },
+   {
+    "direction": "payable",
+    "partyName": "X",
+    "principal": 0,
+    "chargeType": "none",
+    "chargeRate": 0,
+    "feeAmount": 0,
+    "instalmentCount": 3
+   },
+   {
+    "direction": "payable",
+    "partyName": " ",
+    "principal": 1000,
+    "chargeType": "none",
+    "chargeRate": 0,
+    "feeAmount": 0,
+    "instalmentCount": 3
+   },
+   {
+    "direction": "payable",
+    "partyName": "X",
+    "principal": 1000,
+    "chargeType": "none",
+    "chargeRate": 0,
+    "feeAmount": 0,
+    "instalmentCount": 0
+   },
+   {
+    "direction": "payable",
+    "partyName": "X",
+    "principal": 1000,
+    "chargeType": "fee_only",
+    "chargeRate": 0,
+    "feeAmount": 0,
+    "instalmentCount": 3
+   },
+   {
+    "direction": "payable",
+    "partyName": "X",
+    "principal": 1000,
+    "chargeType": "flat",
+    "chargeRate": 5,
+    "feeAmount": 0,
+    "instalmentCount": 3
+   }
+  ],
+  "ibanResults": [
+   {
+    "ok": true,
+    "iban": "PK36SCBL0000001123456702"
+   },
+   {
+    "ok": true,
+    "iban": "PK36SCBL0000001123456702"
+   },
+   {
+    "ok": false,
+    "code": "alias"
+   },
+   {
+    "ok": false,
+    "code": "badChecksum"
+   },
+   {
+    "ok": false,
+    "code": "badLength"
+   },
+   {
+    "ok": false,
+    "code": "notPk"
+   },
+   {
+    "ok": false,
+    "code": "badStructure"
+   },
+   {
+    "ok": false,
+    "code": "empty"
+   }
+  ],
+  "composedIban": "PK83MEZN0101199901012345",
+  "composedValid": {
+   "ok": true,
+   "iban": "PK83MEZN0101199901012345"
+  },
+  "groupIban": "PK36 SCBL 0000 0011 2345 6702",
+  "payloads": {
+   "staticBare": "00020111023004PK36SCBL000000112345670210D924",
+   "dynamicBare": "00020112023003MEEZAN BANK04PK36SCBL0000001123456702051500.506Bill #4210544B",
+   "staticTlv": "0002020102110202300424PK36SCBL00000011234567021004E33C",
+   "dynamicTlv": "0002020102120202300424PK36SCBL0000001123456702050420000607Bill #710045D1E"
+  },
+  "parses": {
+   "staticBare": {
+    "ok": true,
+    "objects": {
+     "pfi": "02",
+     "initiation": "11",
+     "scheme": "30",
+     "iban": "PK36SCBL0000001123456702",
+     "crc": "D924"
+    }
+   },
+   "dynamicBare": {
+    "ok": true,
+    "objects": {
+     "pfi": "02",
+     "initiation": "12",
+     "scheme": "30",
+     "iban": "PK36SCBL0000001123456702",
+     "crc": "544B",
+     "fiName": "MEEZAN BANK",
+     "amount": "1500.5",
+     "particulars": "Bill #42"
+    }
+   },
+   "staticTlv": {
+    "ok": true,
+    "objects": {
+     "pfi": "02",
+     "initiation": "11",
+     "scheme": "30",
+     "iban": "PK36SCBL0000001123456702",
+     "crc": "E33C"
+    }
+   },
+   "dynamicTlv": {
+    "ok": true,
+    "objects": {
+     "pfi": "02",
+     "initiation": "12",
+     "scheme": "30",
+     "iban": "PK36SCBL0000001123456702",
+     "crc": "5D1E",
+     "amount": "2000",
+     "particulars": "Bill #7"
+    }
+   }
+  },
+  "framing": {
+   "mode": "bare",
+   "status": "provisional",
+   "pinnedBy": null
+  },
+  "branding": {
+   "plans": {
+    "logoAlpha": [
+     {
+      "mime": "image/webp",
+      "quality": 0.92,
+      "width": 600,
+      "height": 450
+     },
+     {
+      "mime": "image/webp",
+      "quality": 0.82,
+      "width": 600,
+      "height": 450
+     },
+     {
+      "mime": "image/webp",
+      "quality": 0.82,
+      "width": 450,
+      "height": 337
+     },
+     {
+      "mime": "image/webp",
+      "quality": 0.72,
+      "width": 337,
+      "height": 253
+     }
+    ],
+    "letterhead": [
+     {
+      "mime": "image/jpeg",
+      "quality": 0.85,
+      "width": 1600,
+      "height": 400
+     },
+     {
+      "mime": "image/jpeg",
+      "quality": 0.75,
+      "width": 1600,
+      "height": 400
+     },
+     {
+      "mime": "image/jpeg",
+      "quality": 0.75,
+      "width": 1200,
+      "height": 300
+     },
+     {
+      "mime": "image/jpeg",
+      "quality": 0.65,
+      "width": 900,
+      "height": 225
+     }
+    ],
+    "stampSmall": [
+     {
+      "mime": "image/jpeg",
+      "quality": 0.9,
+      "width": 300,
+      "height": 300
+     },
+     {
+      "mime": "image/jpeg",
+      "quality": 0.8,
+      "width": 300,
+      "height": 300
+     },
+     {
+      "mime": "image/jpeg",
+      "quality": 0.8,
+      "width": 225,
+      "height": 225
+     },
+     {
+      "mime": "image/jpeg",
+      "quality": 0.7,
+      "width": 168,
+      "height": 168
+     }
+    ],
+    "signatureDegenerate": []
+   },
+   "bytes": {
+    "valid": 3,
+    "padded": 2,
+    "ragged": -1,
+    "notBase64": -1
+   },
+   "totalCap": 1250000
+  },
+  "payrollEdges": {
+   "daysInMonth": {
+    "febLeap": 29,
+    "febPlain": 28,
+    "bad": 0
+   },
+   "shift": {
+    "fwd": "2027-02",
+    "back": "2025-11"
+   },
+   "markCycle": [
+    "present",
+    "absent",
+    "half",
+    "leave",
+    "off",
+    null
+   ]
+  },
+  "fiscalEdges": {
+   "plCodes": [
+    "sales_revenue",
+    "sales_discount",
+    "cogs",
+    "expense_rent",
+    "expense_electricity",
+    "expense_salary",
+    "expense_transport",
+    "expense_other",
+    "inventory_loss",
+    "expense_finance"
+   ],
+   "janLabel": "FY 2027"
+  },
+  "registerTotals": {
+   "borrowedOutstanding": 1000,
+   "lentOutstanding": 500
+  }
+ }
+}

@@ -1,0 +1,118 @@
+# Dukaan AI — Flutter app CI (Phase F design §7.1).
+# Runs on app changes AND on web-lib changes: the golden fixtures
+# and the generated dictionary derive from web/lib, so a web-side
+# change that drifts the Dart core or the strings must fail here.
+name: app-ci
+
+on:
+  push:
+    paths:
+      - "flutter-app/**"
+      - "web/lib/**"
+      - "harness/**"
+      - ".github/workflows/app-ci.yml"
+  pull_request:
+    paths:
+      - "flutter-app/**"
+      - "web/lib/**"
+      - "harness/**"
+
+env:
+  FLUTTER_VERSION: "3.35.6"
+
+jobs:
+  analyze-and-test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - uses: subosito/flutter-action@v2
+        with:
+          flutter-version: ${{ env.FLUTTER_VERSION }}
+          cache: true
+
+      # Binary assets: restore any base64 sidecars (the text-only
+      # push route), then assert the eight real binaries the app
+      # cannot build without — fail loudly, never silently.
+      - name: Binary assets present
+        working-directory: flutter-app
+        run: |
+          while IFS= read -r f; do base64 -d "$f" > "${f%.b64}"; done < <(find . -name '*.b64' -not -path './build/*')
+          for p in \
+            assets/fonts/NotoNastaliqUrdu-Regular.ttf \
+            android/gradle/wrapper/gradle-wrapper.jar \
+            android/app/src/main/res/mipmap-mdpi/ic_launcher.png \
+            android/app/src/main/res/mipmap-hdpi/ic_launcher.png \
+            android/app/src/main/res/mipmap-xhdpi/ic_launcher.png \
+            android/app/src/main/res/mipmap-xxhdpi/ic_launcher.png \
+            android/app/src/main/res/mipmap-xxxhdpi/ic_launcher.png \
+            windows/runner/resources/app_icon.ico; do
+            if [ ! -s "$p" ]; then echo "::error::Missing binary asset: $p"; exit 1; fi
+          done
+          echo "Binary assets: all 8 present."
+
+      # Golden-fixture freshness: recompile the TS harness libs and
+      # re-export ALL fixtures (F1–F5); any drift vs the committed
+      # JSON fails.
+      # H6 membership note: g6, h2 and h6 join the gate here. Until
+      # H6 they were deliberately excluded — g6/h2 embedded
+      # today-relative seed timestamps and h2's FY-close case kept
+      # a wall-clock entry id, so re-export could not be a no-op.
+      # H6 made all three deterministic BY CONSTRUCTION (seed ts
+      # pinned to the fixture epoch; the close entry stamped
+      # before capture; h6 is literal data only), and the H6
+      # release audit records the two one-time re-baselines
+      # (g6's current assemble shape; h2's single stamped id).
+      - name: Fixture freshness (web ≡ Dart contract)
+        working-directory: web
+        run: |
+          npx tsc -p ../harness/tsconfig.json
+          node ../harness/fixtures-export.js
+          node ../harness/fixtures-export-f2.js
+          node ../harness/fixtures-export-f3.js
+          node ../harness/fixtures-export-f4.js
+          node ../harness/fixtures-export-f5.js
+          node ../harness/fixtures-export-g5.js
+          node ../harness/fixtures-export-g6.js
+          node ../harness/fixtures-export-h2.js
+          node ../harness/fixtures-export-h4.js
+          node ../harness/fixtures-export-h5.js
+          node ../harness/fixtures-export-h6.js
+          # Fix Round 1 membership note: fr1 joins the gate — its
+          # exporter is deterministic by construction (fixed
+          # timestamps; the load-derived dayOffset is excluded
+          # from its normalized entries), so re-export is a no-op.
+          node ../harness/fixtures-export-fr1.js
+          # Fix Round 2 membership note: fr2 joins the gate — its
+          # exporter is deterministic by construction (fixed
+          # timestamps; id sets + counts + ts-dropped fingerprints
+          # only, never seed rows), so re-export is a no-op.
+          node ../harness/fixtures-export-fr2.js
+          git diff --exit-code -- ../harness/fixtures/
+
+      # The TS harness itself must stay green (1,389+ checks).
+      - name: TS harness
+        working-directory: web
+        run: node ../harness/harness.js
+
+      # i18n drift gate: the Dart dictionary is GENERATED from the
+      # web dictionary; regeneration must be a no-op diff.
+      - name: i18n + permissions generation drift gate
+        working-directory: flutter-app
+        run: node tools/gen_l10n.mjs --check
+
+      - name: Pub get
+        working-directory: flutter-app
+        run: flutter pub get
+
+      - name: Analyze
+        working-directory: flutter-app
+        run: flutter analyze
+
+      - name: Dart tests (core + golden fixtures + themes)
+        working-directory: flutter-app
+        run: flutter test

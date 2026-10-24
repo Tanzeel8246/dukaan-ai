@@ -503,7 +503,14 @@ const EXPENSE_ACCOUNTS: AccountCode[] = [
 /** P&L over an already-filtered entry set — the single computation
  *  behind both the month window and arbitrary ranges. */
 function plOver(selected: JournalEntry[]): MonthPL {
-  const net = (account: AccountCode) => accountNormalBalance(selected, account);
+  // Phase D · D4 (design §4.6): P&L-type reports EXCLUDE `fy_close`
+  // entries. A closing entry is a transfer of the year's result
+  // into retained earnings, not trading activity — excluding it
+  // keeps a closed year's P&L reading exactly as it did the day
+  // before the close, while the trial balance (which must NOT
+  // exclude it) shows the zeroed truth.
+  const trading = selected.filter((e) => e.refType !== "fy_close");
+  const net = (account: AccountCode) => accountNormalBalance(trading, account);
   const revenue = net("sales_revenue");
   const discounts = net("sales_discount");
   const cogs = net("cogs");
@@ -718,27 +725,79 @@ function bucketFor(dayOffset: number): keyof Omit<AgingBuckets, "total"> {
   return "old";
 }
 
-/** Age outstanding RECEIVABLES: repayments are applied FIFO against the
- *  oldest udhaar first; what remains carries the age of its credit row. */
+export interface CreditLotRemaining {
+  /** The lot's key: the bill id, or `row:<id>` for a standalone row. */
+  lotKey: string;
+  /** The lot's age: the LARGEST dayOffset among its rows (a return
+   *  reversal is stamped today; it must not make its bill younger). */
+  dayOffset: number;
+  /** Still owed on this lot after reversals and FIFO repayments. */
+  remaining: number;
+}
+
+/**
+ * The ONE FIFO allocation over a single customer's credit rows —
+ * the lot model `billCreditOutstanding` has always used, now shared
+ * by the aging report and the WhatsApp udhaar position so all three
+ * can never drift apart again (Fix Round 1 · F4).
+ *
+ * Rows group into LOTS by bill (standalone rows are their own lot).
+ * A return/void REVERSAL row (kind "credit", negative amount) nets
+ * against its own lot first — it un-gives that bill's udhaar, it is
+ * NOT a repayment and never enters the repayment pool. Repayments
+ * then retire the oldest lots first; what remains on a lot carries
+ * the lot's age.
+ *
+ * The pre-fix aging skipped negative rows entirely (their
+ * `Math.max(amount, 0)` was 0 and the remainder check dropped
+ * them), so a credit note reduced the journal and the customer's
+ * outstanding but never the aging buckets — the owner's live test
+ * of 2026-10-24: bill 300 → repaid 100 → CN 150 left aging at
+ * 5,700 against Finance's correct 5,550.
+ */
+export function creditLotsRemaining(rows: CreditEntry[]): CreditLotRemaining[] {
+  const lots = new Map<string, { net: number; dayOffset: number; ts: string }>();
+  const lotOf = (c: CreditEntry) => c.billId ?? `row:${c.id}`;
+  for (const c of rows) {
+    if (c.kind !== "credit") continue;
+    const lot = lots.get(lotOf(c)) ?? { net: 0, dayOffset: c.dayOffset, ts: c.ts };
+    lot.net += c.amount; // negative rows are reversals of their own lot
+    if (c.dayOffset > lot.dayOffset) {
+      lot.dayOffset = c.dayOffset;
+      lot.ts = c.ts;
+    }
+    lots.set(lotOf(c), lot);
+  }
+  let pool = rows
+    .filter((c) => c.kind === "repayment")
+    .reduce((a, c) => a + c.amount, 0);
+  const ordered = [...lots.entries()].sort(
+    (a, b) => b[1].dayOffset - a[1].dayOffset || a[1].ts.localeCompare(b[1].ts)
+  );
+  const out: CreditLotRemaining[] = [];
+  for (const [lotKey, lot] of ordered) {
+    const open = Math.max(0, lot.net);
+    const applied = Math.min(pool, open);
+    pool -= applied;
+    const remaining = open - applied;
+    if (remaining > 0) out.push({ lotKey, dayOffset: lot.dayOffset, remaining });
+  }
+  return out;
+}
+
+/** Age outstanding RECEIVABLES on the shared lot allocation:
+ *  reversals net their own bill's lot, repayments retire the
+ *  oldest lots first, and what remains carries its lot's age.
+ *  The buckets' total therefore equals Σ positive
+ *  `customerOutstanding` by construction. */
 export function receivablesAging(credits: CreditEntry[]): AgingBuckets {
   const out: AgingBuckets = { current: 0, mid: 0, old: 0, total: 0 };
   const keys = [...new Set(credits.map(creditKey))];
   for (const key of keys) {
     const rows = credits.filter((c) => creditKey(c) === key);
-    let repaid = rows
-      .filter((c) => c.kind === "repayment")
-      .reduce((a, c) => a + c.amount, 0);
-    const given = rows
-      .filter((c) => c.kind === "credit")
-      .sort((a, b) => b.dayOffset - a.dayOffset); // oldest first
-    for (const g of given) {
-      const applied = Math.min(repaid, Math.max(g.amount, 0));
-      repaid -= applied;
-      const remaining = g.amount - applied;
-      if (remaining > 0) {
-        out[bucketFor(g.dayOffset)] += remaining;
-        out.total += remaining;
-      }
+    for (const lot of creditLotsRemaining(rows)) {
+      out[bucketFor(lot.dayOffset)] += lot.remaining;
+      out.total += lot.remaining;
     }
   }
   return out;
@@ -843,7 +902,10 @@ export function dayCloseSummary(args: {
   for (const b of args.bills) {
     if (b.dayOffset !== 0 || b.status === "held" || b.status === "voided") continue;
     for (const p of b.payments) {
-      if (p.instrument === "cheque") continue;
+      // H1: a points part settles against the loyalty liability,
+      // not a money account — excluded from the buckets on the
+      // same principle as the cheque part above.
+      if (p.instrument === "cheque" || p.instrument === "points") continue;
       byMethod[p.method] += p.amount;
     }
   }

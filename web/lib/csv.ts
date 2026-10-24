@@ -22,6 +22,24 @@ export function downloadCSV(filename: string, csv: string): void {
   URL.revokeObjectURL(url);
 }
 
+/** Trigger a browser download of arbitrary text (Phase D · D5: the
+ *  Tally XML export). Client-side only. */
+export function downloadTextFile(
+  filename: string,
+  text: string,
+  mime = "text/xml;charset=utf-8"
+): void {
+  const blob = new Blob([text], { type: mime });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = filename;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  URL.revokeObjectURL(url);
+}
+
 /** Minimal RFC-4180-ish parser: handles quotes, commas and newlines in cells. */
 export function parseCSV(text: string): Array<Record<string, string>> {
   const rows: string[][] = [];

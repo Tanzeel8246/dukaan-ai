@@ -202,10 +202,190 @@ marker (the D2 block's createInOpenPeriod is by design §6.2),
 source invariants (still 24 makeEntry calls in the store —
 D2's templates compose in lib/payroll), and the additive-only
 rules proof (strip the D2 block → the D1-state file's SHA).
+(The D2 i18n total pin was amended 2,212 → 2,214 when the
+shell/theme polish landed after D2 — same-check amendment.)
+
+The D3 suite covers ERP Phase D · D3 (the loans register —
+design §3): composition refusals via the real `loanTermsError`
+(charged receivable lending refused, never zeroed; fee at or
+above principal refused), charge snapshots (flat = % of the
+original principal; fee_only = the fee; reducing = none), the
+schedule derivation (100,000 over 7 instalments at flat 10%
+splits to the paisa under cumulative allocation; reducing
+charges 2,400/1,800/1,200/600 on the schedule's outstanding;
+weekly steps and the month-end clamp), both drawdown shapes
+through the real builders (gross; fee-netted with the
+`expense_finance` leg), charge accrual as a composed event
+only (a drawn loan's journal carries no charge until the desk
+composes one; the ordinal `nextChargeAccrual` proposal), the
+lifecycle identity after every step (GL `loans_payable` ≡
+the events diary's derived outstanding; trial balance 0),
+charges-first + desk-overridden repayment splits with the
+overpayment refusal, overdue derivation off the schedule
+(paid/partial/overdue states + next-due), mirror-reversal
+restoration, the receivable mirror on `loans_receivable` with
+`receivables` provably untouched (the §3.1 isolation), full
+settlement deriving the settled label, period-lock refusals
+through the real preparePosting, the loans RBAC row, the
+null-safe register search, register totals, the demo sample
+loan (charge-free, no events, outstanding == principal;
+frozen seed identities re-asserted), D3 i18n parity (+119
+keys; the C2 + D2 total pins amended 2,214 → 2,333), source
+invariants (still 24 makeEntry calls in the store — D3's
+templates compose in lib/loans), and the additive-only rules
+proof (strip the D3 block → the D2-state file's SHA).
+
+The D4 suite covers Phase D · D4 (fiscal-year close): the
+registry-driven P&L closing set (exactly the COA's income /
+contra_income / expense codes; clearing, tax and balance-sheet
+accounts never close), the derived pre-close checklist with its
+two HARD gates (a deliberately unbalanced fixture blocks on
+the trial-balance gate; a stranded purchases-clearing balance
+blocks on the clearing gate) and its deriving warnings (draft
+payroll runs inside the FY, open production WIP pools), the
+closing entry's shape (one `fy_close` entry dated the FY's
+last day; every P&L account zeroed; retained earnings credited
+the exact 20,000 net — and DEBITED in the loss-year fixture),
+the §4.6 three-way identity (pre-close P&L == post-close P&L
+under the `fy_close` exclusion == the closing entry's own
+summary), the trial balance's zeroed truth after close, the
+new FY starting clean, opening balances as pure derivations
+(§4.5 — no opening entries anywhere), close-state detection
+(the double-close guard), reopen by mirror with balances
+restored to the paisa and stack discipline (a later closed
+year blocks; unwinding it unblocks), period-lock interplay
+through the real preparePosting (close dated into a lock
+refuses; postings into the closed year refuse after it), the
+zero-movement year (no entry; doc-cited close state), D4 i18n
+parity (+55 `fin.fy.*` keys; earlier total pins amended
+2,339 → 2,394), source invariants (still 24 makeEntry calls
+in the store — D4 composes in lib/fiscal), and the rules
+claim verified by SHA: §4 needs no rules change, so the file
+is byte-identical to the D3-state file.
++ the D5 suite (40) — Phase D · D5 Tally export + journal
+CSV (design §5): the fixed COA → Tally group mapping (all 28
+codes mapped; ledger names overridable via `tallyLedgerNames`,
+groups never), the full §5.3 refType → voucher-type table (all
+33 refTypes; the two loan refTypes in both directions, derived
+from the entry's own loan lines), per-party ledgers
+(customer/supplier/employee refs land on party ledgers under
+the mapped groups; same-name parties disambiguated, never
+merged), opening balances derived in-file for a mid-journal
+range in Tally's sign convention, one voucher per entry with
+per-voucher Dr == Cr and the aggregate == the period trial
+balance, the generated XML re-parsed (well-formedness,
+escaping of comma/quote/Urdu memos, the FILE's own totals
+reconciling to the trial balance), the CSV's row count ==
+the period's journal-line count with memos round-tripping
+through the house parser, the `fy_close` voucher number (the
+FY label), the seed journal exporting whole (21 balanced
+vouchers, no manufactured openings, frozen identities
+untouched), D5 i18n parity (+12 `fin.export.*` keys; earlier
+total pins amended 2,394 → 2,406), source invariants (the
+exporter is pure — no store-write calls in lib/tally; still
+24 makeEntry calls in the store), and the rules file
+byte-identical by the pinned SHA (no D5 rules change).
++ the E1 suite (39) — Phase E · E1 print design foundation
+(design §1): the resolver's default snapshot and its
+24-field sweep, the @page strings, the PRINT_SLOTS matrix
+(challan never priced), the column sources, the §2.4 stamp
+matrix with the asset always absent, thermal suppression,
+the fixtures' closing arithmetic, and the rules SHA
+re-pinned (no E1 rules change).
++ the E2 suite (47) — Phase E · E2 brand assets (design §2):
+the spec table and HARD CAPS (150/150/150/300/300/200 KB,
+total 1,250,000, each under 1 MiB), data-URL measuring
+(ragged payloads measure −1), fit-within-box (never
+upscale; dimensions floor), the format rule (alpha → WebP,
+banners → JPEG), the compression ladder's exact rungs and
+its runner (fits at rung 0 / only at rung 2 / the honest
+refusal with actual figures, plus a property sweep proving
+no run stores over its cap), the buildBrandingAsset
+boundary guard (at-cap accepted, one quad over refused),
+the slot-consumption matrix fed REAL assets through
+brandingDataUrls into E1's visibility rules (paid-only
+stamp, thermal suppression with the logo kept, signature
+slot discipline), E2 i18n parity (+37 `print.brand.*` keys;
+earlier total pins amended 2,459 → 2,496), source
+invariants (lib/branding pure; the store wires the
+collection with owner-gated setters; still 24 makeEntry
+calls; demo storage v16 → v17; the seed ships no assets),
+the rules strip-proof (remove the ONE additive branding
+block and the file is byte-identical to the pre-E2 SHA;
+the D1–D3 canAccess-absence checks and the D4/D5/E1
+byte-pins amended same-check style to strip first), and
+the frozen seed identities closing the suite.
++ the E3 suite (50) — Phase E · E3 Raast QR (design §3):
+full ISO 13616 IBAN validation (every single-character
+corruption refused), CRC-16/CCITT known answers, builder/
+parser round-trips under both framings, the PROVISIONAL
+framing seam pinned as shipped (bare, unpinned — the
+owner's bank QR not yet captured), the reference
+encoder's matrix anchor, and the resolveRaastBlock
+matrix. Rules byte-identical; the seed ships no IBAN.
++ the E4 suite (49) — Phase E · E4 PIN lock (design §4):
+lib/pinlock exercised through its REAL code path (Node
+WebCrypto in the injectable subtle seam) — RFC 7914
+PBKDF2 known-answer vectors, the §4.2 record shape,
+verify accept/reject (wrong digit/length/empty), salt
+uniqueness, tampered hash/salt/iterations, the storage
+proofs (no PIN substring stored; ONLY the module's own
+dukaan-ai-pinlock* keys touched — the zero-Firestore
+seam), the friction schedule at its points, and the
+idle/lock reducer's full transition set (launch locked,
+activity resets, deadline-while-hidden locks on return,
+success clears failures). Source invariants: PinGate
+performs zero Firestore writes (Auth reauthentication
+only); the Device lock card holds no store/backend seam;
+49 pin.* keys EN ≡ UR with the §4.7 honesty copy in both
+languages; earlier total pins amended 2,531 → 2,580.
++ the E5 suite (16) — Phase E · E5 sensitive-action
+gating (design §4.6): the precondition truth table, the
+composition matrix (writes exactly in the allow cases;
+required × fail/cancel composes ZERO), the four call
+sites awaiting requirePin before their store calls,
+payroll/loans desks deliberately ungated, the store
+knowing nothing of the gate. Both suites close on
+still-24 makeEntry calls, the byte-identical rules SHA
+and the frozen seed identities. NOTE: the E4/E5 suites
+are async (PBKDF2), so the runner is a hoisted
+`runAll()` they call when done.
++ the G1 suite (42) — Phase G · G1 tenancy: the registry /
+membership / invite planners, the trial birth, the legacy
+backfill, and the rules v9 additive-only strip proof.
++ the G2 suite (35) — Phase G · G2 plans & counters: the
+catalogue, the derived plan state at its boundary
+instants, the batch-riding counters, staged enforcement
+posture, and the G2 rules spans' strip proof.
++ the G3 suite (37) — Phase G · G3 the /platform console:
+the closed read list + act list (privacy pinned at the
+rules text and the data layer's imports), every act's
+audit event, the payment queue's settlement plans, and
+rules v9 FINAL (1,222 lines; the G3 span strip-proven).
++ the G4 suite (35) — Phase G · G4 renewal flow + trial
+lifecycle: lib/renewal's quote arithmetic (catalogue
+amounts, later-of period starts, month-end clamping),
+the submission plan (born `submitted`, owner-named,
+refusals write nothing), the queue's amount check
+(flagged, never settled), the platformConfig act (set +
+audited event, changed-fields only), the lifecycle
+banner tiers (trial → approaching → urgent → grace →
+read-only; suspension reason with activation clearing),
+and the full scripted LIFECYCLE WALK — trial birth →
+trading → expiry → grace (posting denied under
+enforcement; reads carry no plan condition in the rules)
+→ submit → confirm → active on the payment's own period
+→ lapse → grace → read-only → annual renewal → active,
+plus the rejected branch (record-only settlement, note
+visible, resubmission plans) — with the shop journal's
+SHA spot-asserted UNCHANGED at every step and a closing
+sweep proving no platform write ever targets a tenant
+path. Rules byte-identical (no G4 rules change);
+dictionary 2,761 (+47: 35 renew.* + 12 platform.*).
 
 Run:
     cd ../web && npx tsc -p ../harness/tsconfig.json
     node ../harness/harness.js
 
-Expected: `ALL SUITES GREEN` (1,054 checks). The `out/` dir is
+Expected: `ALL SUITES GREEN` (1,538 checks). The `out/` dir is
 build scratch — safe to delete; it is regenerated by the tsc step.

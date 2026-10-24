@@ -1,0 +1,45 @@
+/** i18n part: shell — Farsi / Dari (فارسی) DRAFT dictionary (Phase H design §4.1).
+ *  Machine-drafted once at build time; every key's review state lives in
+ *  ../review-manifest.json. A draft is a starting point for a named human
+ *  reviewer — never finished copy, never runtime translation. */
+import type { enShell } from "./shell";
+
+export const faShell: Record<keyof typeof enShell, string> = {
+  "shell.brandFallback": "Dukaan AI",
+  "shell.demoMode": "حالت نمايشي",
+  "shell.demoBadgeTitle": "داده نمونه در حال اجرا است — براي زنده شدن Firebase را وصل كنيد",
+  "shell.checkingSession": "جلسه شما بررسي مي‌شود…",
+  "shell.langName": "فارسی",
+  "shell.toggleTheme": "قالب را تغيير دهيد",
+  "shell.chooseTheme": "قالب را انتخاب كنيد",
+  "shell.theme.emerald": "آرامش زمردي",
+  "shell.theme.midnight": "تخته نيمه‌شب",
+  "shell.theme.ocean": "موج اقيانوس",
+  "shell.theme.sand": "شن گرم",
+  "shell.theme.dusk": "بنفش غروب",
+  "shell.openMenu": "منو را باز كنيد",
+  "shell.closeMenu": "منو را ببنديد",
+  "shell.menu": "منو",
+  "shell.collapseSidebar": "نوار كناري را جمع كنيد",
+  "shell.expandSidebar": "نوار كناري را باز كنيد",
+  "shell.mainNav": "راهبري اصلي",
+  "shell.homeLabel": "خانه Dukaan AI",
+  "shell.footerTagline": "يک ERP کامل براي هر نوع كسب‌وكار — موجودي هوشمند، فروش و حساب‌ها، پيش‌بيني تقاضا، و يک دستيار هوش مصنوعي که از داده‌هاي خود كسب‌وكار شما پاسخ مي‌دهد۔",
+  "shell.footerAppHeading": "برنامه",
+  "shell.footerAboutHeading": "درباره ما",
+  "shell.footerColSales": "فروش و سفارش‌ها",
+  "shell.footerColStock": "موجودي و عمليات",
+  "shell.footerColGrowth": "مشتريان و رشد",
+  "shell.footerColFinance": "مالي و گزارش‌ها",
+  "shell.footerColCompany": "شركت و سيستم",
+  "shell.footerTech": "Next.js · Firebase · Flutter",
+  "shell.demoPill": "پروژه نمايشي — همه داده‌ها خيالي است",
+  "shell.footerByDemo": "پروژه نمايشي AI — ساخته",
+  "shell.footerByProd": "سيستم مديريت دكان توسط",
+  "shell.footerRightsDemo": "© 2026 Dukaan AI · داده نمايشي خيالي",
+  "shell.footerRights": "© 2026 Dukaan AI",
+  "shell.notFoundTitle": "صفحه يافت نشد",
+  "shell.notFoundBody": "اين صفحه در دكان موجود نيست۔ بياييد به داشبورد برگرديم۔",
+  "shell.backHome": "بازگشت به داشبورد",
+  "sync.online": "آنلاين",
+};

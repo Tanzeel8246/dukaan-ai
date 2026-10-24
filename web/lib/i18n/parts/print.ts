@@ -1,0 +1,431 @@
+/** i18n part: print — Phase E · E1 print designer (Settings →
+ * Print & branding, Template group) + the print-sheet additions
+ * (column headers, terms label, authorised-signature label).
+ * Brand-asset, Raast and PIN keys join this part with their own
+ * increments (design: ERP-PHASE-E-DESIGN.md §8). en + ur
+ * dictionaries (identical key sets enforced by types). */
+export const enPrint = {
+  /* ---- designer card ---- */
+  "print.title": "Print & branding",
+  "print.sub":
+    "How bills and documents look on paper — paper, header, item columns and footer. Until you change anything here, printing stays exactly as it is today.",
+  "print.paper": "Paper & layout",
+  "print.paper.a4": "Classic A4",
+  "print.paper.a4compact": "Compact A4",
+  "print.paper.a5": "A5",
+  "print.paper.thermal80": "Thermal 80mm",
+  "print.fontScale": "Text size",
+  "print.fontScale.standard": "Standard",
+  "print.fontScale.large": "Large",
+  "print.headerTitle": "Header",
+  "print.headerMode": "Header style",
+  "print.headerMode.text": "Text",
+  "print.headerMode.letterhead": "Letterhead image",
+  "print.headerMode.logoText": "Logo + text",
+  "print.headerModeNote":
+    "Letterhead and logo images are added under Brand assets; until an image exists, the text header prints.",
+  "print.shopNameAlt": "Shop name (other script)",
+  "print.shopNameAltPh": "e.g. مدینہ جنرل اسٹور",
+  "print.showLogo": "Show logo in the header",
+  "print.logoSize": "Logo size",
+  "print.logoSize.s": "Small",
+  "print.logoSize.m": "Medium",
+  "print.logoSize.l": "Large",
+  "print.showShopName": "Show shop name",
+  "print.showShopNameAlt": "Show the second name line",
+  "print.showAddress": "Show address",
+  "print.showPhone": "Show phone",
+  "print.columnsTitle": "Item columns",
+  "print.colSku": "SKU column",
+  "print.colUrduName": "Urdu name under each item",
+  "print.colTax": "Per-line tax column",
+  "print.colTaxNote":
+    "Bills and notes only — quotations and orders carry estimates, never per-line tax.",
+  "print.colDiscount": "Per-line discount column",
+  "print.footerTitle": "Footer",
+  "print.footerNote": "Footer note",
+  "print.footerNotePh": "Printed at the end of bills and documents",
+  "print.termsText": "Terms & conditions",
+  "print.termsPh": "Your terms, printed small in the footer",
+  "print.showThanks": "Show the thank-you line",
+  "print.thanksText": "Custom thank-you line",
+  "print.thanksPh": "Leave empty for the standard line",
+  "print.showSignature": "Authorised signature block on bills",
+  "print.previewTitle": "Live preview",
+  "print.previewBill": "Sample bill",
+  "print.previewQuote": "Sample quotation",
+  "print.sampleBadge": "SAMPLE · نمونہ",
+  "print.reset": "Reset to today's look",
+  "print.saved": "Print design saved.",
+
+  /* ---- brand assets (E2) ---- */
+  "print.brand.title": "Brand assets",
+  "print.brand.sub":
+    "Your logo, letterhead, stamp and signature, printed on bills and documents. Images are compressed automatically on this device and stored with your shop.",
+  "print.brand.logo": "Shop logo",
+  "print.brand.logoHint":
+    "Shown in the header when the design calls for it. A transparent PNG works best.",
+  "print.brand.letterheadHeader": "Letterhead — header banner",
+  "print.brand.letterheadFooter": "Letterhead — footer banner",
+  "print.brand.letterheadHint":
+    "A full-width banner image. On thermal 80mm prints the text header is used instead — banners never print on thermal.",
+  "print.brand.stamp": "Shop stamp / seal",
+  "print.brand.stampHint": "A transparent PNG prints like a real stamp impression.",
+  "print.brand.signature": "Authorised signature",
+  "print.brand.signatureHint":
+    "Replaces the ruled signature line on the documents you choose below. A transparent PNG works best.",
+  "print.brand.raastQr": "Bank Raast QR image",
+  "print.brand.raastNote":
+    "The QR your bank gave you, saved from your banking app. It prints with Raast payments once Raast is set up (Payments).",
+  "print.brand.upload": "Upload image",
+  "print.brand.replace": "Replace",
+  "print.brand.remove": "Remove",
+  "print.brand.empty": "No image yet",
+  "print.brand.sizeLine": "{size} KB · {w} × {h} px",
+  "print.brand.capNote": "Limit {cap} KB after automatic compression",
+  "print.brand.compressing": "Compressing image…",
+  "print.brand.tooLarge":
+    "This image compresses to {actual} KB — over the {cap} KB limit. Crop it or use a simpler image, then try again.",
+  "print.brand.badType": "That file could not be read as an image.",
+  "print.brand.saved": "Image saved.",
+  "print.brand.removed": "Image removed.",
+  "print.brand.stampMode": "Stamp on bills",
+  "print.brand.stampPaid": "Fully-paid bills only",
+  "print.brand.stampAlways": "Every bill",
+  "print.brand.stampNever": "Never",
+  "print.brand.stampAlso": "Also stamp",
+  "print.brand.stampNotes": "Credit / debit notes",
+  "print.brand.stampVouchers": "Payment vouchers",
+  "print.brand.stampQuotes": "Quotations & orders",
+  "print.brand.signOn": "Signature image on",
+  "print.brand.signVouchers": "Payment vouchers",
+  "print.brand.signSlips": "Salary slips",
+  "print.brand.letterheadFooterToggle": "Print the letterhead footer banner",
+  "print.brand.totalLine": "All brand images together: {size} KB",
+
+  /* ---- Raast (E3) ---- */
+  "print.raast.title": "Payments — Raast QR",
+  "print.raast.sub":
+    "Print a Raast QR on bills so customers can scan with any banking app and pay straight to your account.",
+  "print.raast.honest":
+    "Two ways, honestly labelled. Your bank's own QR image (uploaded under Brand assets) is the verified path — when it exists, it prints. The code generated here follows the State Bank's published person-to-person (P2P) template, built from your IBAN alone. It is not a bank-issued merchant (P2M) code — only your bank can issue one of those — and the generated code has not yet been verified against a real bank Raast QR, so scan-test it with your own banking app before you rely on it.",
+  "print.raast.provisional": "Generated QR: pending verification against a real bank Raast QR.",
+  "print.raast.ibanLabel": "Your Raast IBAN",
+  "print.raast.ibanPh": "PK36 … (24 characters)",
+  "print.raast.ibanHint":
+    "Your IBAN is printed on your cheque book and shown in your banking app under account details.",
+  "print.raast.fiLabel": "Bank name (optional)",
+  "print.raast.fiPh": "e.g. Meezan Bank",
+  "print.raast.fiHint": "As your bank prints it — up to 25 characters.",
+  "print.raast.err.alias":
+    "A mobile number cannot be used here — the Raast QR standard carries an IBAN, not a phone alias. Your IBAN is on your cheque book and in your banking app.",
+  "print.raast.err.notPk": "Only a Pakistani (PK) IBAN works with Raast.",
+  "print.raast.err.length":
+    "A Pakistani IBAN is exactly 24 characters — a character seems missing or extra.",
+  "print.raast.err.format":
+    "The middle of an IBAN is a 4-letter bank code followed by the account number. Copy it exactly as printed.",
+  "print.raast.err.checksum":
+    "The IBAN's check digits do not match — a digit is wrong somewhere. Copy it exactly from your cheque book or banking app.",
+  "print.raast.err.fi":
+    "The bank name must be at most 25 characters, in English letters as your bank prints it.",
+  "print.raast.validNote":
+    "This IBAN checks out. Before relying on it, scan the preview with your banking app and confirm YOUR name and account appear.",
+  "print.raast.previewTitle": "Preview — scan-test this code",
+  "print.raast.payloadLabel": "QR contents (for checking)",
+  "print.raast.pathImage":
+    "On bills: your bank's QR image prints (Brand assets) — the verified path.",
+  "print.raast.pathGenerated":
+    "On bills: the generated Raast code from this IBAN prints.",
+  "print.raast.pathNone":
+    "On bills: no Raast QR yet — save an IBAN here, or upload your bank's QR image under Brand assets.",
+  "print.raast.onBills": "On bills",
+  "print.raast.showToggle": "Print a Raast QR on bills",
+  "print.raast.dynamicToggle": "Put the bill's amount and number in the QR (dynamic)",
+  "print.raast.dynamicNote":
+    "The code carries the bill total, so the customer just scans and pays — and the bill number lets you match the payment later. Quotations always carry a plain code with no amount: an estimate is not a demand.",
+  "print.raast.sizeLabel": "QR size on bills",
+  "print.raast.posterBtn": "Print counter poster",
+  "print.raast.posterNote":
+    "One static code for the counter — the customer scans and types the amount.",
+  "print.raast.saved": "Raast settings saved.",
+  "print.raast.sampleNote":
+    "A test IBAN for the demo, shown only so you can see the code. It never prints on a real bill.",
+  /* ---- sheet additions ---- */
+  "print.raast.caption": "Scan with any banking app to pay via Raast",
+  "print.raast.paperIban": "Raast IBAN",
+  "print.raast.posterTitle": "Pay via Raast",
+  "print.col.sku": "SKU",
+  "print.col.tax": "Tax",
+  "print.col.discount": "Discount",
+  "print.termsLabel": "Terms",
+  "print.authorisedSignature": "Authorised signature",
+
+  /* ---- PIN lock (E4/E5) — device-local; the pin.* home (§8) ---- */
+  "pin.title": "This device's lock",
+  "pin.honesty":
+    "The PIN keeps this device's app private from casual use at the counter. It is not a replacement for your account password — anyone who knows the account password can remove the PIN. Your shop data stays protected by your account sign-in.",
+  "pin.statusNone":
+    "No PIN is set on this device — the app opens here without a PIN.",
+  "pin.statusSet": "A PIN is set on this device since {date}.",
+  "pin.digits": "PIN length",
+  "pin.digitsOption": "{n} digits",
+  "pin.newPin": "New PIN",
+  "pin.confirmPin": "Confirm PIN",
+  "pin.currentPin": "Current PIN",
+  "pin.set": "Set PIN",
+  "pin.change": "Change PIN",
+  "pin.remove": "Remove PIN",
+  "pin.errDigits": "Enter exactly {n} digits, numbers only.",
+  "pin.errMismatch": "The two PINs do not match.",
+  "pin.errCurrent": "That current PIN is not correct — nothing was changed.",
+  "pin.errPassword": "That account password was not accepted — nothing was changed.",
+  "pin.setDone": "PIN set on this device.",
+  "pin.changedDone": "PIN changed on this device.",
+  "pin.removedDone": "PIN removed from this device.",
+  "pin.passwordAlt": "…or with your account password",
+  "pin.password": "Account password",
+  "pin.removeWithPassword": "Remove with password",
+  "pin.idle": "Lock automatically when idle",
+  "pin.idleLaunch": "Only when the app opens",
+  "pin.idleMinutes": "After {n} min idle",
+  "pin.gate": "Ask for the PIN before sensitive actions",
+  "pin.gateSub":
+    "Voiding a bill, submitting the day close, and closing or reopening a period or fiscal year will ask for this device's PIN first — only on this device, and only while a PIN is set.",
+  "pin.demoRecovery":
+    "There is no password in demo mode: if this PIN is forgotten, the lock screen can erase the demo data and remove the PIN.",
+  "pin.lock.prompt": "Enter the device PIN",
+  "pin.lock.wrong": "Wrong PIN — try again.",
+  "pin.lock.paused": "Too many wrong tries. The pad opens again in {sec} seconds.",
+  "pin.forgot": "Forgot PIN?",
+  "pin.recover.title": "Forgot the PIN?",
+  "pin.recover.body":
+    "Enter the password of the account signed in on this device. The PIN is removed, the app opens, and you can set a new PIN in Settings. Forgetting the PIN never locks you out of your own shop.",
+  "pin.recover.submit": "Remove PIN and open",
+  "pin.back": "Back",
+  "pin.recover.failed": "That password was not accepted — the lock stays on.",
+  "pin.demoErase.title": "Erase demo data and remove the PIN",
+  "pin.demoErase.body":
+    "There is no account password in demo mode. Erasing resets the demo shop to its sample data and removes this device's PIN.",
+  "pin.demoErase.typeLabel": "Type the shop name to confirm",
+  "pin.demoErase.submit": "Erase data and remove PIN",
+  "pin.lockNow": "Lock now",
+  "pin.gate.title": "PIN required",
+  "pin.gate.body": "Enter this device's PIN to continue.",
+  "pin.gate.actVoid": "Void a posted bill",
+  "pin.gate.actDayClose": "Submit the day close",
+  "pin.gate.actPeriod": "Close or reopen a period",
+  "pin.gate.actFiscal": "Close or reopen the fiscal year",
+  "pin.pad.backspace": "Delete last digit",
+} as const;
+
+export const urPrint: Record<keyof typeof enPrint, string> = {
+  /* ---- designer card ---- */
+  "print.title": "پرنٹ اور برانڈنگ",
+  "print.sub":
+    "بل اور دستاویزات کاغذ پر کیسے دکھیں — کاغذ، ہیڈر، اشیا کے کالم اور فوٹر۔ جب تک یہاں کچھ نہ بدلیں، پرنٹنگ بالکل ویسی ہی رہے گی جیسی آج ہے۔",
+  "print.paper": "کاغذ اور لے آؤٹ",
+  "print.paper.a4": "کلاسک A4",
+  "print.paper.a4compact": "کمپیکٹ A4",
+  "print.paper.a5": "A5",
+  "print.paper.thermal80": "تھرمل 80mm",
+  "print.fontScale": "متن کا سائز",
+  "print.fontScale.standard": "معیاری",
+  "print.fontScale.large": "بڑا",
+  "print.headerTitle": "ہیڈر",
+  "print.headerMode": "ہیڈر کا انداز",
+  "print.headerMode.text": "متن",
+  "print.headerMode.letterhead": "لیٹر ہیڈ تصویر",
+  "print.headerMode.logoText": "لوگو + متن",
+  "print.headerModeNote":
+    "لیٹر ہیڈ اور لوگو کی تصاویر برانڈ اثاثوں میں شامل ہوتی ہیں؛ تصویر موجود نہ ہو تو متنی ہیڈر ہی چھپتا ہے۔",
+  "print.shopNameAlt": "دکان کا نام (دوسری رسم الخط)",
+  "print.shopNameAltPh": "مثلاً مدینہ جنرل اسٹور",
+  "print.showLogo": "ہیڈر میں لوگو دکھائیں",
+  "print.logoSize": "لوگو کا سائز",
+  "print.logoSize.s": "چھوٹا",
+  "print.logoSize.m": "درمیانہ",
+  "print.logoSize.l": "بڑا",
+  "print.showShopName": "دکان کا نام دکھائیں",
+  "print.showShopNameAlt": "نام کی دوسری سطر دکھائیں",
+  "print.showAddress": "پتا دکھائیں",
+  "print.showPhone": "فون دکھائیں",
+  "print.columnsTitle": "اشیا کے کالم",
+  "print.colSku": "SKU کالم",
+  "print.colUrduName": "ہر شے کے نیچے اردو نام",
+  "print.colTax": "فی سطر ٹیکس کالم",
+  "print.colTaxNote":
+    "صرف بلوں اور نوٹس کے لیے — کوٹیشن اور آرڈر پر تخمینے ہوتے ہیں، فی سطر ٹیکس نہیں۔",
+  "print.colDiscount": "فی سطر رعایت کالم",
+  "print.footerTitle": "فوٹر",
+  "print.footerNote": "فوٹر نوٹ",
+  "print.footerNotePh": "بلوں اور دستاویزات کے آخر میں چھپے گا",
+  "print.termsText": "شرائط و ضوابط",
+  "print.termsPh": "آپ کی شرائط، فوٹر میں چھوٹے حروف میں چھپیں گی",
+  "print.showThanks": "شکریے کی سطر دکھائیں",
+  "print.thanksText": "اپنی شکریے کی سطر",
+  "print.thanksPh": "معیاری سطر کے لیے خالی چھوڑیں",
+  "print.showSignature": "بلوں پر مجاز دستخط کا خانہ",
+  "print.previewTitle": "براہِ راست پیش نظارہ",
+  "print.previewBill": "نمونہ بل",
+  "print.previewQuote": "نمونہ کوٹیشن",
+  "print.sampleBadge": "نمونہ · SAMPLE",
+  "print.reset": "آج کی صورت پر واپس کریں",
+  "print.saved": "پرنٹ ڈیزائن محفوظ ہو گیا۔",
+
+  /* ---- brand assets (E2) ---- */
+  "print.brand.title": "برانڈ اثاثے",
+  "print.brand.sub":
+    "آپ کا لوگو، لیٹر ہیڈ، مہر اور دستخط — بلوں اور دستاویزات پر چھپتے ہیں۔ تصاویر اسی ڈیوائس پر خودکار طور پر چھوٹی کر کے آپ کی دکان کے ساتھ محفوظ ہوتی ہیں۔",
+  "print.brand.logo": "دکان کا لوگو",
+  "print.brand.logoHint":
+    "ڈیزائن میں منتخب ہونے پر ہیڈر میں دکھائی دیتا ہے۔ شفاف PNG بہترین رہتا ہے۔",
+  "print.brand.letterheadHeader": "لیٹر ہیڈ — اوپر کا بینر",
+  "print.brand.letterheadFooter": "لیٹر ہیڈ — نیچے کا بینر",
+  "print.brand.letterheadHint":
+    "پوری چوڑائی کی بینر تصویر۔ تھرمل 80mm پر بینر کبھی نہیں چھپتا — وہاں متنی ہیڈر استعمال ہوتا ہے۔",
+  "print.brand.stamp": "دکان کی مہر",
+  "print.brand.stampHint": "شفاف PNG اصلی مہر کے نشان کی طرح چھپتا ہے۔",
+  "print.brand.signature": "مجاز دستخط",
+  "print.brand.signatureHint":
+    "نیچے منتخب دستاویزات پر بنی ہوئی دستخطی لکیر کی جگہ چھپتا ہے۔ شفاف PNG بہترین رہتا ہے۔",
+  "print.brand.raastQr": "بینک راست QR تصویر",
+  "print.brand.raastNote":
+    "آپ کے بینک کا دیا ہوا QR، آپ کی بینکنگ ایپ سے محفوظ کیا گیا۔ راست سیٹ اپ (ادائیگیاں) مکمل ہونے پر راست ادائیگیوں کے ساتھ چھپے گا۔",
+  "print.brand.upload": "تصویر اپ لوڈ کریں",
+  "print.brand.replace": "تبدیل کریں",
+  "print.brand.remove": "ہٹائیں",
+  "print.brand.empty": "ابھی کوئی تصویر نہیں",
+  "print.brand.sizeLine": "{size} KB · {w} × {h} پکسل",
+  "print.brand.capNote": "خودکار کمپریشن کے بعد حد {cap} KB",
+  "print.brand.compressing": "تصویر چھوٹی ہو رہی ہے…",
+  "print.brand.tooLarge":
+    "یہ تصویر چھوٹی ہو کر بھی {actual} KB رہتی ہے — حد {cap} KB سے زیادہ۔ اسے تراشیں یا سادہ تصویر استعمال کر کے دوبارہ کوشش کریں۔",
+  "print.brand.badType": "یہ فائل تصویر کے طور پر نہیں پڑھی جا سکی۔",
+  "print.brand.saved": "تصویر محفوظ ہو گئی۔",
+  "print.brand.removed": "تصویر ہٹا دی گئی۔",
+  "print.brand.stampMode": "بلوں پر مہر",
+  "print.brand.stampPaid": "صرف مکمل ادا شدہ بلوں پر",
+  "print.brand.stampAlways": "ہر بل پر",
+  "print.brand.stampNever": "کبھی نہیں",
+  "print.brand.stampAlso": "ان پر بھی مہر",
+  "print.brand.stampNotes": "کریڈٹ / ڈیبٹ نوٹس",
+  "print.brand.stampVouchers": "ادائیگی واؤچرز",
+  "print.brand.stampQuotes": "کوٹیشنز اور آرڈرز",
+  "print.brand.signOn": "دستخط کی تصویر ان پر",
+  "print.brand.signVouchers": "ادائیگی واؤچرز",
+  "print.brand.signSlips": "تنخواہ کی پرچیاں",
+  "print.brand.letterheadFooterToggle": "لیٹر ہیڈ کا نیچے والا بینر چھاپیں",
+  "print.brand.totalLine": "تمام برانڈ تصاویر مل کر: {size} KB",
+
+  /* ---- Raast (E3) ---- */
+  "print.raast.title": "ادائیگیاں — راست QR",
+  "print.raast.sub":
+    "بلوں پر راست QR چھاپیں تاکہ گاہک کسی بھی بینکنگ ایپ سے اسکین کر کے سیدھا آپ کے اکاؤنٹ میں ادائیگی کر سکے۔",
+  "print.raast.honest":
+    "دو راستے، دونوں صاف لکھے ہوئے۔ آپ کے بینک کی اپنی QR تصویر (برانڈ اثاثوں میں لگائی گئی) تصدیق شدہ راستہ ہے — وہ موجود ہو تو وہی چھپتی ہے۔ یہاں بننے والا کوڈ اسٹیٹ بینک کے شائع شدہ شخص-تا-شخص (P2P) سانچے کے مطابق صرف آپ کے IBAN سے بنتا ہے۔ یہ بینک کا جاری کردہ مرچنٹ (P2M) کوڈ نہیں — وہ صرف آپ کا بینک جاری کر سکتا ہے — اور بنائے گئے کوڈ کی تصدیق ابھی کسی اصل بینک راست QR سے نہیں ہوئی، اس لیے بھروسا کرنے سے پہلے اسے اپنی بینکنگ ایپ سے اسکین کر کے جانچیں۔",
+  "print.raast.provisional": "بنایا گیا QR: اصل بینک راست QR سے تصدیق باقی ہے۔",
+  "print.raast.ibanLabel": "آپ کا راست IBAN",
+  "print.raast.ibanPh": "PK36 … (24 حروف)",
+  "print.raast.ibanHint":
+    "آپ کا IBAN چیک بک پر چھپا ہوتا ہے اور بینکنگ ایپ میں اکاؤنٹ کی تفصیل میں نظر آتا ہے۔",
+  "print.raast.fiLabel": "بینک کا نام (اختیاری)",
+  "print.raast.fiPh": "مثلاً Meezan Bank",
+  "print.raast.fiHint": "جیسا آپ کا بینک لکھتا ہے — زیادہ سے زیادہ 25 حروف۔",
+  "print.raast.err.alias":
+    "یہاں موبائل نمبر نہیں چلے گا — راست QR کے معیار میں فون علیاس نہیں، IBAN ہوتا ہے۔ آپ کا IBAN چیک بک پر اور بینکنگ ایپ میں ملے گا۔",
+  "print.raast.err.notPk": "راست کے لیے صرف پاکستانی (PK) IBAN چلتا ہے۔",
+  "print.raast.err.length":
+    "پاکستانی IBAN پورے 24 حروف کا ہوتا ہے — کوئی حرف کم یا زیادہ لگ رہا ہے۔",
+  "print.raast.err.format":
+    "IBAN کے درمیان میں چار حروف کا بینک کوڈ اور پھر اکاؤنٹ نمبر ہوتا ہے۔ بالکل ویسا ہی لکھیں جیسا چھپا ہے۔",
+  "print.raast.err.checksum":
+    "IBAN کے جانچ ہندسے میل نہیں کھا رہے — کہیں کوئی ہندسہ غلط ہے۔ چیک بک یا بینکنگ ایپ سے ہو بہو نقل کریں۔",
+  "print.raast.err.fi":
+    "بینک کا نام زیادہ سے زیادہ 25 حروف ہو، انگریزی حروف میں جیسا آپ کا بینک لکھتا ہے۔",
+  "print.raast.validNote":
+    "یہ IBAN درست نکلا۔ بھروسا کرنے سے پہلے پیش نظارہ اپنی بینکنگ ایپ سے اسکین کریں اور تصدیق کریں کہ آپ کا اپنا نام اور اکاؤنٹ ہی آ رہا ہے۔",
+  "print.raast.previewTitle": "پیش نظارہ — اس کوڈ کو اسکین کر کے جانچیں",
+  "print.raast.payloadLabel": "QR کا متن (جانچ کے لیے)",
+  "print.raast.pathImage":
+    "بلوں پر: آپ کے بینک کی QR تصویر چھپے گی (برانڈ اثاثے) — یہی تصدیق شدہ راستہ ہے۔",
+  "print.raast.pathGenerated": "بلوں پر: اس IBAN سے بنا راست کوڈ چھپے گا۔",
+  "print.raast.pathNone":
+    "بلوں پر: ابھی کوئی راست QR نہیں — یہاں IBAN محفوظ کریں، یا برانڈ اثاثوں میں بینک کی QR تصویر لگائیں۔",
+  "print.raast.onBills": "بلوں پر",
+  "print.raast.showToggle": "بلوں پر راست QR چھاپیں",
+  "print.raast.dynamicToggle": "QR میں بل کی رقم اور نمبر شامل کریں (ڈائنامک)",
+  "print.raast.dynamicNote":
+    "کوڈ میں بل کی کل رقم ہوتی ہے — گاہک بس اسکین کر کے ادا کرتا ہے — اور بل نمبر سے آپ بعد میں ادائیگی ملا سکتے ہیں۔ کوٹیشن پر ہمیشہ بغیر رقم والا سادہ کوڈ چھپتا ہے: تخمینہ کوئی تقاضا نہیں ہوتا۔",
+  "print.raast.sizeLabel": "بل پر QR کا سائز",
+  "print.raast.posterBtn": "کاؤنٹر پوسٹر چھاپیں",
+  "print.raast.posterNote":
+    "کاؤنٹر کے لیے ایک ساکن کوڈ — گاہک اسکین کر کے رقم خود لکھتا ہے۔",
+  "print.raast.saved": "راست ترتیبات محفوظ ہو گئیں۔",
+  "print.raast.sampleNote":
+    "ڈیمو نمونہ — آزمائشی IBAN، صرف کوڈ دکھانے کے لیے۔ یہ کبھی اصل بل پر نہیں چھپتا۔",
+  /* ---- sheet additions ---- */
+  "print.raast.caption": "کسی بھی بینکنگ ایپ سے اسکین کر کے راست سے ادائیگی کریں",
+  "print.raast.paperIban": "راست IBAN",
+  "print.raast.posterTitle": "راست سے ادائیگی کریں",
+  "print.col.sku": "SKU",
+  "print.col.tax": "ٹیکس",
+  "print.col.discount": "رعایت",
+  "print.termsLabel": "شرائط",
+  "print.authorisedSignature": "مجاز دستخط",
+
+  /* ---- PIN lock (E4/E5) ---- */
+  "pin.title": "اس آلے کا لاک",
+  "pin.honesty":
+    "پن اس آلے پر ایپ کو کاؤنٹر پر اتفاقی استعمال سے نجی رکھتا ہے۔ یہ آپ کے اکاؤنٹ پاس ورڈ کا متبادل نہیں — جو بھی اکاؤنٹ پاس ورڈ جانتا ہے وہ پن ہٹا سکتا ہے۔ آپ کی دکان کا ڈیٹا آپ کے اکاؤنٹ سائن ان سے محفوظ رہتا ہے۔",
+  "pin.statusNone": "اس آلے پر کوئی پن نہیں لگا — یہاں ایپ بغیر پن کے کھلتی ہے۔",
+  "pin.statusSet": "اس آلے پر {date} سے پن لگا ہوا ہے۔",
+  "pin.digits": "پن کی لمبائی",
+  "pin.digitsOption": "{n} ہندسے",
+  "pin.newPin": "نیا پن",
+  "pin.confirmPin": "پن کی تصدیق کریں",
+  "pin.currentPin": "موجودہ پن",
+  "pin.set": "پن لگائیں",
+  "pin.change": "پن بدلیں",
+  "pin.remove": "پن ہٹائیں",
+  "pin.errDigits": "ٹھیک {n} ہندسے درج کریں، صرف اعداد۔",
+  "pin.errMismatch": "دونوں پن ایک جیسے نہیں ہیں۔",
+  "pin.errCurrent": "موجودہ پن درست نہیں — کچھ نہیں بدلا گیا۔",
+  "pin.errPassword": "اکاؤنٹ پاس ورڈ قبول نہیں ہوا — کچھ نہیں بدلا گیا۔",
+  "pin.setDone": "اس آلے پر پن لگ گیا۔",
+  "pin.changedDone": "اس آلے پر پن بدل گیا۔",
+  "pin.removedDone": "اس آلے سے پن ہٹ گیا۔",
+  "pin.passwordAlt": "…یا اپنے اکاؤنٹ پاس ورڈ سے",
+  "pin.password": "اکاؤنٹ پاس ورڈ",
+  "pin.removeWithPassword": "پاس ورڈ سے ہٹائیں",
+  "pin.idle": "غیر فعالیت پر خودکار لاک",
+  "pin.idleLaunch": "صرف اس وقت جب ایپ کھلے",
+  "pin.idleMinutes": "{n} منٹ غیر فعالیت کے بعد",
+  "pin.gate": "حساس اعمال سے پہلے پن پوچھیں",
+  "pin.gateSub":
+    "بل منسوخ کرنا، دن کا اختتام جمع کرنا، اور مدت یا مالی سال بند یا دوبارہ کھولنا — ان سے پہلے اس آلے کا پن پوچھا جائے گا — صرف اس آلے پر، اور صرف اس وقت جب پن لگا ہو۔",
+  "pin.demoRecovery":
+    "ڈیمو موڈ میں پاس ورڈ نہیں ہوتا: یہ پن بھول جائیں تو لاک اسکرین سے ڈیمو ڈیٹا مٹا کر پن ہٹایا جا سکتا ہے۔",
+  "pin.lock.prompt": "آلے کا پن درج کریں",
+  "pin.lock.wrong": "غلط پن — دوبارہ کوشش کریں۔",
+  "pin.lock.paused": "غلط کوششیں زیادہ ہو گئیں۔ پیڈ {sec} سیکنڈ میں دوبارہ کھلے گا۔",
+  "pin.forgot": "پن بھول گئے؟",
+  "pin.recover.title": "پن بھول گئے؟",
+  "pin.recover.body":
+    "اس آلے پر سائن ان اکاؤنٹ کا پاس ورڈ درج کریں۔ پن ہٹ جائے گا، ایپ کھل جائے گی، اور آپ ترتیبات میں نیا پن لگا سکیں گے۔ پن بھولنے سے آپ اپنی ہی دکان سے کبھی بند نہیں ہوتے۔",
+  "pin.recover.submit": "پن ہٹائیں اور کھولیں",
+  "pin.back": "واپس",
+  "pin.recover.failed": "پاس ورڈ قبول نہیں ہوا — لاک برقرار ہے۔",
+  "pin.demoErase.title": "ڈیمو ڈیٹا مٹائیں اور پن ہٹائیں",
+  "pin.demoErase.body":
+    "ڈیمو موڈ میں اکاؤنٹ پاس ورڈ نہیں ہوتا۔ مٹانے سے ڈیمو دکان اپنے نمونہ ڈیٹا پر واپس آ جاتی ہے اور اس آلے کا پن ہٹ جاتا ہے۔",
+  "pin.demoErase.typeLabel": "تصدیق کے لیے دکان کا نام لکھیں",
+  "pin.demoErase.submit": "ڈیٹا مٹائیں اور پن ہٹائیں",
+  "pin.lockNow": "ابھی لاک کریں",
+  "pin.gate.title": "پن درکار ہے",
+  "pin.gate.body": "جاری رکھنے کے لیے اس آلے کا پن درج کریں۔",
+  "pin.gate.actVoid": "درج شدہ بل منسوخ کرنا",
+  "pin.gate.actDayClose": "دن کا اختتام جمع کرنا",
+  "pin.gate.actPeriod": "مدت بند یا دوبارہ کھولنا",
+  "pin.gate.actFiscal": "مالی سال بند یا دوبارہ کھولنا",
+  "pin.pad.backspace": "آخری ہندسہ مٹائیں",
+};

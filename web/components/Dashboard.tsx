@@ -1,9 +1,11 @@
 "use client";
 
 import Link from "next/link";
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import { useStore } from "./StoreProvider";
 import { useLang } from "./LangProvider";
+import { useAuth } from "./AuthProvider";
+import DemoDataModal from "./DemoDataModal";
 import {
   IconAlert,
   IconBasket,
@@ -76,8 +78,18 @@ function barPath(x: number, y: number, w: number, h: number, r: number): string 
 }
 
 export default function Dashboard() {
-  const { ready, products, sales, journal, expenses, bills, accounts, resetDemo } = useStore();
+  const { ready, products, sales, journal, expenses, bills, accounts, resetDemo, demoClass, planView } = useStore();
   const { t } = useLang();
+  const { mode } = useAuth();
+
+  /* Fix Round 2 · FR2: the Dashboard demo button is state-aware.
+   * Demo mode keeps the legacy showroom reset. In production an
+   * empty business offers "Add demo data"; a demo-only business
+   * offers "Re-add demo data"; a business holding real records
+   * offers nothing — demo seed never mixes into real books.
+   * The modal itself (pre-list, PIN challenge, confirmed summary)
+   * is the shared DemoDataModal, also used by Settings. */
+  const [demoModal, setDemoModal] = useState<"add" | "readd" | null>(null);
 
   /** Trend sub-line for a KPI: ▲/▼ + signed % vs a previous period.
    *  prev = 0 → "new" when there is current activity, hidden when both are 0. */
@@ -317,6 +329,24 @@ export default function Dashboard() {
             {fmtWeekday(data.now)} · {fmtDate(data.now)}
           </p>
           <p className="lead">{t("dash.lead")}</p>
+          {/* Phase G · G2: the live invoice counter, next to the
+              plan it counts against (the trial pool in trial;
+              this month's count otherwise). Dark without a plan
+              view. */}
+          {planView?.counters && (
+            <p className="plan-chip">
+              {planView.snapshot.planId === "trial"
+                ? t("plan.trialPool", {
+                    used: planView.counters.invoiceCount,
+                    limit: planView.snapshot.invoiceLimit,
+                  })
+                : `${t("plan.thisMonth")}: ${planView.counters.invoiceCount}${
+                    planView.snapshot.invoiceLimit > 0
+                      ? ` / ${planView.snapshot.invoiceLimit}`
+                      : ""
+                  }`}
+            </p>
+          )}
         </div>
 
         {/* ---------- KPI row ---------- */}
@@ -759,13 +789,25 @@ export default function Dashboard() {
 
         {/* ---------- footer actions ---------- */}
         <div style={{ display: "flex", gap: 12, flexWrap: "wrap" }}>
-          <button type="button" className="btn btn-ghost btn-sm" onClick={resetDemo}>
-            {t("dash.resetDemo")}
-          </button>
+          {mode === "demo" ? (
+            <button type="button" className="btn btn-ghost btn-sm" onClick={resetDemo}>
+              {t("dash.resetDemo")}
+            </button>
+          ) : demoClass === "empty" ? (
+            <button type="button" className="btn btn-ghost btn-sm" onClick={() => setDemoModal("add")}>
+              {t("demo.addButton")}
+            </button>
+          ) : demoClass === "demo-only" ? (
+            <button type="button" className="btn btn-ghost btn-sm" onClick={() => setDemoModal("readd")}>
+              {t("demo.reAddButton")}
+            </button>
+          ) : null}
           <Link href="/assistant" className="btn btn-primary btn-sm">
             <IconBasket /> {t("dash.askAi")}
           </Link>
         </div>
+
+        {demoModal && <DemoDataModal kind={demoModal} onClose={() => setDemoModal(null)} />}
       </div>
     </div>
   );

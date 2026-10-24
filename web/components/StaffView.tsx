@@ -35,6 +35,7 @@ import {
 } from "./ui";
 import { AccountPicker, NegativeBalanceWarning } from "./MoneyAccounts";
 import { SalarySlipSheet } from "./DocPrintSheet";
+import { brandingDataUrls } from "@/lib/branding";
 import { fmtDate, fmtNum, fmtPKR } from "@/lib/format";
 import type { I18nKey } from "@/lib/i18n";
 import { employeeMatches } from "@/lib/search";
@@ -1061,7 +1062,7 @@ function SlipPrint({
   line: PayrollRunLine;
   onClose: () => void;
 }) {
-  const { journal, employees, settings } = useStore();
+  const { journal, employees, settings, branding } = useStore();
   const { t } = useLang();
   const figures = runLineFigures(journal, run, line);
   const designation =
@@ -1086,6 +1087,7 @@ function SlipPrint({
         designation={designation}
         figures={figures}
         settings={settings}
+        assets={brandingDataUrls(branding)}
       />
     </>
   );

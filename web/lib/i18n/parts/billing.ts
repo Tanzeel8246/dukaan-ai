@@ -155,6 +155,9 @@ export const enBilling = {
   "billing.wa.total": "TOTAL: {amount}",
   "billing.wa.payment": "Payment: {payments}",
   "billing.wa.thanks": "Thank you for shopping with us!",
+  /* Phase E · E3 (§1.9/§3.5): one text line when Raast is set
+   * up — a customer who cannot scan can still transfer. */
+  "billing.wa.raastLine": "Pay via Raast — IBAN {iban}",
   "billing.tax.lineAmount": "+ Tax {amount}",
   "billing.tax.lineAmountIncl": "Tax incl. {amount}",
   "billing.tax.includedNote": "included in prices",
@@ -318,6 +321,7 @@ export const urBilling: Record<keyof typeof enBilling, string> = {
   "billing.wa.total": "کل: {amount}",
   "billing.wa.payment": "ادائیگی: {payments}",
   "billing.wa.thanks": "ہم سے خریداری کرنے کا شکریہ!",
+  "billing.wa.raastLine": "راست سے ادائیگی — IBAN {iban}",
   "billing.tax.lineAmount": "+ ٹیکس {amount}",
   "billing.tax.lineAmountIncl": "شامل ٹیکس {amount}",
   "billing.tax.includedNote": "قیمتوں میں شامل",

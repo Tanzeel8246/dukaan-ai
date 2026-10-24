@@ -1,6 +1,6 @@
 /* Dukaan AI — verification harness (reconstructed for Phase B · B1).
  * Compiles lib/ FRESH (see tsconfig.json) and re-runs the documented
- * suites: FIN 34 · COA 10 · A2 16 · RBAC 115 · A4 56 · A5 51 = 282
+ * suites: FIN 34 · COA 10 · A2 16 · RBAC 116 · A4 56 · A5 51 = 283
  * prior checks, plus the B1 (40), B2 (39) and B3 (37) suites = 398,
  * plus the SEARCH suite (72) = 470 — null-safe search predicates
  * (49 through the B3-era fix + 23 for the deferred SuppliersManager
@@ -138,6 +138,229 @@
  * invariants (still 24 makeEntry calls in the store — D2's
  * entries compose in lib/payroll) and the additive-only rules
  * proof (strip the D2 block → the D1-state file's SHA).
+ * (The D2 i18n pin was later amended 2,212 → 2,214 by the
+ * shell/theme polish landing — same-check amendment, recorded
+ * in PRODUCTION.md.)
+ * The D3 suite covers ERP Phase D · D3 — the loans register
+ * (design §3): composition refusals (charged receivable lending
+ * refused, never zeroed), the schedule derivation (100,000 over
+ * 7 at flat 10% splits to the paisa, final-absorb; reducing on
+ * the schedule's outstanding), drawdown shapes (gross + the
+ * fee-netted variant), charge accrual ONLY as a composed event
+ * (a drawn loan's journal carries no charge until the desk
+ * composes one; a charge-free loan's journal is principal-only),
+ * the full lifecycle with GL `loans_payable` ≡ the diary's
+ * derived outstanding after EVERY step and trial balance 0,
+ * partial repayments with charges-first + desk-overridden
+ * splits, overdue derivation off the derived schedule, reversal
+ * cleanliness (mirrors restore positions exactly), the
+ * receivable mirror on `loans_receivable` with the customer
+ * khata provably untouched (the §3.1 isolation), overpayment
+ * refused pre-composition, period-lock refusal for backdated
+ * loan entries, the loans RBAC row as pre-declared, the demo
+ * sample loan (charge-free, no events, outstanding == principal,
+ * frozen seed identities re-asserted), D3 i18n parity (+119
+ * keys; the C2 + D2 total pins amended 2,214 → 2,333), source
+ * invariants (still 24 makeEntry calls in the store — D3's
+ * templates compose in lib/loans) and the additive-only rules
+ * proof (strip the D3 block → the D2-state file's SHA).
+ * The D4 suite covers ERP Phase D · D4 — the fiscal-year close
+ * (design §4): the registry-driven P&L closing set, the derived
+ * pre-close checklist (trial-balance zero and purchases-clearing
+ * zero as HARD gates — an unbalanced fixture and a stranded
+ * clearing balance each block; draft-run and production-pool
+ * warnings derive), the closing entry's shape (one entry, dated
+ * the FY's last day, every P&L account zeroed, the exact net in
+ * retained earnings — profit and loss years both), the §4.6
+ * three-way identity (pre-close P&L == post-close P&L with the
+ * fy_close exclusion == the closing entry's own summary), the
+ * trial balance showing the zeroed truth after close, the new
+ * FY starting clean, double-close state detection, reopen by
+ * mirror (balances restored to the paisa) with stack discipline
+ * (a later closed year blocks; unwinding it unblocks), period-
+ * lock interplay through the real preparePosting (a close dated
+ * into a locked period refuses; a posting dated into the closed
+ * year refuses after it), the zero-movement year (no entry, doc-
+ * cited close state), D4 i18n parity (+55 fin.fy keys; the
+ * earlier total pins amended 2,339 → 2,394), source invariants
+ * (still 24 makeEntry calls in the store — D4's entries compose
+ * in lib/fiscal) and the rules claim verified: §4 needs NO rules
+ * change, so the rules file must be BYTE-IDENTICAL to the
+ * D3-state file (its SHA is pinned).
+ * The D5 suite covers ERP Phase D · D5 — the Tally export +
+ * journal CSV (design §5): the fixed COA → Tally group mapping
+ * (every registry code mapped; names overridable via
+ * tallyLedgerNames, groups never), the full §5.3 refType →
+ * voucher-type table (all 33 refTypes, the two loan refTypes in
+ * both directions), per-party ledgers (customer/supplier/
+ * employee refs land on party ledgers under the mapped groups;
+ * unref'd lines on the control ledgers), opening balances
+ * derived in-file for a mid-journal range (Σ == the pre-range
+ * trial balance's closing truth), one voucher per entry with
+ * per-voucher Dr == Cr and the aggregate == the period trial
+ * balance, the XML's well-formedness + escaping + Tally sign
+ * convention, the CSV's row count == the period's journal-line
+ * count with comma/quote/Urdu memos round-tripping, the fy_close
+ * voucher number (the FY label), the seed journal exporting
+ * whole (21 vouchers, balanced, frozen identities untouched),
+ * D5 i18n parity (+12 fin.export keys; the earlier total pins
+ * amended 2,394 → 2,406), source invariants (the exporter is
+ * pure — no store-write calls in lib/tally; still 24 makeEntry
+ * calls in the store) and the rules file byte-identical (no D5
+ * rules change, the D4 SHA pin re-asserted).
+ * The E1 suite covers ERP Phase E · E1 — the print-design
+ * foundation + invoice designer (design §1): the resolver's
+ * default snapshot deep-pinned (an absent design IS today's
+ * rendering, field for field) + the per-field toggle sweep +
+ * full pass-through, the paper → @page mapping asserted
+ * verbatim, the receipt class composition incl. the desk's
+ * thermal override, the §1.5 slot matrix enforced structurally
+ * (a challan with EVERY toggle on still gains no price-bearing
+ * column; its signature slot is the customer's, never the
+ * shop's), the column sources (SKU/Urdu name resolved live by
+ * productId; per-line tax read from A4's snapshotted taxAmount;
+ * per-line discount the display-only allocateProRata derivation,
+ * summing to the document discount to the paisa), the §2.4
+ * stamp rule (paid-only assertion, held never, thermal
+ * suppressed, per-doc toggles), the header slots (letterhead
+ * replacement + thermal suppression; the logo as thermal's one
+ * kept image), the sample fixtures' closing arithmetic, E1
+ * i18n parity (+53 print keys; the earlier total pins amended
+ * 2,406 → 2,459), source invariants (lib/print is pure — no
+ * posting or store-write call; the chrome extraction wired into
+ * every sheet; the billing desk renders BillPrintSheet; still
+ * 24 makeEntry calls; demo storage still v16) and the rules
+ * claim verified: E1 needs NO rules change — print settings
+ * ride the owner settings doc — so the file is byte-identical
+ * (the D4 SHA pin re-asserted). Phase E posts NOTHING: the
+ * frozen seed identities + the seed journal SHA close the suite.
+ *
+ * The E2 suite (Phase E · E2 — brand assets, design §2) pins
+ * lib/branding, the pure half of the upload pipeline: the spec
+ * table (six kinds, the HARD CAPS 150/150/150/300/300/200 KB,
+ * total 1,250,000), data-URL measuring, fit-within-box
+ * (never upscale), the format rule (alpha → WebP, banners →
+ * JPEG), the compression ladder (quality −0.1, then the box
+ * ×0.75, up to three times) and its runner — fits at rung 0,
+ * fits only at rung 2, and the honest REFUSAL with the actual
+ * figures when no rung fits, plus a property sweep proving no
+ * run ever stores a payload over its cap. buildBrandingAsset
+ * is the boundary guard (at-cap accepted, one quad over
+ * refused, bad mime / zero dims / corrupt payload refused).
+ * The slot-consumption matrix feeds REAL assets (through
+ * brandingDataUrls, the production seam) into E1's visibility
+ * rules: the stamp on a paid bill only, thermal suppression
+ * of stamp + letterhead with the logo kept, signature slot
+ * discipline. E2 i18n parity (+37 print.brand keys; the six
+ * earlier total pins amended 2,459 → 2,496), source invariants
+ * (lib/branding is pure; the store wires the collection with
+ * owner-gated setters; still 24 makeEntry calls; demo storage
+ * v16 → v17; the seed ships no assets), and the rules claim:
+ * ONE additive `branding` block (read canAccess, write
+ * owner-only) — strip-proven byte-identical against the
+ * pre-E2 SHA, which is also how the D4/D5/E1 pins above were
+ * amended (same-check, strip first). The frozen seed
+ * identities close the suite: branding is documents, not
+ * journal data.
+ *
+ * The E3 suite (Phase E · E3 — Raast QR, design §3) pins
+ * lib/raast, the pure payload module, and lib/qr, the encoder
+ * seam: full ISO 13616 IBAN validation (the published PK
+ * example plus six composed bank fixtures validate; EVERY
+ * single-character corruption is refused — mod-97 detects
+ * them all; a Raast alias is refused with its own code,
+ * because the P2P template has no alias object to hold one),
+ * CRC-16/CCITT known answers (the canonical 29B1 for
+ * "123456789", cross-checked against an independent
+ * table-driven implementation), builder/parser round-trips
+ * object-by-object under BOTH framings, the framing seam
+ * itself (RAAST_FRAMING: bare, PROVISIONAL, unpinned — the
+ * owner's bank QR has not yet been captured, and the suite
+ * asserts the shipped state says exactly that, never
+ * "verified"), the reference encoder's 37×37 matrix for a
+ * fixed payload as a regression anchor, and
+ * resolveRaastBlock (the bank image wins, the generated code
+ * is the fallback, a dynamic bill QR carries the bill total
+ * + "Bill #n", quotations/orders/the poster NEVER carry an
+ * amount, thermal caps the size). Source invariants: neither
+ * Raast module touches a posting path; the rules file is
+ * byte-identical to the pre-E3 file (E3 adds no rules); the
+ * seed ships no IBAN. The dictionary pin grows 2,496 →
+ * 2,531 (+35 Raast keys), amended at the seven earlier
+ * sites in the house style. The frozen seed identities
+ * close the suite: Phase E posts nothing, and a QR is a
+ * rendering of a settings string, never an entry.
+ * The E4 suite (Phase E · E4 — PIN lock, design §4) pins
+ * lib/pinlock, the device-local lock core: PBKDF2-HMAC-SHA256
+ * known-answer vectors (RFC 7914 §11) through the app's own
+ * derivePinBits via Node's WebCrypto — the injectable subtle
+ * seam means the harness runs the production code path; the
+ * §4.2 record shape (v 1, 150k iterations, 16-byte salt,
+ * 32-byte hash, chosen digit length); verify accepting the
+ * set PIN and rejecting wrong digit / wrong length / empty;
+ * salt uniqueness; tampered hash/salt/iterations never
+ * verifying; the constant-time compare; storage round-trips
+ * through a fake storage proving the stored record holds NO
+ * substring of the PIN and the module touches ONLY its own
+ * dukaan-ai-pinlock* keys (the zero-Firestore seam — recovery
+ * is Auth reauthentication, asserted in PinGate's source);
+ * the friction schedule at its points (free < 5, 30s at 5,
+ * 2m per further 5, 5m cap) and success clearing it; and the
+ * idle/lock reducer (launch-with-record locked, activity
+ * resets the epoch, the deadline-while-hidden locks on the
+ * return check, activity while locked changes nothing).
+ * Source invariants: AppShell mounts PinGate + the header
+ * lock button; Settings mounts the Device lock card, which
+ * holds no store/backend seam; 49 pin.* keys EN ≡ UR with
+ * the §4.7 honesty copy present in both languages. The
+ * dictionary pin grows 2,531 → 2,580, amended at the eight
+ * earlier sites in the house style. (F5 amendment: the pin
+ * grows once more, 2,580 → 2,581, for the sync.online key —
+ * amended at every pin site in the same style.)
+ * The E5 suite (Phase E · E5 — sensitive-action gating,
+ * design §4.6) pins the gate seam: the precondition truth
+ * table (no record ⇒ never required; pref OFF ⇒ not
+ * required; record + ON ⇒ required), the composition matrix
+ * (writes composed exactly in the allow cases — required ×
+ * {fail, cancel} composes ZERO), the four call sites
+ * (BillingDesk void, DayClose submit, PeriodsPanel
+ * close/reopen, FiscalClosePanel close/reopen) each
+ * awaiting requirePin BEFORE their store call, the payroll
+ * and loans desks deliberately ungated, the store knowing
+ * nothing of the gate, and requirePin's immediate-true path
+ * for ungated flows. Both suites close on the frozen seed
+ * identities + the rules SHA: the PIN is device state and
+ * a screen gate, never an accounting event.
+ * The G4 suite (Phase G · G4 — the renewal flow + the trial
+ * lifecycle, design §3.4–§3.6/§8-G4) pins lib/renewal (the
+ * quote arithmetic, the submission plan, the lifecycle
+ * banner derivation, the suspension-reason read), the
+ * console's config act + amount check in lib/platform, and
+ * walks the full scripted lifecycle (trial → grace → submit
+ * → confirm → active → grace → readonly → renew → active)
+ * with the shop journal's SHA spot-asserted unchanged at
+ * every step. The dictionary pin grows 2,714 → 2,761 (+47:
+ * 35 renew.* + 12 platform.*), amended at every pin site in
+ * the house style; the plan.* count stays 36.
+ * The FR1 suite (Fix Round 1 — the owner's live test of
+ * 2026-10-24) pins the five findings' regressions: F1 the cloud
+ * settings parse (lib/settings `settingsFromOwnerDoc`) carrying
+ * a legacy doc's loyalty/Raast/storefront/WhatsApp blocks
+ * through to the resolver; F4 receivables aging + the WhatsApp
+ * udhaar position rebuilt on the shared credit-lot allocation
+ * (the live 300/100/150 scenario ages to 5,550, not 5,700), the
+ * payables mirror regression-pinned as already-correct; F3 the
+ * derived dayOffset (`dayOffsetForTs`) scoping the day close to
+ * the business day — counter ≡ journal by construction, closes
+ * matched by dateISO; F2 the Balance Sheet balancing on the
+ * seed, a trading walk, a mid-clearing state and across an FY
+ * close; F5 the opening-stock gap + entry (Dr stock / Cr
+ * capital, class-split, NO rules amendment — the refType rides
+ * the tier maps' Core default). The dictionary pin grows
+ * 3,063 → 3,077 (+14: 1 dc.backlog + 9 rep.bs.* + 4
+ * fin.fy.openStock.*), amended at every pin site in the house
+ * style; the D4 fin.fy count grows 55 → 59 and its fiscalClose
+ * gate count 2 → 3 (postOpeningStock joins the row).
  * Store-level templates that
  * cannot execute headless are replicated line-faithfully from source
  * and composed through the REAL makeEntry guard (which throws on
@@ -146,6 +369,16 @@
 const fs = require("fs");
 const crypto = require("crypto");
 const assert = require("assert");
+
+/* Phase E · E3: lib/qr wraps the `qrcode-generator` package,
+ * which is installed in the web app's node_modules — outside
+ * this harness's own tree. Put that directory on the module
+ * path before any compiled lib module is required. */
+process.env.NODE_PATH = [
+  "/home/hatch/workspace/ai-dukaan-ai/web/node_modules",
+  process.env.NODE_PATH || "",
+].join(":");
+require("module").Module._initPaths();
 
 const ledger = require("./out/ledger.js");
 const seed = require("./out/seed.js");
@@ -164,7 +397,453 @@ const boms = require("./out/boms.js");
 const production = require("./out/production.js");
 const jobs = require("./out/jobs.js");
 const payroll = require("./out/payroll.js");
+const loans = require("./out/loans.js");
+const fiscal = require("./out/fiscal.js");
+const tally = require("./out/tally.js");
+const print = require("./out/print.js");
+const branding = require("./out/branding.js");
+const raast = require("./out/raast.js");
+const tenancy = require("./out/tenancy.js");
+const plans = require("./out/plans.js");
+const platform = require("./out/platform.js");
+const renewal = require("./out/renewal.js");
+const backup = require("./out/backup.js");
+const loyalty = require("./out/loyalty.js");
+const storefront = require("./out/storefront.js");
+const whatsapp = require("./out/whatsapp.js");
+const settingsLib = require("./out/settings.js");
+const demoLib = require("./out/demo.js");
+const trashLib = require("./out/trash.js");
+const qrLib = require("./out/qr.js");
+const pinlock = require("./out/pinlock.js");
+const csvLib = require("./out/csv.js");
 const i18n = require("./out/i18n/index.js");
+
+/* Phase E · E2 same-check amendment helper: remove the additive
+ * `branding` match block (E2's ONLY rules change) so the D4/D5/E1
+ * byte-identity pins below keep asserting exactly what they
+ * asserted when written — that nothing ELSE in the file moved.
+ * The E2 suite asserts the strip itself reproduces the pinned
+ * pre-E2 SHA, so the amendment cannot hide drift. */
+function stripE2BrandingBlock(src) {
+  const start = src.indexOf("      // Phase E · E2 — brand assets");
+  if (start < 0) return src;
+  const end = src.indexOf("      // Expenses:", start);
+  // A phase segment that ENDS at the Expenses marker (the C/D
+  // suites' slices) carries no end marker inside itself — there
+  // the block runs to the segment's end.
+  return end < 0 ? src.slice(0, start) : src.slice(0, start) + src.slice(end);
+}
+
+/* Phase G · G1 same-check amendment helper: remove the four
+ * delimited G1 spans (the v9 header note, amendment #1, the G1
+ * helpers, the platform collections) so whole-file and segment
+ * pins keep asserting exactly what they asserted at v8. The
+ * amendment span is replaced by the EXACT v8 access text below
+ * (canAccess + the v3 comment + staffRole as shipped in v8), so
+ * stripping v9 reproduces v8 byte-for-byte — the G1 suite asserts
+ * the stripped whole-file SHA-256 equals the v8 SHA, so the spans
+ * cannot hide drift. A cut consumes the END marker plus exactly
+ * one trailing newline (the spans abut their neighbours with no
+ * blank line of their own). */
+const V8_ACCESS_SPAN = [
+  "    function canAccess(uid) {",
+  "      return isOwner(uid) || isStaffOf(uid);",
+  "    }",
+  "",
+  "    // v3: the caller's role within shop {uid} — \"owner\", the role",
+  "    // stored on their staffIndex doc, or null when they have no",
+  "    // access to this shop at all. A staffIndex doc WITHOUT a role",
+  "    // field yields \"manager\" (the legacy default; .get with default",
+  "    // also covers an explicit null).",
+  "    function staffRole(uid) {",
+  "      return isOwner(uid)",
+  "        ? \"owner\"",
+  "        : (isStaffOf(uid)",
+  "            ? get(staffIndexPath(request.auth.token.email)).data",
+  "                .get('role', 'manager')",
+  "            : null);",
+  "    }",
+].join("\n");
+function cutSpan(s, startMarker, endMarker, replacement) {
+  const a = s.indexOf(startMarker);
+  if (a < 0) return s;
+  const b = s.indexOf(endMarker, a);
+  if (b < 0) return s;
+  return s.slice(0, a) + (replacement || "") + s.slice(b + endMarker.length + 1);
+}
+function stripG1Blocks(src) {
+  let out = stripG3Blocks(stripH3Blocks(stripWaBlocks(stripFR2Blocks(src))));
+  out = cutSpan(
+    out,
+    "// ---- Phase G · G1: rules v9 header note (START) ----",
+    "// ---- Phase G · G1: rules v9 header note (END) ----",
+    ""
+  );
+  out = cutSpan(
+    out,
+    "    // ---- Phase G · G1 amendment #1 (START)",
+    "    // ---- Phase G · G1 amendment #1 (END) ----",
+    V8_ACCESS_SPAN + "\n"
+  );
+  out = cutSpan(
+    out,
+    "    // ---- Phase G · G1 helpers (START) ----",
+    "    // ---- Phase G · G1 helpers (END) ----",
+    ""
+  );
+  out = cutSpan(
+    out,
+    "    // ---- Phase G · G1: platform collections (START) ----",
+    "    // ---- Phase G · G1: platform collections (END) ----",
+    ""
+  );
+  return out;
+}
+
+
+/* Phase G · G2 same-check amendment helper: remove the delimited
+ * G2 spans (the v9 part 2 header note, the G2 helpers, the
+ * completed §4.3 birth window inside businessBirthOk, the
+ * amendment-#2 posting legs, the tier-split creates, and the
+ * three amended platform blocks) so the whole-file and segment
+ * pins keep asserting exactly what they asserted at v9 part 1.
+ * Amendment spans are replaced by the EXACT part-1 text below,
+ * so stripG2Blocks(v9 final) is part 1 byte-for-byte — the G2
+ * suite asserts both that SHA and, composed with stripG1Blocks,
+ * the v8 SHA. Strip order matters: G2 first (its spans nest
+ * inside G1's), then G1. */
+const G2_BIRTH_ORIG = "    // Creation-time shape for a businesses doc (\u00a74.3, G1 part):\n    // the doc's own owner, born active with enforcement off, and\n    // a plan snapshot equal to one of the two legitimate birth\n    // shapes \u2014 trial (a new business: the trial tier's limits, a\n    // future trial end, no paid period) or founding (the \u00a77.2\n    // migration of a shop whose namespace ALREADY exists:\n    // Advanced limits, no expiry of any kind). Anything else \u2014\n    // a self-granted paid tier, a live enforce flag, somebody\n    // else's business \u2014 fails validation. The trial-window\n    // tightness (\u00b1 a day around +14d) completes with G2's\n    // amendment #2, which is also when enforcement starts\n    // reading the snapshot at all.\n    function businessBirthOk(businessId) {\n      let d = request.resource.data;\n      let p = d.get('plan', {});\n      return d.get('ownerUid', '') == businessId\n        && d.get('status', '') == 'active'\n        && d.get('enforce', true) == false\n        && p.get('assignedBy', '') in ['signup', 'migration']\n        && (\n          (p.get('planId', '') == 'trial'\n            && p.get('usersLimit', 0) == 2\n            && p.get('invoiceLimit', 0) == 200\n            && p.get('modulesTier', '') == 'standard'\n            && p.get('trialEndsAt', null) is timestamp\n            && p.get('trialEndsAt', request.time) > request.time\n            && p.get('periodTo', null) == null)\n          || (p.get('planId', '') == 'founding'\n            && p.get('usersLimit', 0) == 10\n            && p.get('invoiceLimit', 0) == 10000\n            && p.get('modulesTier', '') == 'advanced'\n            && p.get('periodTo', null) == null\n            && p.get('trialEndsAt', null) == null\n            && exists(/databases/$(database)/documents/users/$(businessId)))\n        );\n    }";
+const G2_COUNTERS_ORIG = "    match /businessCounters/{businessId} {\n      allow read: if isOwner(businessId) || isPlatformAdmin();\n      allow create: if isOwner(businessId)\n        && request.resource.data.get('invoiceCount', -1) >= 0\n        && request.resource.data.get('memberCount', -1) >= 0;\n      allow update, delete: if false;\n    }";
+const G2_INVITES_ORIG = "    match /businessInvites/{businessId} {\n      match /invites/{inviteId} {\n        allow read: if isOwner(businessId)\n          || (isSignedIn() && resource.data.get('email', '') == request.auth.token.email)\n          || isPlatformAdmin();\n        allow create: if isOwner(businessId)\n          && request.resource.data.get('email', '') == inviteId\n          && request.resource.data.get('status', '') == 'pending';\n        allow update: if isOwner(businessId)\n          || (isSignedIn()\n              && resource.data.get('email', '') == request.auth.token.email\n              && request.resource.data.diff(resource.data).affectedKeys()\n                   .hasOnly(['status', 'claimedBy', 'claimedAt'])\n              && request.resource.data.get('status', '') == 'claimed'\n              && request.resource.data.get('claimedBy', '') == request.auth.uid);\n        allow delete: if isOwner(businessId);\n      }\n    }";
+const G2_MEMBERS_ORIG = "    match /businessMembers/{businessId} {\n      match /members/{memberUid} {\n        allow read: if isOwner(businessId)\n          || request.auth.uid == memberUid\n          || isPlatformAdmin();\n        allow create: if isOwner(businessId)\n          || (isSignedIn()\n              && request.auth.uid == memberUid\n              && request.resource.data.get('email', '') == request.auth.token.email\n              && selfClaimOk(businessId));\n        allow update: if isOwner(businessId);\n        allow delete: if isOwner(businessId) || request.auth.uid == memberUid;\n      }\n    }";
+const G2_LEG_ORIG = {
+  "purchases": "        allow create: if hasRole(uid, ['owner', 'manager']) && createInOpenPeriod(uid);",
+  "supplierPayments": "        allow create: if hasRole(uid, ['owner', 'manager', 'accountant']) && createInOpenPeriod(uid);",
+  "credits": "        allow create: if canAccess(uid) && createInOpenPeriod(uid);",
+  "returns": "        allow create: if hasRole(uid, ['owner', 'manager', 'cashier']) && createInOpenPeriod(uid);",
+  "notes": "        allow create: if hasRole(uid, ['owner', 'manager', 'accountant']) && createInOpenPeriod(uid);",
+  "purchaseReturns": "        allow create: if hasRole(uid, ['owner', 'manager', 'accountant']) && createInOpenPeriod(uid);",
+  "cheques": "        allow create: if canAccess(uid) && createInOpenPeriod(uid);",
+  "cashEntries": "        allow create: if hasRole(uid, ['owner', 'manager', 'accountant']) && createInOpenPeriod(uid);",
+  "expenses": "        allow create: if hasRole(uid, ['owner', 'manager', 'accountant']) && createInOpenPeriod(uid);",
+  "bills": "        allow create: if hasRole(uid, ['owner', 'manager', 'cashier']) && createInOpenPeriod(uid);\n        allow update: if hasRole(uid, ['owner', 'manager', 'cashier']);",
+  "sales": "        allow create: if hasRole(uid, ['owner', 'manager', 'cashier']) && createInOpenPeriod(uid);",
+  "payrollRuns": "        allow create: if hasRole(uid, ['owner', 'accountant']) && createInOpenPeriod(uid);",
+  "loans": "        allow create: if hasRole(uid, ['owner', 'accountant']) && createInOpenPeriod(uid);",
+  "journal": "        allow create: if canAccess(uid) && journalCreateInOpenPeriod(uid);",
+  "boms": "        allow create, update, delete: if hasRole(uid, ['owner', 'manager']);",
+  "productionOrders": "        allow create, update, delete: if hasRole(uid, ['owner', 'manager']);",
+  "jobs": "        allow create, update, delete: if hasRole(uid, ['owner', 'manager']);",
+  "employees": "        allow create, update, delete: if hasRole(uid, ['owner', 'manager']);"
+};
+function stripG2Blocks(src) {
+  let out = stripG3Blocks(stripH3Blocks(stripWaBlocks(stripFR2Blocks(src))));
+  out = cutSpan(out,
+    "// ---- Phase G · G2: rules v9 part 2 header note (START) ----",
+    "// ---- Phase G · G2: rules v9 part 2 header note (END) ----", "");
+  out = cutSpan(out,
+    "    // ---- Phase G · G2 helpers (START) ----",
+    "    // ---- Phase G · G2 helpers (END) ----", "");
+  out = cutSpan(out,
+    "    // ---- Phase G · G2 amendment #2 (birth window) (START) ----",
+    "    // ---- Phase G · G2 amendment #2 (birth window) (END) ----",
+    G2_BIRTH_ORIG + "\n");
+  for (const name of Object.keys(G2_LEG_ORIG)) {
+    out = cutSpan(out,
+      "        // ---- Phase G · G2 amendment #2 (" + name + ") (START) ----",
+      "        // ---- Phase G · G2 amendment #2 (" + name + ") (END) ----",
+      G2_LEG_ORIG[name] + "\n");
+  }
+  out = cutSpan(out,
+    "    // ---- Phase G · G2 amendment (counters) (START) ----",
+    "    // ---- Phase G · G2 amendment (counters) (END) ----",
+    G2_COUNTERS_ORIG + "\n");
+  out = cutSpan(out,
+    "    // ---- Phase G · G2 amendment (invites) (START) ----",
+    "    // ---- Phase G · G2 amendment (invites) (END) ----",
+    G2_INVITES_ORIG + "\n");
+  out = cutSpan(out,
+    "    // ---- Phase G · G2 amendment (members) (START) ----",
+    "    // ---- Phase G · G2 amendment (members) (END) ----",
+    G2_MEMBERS_ORIG + "\n");
+  return out;
+}
+
+/* Phase G · G3 same-check amendment helper: remove the ONE
+ * delimited G3 span (the §6.1 platform collections II —
+ * businessStats, platformPayments, platformConfig) so every
+ * whole-file and segment pin keeps asserting exactly what it
+ * asserted at pre-G3 v9. Both G strip functions above apply it
+ * FIRST (function declarations hoist, so its definition may sit
+ * here): the span is a pure addition sitting after the G1
+ * platform span, so cutting it is a no-op on any earlier file
+ * state and cannot hide drift — the G3 suite asserts
+ * stripG3Blocks(v9+G3) hashes to the pinned pre-G3 v9 SHA, and
+ * the composed strips still land on the v9pt1 and v8 SHAs. */
+function stripG3Blocks(src) {
+  return cutSpan(
+    src,
+    "    // ---- Phase G · G3: platform collections II (START) ----",
+    "    // ---- Phase G · G3: platform collections II (END) ----",
+    ""
+  );
+}
+
+/* Phase H · H3 same-check amendment helper: remove the FOUR
+ * delimited H3 spans (the v10 header note, the design §5.2 named
+ * amendment #1 inside planJournalTierOk — restored to the exact
+ * v9 text below — the H3 helpers, and the storefront blocks) so
+ * every whole-file and segment pin keeps asserting exactly what
+ * it asserted at v9. Both G strip functions apply it FIRST (the
+ * G3 precedent — its spans sit outside theirs): stripH3Blocks
+ * (v10) is v9 byte-for-byte, which the H3 suite proves against
+ * the pinned v9 SHA, and the composed strips still land on the
+ * v9 part-1 and v8 SHAs in the G suites. Amendment #2 of §5.2
+ * needed no text: the journal leg is refType-blind, so the H1
+ * loyalty postings already passed journalCreateInOpenPeriod. */
+const H3_LEG_ORIG =
+  "          : (rt in ['job_material', 'job_material_return',\n" +
+  "                    'transfer_loss', 'purchase_return', 'cheque_clearing',\n" +
+  "                    'cheque_bounce', 'cheque_return']";
+function stripH3Blocks(src) {
+  let out = cutSpan(
+    src,
+    "// ---- Phase H · H3: rules v10 header note (START) ----",
+    "// ---- Phase H · H3: rules v10 header note (END) ----",
+    ""
+  );
+  out = cutSpan(
+    out,
+    "          // ---- Phase H · H3 amendment (journal tier list) (START) ----",
+    "          // ---- Phase H · H3 amendment (journal tier list) (END) ----",
+    H3_LEG_ORIG + "\n"
+  );
+  out = cutSpan(
+    out,
+    "    // ---- Phase H · H3 helpers (START) ----",
+    "    // ---- Phase H · H3 helpers (END) ----",
+    ""
+  );
+  out = cutSpan(
+    out,
+    "    // ---- Phase H · H3: storefront blocks (START) ----",
+    "    // ---- Phase H · H3: storefront blocks (END) ----",
+    ""
+  );
+  return out;
+}
+
+/* Phase H · WhatsApp same-check amendment helper: remove the
+ * TWO delimited WhatsApp spans (the v10 header-note amendment
+ * and the wa collections block inside users/{uid}) so every
+ * whole-file and segment pin keeps asserting exactly what it
+ * asserted at the H3-final v10. Both G strip functions apply it
+ * FIRST (the G3/H3 precedent — its spans sit outside theirs):
+ * stripWaBlocks(amended v10) is the H3-final v10 byte-for-byte,
+ * which the WA suite proves against the pinned H3 SHA, and the
+ * composed strips still land on the v9 FINAL SHA. */
+function stripWaBlocks(src) {
+  // H6 amendment: the H6 strip runs first (the newest-first
+  // funnel — every composed strip in the file passes through
+  // this helper, so the H6 spans leave with the WA spans).
+  let out = cutSpan(
+    stripH6Blocks(src),
+    "// ---- Phase H · WhatsApp: rules v10 header note (START) ----",
+    "// ---- Phase H · WhatsApp: rules v10 header note (END) ----",
+    ""
+  );
+  out = cutSpan(
+    out,
+    "      // ---- Phase H · WhatsApp: wa collections (START) ----",
+    "      // ---- Phase H · WhatsApp: wa collections (END) ----",
+    ""
+  );
+  return out;
+}
+
+/* Phase H · H6 same-check amendment helper: remove the TWO
+ * delimited H6 spans (the v10 amendment note at the top of the
+ * file and the order-consent amendment inside storeOrderCreateOk,
+ * restoring the function's original key-set head) so the WA
+ * suite's strip proof keeps asserting the H3-final v10
+ * byte-for-byte. The amendment span nests inside the H3 helpers
+ * span, so every composed strip through stripH3Blocks already
+ * removes it wholesale — the v9 FINAL proof is untouched. */
+const H6_ORDER_ORIG = "      return keys.hasOnly(['businessId', 'slug', 'customerName',\n                           'phone', 'lines', 'note', 'fulfilment',\n                           'createdAt', 'state'])\n        && keys.hasAll(['businessId', 'slug', 'customerName',\n                        'phone', 'lines', 'fulfilment', 'createdAt',\n                        'state'])";
+function stripH6Blocks(src) {
+  let out = cutSpan(
+    src,
+    "// ---- Phase H · H6: rules v10 amendment note (START) ----",
+    "// ---- Phase H · H6: rules v10 amendment note (END) ----",
+    ""
+  );
+  out = cutSpan(
+    out,
+    "      // ---- Phase H · H6 amendment (order consent key) (START) ----",
+    "      // ---- Phase H · H6 amendment (order consent key) (END) ----",
+    H6_ORDER_ORIG + "\n"
+  );
+  return out;
+}
+
+/* BizCreateFix · v12 same-check amendment helper: remove the TWO
+ * delimited v12 spans (the v12 header note and the accounts
+ * amendment) so every whole-file and segment pin keeps asserting
+ * exactly what it asserted at v11: stripBizCreateFixBlocks(v12)
+ * is v11 byte-for-byte (proven in the BizCreateFix suite below),
+ * and stripFR2Blocks applies it FIRST (the WA/H6 funnel
+ * precedent — every composed strip in the file passes through
+ * stripFR2Blocks, so the v12 spans leave with the FR2 spans). */
+function stripBizCreateFixBlocks(src) {
+  let out = cutSpan(
+    src,
+    "// ---- BizCreateFix · v12 header note (START) ----",
+    "// ---- BizCreateFix · v12 header note (END) ----",
+    ""
+  );
+  out = cutSpan(
+    out,
+    "        // ---- BizCreateFix · v12 amendment (accounts) (START) ----",
+    "        // ---- BizCreateFix · v12 amendment (accounts) (END) ----",
+    ""
+  );
+  return out;
+}
+
+/* Fix Round 2 · FR2 same-check amendment helper: remove every
+ * delimited FR2 span (the v11 header note, the helpers, the five
+ * one-line amendments restored to their exact v10 text below,
+ * the additive mirror/clear-window legs, and the trash block)
+ * so every whole-file and segment pin keeps asserting exactly
+ * what it asserted at the v10 FINAL file. Strip order: FR2
+ * FIRST — its canAccess/staffRole spans nest inside the G1
+ * amendment span and its birth span nests inside the G2 birth
+ * window, so the G1/G2 strips (which now call this helper
+ * first, the Wa/H3/G3 precedent) restore v10 text inside those
+ * spans before replacing them with v8/part-1 text. The FR2
+ * suite asserts stripFR2Blocks(v11) hashes to the pinned v10
+ * SHA, and the composed strips still land on the v9 FINAL, v9
+ * part-1 and v8 SHAs in the G suites. */
+const FR2_CANACCESS_ORIG = "      return isOwner(uid) || isMemberOf(uid) || isStaffOf(uid);\n";
+const FR2_STAFFROLE_ORIG = "      return isOwner(uid)\n";
+const FR2_BIRTH_ORIG = "      return d.get('ownerUid', '') == businessId\n";
+const FR2_STOREFRONT_WRITE_ORIG = "      return d.get('businessId', '') == request.auth.uid\n";
+const FR2_STOREFRONT_UPDATE_ORIG = "        && resource.data.get('businessId', '') == request.auth.uid\n";
+function stripFR2Blocks(src) {
+  // BizCreateFix same-check amendment: the v12 spans sit outside
+  // the FR2 spans, so strip them FIRST — every composed strip in
+  // the file passes through here (the WA/H6 funnel precedent), so
+  // the v12 spans leave with the FR2 spans and all v11/v10/v9 pins
+  // keep holding.
+  let out = stripBizCreateFixBlocks(src);
+  out = cutSpan(out,
+    "// ---- Fix Round 2 · FR2: rules v11 header note (START) ----",
+    "// ---- Fix Round 2 · FR2: rules v11 header note (END) ----", "");
+  out = cutSpan(out,
+    "    // ---- Fix Round 2 · FR2 helpers (START) ----",
+    "    // ---- Fix Round 2 · FR2 helpers (END) ----", "");
+  out = cutSpan(out,
+    "      // ---- Fix Round 2 · FR2 amendment (canAccess) (START) ----",
+    "      // ---- Fix Round 2 · FR2 amendment (canAccess) (END) ----",
+    FR2_CANACCESS_ORIG);
+  out = cutSpan(out,
+    "      // ---- Fix Round 2 · FR2 amendment (staffRole) (START) ----",
+    "      // ---- Fix Round 2 · FR2 amendment (staffRole) (END) ----",
+    FR2_STAFFROLE_ORIG);
+  out = cutSpan(out,
+    "      // ---- Fix Round 2 · FR2 amendment (birth owner) (START) ----",
+    "      // ---- Fix Round 2 · FR2 amendment (birth owner) (END) ----",
+    FR2_BIRTH_ORIG);
+  out = cutSpan(out,
+    "      // ---- Fix Round 2 · FR2 amendment (owner-doc write) (START) ----",
+    "      // ---- Fix Round 2 · FR2 amendment (owner-doc write) (END) ----", "");
+  out = cutSpan(out,
+    "        // ---- Fix Round 2 · FR2 clear window (sales) (START) ----",
+    "        // ---- Fix Round 2 · FR2 clear window (sales) (END) ----", "");
+  out = cutSpan(out,
+    "        // ---- Fix Round 2 · FR2 clear window (journal) (START) ----",
+    "        // ---- Fix Round 2 · FR2 clear window (journal) (END) ----", "");
+  out = cutSpan(out,
+    "        // ---- Fix Round 2 · FR2 clear window (bills) (START) ----",
+    "        // ---- Fix Round 2 · FR2 clear window (bills) (END) ----", "");
+  out = cutSpan(out,
+    "        // ---- Fix Round 2 · FR2 clear window (waCampaigns) (START) ----",
+    "        // ---- Fix Round 2 · FR2 clear window (waCampaigns) (END) ----", "");
+  out = cutSpan(out,
+    "        // ---- Fix Round 2 · FR2 clear window (waSends) (START) ----",
+    "        // ---- Fix Round 2 · FR2 clear window (waSends) (END) ----", "");
+  out = cutSpan(out,
+    "      // ---- Fix Round 2 · FR2 amendment (businesses) (START) ----",
+    "      // ---- Fix Round 2 · FR2 amendment (businesses) (END) ----", "");
+  out = cutSpan(out,
+    "        // ---- Fix Round 2 · FR2 amendment (members read) (START) ----",
+    "        // ---- Fix Round 2 · FR2 amendment (members read) (END) ----", "");
+  out = cutSpan(out,
+    "        // ---- Fix Round 2 · FR2 amendment (members create) (START) ----",
+    "        // ---- Fix Round 2 · FR2 amendment (members create) (END) ----", "");
+  out = cutSpan(out,
+    "        // ---- Fix Round 2 · FR2 amendment (members delete) (START) ----",
+    "        // ---- Fix Round 2 · FR2 amendment (members delete) (END) ----", "");
+  out = cutSpan(out,
+    "        // ---- Fix Round 2 · FR2 amendment (invites read) (START) ----",
+    "        // ---- Fix Round 2 · FR2 amendment (invites read) (END) ----", "");
+  out = cutSpan(out,
+    "        // ---- Fix Round 2 · FR2 amendment (invites create) (START) ----",
+    "        // ---- Fix Round 2 · FR2 amendment (invites create) (END) ----", "");
+  out = cutSpan(out,
+    "        // ---- Fix Round 2 · FR2 amendment (invites update) (START) ----",
+    "        // ---- Fix Round 2 · FR2 amendment (invites update) (END) ----", "");
+  out = cutSpan(out,
+    "        // ---- Fix Round 2 · FR2 amendment (invites delete) (START) ----",
+    "        // ---- Fix Round 2 · FR2 amendment (invites delete) (END) ----", "");
+  out = cutSpan(out,
+    "      // ---- Fix Round 2 · FR2 amendment (counters) (START) ----",
+    "      // ---- Fix Round 2 · FR2 amendment (counters) (END) ----", "");
+  out = cutSpan(out,
+    "      // ---- Fix Round 2 · FR2 amendment (stats) (START) ----",
+    "      // ---- Fix Round 2 · FR2 amendment (stats) (END) ----", "");
+  out = cutSpan(out,
+    "      // ---- Fix Round 2 · FR2 amendment (events) (START) ----",
+    "      // ---- Fix Round 2 · FR2 amendment (events) (END) ----", "");
+  out = cutSpan(out,
+    "      // ---- Fix Round 2 · FR2 amendment (storefront owner) (START) ----",
+    "      // ---- Fix Round 2 · FR2 amendment (storefront owner) (END) ----",
+    FR2_STOREFRONT_WRITE_ORIG);
+  out = cutSpan(out,
+    "        // ---- Fix Round 2 · FR2 amendment (storefront update) (START) ----",
+    "        // ---- Fix Round 2 · FR2 amendment (storefront update) (END) ----",
+    FR2_STOREFRONT_UPDATE_ORIG);
+  out = cutSpan(out,
+    "    // ---- Fix Round 2 · FR2: trash blocks (START) ----",
+    "    // ---- Fix Round 2 · FR2: trash blocks (END) ----", "");
+  /* FR2 owner-leg widenings (no span — one-line replacements, so
+   * the strip restores the v10 originals by replacement. Lenient
+   * by design, like cutSpan itself: old checks strip SLICED
+   * inputs (the C1 check cuts the warehouses/stockLevels region;
+   * D2/D3 cut their blocks), and stripG1(stripG2(...)) strips
+   * FR2 twice — a counted throw would fail those legitimate
+   * calls. The STRICT proof is the FR2 suite's own check:
+   * stripFR2Blocks (which first strips the v12 spans, per the
+   * BizCreateFix amendment above) hashes to the v10 SHA byte-for-byte. */
+  const restoreAll = (text, oldLine, newLine) => text.split(oldLine).join(newLine);
+  out = restoreAll(out,
+    "        allow update, delete: if isBusinessOwner(uid);",
+    "        allow update, delete: if isOwner(uid);");
+  out = restoreAll(out,
+    "        allow delete: if isBusinessOwner(uid);",
+    "        allow delete: if isOwner(uid);");
+  out = restoreAll(out,
+    "        allow create, update, delete: if isBusinessOwner(uid);",
+    "        allow create, update, delete: if isOwner(uid);");
+  out = restoreAll(out,
+    "      match /taxSlabs/{slabId} {\n        allow read: if canAccess(uid);\n        allow write: if isBusinessOwner(uid);",
+    "      match /taxSlabs/{slabId} {\n        allow read: if canAccess(uid);\n        allow write: if isOwner(uid);");
+  out = restoreAll(out,
+    "      match /periods/{periodId} {\n        allow read: if canAccess(uid);\n        allow write: if isBusinessOwner(uid);",
+    "      match /periods/{periodId} {\n        allow read: if canAccess(uid);\n        allow write: if isOwner(uid);");
+  return out;
+}
 
 /* ------------------------------- framework ------------------------------- */
 let cur = null;
@@ -366,7 +1045,7 @@ suite("COA", 10);
   /* Phase D · D1 amended this literal (same check): the registry
    * gained its ONE Phase D code additively — `loans_receivable`
    * (design §3.1) — 27 → 28. The v1/A counts below are untouched. */
-  check(coa.ACCOUNT_CODES.length === 28, "registry holds 28 codes");
+  check(coa.ACCOUNT_CODES.length === 30, "registry holds 30 codes (H1 pin amendment: +loyalty_payable +expense_loyalty, additive since \"H\")");
   const v1 = Object.entries(coa.CHART_OF_ACCOUNTS).filter(([, m]) => m.since === "v1").map(([c]) => c);
   check(v1.length === 17, "17 v1 codes frozen");
   const phaseA = Object.entries(coa.CHART_OF_ACCOUNTS).filter(([, m]) => m.since === "A").map(([c]) => c);
@@ -463,14 +1142,20 @@ suite("A2", 16);
   );
 }
 
-/* ============================== RBAC (115) ============================== */
-suite("RBAC", 115);
+/* ============================== RBAC (118) ============================== */
+/* Pin lineage: 116 was the pre-H pin; H1's loyalty row and H3's
+ * storefront row each added one generated "owner full" check
+ * (117 actual at the H3 close — the expected pin was left stale
+ * and the runner exited 1 despite an all-pass board), and the
+ * WhatsApp row adds one more: 118, amended here with the WA
+ * suite that finally owns the count. */
+suite("RBAC", 118);
 {
   // R-2: manager IS legacy staff, module for module (26).
   for (const m of perm.CURRENT_MODULES) {
     check(perm.accessOf("manager", m) === perm.LEGACY_STAFF_ACCESS[m], `manager == legacy: ${m}`);
   }
-  // Owner is unrestricted across all 40 rows.
+  // Owner is unrestricted across all 43 rows.
   for (const m of Object.keys(perm.PERMISSION_MATRIX)) {
     check(perm.accessOf("owner", m) === "full", `owner full: ${m}`);
   }
@@ -530,7 +1215,7 @@ suite("RBAC", 115);
   const bf6 = perm.backfillStaff({ staffEmails: [], staff: [], indexRoles: {}, now: NOW });
   check(bf6.staff.length === 0 && bf6.indexRoleWrites.length === 0, "backfill: empty in, empty out");
   // Matrix integrity.
-  check(Object.keys(perm.PERMISSION_MATRIX).length === 40, "matrix has 40 rows");
+  check(Object.keys(perm.PERMISSION_MATRIX).length === 43, "matrix has 43 rows (H1 pin amendment: +loyalty row; H3 pin amendment: +storefront row; WA pin amendment: +whatsapp row)");
   check(perm.CURRENT_MODULES.length === 26, "26 current modules");
   check(
     Object.values(perm.PERMISSION_MATRIX).every((row) =>
@@ -1995,7 +2680,7 @@ suite("B4", null);
     "/home/hatch/workspace/ai-dukaan-ai/firebase/firestore.rules", "utf8"
   );
   const CREATE_LINE =
-    "allow create: if hasRole(uid, ['owner', 'manager', 'accountant']) && createInOpenPeriod(uid);";
+    "allow create: if hasRole(uid, ['owner', 'manager', 'accountant']) && createInOpenPeriod(uid) && planPostable(uid);";
   const blockB4 = (marker, next) => {
     const i = rulesB4.indexOf(marker);
     const j = rulesB4.indexOf(next, i);
@@ -2516,7 +3201,7 @@ suite("B5", null);
     rulesSrc.indexOf("match /cheques/{chequeId}") + 400
   );
   check(
-    chqBlock.includes("allow create: if canAccess(uid) && createInOpenPeriod(uid);") &&
+    chqBlock.includes("allow create: if canAccess(uid) && createInOpenPeriod(uid) && planPostable(uid);") &&
       chqBlock.includes("allow update: if hasRole(uid, ['owner', 'manager', 'accountant']);") &&
       rulesSrc.includes("R-B6"),
     "rules: cheques block = canAccess create (G-3, R-B6 noted) + matrix-row update + owner delete"
@@ -2603,12 +3288,12 @@ suite("B6", null); // payment vouchers + prints (design §5, §9 B6)
   const c1Start6 = rulesSrc6.indexOf("      // Phase C · C1");
   const c1End6 = rulesSrc6.indexOf("      // Expenses:", c1Start6);
   const rulesStripped6 = c1Start6 >= 0 && c1End6 > c1Start6
-    ? rulesSrc6.slice(0, c1Start6) + rulesSrc6.slice(c1End6)
+    ? stripG1Blocks(stripG2Blocks(rulesSrc6.slice(0, c1Start6) + rulesSrc6.slice(c1End6)))
     : rulesSrc6;
   check(crypto.createHash("sha256").update(rulesStripped6, "utf8").digest("hex") ===
         "73177ac06f42d4a65ab68c6a7eb6f74e776c38da525742d90a77de0502436e87" &&
         !rulesSrc6.includes("match /vouchers"),
-    "rules: byte-identical to pre-B6 outside the additive C1 blocks (no voucher collection, fields ride existing documents)");
+    "rules: byte-identical to pre-B6 outside the additive C1 blocks (no voucher collection, fields ride existing documents; G1 same-check amendment: the four G1 spans are stripped first — v9's only other deltas, strip-proven in the G1 suite)");
 
   /* ---- print data builders: figures EQUAL the source rows ---- */
   const rvRow = { id: "cr-x", customerId: "cu1", customerName: "Ahmed Raza", customerPhone: "0300-1",
@@ -3469,11 +4154,11 @@ suite("C1", null); // Phase C · C1 — warehouses & stock rows (design §1)
     "rules: warehouses block — read any role (picker names, G-C1), write owner/manager, per the matrix row");
   check(c1Seg.includes("match /stockLevels/{levelId}") && c1Seg.includes("R-B6"),
     "rules: stockLevels block carries the G-C2 widening + the R-B6 do-not-tighten warning");
-  const strippedC1 = rulesC1.slice(0, rulesC1.indexOf("      // Phase C · C1")) +
-    rulesC1.slice(rulesC1.indexOf("      // Expenses:"));
+  const strippedC1 = stripG1Blocks(stripG2Blocks(rulesC1.slice(0, rulesC1.indexOf("      // Phase C · C1")) +
+    rulesC1.slice(rulesC1.indexOf("      // Expenses:"))));
   check(crypto.createHash("sha256").update(strippedC1, "utf8").digest("hex") ===
         "73177ac06f42d4a65ab68c6a7eb6f74e776c38da525742d90a77de0502436e87",
-    "rules: stripping the C1 blocks reproduces the pre-C1 file byte-for-byte (additive only)");
+    "rules: stripping the C1 blocks reproduces the pre-C1 file byte-for-byte (additive only; G1 same-check amendment: the four G1 spans are stripped first — v9's only other deltas, strip-proven in the G1 suite)");
 }
 
 /* ============================ C2 (stock transfers) ============================ */
@@ -3758,8 +4443,8 @@ suite("C2", null); // Phase C · C2 — stock transfers (design §2)
    * The shell/theme/polish increment amends it again (same
    * check): +2 — the fin bucket-breakdown label and the
    * single-string negative-balance line (fixes A + E). */
-  check(Object.keys(i18n.en).length === 2214 && Object.keys(i18n.ur).length === 2214,
-    "i18n: the dictionary now carries 2,214 keys, EN ≡ UR");
+  check(Object.keys(i18n.en).length === 3136 && Object.keys(i18n.ur).length === 3136,
+    "i18n: the dictionary now carries 3,057 keys, EN ≡ UR (pin amended at the five-theme increment: +6 theme-picker keys; D3: +119 loan keys; D4: +55 fin.fy keys; D5: +12 fin.export keys; E1: +53 print keys; E2 pin amendment: +37 print.brand keys; E3 pin amendment: +35 Raast keys (34 print.raast + billing.wa.raastLine); E4 pin amendment: +49 pin keys; F5 pin amendment: +1 sync.online key; G1 pin amendment: +8 biz keys; G2 pin amendment: +36 plan keys; G3 pin amendment: +89 platform keys; G4 pin amendment: +47 keys (35 renew.* + 12 platform.*); G6 pin amendment: +25 backup.* keys; H1 pin amendment: +51 loyalty keys; H3 pin amendment: +108 storefront keys; WA pin amendment: +109 WhatsApp keys; PS/FA pin amendment: +3 settings.lang keys (langPashto/langFarsi/langDraftPreview) — EN/UR values otherwise untouched, PS/FA pinned at the same 3,057 by the PSFA suite)");
 
   /* ---- source invariants: the store wiring ---- */
   const storeSrcC2 = fs.readFileSync(
@@ -3798,11 +4483,11 @@ suite("C2", null); // Phase C · C2 — stock transfers (design §2)
     "rules: stockTransfers block — read canAccess, write owner/manager (design §6.2)");
   check(!c2Seg.includes("createInOpenPeriod"),
     "rules: NO period backstop on the transfer doc — dispatch/receive post nothing; the loss is guarded at the journal (§2.5)");
-  const strippedC2 = rulesC2.slice(0, rulesC2.indexOf("      // Phase C · C2")) +
-    rulesC2.slice(rulesC2.indexOf("      // Expenses:"));
+  const strippedC2 = stripG1Blocks(stripG2Blocks(rulesC2.slice(0, rulesC2.indexOf("      // Phase C · C2")) +
+    rulesC2.slice(rulesC2.indexOf("      // Expenses:"))));
   check(crypto.createHash("sha256").update(strippedC2, "utf8").digest("hex") ===
         "21582bd131ecc692f995381cdbccc1e7f55489b9dd93f793c4fd28d549bc5152",
-    "rules: stripping the C2 block reproduces the pre-C2 file byte-for-byte (additive only)");
+    "rules: stripping the C2 block reproduces the pre-C2 file byte-for-byte (additive only; G1 same-check amendment: the four G1 spans are stripped first — v9's only other deltas, strip-proven in the G1 suite)");
 }
 
 /* ============================ C3 (product class & BOM) ============================ */
@@ -4138,11 +4823,11 @@ suite("C3", null); // Phase C · C3 — product class & BOM (design §3 + §4.1)
     "rules: boms block — read canAccess, write owner/manager (design §6.2)");
   check(!c3Seg.includes("createInOpenPeriod"),
     "rules: NO period backstop on boms — a recipe posts nothing (§7)");
-  const strippedC3 = rulesC3.slice(0, rulesC3.indexOf("      // Phase C · C3")) +
-    rulesC3.slice(rulesC3.indexOf("      // Expenses:"));
+  const strippedC3 = stripG1Blocks(stripG2Blocks(rulesC3.slice(0, rulesC3.indexOf("      // Phase C · C3")) +
+    rulesC3.slice(rulesC3.indexOf("      // Expenses:"))));
   check(crypto.createHash("sha256").update(strippedC3, "utf8").digest("hex") ===
         "fbacf2980246845b7293b5b9e66913aaa191212ce766c4d1f50fd1d9fe023603",
-    "rules: stripping the C3 block reproduces the pre-C3 file byte-for-byte (additive only)");
+    "rules: stripping the C3 block reproduces the pre-C3 file byte-for-byte (additive only; G1 same-check amendment: the four G1 spans are stripped first — v9's only other deltas, strip-proven in the G1 suite)");
 }
 
 /* ============================ C4 (production orders) ============================ */
@@ -4544,11 +5229,11 @@ suite("C4", null); // Phase C · C4 — production orders (design §4)
     "rules: productionOrders block — read canAccess, write owner/manager (design §6.2)");
   check(!c4Seg.includes("createInOpenPeriod"),
     "rules: NO period backstop on the order doc — its events' entries are guarded creates at the journal (§6.2)");
-  const strippedC4 = rulesC4.slice(0, rulesC4.indexOf("      // Phase C · C4")) +
-    rulesC4.slice(rulesC4.indexOf("      // Expenses:"));
+  const strippedC4 = stripG1Blocks(stripG2Blocks(rulesC4.slice(0, rulesC4.indexOf("      // Phase C · C4")) +
+    rulesC4.slice(rulesC4.indexOf("      // Expenses:"))));
   check(crypto.createHash("sha256").update(strippedC4, "utf8").digest("hex") ===
         "a8decf0291e8ca9a2939a8542f995848c8957891ae5c366063ec258ca6cf9f86",
-    "rules: stripping the C4 block reproduces the pre-C4 file byte-for-byte (additive only)");
+    "rules: stripping the C4 block reproduces the pre-C4 file byte-for-byte (additive only; G1 same-check amendment: the four G1 spans are stripped first — v9's only other deltas, strip-proven in the G1 suite)");
 }
 
 /* =============================== C5 =============================== */
@@ -4863,11 +5548,11 @@ suite("C5", null); // Phase C · C5 — job tracker (design §5)
     "rules: jobs block — read canAccess, write owner/manager (design §6.2)");
   check(!c5Seg.includes("createInOpenPeriod"),
     "rules: NO period backstop on the job doc — its material entries are guarded creates at the journal (§6.2)");
-  const strippedC5 = rulesC5.slice(0, rulesC5.indexOf("      // Phase C · C5")) +
-    rulesC5.slice(rulesC5.indexOf("      // Expenses:"));
+  const strippedC5 = stripG1Blocks(stripG2Blocks(rulesC5.slice(0, rulesC5.indexOf("      // Phase C · C5")) +
+    rulesC5.slice(rulesC5.indexOf("      // Expenses:"))));
   check(crypto.createHash("sha256").update(strippedC5, "utf8").digest("hex") ===
         "94077e04a2479bca232a1d7529454a724abff2024044c69c60982a8c9f81b404",
-    "rules: stripping the C5 block reproduces the pre-C5 file byte-for-byte (additive only)");
+    "rules: stripping the C5 block reproduces the pre-C5 file byte-for-byte (additive only; G1 same-check amendment: the four G1 spans are stripped first — v9's only other deltas, strip-proven in the G1 suite)");
 }
 
 /* ============================ FIX (live-audit) ============================ */
@@ -5155,8 +5840,8 @@ suite("FIX", null); // Live-audit fixes — P&L≡sales reconciliation, negative
 suite("D1", null); // Phase D · D1 — declarations, employees & attendance (design §1/§2.2/§6/§9 D1; NO postings)
 {
   /* ---- declarations: the ONE additive COA code (§3.1) ---- */
-  check(coa.ACCOUNT_CODES.length === 28 && coa.ACCOUNT_CODES[27] === "loans_receivable",
-    "D1 COA: loans_receivable is appended as code #28 — every prior code keeps its place");
+  check(coa.ACCOUNT_CODES.length === 30 && coa.ACCOUNT_CODES[27] === "loans_receivable",
+    "D1 COA: loans_receivable is code #28 — every prior code keeps its place (H1 pin amendment: count 28→30, two additive H codes appended after it)");
   const lrMeta = coa.accountMeta("loans_receivable");
   check(lrMeta.type === "asset" && lrMeta.normalBalance === "debit" && lrMeta.since === "D" &&
         coa.normalBalanceSign("loans_receivable") === 1 && coa.isAccountCode("loans_receivable"),
@@ -5364,13 +6049,13 @@ suite("D1", null); // Phase D · D1 — declarations, employees & attendance (de
         d1Seg.includes("hasRole(uid, ['owner', 'manager', 'accountant'])") &&
         d1Seg.includes("hasRole(uid, ['owner', 'manager'])"),
     "rules: employees + attendance blocks — read owner/manager/accountant, write owner/manager (design §6.2)");
-  check(!d1Seg.includes("canAccess(uid)") && d1Seg.indexOf("match /employees") < d1Seg.indexOf("match /attendance"),
-    "rules: Phase D reads are NARROWED — no canAccess read on either HR collection (salary data is not counter data)");
-  const strippedD1 = rulesD1.slice(0, rulesD1.indexOf("      // Phase D · D1")) +
-    rulesD1.slice(rulesD1.indexOf("      // Expenses:"));
+  check(!stripE2BrandingBlock(d1Seg).includes("canAccess(uid)") && d1Seg.indexOf("match /employees") < d1Seg.indexOf("match /attendance"),
+    "rules: Phase D reads are NARROWED — no canAccess read on either HR collection (salary data is not counter data) (E2 same-check amendment: the additive branding block — which legitimately reads canAccess, §2.1 — is stripped from the segment first; it is not an HR collection)");
+  const strippedD1 = stripG1Blocks(stripG2Blocks(rulesD1.slice(0, rulesD1.indexOf("      // Phase D · D1")) +
+    rulesD1.slice(rulesD1.indexOf("      // Expenses:"))));
   check(crypto.createHash("sha256").update(strippedD1, "utf8").digest("hex") ===
         "78df93ea7f53412bc634da26ab039ab40c33bcf1e110ac99cf02ce2f519b4761",
-    "rules: stripping the D1 blocks reproduces the v6 file byte-for-byte (additive only)");
+    "rules: stripping the D1 blocks reproduces the v6 file byte-for-byte (additive only; G1 same-check amendment: the four G1 spans are stripped first — v9's only other deltas, strip-proven in the G1 suite)");
 }
 
 /* ============================ D2 (Phase D · payroll runs, payments, advances, slips) ============================ */
@@ -5655,8 +6340,8 @@ suite("D2", null); // Phase D · D2 — payroll (design §2; the phase's heavies
           .every((k) => typeof i18n.en[k] === "string" && i18n.en[k].length > 0 &&
                        typeof i18n.ur[k] === "string" && i18n.ur[k].length > 0),
     "i18n: every D2 key present and non-empty in Urdu (parity), incl. the Finance composition + journal labels");
-  check(Object.keys(i18n.en).length === 2214 && Object.keys(i18n.ur).length === 2214,
-    "i18n: the dictionary now carries 2,214 keys, EN ≡ UR");
+  check(Object.keys(i18n.en).length === 3136 && Object.keys(i18n.ur).length === 3136,
+    "i18n: the dictionary now carries 3,054 keys, EN ≡ UR (pin amended at the five-theme increment: +6 theme-picker keys; D3: +119 loan keys; D4: +55 fin.fy keys; D5: +12 fin.export keys; E1: +53 print keys; E2 pin amendment: +37 print.brand keys; E3 pin amendment: +35 Raast keys (34 print.raast + billing.wa.raastLine); E4 pin amendment: +49 pin keys; F5 pin amendment: +1 sync.online key; G1 pin amendment: +8 biz keys; G2 pin amendment: +36 plan keys; G3 pin amendment: +89 platform keys; G4 pin amendment: +47 keys (35 renew.* + 12 platform.*); G6 pin amendment: +25 backup.* keys; H1 pin amendment: +51 loyalty keys; H3 pin amendment: +108 storefront keys; WA pin amendment: +109 WhatsApp keys)");
 
   /* ---- rules: the additive payrollRuns block (§6.2) ---- */
   const rulesD2 = fs.readFileSync(
@@ -5667,18 +6352,5793 @@ suite("D2", null); // Phase D · D2 — payroll (design §2; the phase's heavies
   check(d2Seg.includes("match /payrollRuns/{runId}") &&
         d2Seg.includes("hasRole(uid, ['owner', 'manager', 'accountant'])") &&
         d2Seg.includes("hasRole(uid, ['owner', 'accountant']) && createInOpenPeriod(uid)") &&
-        d2Seg.includes("allow delete: if isOwner(uid);"),
-    "rules: payrollRuns — narrowed read (o/m/a), create owner/accountant + period backstop, update o/a, delete owner-only");
-  check(!d2Seg.includes("canAccess(uid)"),
-    "rules: payroll reads are NARROWED — no canAccess read on payrollRuns (salary data is not counter data)");
-  const strippedD2 = rulesD2.slice(0, rulesD2.indexOf("      // Phase D · D2")) +
-    rulesD2.slice(rulesD2.indexOf("      // Expenses:"));
+        d2Seg.includes("allow delete: if isBusinessOwner(uid);"),
+    "rules: payrollRuns — narrowed read (o/m/a), create owner/accountant + period backstop, update o/a, delete owner-only (FR2 same-check amendment: the leg is now isBusinessOwner — uid match OR registry leg — so a generated business's owner deletes exactly as a legacy owner does; staff gain nothing)");
+  check(!stripE2BrandingBlock(d2Seg).includes("canAccess(uid)"),
+    "rules: payroll reads are NARROWED — no canAccess read on payrollRuns (salary data is not counter data) (E2 same-check amendment: the additive branding block — which legitimately reads canAccess, §2.1 — is stripped from the segment first; it is not payroll data)");
+  const strippedD2 = stripG1Blocks(stripG2Blocks(rulesD2.slice(0, rulesD2.indexOf("      // Phase D · D2")) +
+    rulesD2.slice(rulesD2.indexOf("      // Expenses:"))));
   check(crypto.createHash("sha256").update(strippedD2, "utf8").digest("hex") ===
         "00d810dfb60d0b75faf9f58f078a4720121581c07d4d2216b0c054465c67bf4a",
-    "rules: stripping the D2 block reproduces the D1-state file byte-for-byte (additive only)");
+    "rules: stripping the D2 block reproduces the D1-state file byte-for-byte (additive only; G1 same-check amendment: the four G1 spans are stripped first — v9's only other deltas, strip-proven in the G1 suite)");
 }
 
+/* ============================ D3 (Phase D · loans register) ============================ */
+suite("D3", null); // Phase D · D3 — loans register (design §3)
+{
+  const FULL = {
+    fromDate: "2000-01-01", toDate: "2999-12-31",
+    fromTs: "2000-01-01T00:00:00.000Z", toTs: "2999-01-01T00:00:00.000Z",
+  };
+  const T = {
+    dd: "2026-10-01T05:00:00.000Z",
+    ch: "2026-11-01T05:00:00.000Z",
+    rp: "2026-11-05T05:00:00.000Z",
+    rv: "2026-11-06T05:00:00.000Z",
+  };
+  const withEvent = (loan, ev) => ({ ...loan, events: [...loan.events, ev] });
+  const evOf = (kind, entry, extra = {}) => ({
+    kind,
+    amount: extra.amount ?? 0,
+    principalPart: extra.principalPart ?? 0,
+    chargePart: extra.chargePart ?? 0,
+    accountId: extra.accountId ?? null,
+    entryId: entry.id,
+    dayOffset: 0,
+    ts: entry.ts,
+  });
+
+  /* ---- terms: composition refusals (§3.2/§3.4) ---- */
+  const flatTerms = {
+    direction: "payable", partyName: "City Leasing Co", principal: 100000,
+    chargeType: "flat", chargeRate: 10, feeAmount: 0, instalmentCount: 7,
+  };
+  check(loans.loanTermsError(flatTerms) === null,
+    "D3 terms: a flat payable loan composes");
+  check(loans.loanTermsError({ ...flatTerms, direction: "receivable" }) === "chargeReceivable",
+    "D3 terms: charged RECEIVABLE lending is refused at composition (§3.2 rule 3) — never silently zeroed");
+  check(loans.loanTermsError({ ...flatTerms, direction: "receivable", chargeType: "none" }) === null,
+    "D3 terms: a charge-free receivable loan composes");
+  check(loans.loanTermsError({ ...flatTerms, principal: 0 }) === "principal" &&
+        loans.loanTermsError({ ...flatTerms, partyName: "  " }) === "party" &&
+        loans.loanTermsError({ ...flatTerms, instalmentCount: 0 }) === "instalments" &&
+        loans.loanTermsError({ ...flatTerms, chargeRate: 0 }) === "rate",
+    "D3 terms: principal / party / instalments / rate refusals each name their reason");
+  check(loans.loanTermsError({ ...flatTerms, chargeType: "fee_only", feeAmount: 0 }) === "fee" &&
+        loans.loanTermsError({ ...flatTerms, feeAmount: 100000 }) === "fee",
+    "D3 terms: a fee_only loan needs its fee, and a netted fee must leave positive proceeds (fee < principal)");
+  check(eq(loans.loanChargeAmount(flatTerms), 10000) &&
+        eq(loans.loanChargeAmount({ chargeType: "fee_only", principal: 50000, chargeRate: 0, feeAmount: 2000 }), 2000) &&
+        eq(loans.loanChargeAmount({ chargeType: "reducing", principal: 120000, chargeRate: 2, feeAmount: 0 }), 0),
+    "D3 charge snapshot: flat = % of ORIGINAL principal (10,000); fee_only = the fee; reducing snapshots no total");
+
+  /* ---- the schedule derivation (§3.3) ---- */
+  const flatLoan = {
+    id: "loan-1", number: "LN-1", direction: "payable", partyName: "City Leasing Co",
+    partyId: null, principal: 100000, chargeType: "flat", chargeRate: 10,
+    chargeAmount: 10000, startDateISO: "2026-10-01", instalmentCount: 7,
+    instalmentEvery: "month", firstDueISO: "2026-11-01", events: [],
+    status: "active", note: "", dayOffset: 0, ts: "",
+  };
+  const sched = loans.loanSchedule(flatLoan);
+  check(sched.length === 7 && eq(sum(sched.map((s) => s.principalPart)), 100000) &&
+        eq(sum(sched.map((s) => s.chargePart)), 10000),
+    "D3 schedule: 100,000 over 7 at flat 10% — principal parts sum to 100,000 and charge parts to 10,000 EXACTLY");
+  check(eq(sched[0].principalPart, 14285.71) && eq(sched[6].principalPart, 14285.71) &&
+        sched.every((s) => Math.abs(s.principalPart - 100000 / 7) < 0.02) &&
+        eq(sched[0].chargePart, 1428.57) && eq(sched[3].chargePart, 1428.58),
+    "D3 schedule: cumulative-allocation splits (14,285.71/72 alternating; the residual rides the cumulative discipline, not a lump)");
+  check(sched[0].dueISO === "2026-11-01" && sched[6].dueISO === "2027-05-01" &&
+        loans.addMonthsISO("2026-01-31", 1) === "2026-02-28" &&
+        loans.instalmentDueISO({ ...flatLoan, instalmentEvery: "week", firstDueISO: "2026-11-06" }, 3) === "2026-11-20",
+    "D3 schedule dates: monthly steps from the first due date; month-end clamps (31 Jan + 1mo = 28 Feb); weekly steps by 7 days");
+  const redLoan = { ...flatLoan, id: "loan-2", principal: 120000, chargeType: "reducing",
+    chargeRate: 2, chargeAmount: 0, instalmentCount: 4 };
+  const redSched = loans.loanSchedule(redLoan);
+  check(redSched.map((s) => s.chargePart).join(",") === "2400,1800,1200,600" &&
+        eq(sum(redSched.map((s) => s.principalPart)), 120000),
+    "D3 schedule: reducing charges compute per period on the SCHEDULE's outstanding (2,400 / 1,800 / 1,200 / 600)");
+
+  /* ---- drawdown shapes (§3.4) ---- */
+  const ddEntry = loans.buildLoanDrawdownEntry(flatLoan, {
+    method: "cash", accountId: "acc-main", ts: T.dd,
+  });
+  check(ddEntry.refType === "loan_drawdown" && ddEntry.refId === "loan-1" &&
+        ledger.entryBalances(ddEntry) && ddEntry.lines.length === 2 &&
+        ddEntry.lines[0].account === "cash" && ddEntry.lines[0].debit === 100000 &&
+        ddEntry.lines[0].ref === "acc-main" &&
+        ddEntry.lines[1].account === "loans_payable" && ddEntry.lines[1].credit === 100000 &&
+        ddEntry.lines[1].ref === "loan-1",
+    "D3 drawdown (gross): Dr cash (ref = account) 100,000 / Cr loans_payable (ref = loan) 100,000 — one balanced entry");
+  const feeLoan = { ...flatLoan, id: "loan-3", number: "LN-3", principal: 50000,
+    chargeType: "fee_only", chargeRate: 0, chargeAmount: 2000, instalmentCount: 5 };
+  const feeEntry = loans.buildLoanDrawdownEntry(feeLoan, {
+    method: "bank", accountId: "acc-bank", feeAmount: 2000, ts: T.dd,
+  });
+  check(feeEntry.lines.length === 3 &&
+        feeEntry.lines[0].account === "wallet" && eq(feeEntry.lines[0].debit, 48000) &&
+        feeEntry.lines[1].account === "expense_finance" && eq(feeEntry.lines[1].debit, 2000) &&
+        feeEntry.lines[2].account === "loans_payable" && eq(feeEntry.lines[2].credit, 50000) &&
+        ledger.entryBalances(feeEntry),
+    "D3 drawdown (fee netted): Dr money 48,000 + Dr expense_finance 2,000 / Cr loans_payable 50,000 — the fee is expensed at drawdown, never smeared into principal");
+
+  /* ---- charges: proposed, never automatic (§3.2/§3.4) ---- */
+  let loan1 = withEvent(flatLoan, evOf("drawdown", ddEntry, {
+    amount: 100000, principalPart: 100000, accountId: "acc-main",
+  }));
+  const J = [ddEntry];
+  check(!J.some((e) => e.refType === "loan_charge") &&
+        !J.some((e) => e.lines.some((l) => l.account === "expense_finance")) &&
+        eq(loans.loanPosition(loan1).chargesAccrued, 0),
+    "D3 charges: a freshly drawn loan's journal carries NO charge — the schedule proposes, nothing posts on its own");
+  const proposed = loans.nextChargeAccrual(loan1);
+  check(!!proposed && proposed.n === 1 && eq(proposed.chargePart, 1428.57),
+    "D3 charges: the next accrual is instalment 1's 1,428.57 — awaiting the desk's confirmation");
+  check(eq(loans.loanJournalPosition(J, loan1), 100000) &&
+        eq(loans.loanPosition(loan1).outstanding, 100000) &&
+        eq(loans.loanJournalPosition(J, loan1), loans.loanPosition(loan1).outstanding),
+    "D3 identity (drawdown): GL loans_payable == the diary's derived outstanding (100,000)");
+
+  /* ---- charge accruals: discrete, ordinal, per instalment ---- */
+  const ch1 = loans.buildLoanChargeEntry(loan1, { instalment: sched[0], ts: T.ch });
+  check(ch1.refType === "loan_charge" && ch1.lines[0].account === "expense_finance" &&
+        eq(ch1.lines[0].debit, 1428.57) && ch1.lines[1].account === "loans_payable" &&
+        ch1.lines[1].ref === "loan-1" && ledger.entryBalances(ch1),
+    "D3 charge entry: Dr expense_finance / Cr loans_payable (ref = loan) for exactly one instalment's charge");
+  loan1 = withEvent(loan1, evOf("charge", ch1, { amount: 1428.57, chargePart: 1428.57 }));
+  J.push(ch1);
+  const ch2 = loans.buildLoanChargeEntry(loan1, { instalment: sched[1], ts: T.ch });
+  loan1 = withEvent(loan1, evOf("charge", ch2, { amount: 1428.57, chargePart: 1428.57 }));
+  J.push(ch2);
+  check(loans.accruedChargeCount(loan1) === 2 &&
+        eq(loans.loanPosition(loan1).chargesAccrued, 2857.14) &&
+        eq(loans.loanPosition(loan1).outstanding, 102857.14) &&
+        eq(loans.loanJournalPosition(J, loan1), loans.loanPosition(loan1).outstanding) &&
+        loans.nextChargeAccrual(loan1)?.n === 3,
+    "D3 identity (2 accruals): outstanding 102,857.14 on BOTH derivations; the next proposal is instalment 3 (ordinal)");
+
+  /* ---- repayment: charges-first default + the split diary ---- */
+  const split = loans.defaultRepaymentSplit(loan1, 20000);
+  check(eq(split.chargePart, 2857.14) && eq(split.principalPart, 17142.86),
+    "D3 split: the default settles charges first (2,857.14 of charges, then 17,142.86 of principal)");
+  check(loans.repaymentSplitError(loan1, 20000, split) === null &&
+        loans.repaymentSplitError(loan1, 20000, { principalPart: 20000, chargePart: 0 }) === null &&
+        loans.repaymentSplitError(loan1, 20000, { principalPart: 19000, chargePart: 500 }) === "split" &&
+        loans.repaymentSplitError(loan1, 20000, { principalPart: 17142.86, chargePart: 2857.15 }) === "split",
+    "D3 split validation: a desk override may re-attribute (all-principal is valid); a split that mis-sums or over-draws a side refuses");
+  check(loans.repaymentSplitError(loan1, 102857.15, { principalPart: 102857.15, chargePart: 0 }) === "overpay",
+    "D3 overpayment: 1 paisa beyond the derived outstanding refuses pre-composition (§3.4)");
+  const rpEntry = loans.buildLoanRepaymentEntry(loan1, {
+    amount: 20000, method: "cash", accountId: "acc-main", ts: T.rp,
+  });
+  check(rpEntry.refType === "loan_repayment" && rpEntry.lines.length === 2 &&
+        rpEntry.lines[0].account === "loans_payable" && rpEntry.lines[0].debit === 20000 &&
+        rpEntry.lines[0].ref === "loan-1" && rpEntry.lines[1].account === "cash" &&
+        rpEntry.lines[1].credit === 20000,
+    "D3 repayment entry: the journal line is the WHOLE 20,000 — the split lives on the diary, never on the lines (§3.3)");
+  loan1 = withEvent(loan1, evOf("repayment", rpEntry, {
+    amount: 20000, principalPart: split.principalPart, chargePart: split.chargePart,
+    accountId: "acc-main",
+  }));
+  J.push(rpEntry);
+  const posAfterRp = loans.loanPosition(loan1);
+  check(eq(posAfterRp.principalRepaid, 17142.86) && eq(posAfterRp.chargesRepaid, 2857.14) &&
+        eq(posAfterRp.outstanding, 82857.14) &&
+        eq(loans.loanJournalPosition(J, loan1), posAfterRp.outstanding),
+    "D3 identity (repayment): outstanding 82,857.14 — diary and journal still agree to the paisa");
+  const tbJ = reports.trialBalance(J, FULL);
+  check(tbJ.balanced && eq(tbJ.closingDifference, 0),
+    "D3 trial balance: the lifecycle journal balances (difference 0)");
+
+  /* ---- overdue derivation off the schedule (§3.3/§3.5) ---- */
+  const states = loans.loanInstalmentStates(loan1, "2027-01-15");
+  check(states[0].state === "paid" && eq(states[0].paidAmount, 15714.28) &&
+        states[1].state === "partial" && eq(states[1].paidAmount, 4285.72),
+    "D3 instalment states: repayments apply in order — instalment 1 paid in full (15,714.28), instalment 2 partial (4,285.72)");
+  check(states[2].state === "overdue" && eq(states[2].owed, 14285.71) && !states[2].chargeAccrued,
+    "D3 overdue: instalment 3 (due 2027-01-01, unpaid, its charge NOT yet accrued) derives overdue on principal alone");
+  const nextDue = loans.loanNextDue(loan1, "2027-01-15");
+  check(!!nextDue && nextDue.instalment.n === 2 && nextDue.overdueCount === 1,
+    "D3 next-due: the register points at instalment 2 (first with money owed) with exactly 1 overdue instalment");
+
+  /* ---- reversal cleanliness (§3.4: mirror + negated diary) ---- */
+  const rpMirror = loans.buildMirrorEntry(rpEntry, "Loan reversal LN-1", { ts: T.rv });
+  const loan1r = withEvent(loan1, evOf("repayment", rpMirror, {
+    amount: -20000, principalPart: -split.principalPart, chargePart: -split.chargePart,
+    accountId: "acc-main",
+  }));
+  const Jr = [...J, rpMirror];
+  check(rpMirror.reversesId === rpEntry.id && ledger.entryBalances(rpMirror) &&
+        eq(loans.loanPosition(loan1r).outstanding, 102857.14) &&
+        eq(loans.loanPosition(loan1r).totalRepaid, 0) &&
+        eq(loans.loanJournalPosition(Jr, loan1r), 102857.14) &&
+        reports.trialBalance(Jr, FULL).balanced,
+    "D3 reversal: mirroring the repayment restores the position to 102,857.14 on both derivations; TB still 0");
+
+  /* ---- the receivable mirror + the §3.1 isolation ---- */
+  const recLoan = { ...flatLoan, id: "loan-9", number: "LN-9", direction: "receivable",
+    partyName: "Partner — Ahmed", principal: 30000, chargeType: "none",
+    chargeRate: 0, chargeAmount: 0, instalmentCount: 3 };
+  const recDd = loans.buildLoanDrawdownEntry(recLoan, {
+    method: "jazzcash", accountId: "acc-jazz", ts: T.dd,
+  });
+  check(recDd.lines[0].account === "loans_receivable" && recDd.lines[0].debit === 30000 &&
+        recDd.lines[0].ref === "loan-9" && recDd.lines[1].account === "wallet" &&
+        recDd.lines[1].credit === 30000,
+    "D3 receivable drawdown: Dr loans_receivable (ref = loan) / Cr wallet — the mirror on the ONE additive code");
+  let loan9 = withEvent(recLoan, evOf("drawdown", recDd, {
+    amount: 30000, principalPart: 30000, accountId: "acc-jazz",
+  }));
+  const J9 = [recDd];
+  const recRp = loans.buildLoanRepaymentEntry(loan9, {
+    amount: 10000, method: "jazzcash", accountId: "acc-jazz", ts: T.rp,
+  });
+  loan9 = withEvent(loan9, evOf("repayment", recRp, {
+    amount: 10000, principalPart: 10000, accountId: "acc-jazz",
+  }));
+  J9.push(recRp);
+  check(eq(ledger.accountBalance(J9, "loans_receivable"), 20000) &&
+        eq(loans.loanJournalPosition(J9, loan9), 20000) &&
+        eq(loans.loanPosition(loan9).outstanding, 20000) &&
+        eq(ledger.accountBalance(J9, "receivables"), 0) && eq(ledger.accountBalance(J9, "loans_payable"), 0),
+    "D3 isolation: the lent loan rides loans_receivable ONLY — `receivables` (the customer khata) and loans_payable are untouched");
+  check(loans.nextChargeAccrual(loan9) === null &&
+        !J9.some((e) => e.lines.some((l) => l.account === "expense_finance")),
+    "D3 receivable: charge-free end to end — no accrual is even proposed, no finance-expense line exists");
+
+  /* ---- a charge-free loan's journal is principal-only ---- */
+  const freeLoan = { ...recLoan, id: "loan-10", number: "LN-10", direction: "payable",
+    partyName: "Uncle — family" };
+  const freeDd = loans.buildLoanDrawdownEntry(freeLoan, {
+    method: "cash", accountId: "acc-main", ts: T.dd,
+  });
+  const freeRp = loans.buildLoanRepaymentEntry(freeLoan, {
+    amount: 30000, method: "cash", accountId: "acc-main", ts: T.rp,
+  });
+  const freeJ = [freeDd, freeRp];
+  check(freeJ.every((e) => e.lines.every((l) => l.account === "cash" || l.account === "loans_payable")) &&
+        loans.nextChargeAccrual({ ...freeLoan, events: [
+          evOf("drawdown", freeDd, { amount: 30000, principalPart: 30000, accountId: "acc-main" }),
+        ] }) === null,
+    "D3 charge-free: a no-charge loan's whole lifecycle journal contains principal/money lines only");
+
+  /* ---- settlement: outstanding 0 derives the settled label ---- */
+  let settleLoan = loan1r; // outstanding 102,857.14, 2 charges accrued
+  const Jsettle = [...Jr];
+  for (let n = 3; n <= 7; n++) {
+    const inst = sched[n - 1];
+    const e = loans.buildLoanChargeEntry(settleLoan, { instalment: inst, ts: T.ch });
+    settleLoan = withEvent(settleLoan, evOf("charge", e, {
+      amount: inst.chargePart, chargePart: inst.chargePart,
+    }));
+    Jsettle.push(e);
+  }
+  const finalSplit = loans.defaultRepaymentSplit(settleLoan,
+    loans.loanPosition(settleLoan).outstanding);
+  const finalRp = loans.buildLoanRepaymentEntry(settleLoan, {
+    amount: loans.loanPosition(settleLoan).outstanding, method: "cash",
+    accountId: "acc-main", ts: T.rp,
+  });
+  settleLoan = withEvent(settleLoan, evOf("repayment", finalRp, {
+    amount: finalRp.lines[0].debit, principalPart: finalSplit.principalPart,
+    chargePart: finalSplit.chargePart, accountId: "acc-main",
+  }));
+  Jsettle.push(finalRp);
+  check(eq(loans.loanPosition(settleLoan).outstanding, 0) &&
+        eq(loans.loanJournalPosition(Jsettle, settleLoan), 0) &&
+        loans.loanStatusFor(settleLoan) === "settled" &&
+        reports.trialBalance(Jsettle, FULL).balanced,
+    "D3 settlement: accrue the rest + repay the whole outstanding → 0 on both derivations, the label derives settled, TB 0");
+
+  /* ---- period locks: backdated loan entries refuse (§7) ---- */
+  const lockEnd = periods.endOfDayPktInstant("2026-10-31");
+  const backDd = loans.buildLoanDrawdownEntry(flatLoan, {
+    method: "cash", accountId: "acc-main", ts: "2026-10-05T05:00:00.000Z",
+  });
+  let ddLockThrew = false;
+  try { periods.preparePosting(backDd, lockEnd); }
+  catch (e) { ddLockThrew = periods.isPeriodLockedError(e); }
+  check(ddLockThrew,
+    "D3 period lock: a drawdown dated inside the locked period is refused by preparePosting");
+  const backRp = loans.buildLoanRepaymentEntry(flatLoan, {
+    amount: 1000, method: "cash", accountId: "acc-main", ts: "2026-10-05T05:00:00.000Z",
+  });
+  let rpLockThrew = false;
+  try { periods.preparePosting(backRp, lockEnd); }
+  catch (e) { rpLockThrew = periods.isPeriodLockedError(e); }
+  const okRp = loans.buildLoanRepaymentEntry(flatLoan, {
+    amount: 1000, method: "cash", accountId: "acc-main", ts: "2026-11-02T05:00:00.000Z",
+  });
+  check(rpLockThrew && periods.preparePosting(okRp, lockEnd).dateISO === "2026-11-02",
+    "D3 period lock: a backdated repayment refuses the same way; the same repayment at its real date passes");
+
+  /* ---- RBAC: the loans row, as pre-declared (§6.1) ---- */
+  check(perm.can("owner", "loans", "write") && perm.can("accountant", "loans", "write") &&
+        perm.can("manager", "loans", "view") && !perm.can("manager", "loans", "write") &&
+        !perm.can("cashier", "loans", "view"),
+    "RBAC loans: owner/accountant write, manager reads, cashier excluded — the A3 row consumed unchanged");
+
+  /* ---- search: the register predicate is null-safe ---- */
+  check(search.loanMatches({ number: "LN-1", partyName: "City Leasing Co" }, "leasing") &&
+        search.loanMatches({ number: "LN-1" }, "ln-1") &&
+        !search.loanMatches({ partyName: null, number: undefined }, "x") &&
+        search.loanMatches({}, ""),
+    "D3 search: loanMatches hits number/party, survives missing fields, and a blank query matches all");
+
+  /* ---- demo seed: the journalless sample loan (§10.3) ---- */
+  const seedLoans = seed.getSeedLoans();
+  check(seedLoans.length === 1 && seedLoans[0].chargeType === "none" &&
+        seedLoans[0].events.length === 0 && seedLoans[0].status === "active" &&
+        seedLoans[0].number === "LN-1" &&
+        eq(loans.loanPosition(seedLoans[0]).outstanding, seedLoans[0].principal) &&
+        loans.loanPosition(seedLoans[0]).drawn === false,
+    "D3 seed: ONE charge-free sample loan, no events — its outstanding derives as the full principal, drawn = false (demo-only posture)");
+  check(journal.length === 21 && eq(ledger.accountBalance(journal, "inventory"), 272805) &&
+        eq(ledger.accountBalance(journal, "cash"), 50000) &&
+        eq(ledger.accountBalance(journal, "loans_payable"), 0) &&
+        eq(ledger.accountBalance(journal, "loans_receivable"), 0),
+    "D3 seed: frozen identities stand — 21 entries, inventory 272,805, cash 50,000, no loan balances in the seed journal");
+
+  /* ---- register totals (§3.5) ---- */
+  const regTotals = loans.loansRegisterTotals([loan1, loan9, { ...freeLoan, status: "cancelled" }]);
+  check(eq(regTotals.borrowedOutstanding, 82857.14) && eq(regTotals.lentOutstanding, 20000),
+    "D3 register totals: borrowed Σ outstanding + lent Σ outstanding, cancelled loans excluded");
+
+  /* ---- source invariants: wiring + guards + no new posting route ---- */
+  const storeSrcD3 = fs.readFileSync(
+    "/home/hatch/workspace/ai-dukaan-ai/web/components/StoreProvider.tsx", "utf8");
+  check(storeSrcD3.includes("createLoan") && storeSrcD3.includes("accrueLoanCharge") &&
+        storeSrcD3.includes("repayLoan") && storeSrcD3.includes("reverseLoanEvent") &&
+        storeSrcD3.includes("deleteLoan") && storeSrcD3.includes("getSeedLoans"),
+    "source: the D3 store actions + the demo sample loan are wired into the store");
+  check(storeSrcD3.includes("loanTermsError(terms)") &&
+        storeSrcD3.includes("repaymentSplitError(cur, amount, split)") &&
+        storeSrcD3.includes("instalmentN !== accruedChargeCount(cur) + 1") &&
+        storeSrcD3.includes("buildLoanDrawdownEntry") && storeSrcD3.includes("buildMirrorEntry"),
+    "source: composition refusals + the ordinal accrual guard refuse pre-composition; entries compose in lib/loans");
+  check((storeSrcD3.match(/makeEntry\(/g) || []).length === 24,
+    "source: still 24 makeEntry calls in the store — D3 adds NO posting route (templates live in lib/loans)");
+  const loansSrcD3 = fs.readFileSync(
+    "/home/hatch/workspace/ai-dukaan-ai/web/components/LoansView.tsx", "utf8");
+  check(loansSrcD3.includes('can(role, "loans", "view")') && loansSrcD3.includes("loanPosition") &&
+        loansSrcD3.includes("nextChargeAccrual") && loansSrcD3.includes("NegativeBalanceWarning") &&
+        loansSrcD3.includes("outflowPreview") && loansSrcD3.includes("loanMatches"),
+    "source: the Loans screen gates on the loans row, derives via lib/loans, warns via outflowPreview and searches via lib/search");
+  const finSrcD3 = fs.readFileSync(
+    "/home/hatch/workspace/ai-dukaan-ai/web/components/FinanceView.tsx", "utf8");
+  check(finSrcD3.includes("loansRegisterTotals") && finSrcD3.includes("fin.loan.title") &&
+        finSrcD3.includes("fin.ref.loanDrawdown") && finSrcD3.includes("fin.ref.loanRepayment"),
+    "source: Finance renders the §3.5 loans breakdown and the journal viewer names the loan refTypes");
+
+  /* ---- i18n: the D3 strings, both languages ---- */
+  const loanKeys = Object.keys(i18n.en).filter((k) => k.startsWith("loan."));
+  const d3Keys = Object.keys(i18n.en).filter((k) =>
+    k.startsWith("loan.") || k.startsWith("fin.loan.") ||
+    k.startsWith("fin.ref.loan") || k === "nav.loans");
+  check(loanKeys.length === 108 && d3Keys.length === 119,
+    `i18n: D3 carries ${d3Keys.length} keys (119 expected: 108 loan.* + 7 fin.loan.* + 3 journal labels + nav.loans)`);
+  check(d3Keys.every((k) => typeof i18n.ur[k] === "string" && i18n.ur[k].length > 0),
+    "i18n: every D3 key present and non-empty in Urdu (parity)");
+  check(Object.keys(i18n.en).length === 3136 && Object.keys(i18n.ur).length === 3136,
+    "i18n: the dictionary now carries 3,054 keys, EN ≡ UR (D4: +55 fin.fy keys; D5: +12 fin.export keys; E1 pin amendment: +53 print keys; E2 pin amendment: +37 print.brand keys; E3 pin amendment: +35 Raast keys (34 print.raast + billing.wa.raastLine); E4 pin amendment: +49 pin keys; F5 pin amendment: +1 sync.online key; G1 pin amendment: +8 biz keys; G2 pin amendment: +36 plan keys; G3 pin amendment: +89 platform keys; G4 pin amendment: +47 keys (35 renew.* + 12 platform.*); G6 pin amendment: +25 backup.* keys; H1 pin amendment: +51 loyalty keys; H3 pin amendment: +108 storefront keys; WA pin amendment: +109 WhatsApp keys)");
+
+  /* ---- rules: the additive loans block (§6.2) ---- */
+  const rulesD3 = fs.readFileSync(
+    "/home/hatch/workspace/ai-dukaan-ai/firebase/firestore.rules", "utf8");
+  const d3Seg = rulesD3.slice(
+    rulesD3.indexOf("      // Phase D · D3"),
+    rulesD3.indexOf("      // Expenses:"));
+  check(d3Seg.includes("match /loans/{loanId}") &&
+        d3Seg.includes("hasRole(uid, ['owner', 'manager', 'accountant'])") &&
+        d3Seg.includes("hasRole(uid, ['owner', 'accountant']) && createInOpenPeriod(uid)") &&
+        d3Seg.includes("allow delete: if isBusinessOwner(uid);"),
+    "rules: loans — narrowed read (o/m/a), create owner/accountant + period backstop, update o/a, delete owner-only (FR2 same-check amendment: the leg is now isBusinessOwner — uid match OR registry leg — so a generated business's owner deletes exactly as a legacy owner does; staff gain nothing)");
+  check(!stripE2BrandingBlock(d3Seg).includes("canAccess(uid)"),
+    "rules: loan reads are NARROWED — no canAccess read on loans (loan terms are not counter data) (E2 same-check amendment: the additive branding block — which legitimately reads canAccess, §2.1 — is stripped from the segment first; it is not a loan record)");
+  const strippedD3 = stripG1Blocks(stripG2Blocks(rulesD3.slice(0, rulesD3.indexOf("      // Phase D · D3")) +
+    rulesD3.slice(rulesD3.indexOf("      // Expenses:"))));
+  check(crypto.createHash("sha256").update(strippedD3, "utf8").digest("hex") ===
+        "1ee537fd95f2d9316ca0ebd8b9c67eacdf196e26bb0d8a3d894e269e47ab5bbf",
+    "rules: stripping the D3 block reproduces the D2-state file byte-for-byte (additive only; G1 same-check amendment: the four G1 spans are stripped first — v9's only other deltas, strip-proven in the G1 suite)");
+}
+
+/* ============================ D4 (Phase D · fiscal-year close) ============================ */
+suite("D4", null); // Phase D · D4 — fiscal-year close (design §4)
+{
+  const T = (dateISO, h = 6) =>
+    new Date(Date.parse(periods.startOfDayPktInstant(dateISO)) + h * 3600e3).toISOString();
+  const E = (memo, refType, dateISO, lines) =>
+    ledger.makeEntry(memo, refType, null, lines, { ts: T(dateISO) });
+  const L = (account, debit, credit, ref = null) => ({ account, debit, credit, ref });
+
+  const range26 = periods.fiscalYearRange({}, T("2026-02-15"));
+  const range27 = periods.fiscalYearRange({}, T("2026-09-15"));
+  check(range26.startDate === "2025-07-01" && range26.endDate === "2026-06-30" &&
+        range27.startDate === "2026-07-01" && range27.endDate === "2027-06-30",
+    "D4 ranges: the default PK fiscal year runs 1 Jul – 30 Jun");
+  check(fiscal.fyLabel(range26) === "FY 2025-26" &&
+        fiscal.fyLabel(periods.fiscalYearRange(
+          { fiscalYearStartMonth: 1, fiscalYearStartDay: 1 }, T("2026-03-01"))) === "FY 2026",
+    "D4 label: FY 2025-26 for a July year; a 1-January year is simply FY 2026");
+
+  /* ---- the closing set is the registry's P&L class (§4.3) ---- */
+  const plCodes = fiscal.plAccountCodes();
+  check(plCodes.length === 11 &&
+        ["sales_revenue", "sales_discount", "cogs", "expense_rent", "expense_electricity",
+         "expense_salary", "expense_transport", "expense_other", "expense_finance",
+         "inventory_loss", "expense_loyalty"].every((c) => plCodes.includes(c)),
+    "D4 closing set: exactly the registry's income + contra_income + expense codes (11 — H1 pin amendment: expense_loyalty joins BY TYPE from the registry, the §4.3 derivation itself unchanged)");
+  check(!plCodes.includes("purchases") && !plCodes.includes("tax_payable") &&
+        !plCodes.includes("tax_input") && !plCodes.includes("retained_earnings") &&
+        !plCodes.includes("wip") && !plCodes.includes("capital"),
+    "D4 closing set: clearing, tax, equity and balance-sheet accounts are NEVER closed — they carry forward");
+
+  /* ---- the fixture: FY 2025-26 trading + FY 2026-27 start ---- */
+  const J = [
+    E("Owner capital in", "cashbook", "2025-08-10",
+      [L("cash", 500000, 0), L("capital", 0, 500000)]),
+    E("Purchase — goods in", "purchase", "2025-09-05",
+      [L("purchases", 300000, 0), L("payables", 0, 300000)]),
+    E("Purchase — into stock", "purchase", "2025-09-05",
+      [L("inventory", 300000, 0), L("purchases", 0, 300000)]),
+    E("Sale", "sale", "2025-10-12",
+      [L("cash", 395000, 0), L("sales_discount", 5000, 0), L("sales_revenue", 0, 400000)]),
+    E("Sale — COGS", "sale", "2025-10-12",
+      [L("cogs", 220000, 0), L("inventory", 0, 220000)]),
+    E("Rent", "expense", "2025-11-03",
+      [L("expense_rent", 60000, 0), L("cash", 0, 60000)]),
+    E("Salaries", "expense", "2025-12-08",
+      [L("expense_salary", 80000, 0), L("cash", 0, 80000)]),
+    E("Electricity", "expense", "2026-01-15",
+      [L("expense_electricity", 10000, 0), L("cash", 0, 10000)]),
+    E("Bank charges", "expense", "2026-02-20",
+      [L("expense_finance", 3000, 0), L("cash", 0, 3000)]),
+    E("Stock write-off", "adjustment", "2026-03-11",
+      [L("inventory_loss", 2000, 0), L("inventory", 0, 2000)]),
+    E("Sales tax collected", "cashbook", "2026-04-05",
+      [L("cash", 8000, 0), L("tax_payable", 0, 8000)]),
+    E("Production labour accrued", "production_issue", "2026-05-09",
+      [L("wip", 4000, 0), L("salary_payable", 0, 4000)]), // ref-less C4 shape
+    E("Sale (new FY)", "sale", "2026-08-14",
+      [L("cash", 50000, 0), L("sales_revenue", 0, 50000)]),
+    E("Sale — COGS (new FY)", "sale", "2026-08-14",
+      [L("cogs", 30000, 0), L("inventory", 0, 30000)]),
+  ];
+  const baseArgs = {
+    journal: J, payrollRuns: [], productionOrders: [], cheques: [], products: [],
+    range: range26, lockedThrough: "",
+  };
+
+  /* ---- the checklist on a clean year (§4.2) ---- */
+  const cl = fiscal.fiscalYearCloseChecklist(baseArgs);
+  check(cl.hardGatesPass === true && cl.trialBalance.difference === 0 &&
+        cl.trialBalance.closingDifference === 0 && cl.purchasesClearing === 0,
+    "D4 checklist: a clean year passes both hard gates (TB zero, purchases clearing zero)");
+  check(cl.warningIds.length === 0 && cl.draftPayrollRuns === 0 &&
+        cl.openProductionOrders === 0,
+    "D4 checklist: no warnings on a year with no draft runs and no open production pools");
+  check(eq(cl.salary.glBalance, 4000) && eq(cl.salary.unassignedAccrued, 4000) &&
+        eq(cl.salary.owedToEmployees, 0),
+    "D4 checklist: salary_payable composition at FY end — the ref-less production accrual sits in the unassigned bucket (4,000)");
+  check(eq(cl.stockGl, 78000) && eq(cl.stockShelf, 0) && eq(cl.stockDivergence, 78000) &&
+        cl.lockCoversFyEnd === false,
+    "D4 checklist: stock GL at FY end is 78,000 (300,000 in − 220,000 COGS − 2,000 loss); the shelf divergence and lock state are informational");
+
+  /* ---- hard gate 1: an unbalanced journal blocks (§4.2 #1) ---- */
+  const doctored = {
+    id: "j-doctored", memo: "hand-doctored", refType: "cashbook", refId: null,
+    reversesId: null, dayOffset: 0, ts: T("2026-02-01"),
+    lines: [L("cash", 100, 0)], // no credit leg — bypasses makeEntry on purpose
+  };
+  const clBad = fiscal.fiscalYearCloseChecklist({ ...baseArgs, journal: [...J, doctored] });
+  check(clBad.hardGatesPass === false && clBad.trialBalance.difference !== 0 &&
+        clBad.items.find((i) => i.id === "trialBalance").triggered === true,
+    "D4 gate: a deliberately unbalanced fixture makes the trial-balance gate FAIL — the close is blocked");
+
+  /* ---- hard gate 2: stranded purchases clearing blocks (§4.2 #2) ---- */
+  const stranded = E("Purchase — receipt leg missing", "purchase", "2026-02-01",
+    [L("purchases", 50000, 0), L("payables", 0, 50000)]);
+  const clStranded = fiscal.fiscalYearCloseChecklist({ ...baseArgs, journal: [...J, stranded] });
+  check(clStranded.hardGatesPass === false && eq(clStranded.purchasesClearing, 50000) &&
+        clStranded.items.find((i) => i.id === "purchasesClearing").triggered === true,
+    "D4 gate: a purchase whose inventory leg never landed leaves clearing at 50,000 — the close refuses to bury it in equity");
+
+  /* ---- warnings derive (§4.2 #3/#4) ---- */
+  const draftRun = {
+    id: "run-draft", number: null, month: "2026-03", lines: [],
+    totals: { gross: 0, deductions: 0, netAccrued: 0 }, payments: [],
+    accrualEntryId: null, status: "draft", note: "", dayOffset: 0, ts: "",
+  };
+  const draftRunNextFy = { ...draftRun, id: "run-draft-27", month: "2026-08" };
+  const openOrder = {
+    id: "po-1", status: "open", plannedQty: 10,
+    events: [{ kind: "issue", qty: 0, value: 4000, lines: [], entryId: "x", ts: T("2026-05-09") }],
+  };
+  const clWarn = fiscal.fiscalYearCloseChecklist({
+    ...baseArgs, payrollRuns: [draftRun, draftRunNextFy], productionOrders: [openOrder],
+  });
+  check(clWarn.draftPayrollRuns === 1 && clWarn.warningIds.includes("draftPayroll") &&
+        clWarn.hardGatesPass === true,
+    "D4 warnings: a draft run for a month INSIDE the FY warns (next-FY draft does not); warnings never masquerade as gates");
+  check(clWarn.openProductionOrders === 1 && eq(clWarn.openProductionPoolTotal, 4000) &&
+        clWarn.warningIds.includes("productionPools"),
+    "D4 warnings: an open production order's WIP pool (4,000) surfaces as a warning — WIP carries forward legitimately");
+
+  /* ---- the closing entry (§4.3) ---- */
+  const plBefore = ledger.profitAndLossInRange(J, range26.fromTs, range26.toTs);
+  check(eq(plBefore.revenue, 400000) && eq(plBefore.discounts, 5000) &&
+        eq(plBefore.netRevenue, 395000) && eq(plBefore.cogs, 220000) &&
+        eq(plBefore.expensesTotal, 150000) && eq(plBefore.stockLoss, 2000) &&
+        eq(plBefore.net, 23000),
+    "D4 fixture P&L: revenue 400,000 − discounts 5,000 − COGS 220,000 − expenses 150,000 − loss 2,000 = net 23,000");
+  const closeEntry = fiscal.buildFiscalClosingEntry(J, range26, "per-d4-1");
+  check(!!closeEntry && closeEntry.refType === "fy_close" && closeEntry.refId === "per-d4-1" &&
+        ledger.entryBalances(closeEntry) && closeEntry.lines.length === 9,
+    "D4 close: ONE fy_close entry citing the periods doc — 8 zeroing lines + the retained-earnings line, balanced by makeEntry");
+  check(closeEntry.ts === periods.endOfDayPktInstant("2026-06-30") &&
+        periods.businessDateISO(closeEntry.ts) === "2026-06-30",
+    "D4 close: the entry is dated the FY's LAST DAY (2026-06-30) — an entry of that year");
+  const retainedLine = closeEntry.lines.find((l) => l.account === "retained_earnings");
+  check(!!retainedLine && retainedLine.credit === 20000 && retainedLine.debit === 0,
+    "D4 close: retained earnings is credited exactly 20,000 (the year's true net incl. 3,000 finance charges the MonthPL shape does not track)");
+  const J2 = [...J, closeEntry];
+  const inFy26 = (arr) => arr.filter((e) => e.ts >= range26.fromTs && e.ts < range26.toTs);
+  check(fiscal.plAccountCodes().every(
+          (c) => eq(ledger.accountBalance(inFy26(J2), c), 0)),
+    "D4 close: after the entry, EVERY P&L account's FY movement is zero — the year is zeroed, registry-wide");
+  check(eq(ledger.accountNormalBalance(J2.filter((e) => e.ts < range26.toTs), "retained_earnings"), 20000) &&
+        eq(ledger.accountNormalBalance(J2.filter((e) => e.ts < range26.toTs), "tax_payable"), 8000) &&
+        eq(ledger.accountNormalBalance(J2.filter((e) => e.ts < range26.toTs), "salary_payable"), 4000),
+    "D4 close: balance-sheet accounts are untouched by the close (tax payable 8,000 and salary payable 4,000 carry forward; retained earnings holds the result)");
+
+  /* ---- §4.6: the three-way P&L identity ---- */
+  const plAfter = ledger.profitAndLossInRange(J2, range26.fromTs, range26.toTs);
+  check(eq(plAfter.revenue, plBefore.revenue) && eq(plAfter.discounts, plBefore.discounts) &&
+        eq(plAfter.netRevenue, plBefore.netRevenue) && eq(plAfter.cogs, plBefore.cogs) &&
+        eq(plAfter.grossProfit, plBefore.grossProfit) &&
+        eq(plAfter.expensesTotal, plBefore.expensesTotal) &&
+        eq(plAfter.stockLoss, plBefore.stockLoss) && eq(plAfter.net, plBefore.net),
+    "D4 identity (§4.6): the closed year's P&L — with fy_close entries excluded — reads EXACTLY as before the close, field for field");
+  const summary = fiscal.closingEntrySummary(closeEntry);
+  const rowOf = (c) => summary.rows.find((r) => r.account === c)?.amount ?? 0;
+  check(eq(rowOf("sales_revenue"), plBefore.revenue) && eq(rowOf("sales_discount"), plBefore.discounts) &&
+        eq(rowOf("cogs"), plBefore.cogs) && eq(rowOf("inventory_loss"), plBefore.stockLoss) &&
+        eq(rowOf("expense_rent"), 60000) && eq(rowOf("expense_salary"), 80000) &&
+        eq(summary.net, 20000) && eq(plBefore.net - 3000, summary.net),
+    "D4 identity (§4.6): the closing entry's own summary agrees with the P&L on every tracked account, its net (20,000) being the P&L net less the finance charges it alone carries");
+  const plMonth = ledger.profitAndLoss(J2, new Date(T("2026-06-15")));
+  check(eq(plMonth.revenue, 0) && eq(plMonth.net, 0),
+    "D4 identity (§4.6): even the monthly P&L over the close month (June 2026) excludes the closing entry — it is a transfer, not trading");
+
+  /* ---- the trial balance tells the zeroed truth ---- */
+  const tbAfter = reports.trialBalance(J2, fiscal.reportRangeOf(range26));
+  check(tbAfter.balanced === true && tbAfter.difference === 0 && tbAfter.closingDifference === 0,
+    "D4 trial balance after close: still balanced (it does NOT exclude the closing entry)");
+  check(tbAfter.rows.filter((r) => fiscal.plAccountCodes().includes(r.account))
+          .every((r) => eq(r.closing, 0)) &&
+        eq(tbAfter.rows.find((r) => r.account === "retained_earnings")?.closing ?? 0, 20000),
+    "D4 trial balance after close: every P&L closing is 0 and retained earnings closes at 20,000");
+
+  /* ---- the new FY starts clean ---- */
+  const pl27Before = ledger.profitAndLossInRange(J, range27.fromTs, range27.toTs);
+  const pl27After = ledger.profitAndLossInRange(J2, range27.fromTs, range27.toTs);
+  check(eq(pl27Before.revenue, 50000) && eq(pl27Before.net, 20000) &&
+        eq(pl27After.revenue, 50000) && eq(pl27After.net, 20000),
+    "D4 new FY: FY 2026-27's P&L (revenue 50,000, net 20,000) is identical before and after the old year's close — the new year starts clean");
+
+  /* ---- openings are derived, never posted (§4.5) ---- */
+  const openings = fiscal.balanceSheetBalances(J2, range27.fromTs);
+  const openOf = (c) => openings.find((r) => r.account === c)?.balance ?? 0;
+  check(eq(openOf("cash"), 750000) && eq(openOf("capital"), 500000) &&
+        eq(openOf("retained_earnings"), 20000) && eq(openOf("payables"), 300000) &&
+        eq(openOf("inventory"), 78000) && eq(openOf("wip"), 4000) &&
+        openings.every((r) => !fiscal.plAccountCodes().includes(r.account)),
+    "D4 openings (§4.5): the next FY's opening balances derive from the continuous journal (cash 750,000 · capital 500,000 · retained 20,000 · inventory 78,000 · WIP 4,000) — no opening entry exists anywhere");
+
+  /* ---- close state, double-close, reopen (§4.3/§4.4) ---- */
+  const closeDoc = {
+    id: "per-d4-1", kind: "fiscal_year", from: range26.fromTs,
+    to: periods.endOfDayPktInstant("2026-06-30"), action: "close",
+    byUid: "u1", byEmail: "owner@example.com", ts: T("2026-07-05"),
+    note: "", prevLockedThrough: periods.endOfDayPktInstant("2025-12-31"),
+    entryId: closeEntry.id, warningsAcked: false,
+  };
+  check(fiscal.fiscalCloseState(J2, [closeDoc], range26).closed === true &&
+        fiscal.fiscalCloseState(J, [], range26).closed === false,
+    "D4 state: a closed year is detected from its doc + entry (this is what makes a second close refuse); an untouched year is open");
+  const mirror = fiscal.buildFiscalReopenEntry(closeEntry, T("2026-07-06"));
+  check(mirror.refType === "fy_close" && mirror.reversesId === closeEntry.id &&
+        mirror.lines.find((l) => l.account === "retained_earnings").debit === 20000 &&
+        ledger.entryBalances(mirror),
+    "D4 reopen: the mirror swaps every line (retained earnings debited back 20,000) and cites the closing entry in reversesId");
+  const reopenDoc = {
+    id: "per-d4-2", kind: "fiscal_year", from: closeDoc.from, to: closeDoc.to,
+    action: "reopen", byUid: "u1", byEmail: "owner@example.com",
+    ts: T("2026-07-06"), note: "missed bill", entryId: mirror.id,
+    reopensPeriodId: "per-d4-1",
+  };
+  const J3 = [...J2, mirror];
+  check(fiscal.fiscalCloseState(J3, [closeDoc, reopenDoc], range26).closed === false,
+    "D4 reopen: after the mirror + reopen doc, the year reads open again (the state the store's double-close guard and re-close both consult)");
+  check(fiscal.plAccountCodes().every(
+          (c) => eq(ledger.accountNormalBalance(J3, c), ledger.accountNormalBalance(J, c))) &&
+        eq(ledger.accountNormalBalance(J3, "retained_earnings"),
+           ledger.accountNormalBalance(J, "retained_earnings")),
+    "D4 reopen: every P&L balance and retained earnings are restored to the paisa — close + mirror cancel exactly, all-time");
+  check(closeDoc.prevLockedThrough === periods.endOfDayPktInstant("2025-12-31"),
+    "D4 reopen: the lock restoration target is the close doc's recorded prevLockedThrough — the store restores exactly this value in the reopen batch");
+
+  /* ---- stack discipline (§4.4) ---- */
+  const closeEntry27 = fiscal.buildFiscalClosingEntry(J2, range27, "per-d4-3");
+  const closeDoc27 = {
+    ...closeDoc, id: "per-d4-3", from: range27.fromTs,
+    to: periods.endOfDayPktInstant("2027-06-30"), ts: T("2027-07-05"),
+    entryId: closeEntry27.id,
+  };
+  const J4 = [...J2, closeEntry27];
+  check(fiscal.fiscalReopenBlocker(J4, [closeDoc, closeDoc27], closeDoc)?.id === "per-d4-3" &&
+        fiscal.fiscalReopenBlocker(J4, [closeDoc, closeDoc27], closeDoc27) === null,
+    "D4 stack: reopening FY 2025-26 while FY 2026-27 stands closed is BLOCKED by the later close; the latest year itself reopens freely");
+  const mirror27 = fiscal.buildFiscalReopenEntry(closeEntry27, T("2027-07-06"));
+  const reopenDoc27 = { ...reopenDoc, id: "per-d4-4", reopensPeriodId: "per-d4-3", entryId: mirror27.id };
+  check(fiscal.fiscalReopenBlocker([...J4, mirror27], [closeDoc, closeDoc27, reopenDoc27], closeDoc) === null,
+    "D4 stack: once the later year is reopened, the earlier year's reopen unblocks — closes unwind in reverse order only");
+
+  /* ---- period-lock interplay (§4.3 ordering + §7) ---- */
+  let lockedThrew = false;
+  try {
+    periods.preparePosting({ ...closeEntry }, periods.endOfDayPktInstant("2026-08-31"));
+  } catch (e) { lockedThrew = periods.isPeriodLockedError(e); }
+  check(lockedThrew,
+    "D4 lock: a closing entry dated inside an ALREADY-locked period is refused by the real guard (the close composes against the pre-close lock)");
+  const admitted = periods.preparePosting(
+    { ...closeEntry, dateISO: undefined },
+    periods.endOfDayPktInstant("2025-12-31"));
+  check(admitted.dateISO === "2026-06-30",
+    "D4 lock: against a lock reaching only mid-year, the same entry is admitted and stamps dateISO = the FY's last day");
+  let postCloseThrew = false;
+  try {
+    periods.preparePosting(
+      ledger.makeEntry("late bill", "sale", null,
+        [L("cash", 100, 0), L("sales_revenue", 0, 100)], { ts: T("2026-03-01") }),
+      periods.endOfDayPktInstant("2026-06-30"));
+  } catch (e) { postCloseThrew = periods.isPeriodLockedError(e); }
+  check(postCloseThrew,
+    "D4 lock: after the close advances the lock to the FY end, an ordinary posting dated inside the closed year refuses — the lock does its job");
+
+  /* ---- the zero-movement year: no entry, still a close (§4.3) ---- */
+  const range24 = periods.fiscalYearRange({}, T("2025-02-15"));
+  check(fiscal.buildFiscalClosingEntry(J, range24, "per-d4-9") === null,
+    "D4 zero year: an FY with no P&L movement composes NO entry (nothing to zero) — the close is its doc + lock only");
+  const zeroDoc = {
+    ...closeDoc, id: "per-d4-9", from: range24.fromTs,
+    to: periods.endOfDayPktInstant("2025-06-30"), entryId: null,
+  };
+  check(fiscal.fiscalCloseState(J, [zeroDoc], range24).closed === true &&
+        fiscal.fiscalCloseState(J, [zeroDoc, { ...reopenDoc, id: "per-d4-10", reopensPeriodId: "per-d4-9" }], range24).closed === false,
+    "D4 zero year: its close state rides the DOCS alone (entryId null), and a citing reopen doc opens it again");
+
+  /* ---- a loss year debits retained earnings (§4.3) ---- */
+  const JL = [
+    E("Sale", "sale", "2025-09-01", [L("cash", 10000, 0), L("sales_revenue", 0, 10000)]),
+    E("Rent", "expense", "2025-10-01", [L("expense_rent", 15000, 0), L("cash", 0, 15000)]),
+  ];
+  const lossEntry = fiscal.buildFiscalClosingEntry(JL, range26, "per-d4-7");
+  const lossRetained = lossEntry.lines.find((l) => l.account === "retained_earnings");
+  check(!!lossEntry && lossRetained.debit === 5000 && lossRetained.credit === 0 &&
+        ledger.entryBalances(lossEntry) &&
+        eq(fiscal.closingEntrySummary(lossEntry).net, -5000),
+    "D4 loss year: retained earnings is DEBITED the 5,000 loss and the entry still balances; the summary reports net −5,000");
+
+  /* ---- i18n: the D4 strings, both languages ---- */
+  const fyKeys = Object.keys(i18n.en).filter((k) => k.startsWith("fin.fy."));
+  check(fyKeys.length === 59 && fyKeys.every((k) => typeof i18n.ur[k] === "string" && i18n.ur[k].length > 0),
+    `i18n: D4 carries ${fyKeys.length} fin.fy.* keys (59 expected — 55 at D4; Fix Round 1 · F5 amendment: +4 fin.fy.openStock.* keys), each present and non-empty in Urdu`);
+  check(Object.keys(i18n.en).length === 3136 && Object.keys(i18n.ur).length === 3136,
+    "i18n: the dictionary now carries 3,054 keys, EN ≡ UR (E1 pin amendment: +53 print keys; E2 pin amendment: +37 print.brand keys; E3 pin amendment: +35 Raast keys (34 print.raast + billing.wa.raastLine); E4 pin amendment: +49 pin keys; F5 pin amendment: +1 sync.online key; G1 pin amendment: +8 biz keys; G2 pin amendment: +36 plan keys; G3 pin amendment: +89 platform keys; G4 pin amendment: +47 keys (35 renew.* + 12 platform.*); G6 pin amendment: +25 backup.* keys; H1 pin amendment: +51 loyalty keys; H3 pin amendment: +108 storefront keys; WA pin amendment: +109 WhatsApp keys)");
+
+  /* ---- source invariants: the store wiring ---- */
+  const storeSrcD4 = fs.readFileSync(
+    "/home/hatch/workspace/ai-dukaan-ai/web/components/StoreProvider.tsx", "utf8");
+  check((storeSrcD4.match(/makeEntry\(/g) || []).length === 24,
+    "source: still 24 makeEntry calls in the store — D4's closing and mirror entries compose in lib/fiscal + lib/payroll, no new inline posting path");
+  check((storeSrcD4.match(/can\(roleRef\.current, "fiscalClose", "write"\)/g) || []).length === 3 &&
+        storeSrcD4.includes("buildFiscalClosingEntry") &&
+        storeSrcD4.includes("buildOpeningStockEntry") &&
+        storeSrcD4.includes("fiscalYearCloseChecklist") &&
+        storeSrcD4.includes("lockedThrough: restored"),
+    "source: both FY actions are owner-gated on the fiscalClose row and compose through lib/fiscal; the reopen restores the recorded lock in its batch (Fix Round 1 · F5 amendment: a THIRD gate on the same row — postOpeningStock, composing through lib/fiscal's buildOpeningStockEntry)");
+
+  /* ---- rules: §4 needs NO change — byte-identical, asserted ---- */
+  const rulesD4 = fs.readFileSync(
+    "/home/hatch/workspace/ai-dukaan-ai/firebase/firestore.rules", "utf8");
+  check(crypto.createHash("sha256").update(stripE2BrandingBlock(stripG1Blocks(stripG2Blocks(rulesD4))), "utf8").digest("hex") ===
+        "3cae3c7641955ab4fda07aa21b404fc9274e1bd49dc2aabeb96269fefad1942c",
+    "rules: the D4 claim verified — the close rides the existing journal-create guard + owner-doc writes, so the rules file is byte-identical to the D3-state file (E2 same-check amendment: the additive branding block is stripped first — E2's only rules change, strip-proven in the E2 suite; G1 same-check amendment: the four G1 spans are stripped first — v9's only other deltas, strip-proven in the G1 suite)");
+
+  /* ---- seed / legacy regression: a shop that never closes ---- */
+  check(journal.length === 21 && !journal.some((e) => e.refType === "fy_close") &&
+        eq(ledger.accountBalance(journal, "inventory"), 272805) &&
+        eq(ledger.cashBalance(journal), 50000) &&
+        eq(ledger.payablesTotal(journal), 27900) &&
+        eq(ledger.receivablesTotal(journal), 5500),
+    "seed regression: the frozen identities stand and the seed carries no fy_close entry — the P&L exclusion is a no-op for shops that never close");
+}
+
+/* =============================== D5 =============================== */
+suite("D5", null); // Phase D · D5 — Tally export + journal CSV (design §5)
+{
+  const T = (dateISO, h = 6) =>
+    new Date(Date.parse(periods.startOfDayPktInstant(dateISO)) + h * 3600e3).toISOString();
+  const E = (memo, refType, dateISO, lines, refId = null) =>
+    ledger.makeEntry(memo, refType, refId, lines, { ts: T(dateISO) });
+  const L = (account, debit, credit, ref = null) => ({ account, debit, credit, ref });
+
+  const parties = {
+    customers: [
+      { id: "cust-1", name: "Haji Muhammad Saleem", phone: "0300-1", address: "", note: "", ts: "" },
+      { id: "cust-2", name: "Haji Muhammad Saleem", phone: "0300-2", address: "", note: "", ts: "" },
+    ],
+    suppliers: [
+      { id: "sup-1", name: "Malik Traders", phone: "", company: "", notes: "", ts: "" },
+    ],
+    employees: [
+      { id: "emp-1", name: "Ahmed Raza", phone: "", designation: "Salesman", linkedUserEmail: null, joinDateISO: null, payBasis: "monthly", baseAmount: 30000, allowances: [], paidLeaveDays: 0, active: true, note: "", ts: "" },
+    ],
+    accounts: [
+      { id: "acct-till", name: "Main Till", kind: "cash", method: "cash", legacyFor: "cash", archived: false, sortOrder: 0, ts: "" },
+    ],
+    docNumbers: new Map([
+      ["bill-0", "5"], ["bill-1", "6"], ["pay-1", "PV-1"], ["run-1", "PAY-1"], ["loan-1", "LN-1"],
+    ]),
+  };
+  const settings = { shopName: "Madina General Store" };
+
+  /* ---- §5.2: every COA code maps; groups are Tally's own ---- */
+  check(coa.ACCOUNT_CODES.length === 30 &&
+        coa.ACCOUNT_CODES.every((c) =>
+          tally.TALLY_LEDGER_MAP[c] &&
+          typeof tally.TALLY_LEDGER_MAP[c].name === "string" && tally.TALLY_LEDGER_MAP[c].name.length > 0 &&
+          typeof tally.TALLY_LEDGER_MAP[c].group === "string" && tally.TALLY_LEDGER_MAP[c].group.length > 0),
+    "mapping: all 28 COA codes carry a Tally ledger name + group — no unmapped code");
+  check(tally.TALLY_LEDGER_MAP.cash.name === "Cash" && tally.TALLY_LEDGER_MAP.cash.group === "Cash-in-Hand" &&
+        tally.TALLY_LEDGER_MAP.wallet.group === "Bank Accounts" &&
+        tally.TALLY_LEDGER_MAP.receivables.name === "Sundry Debtors — Control" &&
+        tally.TALLY_LEDGER_MAP.receivables.group === "Sundry Debtors" &&
+        tally.TALLY_LEDGER_MAP.payables.group === "Sundry Creditors" &&
+        tally.TALLY_LEDGER_MAP.loans_receivable.name === "Loans Receivable" &&
+        tally.TALLY_LEDGER_MAP.loans_receivable.group === "Loans & Advances (Asset)" &&
+        tally.TALLY_LEDGER_MAP.loans_payable.group === "Loans (Liability)" &&
+        tally.TALLY_LEDGER_MAP.retained_earnings.group === "Reserves & Surplus" &&
+        tally.TALLY_LEDGER_MAP.sales_discount.group === "Sales Accounts" &&
+        tally.TALLY_LEDGER_MAP.cogs.group === "Direct Expenses" &&
+        tally.TALLY_LEDGER_MAP.expense_finance.name === "Finance Charges" &&
+        tally.TALLY_LEDGER_MAP.expense_finance.group === "Indirect Expenses" &&
+        tally.TALLY_LEDGER_MAP.tax_payable.group === "Duties & Taxes" &&
+        tally.TALLY_LEDGER_MAP.salary_payable.group === "Current Liabilities",
+    "mapping: the §5.2 table's names + predefined groups are verbatim");
+
+  /* ---- name overrides move names only, never groups ---- */
+  const overridden = { shopName: "X", tallyLedgerNames: { sales_revenue: "Sales A/c", cash: "  " } };
+  check(tally.tallyLedgerName("sales_revenue", overridden) === "Sales A/c" &&
+        tally.tallyLedgerName("cash", overridden) === "Cash" &&
+        tally.TALLY_LEDGER_MAP.sales_revenue.group === "Sales Accounts",
+    "overrides: tallyLedgerNames renames a ledger (blank overrides ignored); its group is untouched");
+
+  /* ---- §5.3: the full refType → voucher-type table ---- */
+  const ALL_REFTYPES = [
+    "sale", "bill", "bill_void", "return", "purchase", "supplier_payment",
+    "expense", "expense_reversal", "credit", "repayment", "adjustment",
+    "cashbook", "seed", "transfer", "tax_payment", "purchase_return",
+    "cheque_clearing", "cheque_bounce", "cheque_return", "transfer_loss",
+    "reclass", "production_issue", "production_complete", "production_scrap",
+    "job_material", "job_material_return", "payroll_accrual", "payroll_payment",
+    "salary_advance", "loan_drawdown", "loan_charge", "loan_repayment", "fy_close",
+  ];
+  const VCH_TYPES = ["Sales", "Purchase", "Payment", "Receipt", "Contra", "Journal", "Debit Note", "Credit Note"];
+  check(ALL_REFTYPES.length === 33 &&
+        ALL_REFTYPES.every((rt) =>
+          VCH_TYPES.includes(tally.tallyVoucherType(rt, "payable")) &&
+          VCH_TYPES.includes(tally.tallyVoucherType(rt, "receivable"))),
+    "voucher types: every one of the 33 postable refTypes maps to a Tally voucher type in both directions");
+  check(tally.tallyVoucherType("bill") === "Sales" && tally.tallyVoucherType("sale") === "Sales" &&
+        tally.tallyVoucherType("purchase") === "Purchase" &&
+        tally.tallyVoucherType("return") === "Credit Note" &&
+        tally.tallyVoucherType("purchase_return") === "Debit Note" &&
+        tally.tallyVoucherType("supplier_payment") === "Payment" &&
+        tally.tallyVoucherType("expense") === "Payment" &&
+        tally.tallyVoucherType("expense_reversal") === "Payment" &&
+        tally.tallyVoucherType("payroll_payment") === "Payment" &&
+        tally.tallyVoucherType("salary_advance") === "Payment" &&
+        tally.tallyVoucherType("repayment") === "Receipt" &&
+        tally.tallyVoucherType("credit") === "Receipt" &&
+        tally.tallyVoucherType("transfer") === "Contra" &&
+        tally.tallyVoucherType("tax_payment") === "Journal" &&
+        tally.tallyVoucherType("cheque_bounce") === "Journal" &&
+        tally.tallyVoucherType("payroll_accrual") === "Journal" &&
+        tally.tallyVoucherType("loan_charge") === "Journal" &&
+        tally.tallyVoucherType("fy_close") === "Journal" &&
+        tally.tallyVoucherType("adjustment") === "Journal" &&
+        tally.tallyVoucherType("seed") === "Journal",
+    "voucher types: the §5.3 fixed table is exact (Sales/Purchase/Credit Note/Debit Note/Payment/Receipt/Contra/Journal catch-all)");
+  check(tally.tallyVoucherType("loan_drawdown", "payable") === "Contra" &&
+        tally.tallyVoucherType("loan_drawdown", "receivable") === "Receipt" &&
+        tally.tallyVoucherType("loan_repayment", "payable") === "Payment" &&
+        tally.tallyVoucherType("loan_repayment", "receivable") === "Receipt" &&
+        tally.tallyVoucherType("loan_drawdown") === "Contra",
+    "voucher types: the loan refTypes are directional — drawdown payable Contra / receivable Receipt; repayment payable Payment / receivable Receipt");
+  {
+    const ddP = E("Loan in", "loan_drawdown", "2026-07-10",
+      [L("cash", 1000, 0), L("loans_payable", 0, 1000, "loan-1")]);
+    const ddR = E("Loan out", "loan_drawdown", "2026-07-10",
+      [L("loans_receivable", 1000, 0, "loan-2"), L("cash", 0, 1000)]);
+    const rpR = E("Loan back", "loan_repayment", "2026-07-11",
+      [L("cash", 400, 0), L("loans_receivable", 0, 400, "loan-2")]);
+    check(tally.voucherTypeForEntry(ddP) === "Contra" &&
+          tally.voucherTypeForEntry(ddR) === "Receipt" &&
+          tally.voucherTypeForEntry(rpR) === "Receipt" &&
+          tally.loanDirectionOf(ddP) === "payable" && tally.loanDirectionOf(rpR) === "receivable",
+      "voucher types: an entry's loan direction derives from its own loan-account lines — no register lookup");
+  }
+
+  /* ---- the fixture journal: June (pre-range) + July (the range) ---- */
+  const nastyMemo = 'Rent, "shop" & <main> — کرایہ';
+  const J = [
+    E("Owner capital in", "cashbook", "2026-06-05",
+      [L("cash", 200000, 0, "acct-till"), L("capital", 0, 200000)]),
+    E("Purchase — goods in", "purchase", "2026-06-10",
+      [L("purchases", 40000, 0), L("payables", 0, 40000, "sup-1")]),
+    E("Purchase — into stock", "purchase", "2026-06-10",
+      [L("inventory", 40000, 0), L("purchases", 0, 40000)]),
+    E("Bill #5", "bill", "2026-06-20",
+      [L("cash", 5000, 0, "acct-till"), L("sales_revenue", 0, 5000)], "bill-0"),
+    E("Bill #6", "bill", "2026-07-03",
+      [L("cash", 10000, 0, "acct-till"), L("receivables", 15000, 0, "cust-1"), L("sales_revenue", 0, 25000)], "bill-1"),
+    E("Repayment — Haji Muhammad Saleem", "repayment", "2026-07-05",
+      [L("cash", 5000, 0, "acct-till"), L("receivables", 0, 5000, "cust-1")], "cred-1"),
+    E("Payment — Malik Traders", "supplier_payment", "2026-07-06",
+      [L("payables", 20000, 0, "sup-1"), L("cash", 0, 20000, "acct-till")], "pay-1"),
+    E("Return — Bill #6", "return", "2026-07-08",
+      [L("sales_revenue", 2000, 0), L("cash", 0, 2000, "acct-till")], "bill-1"),
+    E("Loan drawdown LN-1", "loan_drawdown", "2026-07-10",
+      [L("cash", 100000, 0, "acct-till"), L("loans_payable", 0, 100000, "loan-1")], "loan-1"),
+    E(nastyMemo, "expense", "2026-07-15",
+      [L("expense_rent", 12000, 0), L("cash", 0, 12000, "acct-till")]),
+    E("Loan repayment LN-1", "loan_repayment", "2026-07-20",
+      [L("loans_payable", 10000, 0, "loan-1"), L("cash", 0, 10000, "acct-till")], "loan-1"),
+    E("Payroll accrual PAY-1", "payroll_accrual", "2026-07-31",
+      [L("expense_salary", 30000, 0), L("salary_payable", 0, 30000, "emp-1")], "run-1"),
+  ];
+  const range = reports.resolveReportRange("custom", null, { from: "2026-07-01", to: "2026-07-31" });
+  const model = tally.buildTallyExport(J, parties, settings, range);
+  const tb = reports.trialBalance(J, range);
+  const masterByName = new Map(model.masters.map((m) => [m.name, m]));
+
+  check(model.vouchers.length === 8,
+    "model: one voucher per in-range entry (8 July entries; the 4 June entries stay out)");
+  check(model.vouchers.every((v) => eq(v.debitTotal, v.creditTotal)),
+    "model: every voucher balances in our terms (ΣDr == ΣCr) before the Tally sign conversion");
+  check(eq(model.totalDebits, tb.totalDebits) && eq(model.totalCredits, tb.totalCredits) && eq(tb.difference, 0),
+    "model: the export's aggregate totals equal the period trial balance exactly");
+  check(model.company === "Madina General Store" && model.fromDate === "2026-07-01" && model.toDate === "2026-07-31",
+    "model: the company name rides from settings; the range echoes the requested period");
+
+  /* ---- party ledgers vs control ledgers ---- */
+  check(masterByName.has("Haji Muhammad Saleem") && masterByName.get("Haji Muhammad Saleem").group === "Sundry Debtors" &&
+        masterByName.has("Malik Traders") && masterByName.get("Malik Traders").group === "Sundry Creditors" &&
+        masterByName.has("Ahmed Raza") && masterByName.get("Ahmed Raza").group === "Current Liabilities",
+    "party ledgers: ref'd receivables/payables/salary lines mint per-party ledgers under the mapped groups");
+  check(!masterByName.has("Sundry Debtors — Control") && !masterByName.has("Sundry Creditors — Control") &&
+        !masterByName.has("Salary Payable"),
+    "party ledgers: when every receivables/payables/salary line is ref'd, the control and account masters for those accounts never appear — the party ledgers carry the whole truth");
+  {
+    const billV = model.vouchers.find((v) => v.number === "6");
+    const recLine = billV.lines.find((l) => l.ledgerName === "Haji Muhammad Saleem");
+    const cashLine = billV.lines.find((l) => l.ledgerName === "Cash");
+    check(!!recLine && eq(recLine.debit, 15000) && recLine.isDeemedPositive && eq(recLine.amount, -15000) &&
+          !!cashLine && eq(cashLine.amount, -10000) &&
+          billV.type === "Sales" && billV.date === "20260703" && billV.dateISO === "2026-07-03",
+      "vouchers: the bill's receivable leg lands on the customer's own ledger; Tally amounts are negative for debits (deemed positive), the date is YYYYMMDD");
+    const salesLine = billV.lines.find((l) => l.ledgerName === "Sales");
+    check(!!salesLine && !salesLine.isDeemedPositive && eq(salesLine.amount, 25000),
+      "vouchers: a credit line is not deemed positive and its Tally amount is positive");
+  }
+  check(model.vouchers.find((v) => v.entryId === J[5].id).number === null &&
+        model.vouchers.find((v) => v.type === "Contra").number === "LN-1" &&
+        model.vouchers.find((v) => v.type === "Journal" && v.narration.startsWith("Payroll")).number === "PAY-1" &&
+        model.vouchers.filter((v) => v.type === "Payment").some((v) => v.number === "PV-1") &&
+        model.vouchers.some((v) => v.type === "Credit Note") &&
+        model.vouchers.some((v) => v.type === "Receipt"),
+    "voucher numbers: the cited documents' numbers ride (bill 6, PV-1, PAY-1, LN-1); an unmapped refId exports unnumbered; types follow the entries");
+
+  /* ---- opening balances: derived in-file for a mid-journal range ---- */
+  check(eq(masterByName.get("Cash").openingBalance, -205000) &&
+        eq(masterByName.get("Owner Capital").openingBalance, 200000) &&
+        eq(masterByName.get("Malik Traders").openingBalance, 40000) &&
+        eq(masterByName.get("Stock — Goods").openingBalance, -40000) &&
+        eq(masterByName.get("Sales").openingBalance, 5000) &&
+        eq(masterByName.get("Loans Payable").openingBalance, 0),
+    "openings: each ledger's pre-range balance is derived per ledger (party-aware) in Tally's sign convention (debit negative)");
+  {
+    // The openings + in-range movement must reproduce the closing truth.
+    const tbAll = reports.trialBalance(J, reports.resolveReportRange("custom", null, { from: "2026-06-01", to: "2026-07-31" }));
+    check(eq(tbAll.closingDifference, 0) &&
+          eq(sum(model.masters.map((m) => m.openingBalance)) +
+             (model.totalCredits - model.totalDebits), 0),
+      "openings: Σ openings netted against the period's movement stays zero — the file's books balance end to end");
+    const fullModel = tally.buildTallyExport(J, parties, settings,
+      reports.resolveReportRange("custom", null, { from: "2026-06-01", to: "2026-07-31" }));
+    check(fullModel.masters.every((m) => m.openingBalance === 0) && fullModel.vouchers.length === 12,
+      "openings: a range starting at the journal's first entry emits NO opening balances (they are manufactured per export, never stored)");
+  }
+
+  /* ---- overrides flow into the file ---- */
+  {
+    const m2 = tally.buildTallyExport(J, parties,
+      { shopName: "Madina General Store", tallyLedgerNames: { sales_revenue: "Sales A/c" } }, range);
+    check(m2.masters.some((m) => m.name === "Sales A/c" && m.group === "Sales Accounts") &&
+          !m2.masters.some((m) => m.name === "Sales") &&
+          m2.vouchers.every((v) => v.lines.every((l) => l.ledgerName !== "Sales")),
+      "overrides: a renamed ledger is used by masters AND voucher lines alike; the group stays Sales Accounts");
+  }
+
+  /* ---- same-name parties never merge ---- */
+  {
+    const clash = [
+      E("Sale A", "bill", "2026-07-02",
+        [L("receivables", 100, 0, "cust-1"), L("sales_revenue", 0, 100)]),
+      E("Sale B", "bill", "2026-07-03",
+        [L("receivables", 200, 0, "cust-2"), L("sales_revenue", 0, 200)]),
+    ];
+    const cm = tally.buildTallyExport(clash, parties, settings, range);
+    const names = cm.masters.filter((m) => m.isParty).map((m) => m.name);
+    check(names.length === 2 && names.includes("Haji Muhammad Saleem") && names.includes("Haji Muhammad Saleem (2)"),
+      "party ledgers: two parties sharing a name get distinct Tally ledgers (clean name + suffixed), never a silent merge");
+  }
+
+  /* ---- the XML: well-formed, escaped, reconciled ---- */
+  function xmlWellFormed(xml) {
+    const stack = [];
+    const re = /<\?[\s\S]*?\?>|<!--[\s\S]*?-->|<\/?[A-Za-z][^>]*?>/g;
+    let m, last = 0;
+    while ((m = re.exec(xml))) {
+      if (/[<>]/.test(xml.slice(last, m.index))) return false;
+      last = m.index + m[0].length;
+      const tag = m[0];
+      if (tag.startsWith("<?") || tag.startsWith("<!--")) continue;
+      if (tag.endsWith("/>")) continue;
+      if (tag.startsWith("</")) {
+        if (stack.pop() !== tag.slice(2, -1).trim()) return false;
+      } else stack.push(tag.slice(1).split(/[\s>]/)[0]);
+    }
+    return stack.length === 0 && !/[<>]/.test(xml.slice(last));
+  }
+  const xml = tally.tallyXML(J, parties, settings, range);
+  check(xmlWellFormed(xml) && xml.startsWith('<?xml version="1.0" encoding="UTF-8"?>'),
+    "XML: the generated file is well-formed (balanced tags, no stray angle brackets in text)");
+  check((xml.match(/<VOUCHER /g) || []).length === 8 &&
+        (xml.match(/<LEDGER /g) || []).length === model.masters.length &&
+        xml.includes("<SVCURRENTCOMPANY>Madina General Store</SVCURRENTCOMPANY>") &&
+        xml.includes("<OPENINGBALANCE>-205000.00</OPENINGBALANCE>") &&
+        !xml.includes("<OPENINGBALANCE>0.00</OPENINGBALANCE>"),
+    "XML: one TALLYMESSAGE per master and per voucher; the company rides in SVCURRENTCOMPANY; zero openings are omitted, real ones print signed");
+  check(xml.includes("Rent, &quot;shop&quot; &amp; &lt;main&gt; — کرایہ") && !xml.includes("<main>"),
+    "XML: memos are escaped (&, <, >, quotes) while Urdu text passes through as UTF-8");
+  {
+    const blocks = xml.split("<VOUCHER ").slice(1).map((s) => s.split("</VOUCHER>")[0]);
+    let aggDr = 0, aggCr = 0, perVoucherOk = blocks.length === 8;
+    for (const b of blocks) {
+      let dr = 0, cr = 0;
+      for (const mm of b.matchAll(/<ALLLEDGERENTRIES\.LIST>([\s\S]*?)<\/ALLLEDGERENTRIES\.LIST>/g)) {
+        const inner = mm[1];
+        const deemed = /<ISDEEMEDPOSITIVE>(\w+)<\/ISDEEMEDPOSITIVE>/.exec(inner)[1] === "Yes";
+        const amount = parseFloat(/<AMOUNT>(-?[\d.]+)<\/AMOUNT>/.exec(inner)[1]);
+        if (deemed) dr += -amount; else cr += amount;
+      }
+      if (!eq(dr, cr)) perVoucherOk = false;
+      aggDr += dr; aggCr += cr;
+    }
+    check(perVoucherOk && eq(aggDr, tb.totalDebits) && eq(aggCr, tb.totalCredits),
+      "XML: re-parsing the FILE reconciles — every voucher's deemed-positive total equals its credit total, and the file's aggregate equals the trial balance");
+  }
+  check(tally.tallyXML(J, parties, settings, range) === xml,
+    "XML: the exporter is deterministic — identical inputs render byte-identical files");
+
+  /* ---- fy_close: the voucher number is the FY label (§6.3) ---- */
+  {
+    const close = E("FY close", "fy_close", "2026-06-30",
+      [L("sales_revenue", 100, 0), L("retained_earnings", 0, 100)], "periods-doc-1");
+    check(tally.voucherNumberFor(close, parties, settings) === "FY 2025-26" &&
+          tally.voucherTypeForEntry(close) === "Journal",
+      "fy_close: its voucher number is the fiscal-year label (FY 2025-26), not a series number");
+  }
+
+  /* ---- the journal CSV ---- */
+  const csv = tally.journalCSV(J, parties, settings, range);
+  const parsed = csvLib.parseCSV(csv);
+  const inRangeLines = J.filter((e) => reports.inRange(e.ts, range))
+    .reduce((n, e) => n + e.lines.length, 0);
+  check(csv.split("\n")[0] === tally.JOURNAL_CSV_HEADERS.join(",") &&
+        parsed.length === inRangeLines && inRangeLines === 17,
+    "CSV: the header is the design's eight columns and the row count equals the period's journal-line count (17)");
+  {
+    const nasty = parsed.find((r) => r.narration === nastyMemo);
+    const billRows = parsed.filter((r) => r["voucher no"] === "6" && r.type === "Sales");
+    check(!!nasty && nasty.account === "Rent" && eq(parseFloat(nasty.debit), 12000),
+      "CSV: a memo carrying commas, quotes and Urdu round-trips through the house parser byte-exact");
+    check(billRows.length === 3 &&
+          billRows.some((r) => r.account === "Haji Muhammad Saleem" && r["party/ref"] === "Haji Muhammad Saleem") &&
+          billRows.some((r) => r.account === "Cash" && r["party/ref"] === "Main Till") &&
+          billRows.every((r) => r.type === "Sales" && r.date === "2026-07-03"),
+      "CSV: rows carry the same ledger naming as the XML (party ledger for the receivable leg, bucket ledger for cash), the money account in Party/Ref, the voucher type and the business date");
+    check(eq(sum(parsed.map((r) => parseFloat(r.debit || "0"))), tb.totalDebits) &&
+          eq(sum(parsed.map((r) => parseFloat(r.credit || "0"))), tb.totalCredits),
+      "CSV: the flat rows sum to the trial balance — the fallback loses nothing");
+  }
+  {
+    const emptyRange = reports.resolveReportRange("custom", null, { from: "2024-01-01", to: "2024-01-31" });
+    const emptyModel = tally.buildTallyExport(J, parties, settings, emptyRange);
+    check(emptyModel.vouchers.length === 0 &&
+          tally.journalCSV(J, parties, settings, emptyRange) === tally.JOURNAL_CSV_HEADERS.join(",") &&
+          xmlWellFormed(tally.tallyXML(J, parties, settings, emptyRange)),
+      "empty range: no vouchers, a header-only CSV, and a still-well-formed XML envelope");
+  }
+
+  /* ---- the seed journal exports whole; frozen identities stand ---- */
+  {
+    const seedParties = {
+      customers: seed.getSeedCustomers(),
+      suppliers: seed.getSeedSuppliers(),
+      employees: seed.getSeedEmployees(),
+      accounts,
+    };
+    const seedSettings = seed.getSeedSettings();
+    const allRange = reports.resolveReportRange("custom", null, { from: "2000-01-01", to: "2100-12-31" });
+    const sm = tally.buildTallyExport(journal, seedParties, seedSettings, allRange);
+    const stb = reports.trialBalance(journal, allRange);
+    check(journal.length === 21 && sm.vouchers.length === 21 &&
+          sm.vouchers.every((v) => eq(v.debitTotal, v.creditTotal)) &&
+          eq(sm.totalDebits, stb.totalDebits) && eq(sm.totalCredits, stb.totalCredits) &&
+          sm.masters.every((m) => m.openingBalance === 0),
+      "seed: all 21 seed entries export as balanced vouchers reconciling to the seed trial balance, with no manufactured openings");
+    check(xmlWellFormed(tally.tallyXML(journal, seedParties, seedSettings, allRange)),
+      "seed: the full seed journal renders as well-formed Tally XML");
+  }
+
+  /* ---- i18n: the D5 export keys ---- */
+  const d5Keys = [
+    "fin.export.tallyTitle", "fin.export.range", "fin.export.lastFiscal", "fin.export.all",
+    "fin.export.count", "fin.export.tally", "fin.export.journalCsv", "fin.export.empty",
+    "fin.export.tallyNote", "fin.export.ledgerNames", "fin.export.ledgerNamesCaption",
+    "fin.export.ledgerSaved",
+  ];
+  check(d5Keys.length === 12 &&
+        d5Keys.every((k) => typeof i18n.en[k] === "string" && i18n.en[k].length > 0 &&
+                           typeof i18n.ur[k] === "string" && i18n.ur[k].length > 0),
+    "i18n: the 12 new D5 fin.export.* keys are present and non-empty in both languages (parity)");
+  check(Object.keys(i18n.en).length === 3136 && Object.keys(i18n.ur).length === 3136,
+    "i18n: the dictionary now carries 3,054 keys, EN ≡ UR (D5: +12 fin.export keys; E1 pin amendment: +53 print keys; E2 pin amendment: +37 print.brand keys; E3 pin amendment: +35 Raast keys (34 print.raast + billing.wa.raastLine); E4 pin amendment: +49 pin keys; F5 pin amendment: +1 sync.online key; G1 pin amendment: +8 biz keys; G2 pin amendment: +36 plan keys; G3 pin amendment: +89 platform keys; G4 pin amendment: +47 keys (35 renew.* + 12 platform.*); G6 pin amendment: +25 backup.* keys; H1 pin amendment: +51 loyalty keys; H3 pin amendment: +108 storefront keys; WA pin amendment: +109 WhatsApp keys)");
+
+  /* ---- source invariants: purity + wiring ---- */
+  const tallySrc = fs.readFileSync(
+    "/home/hatch/workspace/ai-dukaan-ai/web/lib/tally.ts", "utf8");
+  check(!/writeBatch|guardPostings|setDoc|updateDoc|addDoc|deleteDoc/.test(tallySrc) &&
+        tallySrc.includes("TALLY_LEDGER_MAP") && tallySrc.includes("buildTallyExport"),
+    "source: lib/tally is a pure renderer — no store-write or posting call exists in it");
+  const finSrcD5 = fs.readFileSync(
+    "/home/hatch/workspace/ai-dukaan-ai/web/components/FinanceView.tsx", "utf8");
+  const repSrcD5 = fs.readFileSync(
+    "/home/hatch/workspace/ai-dukaan-ai/web/components/ReportsView.tsx", "utf8");
+  const setSrcD5 = fs.readFileSync(
+    "/home/hatch/workspace/ai-dukaan-ai/web/components/SettingsView.tsx", "utf8");
+  const storeSrcD5 = fs.readFileSync(
+    "/home/hatch/workspace/ai-dukaan-ai/web/components/StoreProvider.tsx", "utf8");
+  check(finSrcD5.includes("ExportsPanel") && repSrcD5.includes("TallyExportButtons") &&
+        setSrcD5.includes("tallyLedgerNames") &&
+        (storeSrcD5.match(/makeEntry\(/g) || []).length === 24,
+    "source: Finance hosts the export panel, Reports' trial balance hosts the same actions, Settings edits tallyLedgerNames; still 24 makeEntry calls in the store");
+
+  /* ---- rules: D5 needs NO change — byte-identical, asserted ---- */
+  const rulesD5 = fs.readFileSync(
+    "/home/hatch/workspace/ai-dukaan-ai/firebase/firestore.rules", "utf8");
+  check(crypto.createHash("sha256").update(stripE2BrandingBlock(stripG1Blocks(stripG2Blocks(rulesD5))), "utf8").digest("hex") ===
+        "3cae3c7641955ab4fda07aa21b404fc9274e1bd49dc2aabeb96269fefad1942c",
+    "rules: exports read only the already-readable journal — the rules file is byte-identical to the D3/D4-state file (E2 same-check amendment: the additive branding block is stripped first — E2's only rules change, strip-proven in the E2 suite; G1 same-check amendment: the four G1 spans are stripped first — v9's only other deltas, strip-proven in the G1 suite)");
+
+  /* ---- seed regression: exporting changes nothing ---- */
+  check(journal.length === 21 &&
+        eq(ledger.accountBalance(journal, "inventory"), 272805) &&
+        eq(ledger.cashBalance(journal), 50000) &&
+        eq(ledger.payablesTotal(journal), 27900) &&
+        eq(ledger.receivablesTotal(journal), 5500),
+    "seed regression: the frozen identities stand — the exporter derived everything and stored nothing");
+}
+
+/* =============================== E1 =============================== */
+suite("E1", null); // Phase E · E1 — print design foundation + invoice designer (design §1)
+{
+  const R = (pd) => print.resolvePrintDesign(pd ? { printDesign: pd } : {});
+  const DEF = R(null);
+
+  /* ---- §1.2: the resolver — defaults ARE today's rendering ---- */
+  let defOk = true;
+  try {
+    assert.deepStrictEqual(DEF, {
+      paper: "a4", fontScale: "standard", showLogo: false, logoSize: "m",
+      showShopName: true, showShopNameAlt: true, showAddress: true, showPhone: true,
+      colSku: false, colUrduName: false, colTax: false, colDiscount: false,
+      footerNote: "", termsText: "", showThanks: true, thanksText: "",
+      showSignature: false, headerMode: "text", showLetterheadFooter: false,
+      stampMode: "paid",
+      stampDocs: { notes: false, vouchers: false, quotations: false },
+      signDocs: { vouchers: true, salarySlips: true, bills: false },
+      showRaastQr: false, raastQrSize: "m", raastDynamic: true,
+    });
+  } catch { defOk = false; }
+  check(defOk,
+    "resolver: an absent printDesign resolves to the pinned default snapshot — classic A4, every identity line on, every E1 column/stamp/signature novelty off except the voucher + salary-slip signature lines that always printed");
+  check(JSON.stringify(R({})) === JSON.stringify(DEF) &&
+        JSON.stringify(print.resolvePrintDesign({ shopName: "X" })) === JSON.stringify(DEF),
+    "resolver: an empty design (the designer's Reset state) is absence-equivalent — the single seam makes {} and missing indistinguishable");
+
+  const sweeps = [
+    [{ paper: "a5" }, "paper", "a5"], [{ paper: "thermal80" }, "paper", "thermal80"],
+    [{ fontScale: "large" }, "fontScale", "large"],
+    [{ showLogo: true }, "showLogo", true], [{ logoSize: "l" }, "logoSize", "l"],
+    [{ showShopName: false }, "showShopName", false],
+    [{ showShopNameAlt: false }, "showShopNameAlt", false],
+    [{ showAddress: false }, "showAddress", false], [{ showPhone: false }, "showPhone", false],
+    [{ colSku: true }, "colSku", true], [{ colUrduName: true }, "colUrduName", true],
+    [{ colTax: true }, "colTax", true], [{ colDiscount: true }, "colDiscount", true],
+    [{ footerNote: "Note" }, "footerNote", "Note"], [{ termsText: "Terms" }, "termsText", "Terms"],
+    [{ showThanks: false }, "showThanks", false], [{ thanksText: "Shukriya" }, "thanksText", "Shukriya"],
+    [{ showSignature: true }, "showSignature", true],
+    [{ headerMode: "letterhead" }, "headerMode", "letterhead"],
+    [{ showLetterheadFooter: true }, "showLetterheadFooter", true],
+    [{ stampMode: "always" }, "stampMode", "always"],
+    [{ showRaastQr: true }, "showRaastQr", true], [{ raastQrSize: "s" }, "raastQrSize", "s"],
+    [{ raastDynamic: false }, "raastDynamic", false],
+  ];
+  check(sweeps.every(([patch, key, val]) => {
+    const r = R(patch);
+    return r[key] === val &&
+      Object.keys(DEF).every((k) => k === key || JSON.stringify(r[k]) === JSON.stringify(DEF[k]));
+  }),
+    "resolver: each single-field patch moves exactly its own resolved key and no other (24-field sweep)");
+  check(R({ stampDocs: { notes: true } }).stampDocs.notes === true &&
+        R({ stampDocs: { notes: true } }).stampDocs.vouchers === false &&
+        R({ stampDocs: { notes: true } }).stampDocs.quotations === false &&
+        R({ signDocs: { bills: true } }).signDocs.bills === true &&
+        R({ signDocs: { bills: true } }).signDocs.vouchers === true &&
+        R({ signDocs: { bills: true } }).signDocs.salarySlips === true &&
+        R({ signDocs: { vouchers: false } }).signDocs.salarySlips === true,
+    "resolver: nested stampDocs/signDocs patches merge over the defaults field-by-field — a partial nested object never zeroes its siblings");
+
+  const FULL = {
+    paper: "a5", fontScale: "large", showLogo: true, logoSize: "s",
+    showShopName: false, showShopNameAlt: false, showAddress: false, showPhone: false,
+    colSku: true, colUrduName: true, colTax: true, colDiscount: true,
+    footerNote: "F", termsText: "T", showThanks: false, thanksText: "Th",
+    showSignature: true, headerMode: "logo-text", showLetterheadFooter: true,
+    stampMode: "never",
+    stampDocs: { notes: true, vouchers: true, quotations: true },
+    signDocs: { vouchers: false, salarySlips: false, bills: true },
+    showRaastQr: true, raastQrSize: "l", raastDynamic: false,
+  };
+  let passOk = true;
+  try { assert.deepStrictEqual(R(FULL), FULL); } catch { passOk = false; }
+  check(passOk,
+    "resolver: a fully-specified design passes through untouched — no field is dropped, coerced or re-defaulted");
+
+  /* ---- §1.7: paper mechanics ---- */
+  check(print.paperPageRule("a4") === "size: A4 portrait; margin: 10mm" &&
+        print.paperPageRule("a4-compact") === "size: A4 portrait; margin: 10mm" &&
+        print.paperPageRule("a5") === "size: A5 portrait; margin: 8mm" &&
+        print.paperPageRule("thermal80") === "size: 80mm auto; margin: 4mm",
+    "@page: the paper mapping verbatim — compact is a layout on A4 paper (A4's rule), A5 at 8mm, thermal 80mm auto at 4mm");
+  check(print.receiptClassName(DEF) === "receipt" &&
+        print.receiptClassName(R({ paper: "a4-compact" })) === "receipt receipt-compact" &&
+        print.receiptClassName(R({ paper: "a5" })) === "receipt receipt-a5" &&
+        print.receiptClassName(R({ paper: "thermal80" })) === "receipt receipt-80" &&
+        print.receiptClassName(R({ fontScale: "large" })) === "receipt receipt-lg" &&
+        print.receiptClassName(R({ paper: "thermal80", fontScale: "large" })) === "receipt receipt-80 receipt-lg" &&
+        print.receiptClassName(DEF, "thermal80") === "receipt receipt-80" &&
+        print.receiptClassName(R({ paper: "thermal80" }), "a4") === "receipt",
+    "layouts: the class composition — classic A4 is the bare .receipt (today's measure); the desk's per-print paper override wins over the template in both directions");
+
+  /* ---- §1.5: the slot matrix, enforced structurally ---- */
+  check(print.slotsFor("challan").signature === "customer" && print.slotsFor("challan").stamp === "none" &&
+        print.slotsFor("job").signature === "customer" &&
+        print.slotsFor("bill").stamp === "rule" && print.slotsFor("bill").signature === "shop" &&
+        print.slotsFor("voucher").signature === "shop" && print.slotsFor("voucher").stamp === "toggle" &&
+        print.slotsFor("salarySlip").signature === "shop" && print.slotsFor("salarySlip").footerNote === false &&
+        print.slotsFor("report").paper === false && print.slotsFor("report").terms === false &&
+        print.slotsFor("note").colTax === true && print.slotsFor("note").colDiscount === false &&
+        print.slotsFor("quotation").colTax === false && print.slotsFor("quotation").colDiscount === true &&
+        print.slotsFor("transfer").footerNote === false && print.slotsFor("production").terms === false,
+    "slots: the §1.5 matrix as declared — challan/job signature lines are the customer's, the bill stamp is the status rule, reports take no template paper or terms, the note is tax-never-discount, the quotation discount-never-tax");
+  const ALL_ON = R({ colSku: true, colUrduName: true, colTax: true, colDiscount: true });
+  const NO_COLS = JSON.stringify({ sku: false, urduName: false, tax: false, discount: false });
+  check(["challan", "po", "transfer", "production", "job", "voucher", "salarySlip", "report"]
+          .every((k) => JSON.stringify(print.resolveItemColumns(ALL_ON, k)) === NO_COLS),
+    "slots: with EVERY column toggle on, the price-free documents still resolve to no item columns at all — a delivery challan can NEVER gain prices through the designer");
+  check(JSON.stringify(print.resolveItemColumns(ALL_ON, "bill")) ===
+          JSON.stringify({ sku: true, urduName: true, tax: true, discount: true }) &&
+        JSON.stringify(print.resolveItemColumns(ALL_ON, "note")) ===
+          JSON.stringify({ sku: true, urduName: true, tax: true, discount: false }) &&
+        JSON.stringify(print.resolveItemColumns(ALL_ON, "quotation")) ===
+          JSON.stringify({ sku: true, urduName: true, tax: false, discount: true }) &&
+        JSON.stringify(print.resolveItemColumns(ALL_ON, "order")) ===
+          JSON.stringify({ sku: true, urduName: true, tax: false, discount: true }),
+    "slots: the toggle ∩ matrix intersection — bill gets all four columns, the note tax-only beyond identity, quotation/order discount but never a tax column");
+  check(JSON.stringify(print.resolveItemColumns(DEF, "bill")) === NO_COLS &&
+        JSON.stringify(print.resolveItemColumns(DEF, "note")) === NO_COLS,
+    "slots: the default design adds no column to any sheet — today's tables stand byte-for-byte");
+
+  /* ---- §1.4: the column sources ---- */
+  const prods = print.sampleProducts();
+  check(print.productPrintInfo(prods, "sample-p1").sku === "SMP-001" &&
+        print.productPrintInfo(prods, "sample-p1").urduName === "نمونہ چاول" &&
+        print.productPrintInfo(prods, "sample-p2").sku === "SMP-002" &&
+        print.productPrintInfo(prods, "sample-p2").urduName === "نمونہ تیل" &&
+        print.productPrintInfo(prods, "gone").sku === "" &&
+        print.productPrintInfo(prods, "gone").urduName === "" &&
+        print.productPrintInfo(undefined, "sample-p1").sku === "",
+    "columns: SKU + Urdu name resolve LIVE from the products list by productId — a deleted product (or no list) prints blank, never a stored snapshot");
+  const sb = print.sampleBill();
+  check(print.printLineTax(sb.items[0]) === 0 && eq(print.printLineTax(sb.items[1]), 320.73) &&
+        print.printLineTax({}) === 0,
+    "columns: the per-line tax reads A4's snapshotted taxAmount verbatim (absent ⇒ 0) — real document data, never recomputed at print");
+  const tl = tax.billTaxLines(sb);
+  check(tl.length === 1 && tl[0].name === "GST 18%" && tl[0].kind === "percent" &&
+        tl[0].inclusive === false && eq(tl[0].amount, 320.73) &&
+        eq(sum(sb.items.map((i) => print.printLineTax(i))), sb.taxAmount),
+    "columns: the sample bill's snapshotted lines regroup to its single GST 18% summary line of 320.73 == the bill's own taxAmount");
+  check(JSON.stringify(print.printLineDiscounts([100, 100, 100], 100)) ===
+          JSON.stringify(tax.allocateProRata([100, 100, 100], 100)) &&
+        eq(sum(print.printLineDiscounts([100, 100, 100], 100)), 100) &&
+        eq(sum(print.printLineDiscounts([250, 200], 50)), 50) &&
+        eq(sum(print.printLineDiscounts(sb.items.map((i) => i.total), sb.discountAmount)), sb.discountAmount) &&
+        print.printLineDiscounts([500, 300], 0).every((v) => v === 0),
+    "columns: the per-line discount IS allocateProRata — a display-only derivation whose shares sum to the document discount to the paisa (zero discount ⇒ zero shares)");
+  const partialBill = { ...sb, status: "partially_returned" };
+  check(eq(sum(print.printLineDiscounts(partialBill.items.map((i) => i.total), partialBill.discountAmount)), 200),
+    "columns: the derivation is over the document's ORIGINAL lines — a partially-returned bill's per-line discounts still sum to its discountAmount");
+
+  /* ---- §2.4: the stamp rule ---- */
+  const ASSET = "data:image/png;base64,AAAA";
+  const paidD = R({ stampMode: "paid" });
+  check(print.stampVisible(paidD, null, "bill", "paid") === false &&
+        print.stampVisible(paidD, undefined, "bill", "paid") === false &&
+        print.stampVisible(R({ stampMode: "always", stampDocs: { notes: true } }), null, "note") === false,
+    "stamp: no asset ⇒ no stamp, whatever the design says (E1's standing state — assets land in E2)");
+  check(print.stampVisible(paidD, ASSET, "bill", "paid") === true &&
+        print.stampVisible(paidD, ASSET, "bill", "partially_returned") === false &&
+        print.stampVisible(paidD, ASSET, "bill", "credit") === false &&
+        print.stampVisible(paidD, ASSET, "bill", "held") === false,
+    "stamp: mode 'paid' asserts settlement only on a fully-paid bill — a partially-returned bill has lost that assertion, credit and held never had it");
+  check(print.stampVisible(R({ stampMode: "always" }), ASSET, "bill", "partially_returned") === true &&
+        print.stampVisible(R({ stampMode: "always" }), ASSET, "bill", "credit") === true &&
+        print.stampVisible(R({ stampMode: "always" }), ASSET, "bill", "held") === false &&
+        print.stampVisible(R({ stampMode: "never" }), ASSET, "bill", "paid") === false,
+    "stamp: mode 'always' prints on open and settled bills alike, but a HELD bill never carries it in any mode (held paper is not a receipt); 'never' suppresses outright");
+  check(print.stampVisible(R({ stampDocs: { notes: true } }), ASSET, "note") === true &&
+        print.stampVisible(paidD, ASSET, "note") === false &&
+        print.stampVisible(R({ stampDocs: { vouchers: true } }), ASSET, "voucher") === true &&
+        print.stampVisible(paidD, ASSET, "voucher") === false &&
+        print.stampVisible(R({ stampDocs: { quotations: true } }), ASSET, "quotation") === true &&
+        print.stampVisible(R({ stampDocs: { quotations: true } }), ASSET, "order") === true &&
+        print.stampVisible(R({ stampDocs: { notes: true, vouchers: true, quotations: true } }), ASSET, "challan") === false &&
+        print.stampVisible(paidD, ASSET, "report") === false,
+    "stamp: per-doc toggles govern notes/vouchers/quotations (orders ride the quotations key); slot-less documents never stamp");
+  check(print.stampVisible(R({ paper: "thermal80", stampMode: "always" }), ASSET, "bill", "paid") === false,
+    "stamp: thermal suppresses the stamp unconditionally (§1.7 hard rule)");
+
+  /* ---- §1.3/§1.7: header slots ---- */
+  check(print.letterheadHeaderVisible(R({ headerMode: "letterhead" }), true) === true &&
+        print.letterheadHeaderVisible(R({ headerMode: "letterhead", paper: "thermal80" }), true) === false &&
+        print.letterheadHeaderVisible(R({ headerMode: "letterhead" }), false) === false &&
+        print.letterheadHeaderVisible(DEF, true) === false &&
+        print.letterheadFooterVisible(R({ showLetterheadFooter: true }), true) === true &&
+        print.letterheadFooterVisible(R({ showLetterheadFooter: true, paper: "thermal80" }), true) === false &&
+        print.letterheadFooterVisible(DEF, true) === false,
+    "header: the letterhead replaces the text header only in letterhead mode with an asset present; thermal suppresses letterhead head AND foot unconditionally — the text header prints instead");
+  check(print.logoVisible(R({ showLogo: true }), true, false) === true &&
+        print.logoVisible(DEF, true, false) === false &&
+        print.logoVisible(R({ headerMode: "logo-text" }), true, false) === true &&
+        print.logoVisible(R({ headerMode: "letterhead", showLogo: true }), true, true) === false &&
+        print.logoVisible(R({ showLogo: true }), false, false) === false &&
+        print.logoVisible(R({ showLogo: true, paper: "thermal80" }), true, false) === true,
+    "header: the logo prints on its toggle or in logo-text mode, never under a letterhead banner, and is the one image thermal keeps (small, centred)");
+
+  /* ---- §2.4: the signature slot ---- */
+  check(print.shopSignatureVisible(DEF, "voucher") === true &&
+        print.shopSignatureVisible(DEF, "salarySlip") === true &&
+        print.shopSignatureVisible(DEF, "bill") === false &&
+        print.shopSignatureVisible(R({ showSignature: true }), "bill") === true &&
+        print.shopSignatureVisible(R({ signDocs: { bills: true } }), "bill") === true &&
+        print.shopSignatureVisible(R({ signDocs: { vouchers: false } }), "voucher") === false &&
+        print.shopSignatureVisible(R({ signDocs: { salarySlips: false } }), "salarySlip") === false &&
+        print.shopSignatureVisible(R({ showSignature: true }), "challan") === false &&
+        print.shopSignatureVisible(R({ showSignature: true }), "job") === false &&
+        print.shopSignatureVisible(R({ showSignature: true }), "quotation") === false,
+    "signature: vouchers + salary slips carry the shop slot by default (as their bodies always printed it), bills only on their toggle; the challan/job receiver lines are the customer's — the shop signature can never land there");
+
+  /* ---- default-design rendering equivalence (the E1 promise) ---- */
+  check(print.stampVisible(DEF, null, "bill", "paid") === false &&
+        print.letterheadHeaderVisible(DEF, false) === false &&
+        print.letterheadFooterVisible(DEF, false) === false &&
+        print.logoVisible(DEF, false, false) === false &&
+        print.receiptClassName(DEF) === "receipt" &&
+        print.paperPageRule(DEF.paper) === "size: A4 portrait; margin: 10mm" &&
+        DEF.footerNote === "" && DEF.termsText === "" && DEF.thanksText === "" && DEF.showThanks === true,
+    "equivalence: under the default design every E1 novelty resolves OFF — no stamp, letterhead or logo (no assets exist in E1), no footer note/terms/custom thanks, the classic A4 receipt at the historical 10mm page margin: today's output, slot for slot");
+
+  /* ---- §1.8: the sample fixtures ---- */
+  check(eq(sum(sb.items.map((i) => i.total)), sb.subtotal) &&
+        eq(sb.subtotal - sb.discountAmount + sb.taxAmount, sb.total) &&
+        eq(sum(sb.payments.map((p) => p.amount)), sb.total) &&
+        sb.status === "paid" && sb.billNo === 101 && sb.items.length === 2 &&
+        sb.payments.length === 2,
+    "fixture: the sample bill closes — lines 4,760 − discount 200 + tax 320.73 = 4,880.73, and its split cash/bank payments sum to the total");
+  const sq = print.sampleQuotation();
+  check(sq.number === "QT-101" && sq.status === "issued" &&
+        eq(sum(sq.lines.map((l) => l.total)), sq.subtotal) &&
+        eq(sq.subtotal - sq.discountAmount + sq.estimatedTax, sq.total) &&
+        eq(sq.estimatedTax, sb.taxAmount),
+    "fixture: the sample quotation mirrors the bill's lines with its tax carried as the estimate — 4,760 − 200 + 320.73 = 4,880.73");
+  check(print.sampleProducts() !== print.sampleProducts() &&
+        print.sampleBill() !== print.sampleBill() &&
+        print.sampleBill().items !== print.sampleBill().items,
+    "fixture: samples are fresh copies per call (code fixtures, §10.3 — never shared or seed state)");
+
+  /* ---- i18n: the E1 print keys ---- */
+  const e1Keys = [
+    "print.title", "print.sub", "print.paper", "print.paper.a4", "print.paper.a4compact",
+    "print.paper.a5", "print.paper.thermal80", "print.fontScale", "print.fontScale.standard",
+    "print.fontScale.large", "print.headerTitle", "print.headerMode", "print.headerMode.text",
+    "print.headerMode.letterhead", "print.headerMode.logoText", "print.headerModeNote",
+    "print.shopNameAlt", "print.shopNameAltPh", "print.showLogo", "print.logoSize",
+    "print.logoSize.s", "print.logoSize.m", "print.logoSize.l", "print.showShopName",
+    "print.showShopNameAlt", "print.showAddress", "print.showPhone", "print.columnsTitle",
+    "print.colSku", "print.colUrduName", "print.colTax", "print.colTaxNote", "print.colDiscount",
+    "print.footerTitle", "print.footerNote", "print.footerNotePh", "print.termsText",
+    "print.termsPh", "print.showThanks", "print.thanksText", "print.thanksPh",
+    "print.showSignature", "print.previewTitle", "print.previewBill", "print.previewQuote",
+    "print.sampleBadge", "print.reset", "print.saved",
+    "print.col.sku", "print.col.tax", "print.col.discount", "print.termsLabel",
+    "print.authorisedSignature",
+  ];
+  check(e1Keys.length === 53 &&
+        e1Keys.every((k) => typeof i18n.en[k] === "string" && i18n.en[k].length > 0 &&
+                           typeof i18n.ur[k] === "string" && i18n.ur[k].length > 0),
+    "i18n: the 53 new E1 print.* keys are present and non-empty in both languages (parity)");
+  check(Object.keys(i18n.en).length === 3136 && Object.keys(i18n.ur).length === 3136,
+    "i18n: the dictionary now carries 3,054 keys, EN ≡ UR (E1 pin amendment: +53 print keys; E2 pin amendment: +37 print.brand keys; E3 pin amendment: +35 Raast keys (34 print.raast + billing.wa.raastLine); E4 pin amendment: +49 pin keys; F5 pin amendment: +1 sync.online key; G1 pin amendment: +8 biz keys; G2 pin amendment: +36 plan keys; G3 pin amendment: +89 platform keys; G4 pin amendment: +47 keys (35 renew.* + 12 platform.*); G6 pin amendment: +25 backup.* keys; H1 pin amendment: +51 loyalty keys; H3 pin amendment: +108 storefront keys; WA pin amendment: +109 WhatsApp keys)");
+
+  /* ---- source invariants: purity + wiring ---- */
+  const printSrc = fs.readFileSync(
+    "/home/hatch/workspace/ai-dukaan-ai/web/lib/print.ts", "utf8");
+  check(!/makeEntry|guardPostings|writeBatch|setDoc|updateDoc|addDoc|deleteDoc/.test(printSrc) &&
+        printSrc.includes("resolvePrintDesign") && printSrc.includes("allocateProRata") &&
+        printSrc.includes("taxAmount"),
+    "source: lib/print is a pure resolver — no posting or store-write call exists in it; the discount column reuses allocateProRata and the tax column reads the taxAmount snapshot");
+  const chromeSrc = fs.readFileSync(
+    "/home/hatch/workspace/ai-dukaan-ai/web/components/PrintChrome.tsx", "utf8");
+  const docSrc = fs.readFileSync(
+    "/home/hatch/workspace/ai-dukaan-ai/web/components/DocPrintSheet.tsx", "utf8");
+  check(chromeSrc.includes("export function PrintHeader") && chromeSrc.includes("export function PrintFooter") &&
+        chromeSrc.includes("export function PrintPageStyle") && chromeSrc.includes("export function PrintItemsTable"),
+    "source: the shared chrome exports PrintHeader / PrintFooter / PrintPageStyle / PrintItemsTable");
+  check(docSrc.includes("PrintHeader") && docSrc.includes("PrintFooter") && docSrc.includes("PrintPageStyle") &&
+        docSrc.includes("export function BillPrintSheet") &&
+        ["VoucherPrintSheet", "ChallanPrintSheet", "PoPrintSheet", "NotePrintSheet",
+         "TransferPrintSheet", "ProductionPrintSheet", "JobPrintSheet", "SalarySlipSheet"]
+          .every((n) => docSrc.includes(`export function ${n}`)),
+    "source: all nine sheets + the extracted BillPrintSheet render through the shared chrome");
+  const billDeskSrc = fs.readFileSync(
+    "/home/hatch/workspace/ai-dukaan-ai/web/components/BillingDesk.tsx", "utf8");
+  check(billDeskSrc.includes("<BillPrintSheet") && !billDeskSrc.includes('receipt" + (thermal'),
+    "source: the billing desk's receipt IS BillPrintSheet — the inline receipt markup is gone, one render path for screen print and designer preview alike");
+  const cssSrc = fs.readFileSync(
+    "/home/hatch/workspace/ai-dukaan-ai/web/app/globals.css", "utf8");
+  check(!/^@page\s*\{/m.test(cssSrc) && cssSrc.includes(".receipt-compact") &&
+        cssSrc.includes(".receipt-a5") && cssSrc.includes(".receipt-lg") &&
+        cssSrc.includes(".print-preview-frame"),
+    "source: globals carries no global @page rule (each sheet renders its own via PrintPageStyle) and defines the compact/A5/large layouts + the screen-only preview frame");
+  const setSrcE1 = fs.readFileSync(
+    "/home/hatch/workspace/ai-dukaan-ai/web/components/SettingsView.tsx", "utf8");
+  const designerSrc = fs.readFileSync(
+    "/home/hatch/workspace/ai-dukaan-ai/web/components/PrintDesigner.tsx", "utf8");
+  check(setSrcE1.includes("PrintDesignerSection") &&
+        designerSrc.includes("sampleBill") && designerSrc.includes("sampleQuotation") &&
+        designerSrc.includes("updateSettings") &&
+        designerSrc.includes("BillPrintSheet") && designerSrc.includes("DocPrintSheet"),
+    "source: Settings mounts the owner-only designer card; the designer saves via updateSettings and previews the sample fixtures through the real sheets");
+  const storeSrcE1 = fs.readFileSync(
+    "/home/hatch/workspace/ai-dukaan-ai/web/components/StoreProvider.tsx", "utf8");
+  check((storeSrcE1.match(/makeEntry\(/g) || []).length === 24 &&
+        storeSrcE1.includes('"dukaan-ai-store-v16"'),
+    "source: still 24 makeEntry calls in the store and demo storage still v16 — E1 posts nothing and migrates nothing");
+
+  /* ---- rules: E1 needs NO change — byte-identical, asserted ---- */
+  const rulesE1 = fs.readFileSync(
+    "/home/hatch/workspace/ai-dukaan-ai/firebase/firestore.rules", "utf8");
+  check(crypto.createHash("sha256").update(stripE2BrandingBlock(stripG1Blocks(stripG2Blocks(rulesE1))), "utf8").digest("hex") ===
+        "3cae3c7641955ab4fda07aa21b404fc9274e1bd49dc2aabeb96269fefad1942c",
+    "rules: print settings ride the owner settings doc under the existing write pattern — the rules file is byte-identical to the D3/D4/D5-state file (E2 same-check amendment: the additive branding block is stripped first — E2's only rules change, strip-proven in the E2 suite; G1 same-check amendment: the four G1 spans are stripped first — v9's only other deltas, strip-proven in the G1 suite)");
+
+  /* ---- seed regression: Phase E posts nothing ---- */
+  const normalizedE1 = journal.map((e) => { const { ts, ...rest } = e; return rest; });
+  const shaE1 = crypto.createHash("sha256").update(JSON.stringify(normalizedE1), "utf8").digest("hex");
+  const allRangeE1 = reports.resolveReportRange("custom", null, { from: "2000-01-01", to: "2100-12-31" });
+  const tbE1 = reports.trialBalance(journal, allRangeE1);
+  check(journal.length === 21 && shaE1 === "e17e5bda19e87de698b0c0a37e923f9b396bc387e2092b2ffbbd7d60d4971168" &&
+        eq(ledger.accountBalance(journal, "inventory"), 272805) &&
+        eq(ledger.cashBalance(journal), 50000) &&
+        eq(ledger.payablesTotal(journal), 27900) &&
+        eq(ledger.receivablesTotal(journal), 5500) &&
+        eq(tbE1.totalDebits, tbE1.totalCredits),
+    "seed regression: the frozen identities stand — 21 entries, the seed-journal SHA, inventory 272,805 / cash 50,000 / payables 27,900 / receivables 5,500, trial balance zero. Print design is settings, not postings");
+}
+
+/* ================================ E2 ================================ */
+suite("E2", null); // Phase E · E2 — brand assets: the capped pipeline + slot consumption (design §2)
+{
+  const B = branding;
+  const RE2 = (pd) => print.resolvePrintDesign(pd ? { printDesign: pd } : {});
+  const DEF2 = RE2();
+  const urlOf = (mime, payloadChars) => "data:" + mime + ";base64," + "A".repeat(payloadChars);
+
+  /* ---- the spec table: caps are design constants (§2.3) ---- */
+  check(JSON.stringify(B.BRANDING_KINDS) ===
+        JSON.stringify(["logo", "letterheadHeader", "letterheadFooter", "stamp", "signature", "raastQrImage"]),
+    "specs: the six asset kinds, in the design's order — the five print slots plus the reserved Raast QR image");
+  check(B.BRANDING_SPECS.logo.capBytes === 150000 && B.BRANDING_SPECS.stamp.capBytes === 150000 &&
+        B.BRANDING_SPECS.signature.capBytes === 150000 && B.BRANDING_SPECS.letterheadHeader.capBytes === 300000 &&
+        B.BRANDING_SPECS.letterheadFooter.capBytes === 300000 && B.BRANDING_SPECS.raastQrImage.capBytes === 200000,
+    "specs: the HARD CAPS — logo / stamp / signature ≤ 150,000 bytes, letterhead ≤ 300,000, the bank-issued Raast image ≤ 200,000");
+  check(B.BRANDING_TOTAL_CAP_BYTES === 1250000 &&
+        B.BRANDING_KINDS.every((k) => B.BRANDING_SPECS[k].capBytes < 1048576),
+    "specs: the six caps total 1,250,000 bytes (~1 MB of branding per shop) and every single payload stays under the 1 MiB Firestore document limit");
+  check(B.BRANDING_SPECS.logo.maxWidth === 600 && B.BRANDING_SPECS.logo.maxHeight === 600 &&
+        B.BRANDING_SPECS.letterheadHeader.maxWidth === 1600 && B.BRANDING_SPECS.letterheadHeader.maxHeight === 400 &&
+        B.BRANDING_SPECS.letterheadFooter.maxWidth === 1600 && B.BRANDING_SPECS.signature.maxWidth === 800 &&
+        B.BRANDING_SPECS.signature.maxHeight === 300 && B.BRANDING_SPECS.raastQrImage.maxWidth === 800 &&
+        B.BRANDING_SPECS.letterheadHeader.banner === true && B.BRANDING_SPECS.letterheadFooter.banner === true &&
+        !B.BRANDING_SPECS.logo.banner && !B.BRANDING_SPECS.stamp.banner,
+    "specs: the max boxes (logo 600², letterhead 1600×400, signature 800×300, Raast 800²) and the banner flags that force JPEG");
+
+  /* ---- data-URL measures ---- */
+  check(B.dataUrlBytes("data:image/png;base64,QUJD") === 3 &&
+        B.dataUrlBytes("data:image/png;base64,QUI=") === 2 &&
+        B.dataUrlBytes("data:image/png;base64,QQ==") === 1,
+    "dataUrlBytes: the decoded length counts the base64 payload minus its padding (3 / 2 / 1)");
+  check(B.dataUrlBytes("") === -1 && B.dataUrlBytes("nope") === -1 &&
+        B.dataUrlBytes("data:image/png;base64") === -1 && B.dataUrlBytes("data:image/png;base64,QUI") === -1,
+    "dataUrlBytes: malformed input (no marker, no comma, a payload that is not whole base64 quads) measures −1, never a guess");
+  check(B.dataUrlMime("data:image/webp;base64,AAAA") === "image/webp" &&
+        B.dataUrlMime("data:image/png;base64,AAAA") === "image/png" &&
+        B.dataUrlMime("data:text/plain;base64,AAAA") === null && B.dataUrlMime("garbage") === null,
+    "dataUrlMime: only the three encodable image mimes parse; anything else is null");
+
+  /* ---- fitWithinBox: normalise, never upscale (§2.2 step 1) ---- */
+  const fitLogo = B.fitWithinBox(1200, 900, B.BRANDING_SPECS.logo);
+  check(fitLogo.width === 600 && fitLogo.height === 450,
+    "fit: a 1200×900 logo normalises to 600×450 — the box binds on width, the aspect is kept");
+  const fitHead = B.fitWithinBox(3200, 900, B.BRANDING_SPECS.letterheadHeader);
+  check(fitHead.width === 1422 && fitHead.height === 400,
+    "fit: a 3200×900 letterhead normalises to 1422×400 — the box binds on height");
+  const fitSign = B.fitWithinBox(400, 150, B.BRANDING_SPECS.signature);
+  check(fitSign.width === 400 && fitSign.height === 150,
+    "fit: an already-small signature is NEVER upscaled (400×150 stays 400×150)");
+  const fitStamp = B.fitWithinBox(90, 2000, B.BRANDING_SPECS.stamp);
+  check(fitStamp.width === 27 && fitStamp.height === 600,
+    "fit: a tall thin stamp (90×2000) fits by height to 27×600");
+  const fitBad = B.fitWithinBox(0, 100, B.BRANDING_SPECS.logo);
+  const fitThin = B.fitWithinBox(1, 10000, B.BRANDING_SPECS.logo);
+  check(fitBad.width === 0 && fitBad.height === 0 && fitThin.width === 1 && fitThin.height === 600,
+    "fit: unusable dimensions fit to 0×0 (the pipeline refuses them), and an extreme aspect still yields at least one pixel");
+
+  /* ---- chooseFormat: transparency is data, banners are JPEG ---- */
+  check(B.chooseFormat("letterheadHeader", true) === "image/jpeg" &&
+        B.chooseFormat("letterheadFooter", true) === "image/jpeg",
+    "format: letterhead art is JPEG even when the source carries alpha — a banner's transparency would print as a hole (§2.2 step 2)");
+  check(B.chooseFormat("logo", true) === "image/webp" && B.chooseFormat("stamp", true) === "image/webp" &&
+        B.chooseFormat("signature", true) === "image/webp" && B.chooseFormat("raastQrImage", true) === "image/webp" &&
+        B.chooseFormat("logo", false) === "image/jpeg" && B.chooseFormat("stamp", false) === "image/jpeg" &&
+        B.chooseFormat("signature", false) === "image/jpeg" && B.chooseFormat("raastQrImage", false) === "image/jpeg",
+    "format: real alpha → WebP (transparency preserved for logo / stamp / signature / QR); no alpha → JPEG everywhere");
+
+  /* ---- compressionPlan: the ladder (§2.2 step 3) ---- */
+  const planLogo = B.compressionPlan("logo", { width: 1200, height: 900, hasAlpha: true });
+  check(planLogo.length === 4 && planLogo.every((s) => s.mime === "image/webp") &&
+        planLogo.map((s) => Math.round(s.quality * 100)).join(",") === "92,82,82,72",
+    "plan: a transparent logo walks WebP at quality 0.92 → 0.82 → 0.82 → 0.72 (quality first, then the box)");
+  check(planLogo.map((s) => s.width + "x" + s.height).join(",") === "600x450,600x450,450x337,337x253",
+    "plan: the box holds for two rungs, then shrinks ×0.75 per rung (600×450 → 450×337 → 337×253) — fitted dimensions FLOOR, so a step never lands a pixel over its box");
+  const planSign = B.compressionPlan("signature", { width: 1600, height: 600, hasAlpha: false });
+  check(planSign.every((s) => s.mime === "image/jpeg") &&
+        planSign.map((s) => Math.round(s.quality * 100)).join(",") === "90,80,80,70" &&
+        planSign.map((s) => s.width + "x" + s.height).join(",") === "800x300,800x300,600x225,450x168",
+    "plan: an opaque signature walks JPEG 0.90 → 0.70 over the 800×300 box");
+  const planHead = B.compressionPlan("letterheadHeader", { width: 3200, height: 900, hasAlpha: true });
+  check(planHead.every((s) => s.mime === "image/jpeg") &&
+        planHead.map((s) => Math.round(s.quality * 100)).join(",") === "85,75,75,65" &&
+        planHead.map((s) => s.width + "x" + s.height).join(",") === "1422x400,1422x400,1066x300,799x225",
+    "plan: a letterhead banner walks JPEG from 0.85 regardless of alpha, over the 1600×400 box");
+  check(B.compressionPlan("logo", { width: 0, height: 0, hasAlpha: false }).length === 0 &&
+        B.BRANDING_KINDS.every((k) => {
+          const p = B.compressionPlan(k, { width: 4000, height: 3000, hasAlpha: true });
+          return p.length === 4 && p.every((s, i) => i === 0 ||
+            (s.width <= p[i - 1].width && s.height <= p[i - 1].height && s.quality <= p[i - 1].quality));
+        }),
+    "plan: unusable dimensions plan nothing; for every kind the ladder is monotone — the box and the quality only ever step DOWN");
+
+  /* ---- runCompressionPlan: caps enforced, refusal honest ---- */
+  const encModelA = (step) => ({
+    dataUrl: "data:" + step.mime + ";base64,AAAA",
+    bytes: 500 + Math.floor((step.width * step.height) / 50),
+  });
+  const runA = B.runCompressionPlan("logo", { width: 1200, height: 900, hasAlpha: true }, encModelA);
+  check(runA.ok === true && runA.stepIndex === 0 && runA.bytes === 5900 &&
+        runA.dataUrl.indexOf("data:image/webp") === 0,
+    "run: a compressible logo lands on the FIRST rung (5,900 bytes under the model) — the pipeline never degrades what already fits");
+  const encModelB = (step) => ({
+    dataUrl: "data:" + step.mime + ";base64,AAAA",
+    bytes: Math.floor(step.width * step.height * 0.7),
+  });
+  const runB = B.runCompressionPlan("logo", { width: 1200, height: 900, hasAlpha: true }, encModelB);
+  check(runB.ok === true && runB.stepIndex === 2 && runB.bytes === 106155 &&
+        runB.step.width === 450 && runB.step.height === 337,
+    "run: a heavy logo walks to rung 2 (the ×0.75 box) and lands at 106,155 bytes — under the 150,000 cap, quality already spent");
+  const runHead = B.runCompressionPlan("letterheadHeader", { width: 3200, height: 900, hasAlpha: true },
+    (step) => ({ dataUrl: "data:" + step.mime + ";base64,AAAA", bytes: Math.floor(step.width * step.height * 0.6) }));
+  check(runHead.ok === true && runHead.stepIndex === 2 && runHead.bytes === 191880,
+    "run: a heavy letterhead lands on rung 2 at 191,880 bytes under ITS 300,000 cap — the caps are per-kind, not global");
+  const runRefuse = B.runCompressionPlan("logo", { width: 1200, height: 900, hasAlpha: true },
+    (step) => ({ dataUrl: "data:" + step.mime + ";base64,AAAA", bytes: 999999 }));
+  check(runRefuse.ok === false && runRefuse.capBytes === 150000 &&
+        runRefuse.lastBytes === 999999 && runRefuse.stepsTried === 4,
+    "run: an image no rung can save is REFUSED with the actual figures (cap 150,000; last encode 999,999 after 4 rungs) — never silently truncated (§2.2 step 4)");
+  let sweepOk = true;
+  const sweepModels = [
+    () => 400000,
+    (s) => Math.floor(s.width * s.height * 1.2),
+    (s) => Math.floor(s.width * s.height * 0.05),
+  ];
+  for (const kind of B.BRANDING_KINDS) {
+    for (const hasAlpha of [true, false]) {
+      for (let m = 0; m < sweepModels.length; m++) {
+        const out = B.runCompressionPlan(kind, { width: 4000, height: 3000, hasAlpha },
+          (step) => ({ dataUrl: "data:" + step.mime + ";base64,AAAA", bytes: sweepModels[m](step) }));
+        if (out.ok && out.bytes > B.BRANDING_SPECS[kind].capBytes) sweepOk = false;
+        if (m === 0 && out.ok) sweepOk = false; // a flat 400 KB encode exceeds EVERY cap
+        if (m === 2 && !out.ok) sweepOk = false; // a light encode must always land
+      }
+    }
+  }
+  check(sweepOk,
+    "run (property sweep): across all kinds × alpha × size models, no run ever yields a stored payload over its cap; a flat 400 KB encode is refused everywhere; a light encode always lands");
+
+  /* ---- buildBrandingAsset: the boundary guard ---- */
+  const goodLogo = B.buildBrandingAsset("logo", urlOf("image/png", 132), 120, 90, "2026-10-22T00:00:00.000Z");
+  check(goodLogo !== null && goodLogo.id === "logo" && goodLogo.kind === "logo" &&
+        goodLogo.mime === "image/png" && goodLogo.bytes === 99 &&
+        goodLogo.width === 120 && goodLogo.height === 90 &&
+        goodLogo.updatedAt === "2026-10-22T00:00:00.000Z" &&
+        B.dataUrlBytes(goodLogo.dataUrl) === goodLogo.bytes,
+    "asset: a valid encode becomes the fixed-id doc (id == kind) with the MEASURED byte count — the stored size is the data URL's own length, never a caller's claim");
+  check(B.buildBrandingAsset("logo", urlOf("image/jpeg", 200000), 600, 450, "t") !== null &&
+        B.buildBrandingAsset("letterheadHeader", urlOf("image/jpeg", 400000), 1600, 400, "t") !== null,
+    "asset: exactly AT the cap is accepted (150,000 bytes for the logo, 300,000 for the letterhead) — the cap is a ≤, not a <");
+  check(B.buildBrandingAsset("logo", urlOf("image/jpeg", 200004), 600, 450, "t") === null &&
+        B.buildBrandingAsset("letterheadHeader", urlOf("image/jpeg", 400004), 1600, 400, "t") === null,
+    "asset: one base64 quad OVER the cap (150,003 / 300,003 bytes) is refused at the boundary — the store can never persist an over-cap payload");
+  check(B.buildBrandingAsset("logo", urlOf("image/gif", 132), 10, 10, "t") === null &&
+        B.buildBrandingAsset("logo", urlOf("image/png", 132), 0, 10, "t") === null &&
+        B.buildBrandingAsset("logo", "data:image/png;base64,!!!", 10, 10, "t") === null,
+    "asset: a non-encodable mime, a zero dimension, or a corrupt payload are all refused — the doc only ever holds a real, measured image");
+
+  /* ---- the maps the print seam consumes ---- */
+  const stampAsset = B.buildBrandingAsset("stamp", urlOf("image/webp", 132), 50, 50, "t");
+  const byKindE2 = B.brandingByKind([goodLogo, stampAsset]);
+  check(byKindE2.logo === goodLogo && byKindE2.stamp === stampAsset &&
+        byKindE2.signature === undefined && byKindE2.raastQrImage === undefined,
+    "maps: brandingByKind files each doc under its kind; absent slots stay absent");
+  const urlsE2 = B.brandingDataUrls([goodLogo, stampAsset]);
+  check(Object.keys(urlsE2).length === 6 && urlsE2.logo === goodLogo.dataUrl &&
+        urlsE2.stamp === stampAsset.dataUrl && urlsE2.letterheadHeader === null &&
+        urlsE2.letterheadFooter === null && urlsE2.signature === null && urlsE2.raastQrImage === null,
+    "maps: brandingDataUrls emits the full PrintAssets shape — present slots as URLs, absent slots as null, so `assets?.logo` Just Works at every sheet");
+  check(B.brandingTotalBytes([goodLogo, stampAsset]) === 198 && B.brandingTotalBytes([]) === 0,
+    "maps: the settings total is the plain sum of the stored byte counts (99 + 99)");
+
+  /* ---- slot consumption WITH real assets (the E1 matrix, fed) ---- */
+  const allAssets = B.brandingDataUrls(B.BRANDING_KINDS.map((k) =>
+    B.buildBrandingAsset(k, urlOf("image/png", 132), 10, 10, "t")));
+  check(print.stampVisible(DEF2, allAssets.stamp, "bill", "paid") === true &&
+        print.stampVisible(DEF2, allAssets.stamp, "bill", "partially_returned") === false &&
+        print.stampVisible(DEF2, allAssets.stamp, "bill", "held") === false &&
+        print.stampVisible(DEF2, allAssets.stamp, "bill", "credit") === false,
+    "slots: with a stamp asset stored, a PAID bill prints it — a partially-returned or held or credit bill never does (the E1 §2.4 rule, now fed a real asset)");
+  check(print.stampVisible(RE2({ paper: "thermal80", stampMode: "always" }), allAssets.stamp, "bill", "paid") === false &&
+        print.letterheadHeaderVisible(RE2({ headerMode: "letterhead", paper: "thermal80" }), allAssets.letterheadHeader !== null) === false &&
+        print.letterheadFooterVisible(RE2({ showLetterheadFooter: true, paper: "thermal80" }), allAssets.letterheadFooter !== null) === false &&
+        print.logoVisible(RE2({ headerMode: "logo-text", paper: "thermal80" }), allAssets.logo !== null, allAssets.letterheadHeader !== null) === true,
+    "slots: thermal suppresses the stamp AND the letterhead (header + footer) even with assets stored — the logo alone survives, small and centred (§1.7)");
+  check(print.stampVisible(DEF2, allAssets.stamp, "voucher") === false &&
+        print.stampVisible(RE2({ stampDocs: { vouchers: true } }), allAssets.stamp, "voucher") === true &&
+        print.stampVisible(RE2({ stampDocs: { notes: true } }), allAssets.stamp, "note") === true &&
+        print.stampVisible(RE2({ stampDocs: { notes: true, vouchers: true, quotations: true } }), allAssets.stamp, "challan") === false,
+    "slots: the per-document stamp toggles the E2 brand group edits gate vouchers and notes (default off); a challan never carries the stamp");
+  check(print.letterheadHeaderVisible(RE2({ headerMode: "letterhead" }), allAssets.letterheadHeader !== null) === true &&
+        print.letterheadFooterVisible(RE2({ showLetterheadFooter: true }), allAssets.letterheadFooter !== null) === true &&
+        print.letterheadHeaderVisible(RE2({ headerMode: "letterhead" }), urlsE2.letterheadHeader !== null) === false &&
+        print.stampVisible(DEF2, stampAsset.dataUrl, "bill", "paid") === true &&
+        print.stampVisible(DEF2, null, "bill", "paid") === false,
+    "slots: letterhead chrome prints on A4 exactly when its asset exists — remove the asset and the slot goes silent, nothing dangles");
+  check(print.logoVisible(RE2({ headerMode: "logo-text" }), allAssets.logo !== null, allAssets.letterheadHeader !== null) === true &&
+        print.logoVisible(RE2({ headerMode: "letterhead" }), allAssets.logo !== null, allAssets.letterheadHeader !== null) === false,
+    "slots: the logo prints beside the shop name in logo-text mode, and yields when a letterhead banner has replaced the header wholesale");
+  check(print.shopSignatureVisible(RE2({ showSignature: true }), "challan") === false &&
+        print.shopSignatureVisible(RE2({ showSignature: true }), "job") === false &&
+        print.shopSignatureVisible(DEF2, "voucher") === true &&
+        print.shopSignatureVisible(RE2({ signDocs: { vouchers: false } }), "voucher") === false &&
+        print.shopSignatureVisible(DEF2, "salarySlip") === true &&
+        print.shopSignatureVisible(RE2({ signDocs: { salarySlips: false } }), "salarySlip") === false,
+    "slots: the signature image fills ONLY the shop-signature slot (vouchers + salary slips by default, toggles honoured) — the challan/job receiver lines stay the customer's, asset or no asset");
+
+  /* ---- i18n: the brand group speaks both languages ---- */
+  const brandKeys = Object.keys(i18n.en).filter((k) => k.startsWith("print.brand."));
+  check(brandKeys.length === 37 && brandKeys.every((k) => typeof i18n.ur[k] === "string" && i18n.ur[k].length > 0),
+    "i18n: E2 carries 37 print.brand.* keys, every one present and non-empty in Urdu (parity)");
+  check(Object.keys(i18n.en).length === 3136 && Object.keys(i18n.ur).length === 3136,
+    "i18n: the dictionary now carries 3,054 keys, EN ≡ UR (E2: +37 print.brand keys; E3 pin amendment: +35 Raast keys (34 print.raast + billing.wa.raastLine); E4 pin amendment: +49 pin keys; F5 pin amendment: +1 sync.online key; G1 pin amendment: +8 biz keys; G2 pin amendment: +36 plan keys; G3 pin amendment: +89 platform keys; G4 pin amendment: +47 keys (35 renew.* + 12 platform.*); G6 pin amendment: +25 backup.* keys; H1 pin amendment: +51 loyalty keys; H3 pin amendment: +108 storefront keys; WA pin amendment: +109 WhatsApp keys)");
+
+  /* ---- source invariants ---- */
+  const brandingSrc = fs.readFileSync(
+    "/home/hatch/workspace/ai-dukaan-ai/web/lib/branding.ts", "utf8");
+  check(!brandingSrc.includes("makeEntry(") && !brandingSrc.includes("guardPostings") &&
+        !brandingSrc.includes("setDoc") && !brandingSrc.includes("updateDoc") &&
+        !brandingSrc.includes("deleteDoc") && !brandingSrc.includes("writeBatch") &&
+        !brandingSrc.includes("firebase"),
+    "source: lib/branding is pure — no store writes, no Firestore, no journal calls; the canvas lives in the component, the caps live here");
+  const storeSrcE2 = fs.readFileSync(
+    "/home/hatch/workspace/ai-dukaan-ai/web/components/StoreProvider.tsx", "utf8");
+  check(storeSrcE2.includes('"branding"') && storeSrcE2.includes("setBrandingAsset") &&
+        storeSrcE2.includes("removeBrandingAsset") &&
+        (storeSrcE2.match(/makeEntry\(/g) || []).length === 24,
+    "source: the store subscribes the branding collection and exposes the owner-gated setter/remover; still exactly 24 makeEntry calls — E2 posts nothing");
+  check(storeSrcE2.includes('"dukaan-ai-store-v17"') && storeSrcE2.includes('STORAGE_KEY = "dukaan-ai-store-v17"'),
+    "demo: storage bumps v16 → v17 — the branding field joins the demo snapshot shape (an older demo cache can never render the new build's state incomplete)");
+  check(storeSrcE2.includes("branding: []") &&
+        !/branding:\s*\[\s*\{/.test(storeSrcE2),
+    "demo: the seed ships NO brand assets (design §2.6) — the demo shop's paper stays exactly as unbranded as today's until its owner uploads; nothing implies a real brand");
+  const brandUiSrc = fs.readFileSync(
+    "/home/hatch/workspace/ai-dukaan-ai/web/components/BrandAssets.tsx", "utf8");
+  const designerSrcE2 = fs.readFileSync(
+    "/home/hatch/workspace/ai-dukaan-ai/web/components/PrintDesigner.tsx", "utf8");
+  const sheetSrcE2 = fs.readFileSync(
+    "/home/hatch/workspace/ai-dukaan-ai/web/components/DocPrintSheet.tsx", "utf8");
+  const reportSheetSrcE2 = fs.readFileSync(
+    "/home/hatch/workspace/ai-dukaan-ai/web/components/ReportPrintSheet.tsx", "utf8");
+  check(brandUiSrc.includes("runCompressionPlan") && brandUiSrc.includes("buildBrandingAsset") &&
+        brandUiSrc.includes("BRANDING_SPECS") && designerSrcE2.includes("BrandAssetsGroup") &&
+        designerSrcE2.includes("brandingDataUrls(branding)") &&
+        (sheetSrcE2.match(/assets=\{assets\}/g) || []).length >= 15 &&
+        reportSheetSrcE2.includes("assets={assets}"),
+    "source: the brand group runs the pure pipeline and the boundary guard; the designer mounts it and previews with the live assets; every sheet forwards the assets into the print chrome");
+
+  /* ---- rules: ONE additive block, strip-proven (§5) ---- */
+  const rulesE2 = fs.readFileSync(
+    "/home/hatch/workspace/ai-dukaan-ai/firebase/firestore.rules", "utf8");
+  const strippedE2 = stripE2BrandingBlock(stripG1Blocks(stripG2Blocks(rulesE2)));
+  const blockStart = rulesE2.indexOf("      // Phase E · E2 — brand assets");
+  const blockEnd = rulesE2.indexOf("      // Expenses:");
+  const blockE2 = blockStart >= 0 && blockEnd > blockStart ? rulesE2.slice(blockStart, blockEnd) : "";
+  check(crypto.createHash("sha256").update(strippedE2, "utf8").digest("hex") ===
+        "3cae3c7641955ab4fda07aa21b404fc9274e1bd49dc2aabeb96269fefad1942c" &&
+        !strippedE2.includes("match /branding/"),
+    "rules: strip the additive branding block and the file is byte-identical to the pre-E2 577-line file (the pinned D3-state SHA) — E2 changed nothing else (G1 same-check amendment: the four G1 spans are stripped first — v9's only other deltas, strip-proven in the G1 suite)");
+  check(blockE2.includes("match /branding/{kind}") &&
+        blockE2.includes("allow read: if canAccess(uid);") &&
+        blockE2.includes("allow create, update, delete: if isBusinessOwner(uid);") &&
+        blockStart > rulesE2.indexOf("match /users/{uid}"),
+    "rules: the branding block sits inside the tenant match — every role READS (every desk prints branded paper), the OWNER alone creates / updates / deletes (FR2 same-check amendment: the leg is now isBusinessOwner — uid match OR registry leg — so a generated business's owner manages brand assets exactly as a legacy owner does; staff gain nothing)");
+
+  /* ---- seed regression: branding is not journal data ---- */
+  const normalizedE2 = journal.map((e) => { const { ts, ...rest } = e; return rest; });
+  const shaE2 = crypto.createHash("sha256").update(JSON.stringify(normalizedE2), "utf8").digest("hex");
+  const allRangeE2 = reports.resolveReportRange("custom", null, { from: "2000-01-01", to: "2100-12-31" });
+  const tbE2 = reports.trialBalance(journal, allRangeE2);
+  check(journal.length === 21 && shaE2 === "e17e5bda19e87de698b0c0a37e923f9b396bc387e2092b2ffbbd7d60d4971168" &&
+        eq(ledger.accountBalance(journal, "inventory"), 272805) &&
+        eq(ledger.cashBalance(journal), 50000) &&
+        eq(ledger.payablesTotal(journal), 27900) &&
+        eq(ledger.receivablesTotal(journal), 5500) &&
+        eq(tbE2.totalDebits, tbE2.totalCredits),
+    "seed regression: the frozen identities stand — 21 entries, the seed-journal SHA, inventory 272,805 / cash 50,000 / payables 27,900 / receivables 5,500, trial balance zero. Brand assets are documents beside the journal, never entries in it");
+}
+
+/* ================================ E3 ================================ */
+suite("E3", null); // Phase E · E3 — Raast QR: IBAN validation, the P2P payload + parser, the framing seam, print resolution (design §3)
+{
+  const R = raast;
+  const IBAN_SCBL = "PK36SCBL0000001123456702"; // the published IBAN-registry example for Pakistan
+  const IBAN_MEZN = "PK56MEZN0001234567890123";
+  const IBAN_UNIL = "PK74UNIL0109000123456789";
+  const IBAN_HABB = "PK84HABB0010020801234503";
+  const IBAN_MUCB = "PK63MUCB0001234567890456";
+  const IBAN_ABPA = "PK32ABPA0010001234567890";
+  const IBAN_NBPA = "PK51NBPA1234567890123456";
+
+  /* ---- the framing seam: shipped PROVISIONAL, and it says so ---- */
+  check(R.RAAST_FRAMING.mode === "bare" && R.RAAST_FRAMING.status === "provisional" && R.RAAST_FRAMING.pinnedBy === null,
+    "seam: RAAST_FRAMING ships bare + PROVISIONAL + unpinned — the owner's bank-app QR has not yet pinned the framing (design §3.3), and the generated path is nowhere claimed verified");
+  check(R.RAAST_SAMPLE_IBAN === IBAN_SCBL && R.validatePkIban(R.RAAST_SAMPLE_IBAN).ok === true,
+    "seam: the demo sample is the published registry example IBAN — checksum-valid, a format sample rather than anyone's account (§7)");
+
+  /* ---- CRC-16/CCITT known answers ---- */
+  check(R.crc16Ccitt("123456789") === 0x29b1 && R.crc16CcittHex("123456789") === "29B1",
+    "crc: the canonical known answer — CRC-16/CCITT-FALSE of \"123456789\" is 0x29B1");
+  check(R.crc16Ccitt("") === 0xffff && R.crc16Ccitt("A") === 0xb915,
+    "crc: the empty string keeps the 0xFFFF init; \"A\" gives 0xB915");
+  {
+    // An independent, table-driven implementation must agree
+    // with the shipped bitwise one everywhere sampled — two
+    // implementations, one algorithm.
+    const table = [];
+    for (let n = 0; n < 256; n++) {
+      let c = n << 8;
+      for (let k = 0; k < 8; k++) c = c & 0x8000 ? (c << 1) ^ 0x1021 : c << 1;
+      table[n] = c & 0xffff;
+    }
+    const crcT = (s) => {
+      let c = 0xffff;
+      for (let i = 0; i < s.length; i++) c = ((c << 8) ^ table[((c >> 8) ^ s.charCodeAt(i)) & 0xff]) & 0xffff;
+      return c;
+    };
+    const samples = ["", "A", "123456789", "Raast", IBAN_SCBL,
+      "00020111023003Standard Chartered04" + IBAN_SCBL + "10",
+      "0002020102120202300318Meezan Bank0424" + IBAN_MEZN + "1004"];
+    check(samples.every((s) => crcT(s) === R.crc16Ccitt(s)),
+      "crc: the shipped bitwise CRC and an independent table-driven one agree on every sampled string");
+  }
+
+  /* ---- IBAN validation: the valid vectors ---- */
+  check([IBAN_SCBL, IBAN_MEZN, IBAN_UNIL, IBAN_HABB, IBAN_MUCB, IBAN_ABPA, IBAN_NBPA]
+        .every((i) => R.validatePkIban(i).ok === true),
+    "iban: the published example and six bank fixtures (SCBL/MEZN/UNIL/HABB/MUCB/ABPA/NBPA) all validate");
+  check(R.validatePkIban("pk36 scbl 0000 0011 2345 6702").ok === true &&
+        R.validatePkIban(" PK56-MEZN-0001-2345-6789-0123 ").ok === true &&
+        R.validatePkIban("pk36scbl0000001123456702").iban === IBAN_SCBL,
+    "iban: entry normalisation — spaces, dashes, case and padding all fold to the bare 24 characters");
+  check(R.pkIbanWithCheckDigits("SCBL", "0000001123456702") === IBAN_SCBL &&
+        R.pkIbanWithCheckDigits("MEZN", "0001234567890123") === IBAN_MEZN,
+    "iban: the check-digit composer reproduces the published example from its parts (98 − mod-97)");
+  check(R.groupIban(IBAN_SCBL) === "PK36 SCBL 0000 0011 2345 6702",
+    "iban: display grouping in fours — the form paper and screen both print");
+
+  /* ---- IBAN validation: refusal, with the right reasons ---- */
+  check(R.validatePkIban("").code === "empty" && R.validatePkIban(null).code === "empty" &&
+        R.validatePkIban(undefined).code === "empty",
+    "iban: empty input is its own code (Settings treats it as 'feature off', never an error)");
+  check(R.validatePkIban("03001234567").code === "alias" &&
+        R.validatePkIban("0300-1234567").code === "alias" &&
+        R.validatePkIban("+92 300 1234567").code === "alias" &&
+        R.validatePkIban("923001234567").code === "alias",
+    "iban: a Raast ALIAS (mobile number, in any of its written forms) is REFUSED with the alias code — the P2P template has no alias object (§3.2)");
+  check(R.validatePkIban("GB29NWBK60161331926819").code === "notPk" &&
+        R.validatePkIban("123456789012345678901234").code === "notPk",
+    "iban: a non-PK IBAN is refused (Raast is domestic), and a bare 24-digit string is not an IBAN");
+  check(R.validatePkIban("PK36SCBL000000112345670").code === "badLength" &&
+        R.validatePkIban("PK36SCBL00000011234567021").code === "badLength",
+    "iban: 23 or 25 characters is badLength — a missing or extra character, caught before structure");
+  check(R.validatePkIban("PK36SCBL00000011234567AB").code === "badStructure" &&
+        R.validatePkIban("PK36SCB10000001123456702").code === "badStructure",
+    "iban: letters in the account segment, or a digit inside the bank code, is badStructure");
+  {
+    // mod-97 detects EVERY single-character substitution:
+    // the difference is (Δ·10^k) with |Δ| ≤ 25 and 97 prime,
+    // so it can never be ≡ 0 (mod 97). Corrupt each position
+    // of a fixture in turn and require refusal — with the
+    // checksum code wherever the structure survives.
+    let allRefused = true;
+    let allChecksum = true;
+    for (let i = 2; i < IBAN_MEZN.length; i++) {
+      const ch = IBAN_MEZN[i];
+      const repl = /[0-9]/.test(ch)
+        ? String((Number(ch) + 1) % 10)
+        : ch === "Z" ? "A" : String.fromCharCode(ch.charCodeAt(0) + 1);
+      const corrupted = IBAN_MEZN.slice(0, i) + repl + IBAN_MEZN.slice(i + 1);
+      const res = R.validatePkIban(corrupted);
+      if (res.ok) allRefused = false;
+      else if (res.code !== "badChecksum") allChecksum = false;
+    }
+    check(allRefused && allChecksum,
+      "iban: EVERY single-character corruption of a valid IBAN (all 22 positions) is refused, each with badChecksum — a typo'd digit is caught at the desk");
+  }
+  check(R.validatePkIban("PK00MEZN0001234567890123").code === "badChecksum",
+    "iban: zeroed check digits fail the checksum even with perfect structure");
+
+  /* ---- FI name ---- */
+  check(R.validateRaastFiName("  Meezan Bank ").ok === true &&
+        R.validateRaastFiName("  Meezan Bank ").value === "Meezan Bank" &&
+        R.validateRaastFiName("").ok === true && R.validateRaastFiName(null).ok === true,
+    "fi: the bank name trims; empty is simply absent (object 03 is optional)");
+  check(R.validateRaastFiName("A".repeat(26)).code === "fiTooLong" &&
+        R.validateRaastFiName("میزان بینک").code === "fiBadChars" &&
+        R.validateRaastFiName("A".repeat(25)).ok === true,
+    "fi: 25 characters is the cap (26 refuses), and non-ASCII refuses — the payload's class is ASCII (§3.3)");
+
+  /* ---- amount formatting (§3.3) ---- */
+  check(R.formatRaastAmount(1500) === "1500" && R.formatRaastAmount(1500.5) === "1500.5" &&
+        R.formatRaastAmount(1500.50) === "1500.5" && R.formatRaastAmount(4880.73) === "4880.73" &&
+        R.formatRaastAmount(0.5) === "0.5" && R.formatRaastAmount(9999999.99) === "9999999.99",
+    "amount: integers plain, one decimal kept, trailing zeros trimmed, no separators — up to the 10-character object limit");
+  {
+    let threw = 0;
+    for (const [amt, code] of [[99999999.99, "amountTooLong"], [0, "badAmount"], [-5, "badAmount"], [NaN, "badAmount"]]) {
+      try { R.formatRaastAmount(amt); } catch (e) { if (e.code === code) threw++; }
+    }
+    check(threw === 4,
+      "amount: an 11-character amount, zero, a negative and NaN each refuse at composition with their codes — the builder never emits an over-length object");
+  }
+
+  /* ---- the builder, bare seam (the shipped provisional framing) ---- */
+  const STATIC_FIXTURE = "00020111023003Standard Chartered04" + IBAN_SCBL + "10E600";
+  const DYNAMIC_FIXTURE = "00020112023004" + IBAN_SCBL + "054880.7306Bill #1011009B3";
+  check(R.buildRaastP2pPayload({ iban: IBAN_SCBL, fiName: "Standard Chartered" }) === STATIC_FIXTURE,
+    "builder (bare): the static fixture byte-for-byte — PFI 02, initiation 11, scheme 30 (Raast), FI name, IBAN, CRC E600 over the payload + \"10\"");
+  check(R.buildRaastP2pPayload({ iban: IBAN_SCBL, amount: 4880.73, particulars: R.billParticulars(101) }) === DYNAMIC_FIXTURE,
+    "builder (bare): the dynamic fixture byte-for-byte — initiation 12, the amount object, \"Bill #101\" particulars, CRC 09B3");
+  check(R.billParticulars(7) === "Bill #7" && R.billParticulars("QT-9") === "Bill #QT-9",
+    "builder: the particulars is the bill label and nothing else — ASCII by construction (§3.3)");
+
+  /* ---- round-trips: builder and parser prove each other ---- */
+  const rtCases = [
+    { iban: IBAN_MEZN },
+    { iban: IBAN_MEZN, fiName: "Meezan Bank" },
+    { iban: IBAN_UNIL, amount: 250 },
+    { iban: IBAN_HABB, fiName: "Habib Bank", amount: 1500.5, particulars: "Bill #42" },
+    { iban: IBAN_MUCB, particulars: "Bill #9" },
+    { iban: IBAN_NBPA, fiName: "National Bank", amount: 9999999.99, particulars: "Bill #100000" },
+  ];
+  for (const framing of ["bare", "tlv"]) {
+    const allOk = rtCases.every((input) => {
+      const payload = R.buildRaastP2pPayload(input, framing);
+      const parsed = R.parseRaastP2pPayload(payload, framing);
+      if (!parsed.ok) return false;
+      const o = parsed.objects;
+      return o.pfi === "02" && o.scheme === "30" && o.iban === input.iban &&
+        o.initiation === (input.amount !== undefined ? "12" : "11") &&
+        o.fiName === (input.fiName || undefined) &&
+        o.amount === (input.amount !== undefined ? R.formatRaastAmount(input.amount) : undefined) &&
+        o.particulars === (input.particulars || undefined) &&
+        typeof o.crc === "string" && o.crc.length === 4;
+    });
+    check(allOk,
+      `round-trip (${framing}): every builder output parses back object-by-object — FI/amount/particulars presence and the dynamic ⇔ initiation-12 correspondence exact, CRC verifying`);
+  }
+  check(R.buildRaastP2pPayload({ iban: IBAN_SCBL, fiName: "Standard Chartered" }, "tlv")
+        .startsWith("0002020102110202300318Standard Chartered0424" + IBAN_SCBL),
+    "builder (tlv): the alternative framing frames every object id + 2-digit length — the seam's other hypothesis, one constant away");
+  check(R.parseRaastP2pPayload(STATIC_FIXTURE, "tlv").ok === false &&
+        R.parseRaastP2pPayload(R.buildRaastP2pPayload({ iban: IBAN_MEZN }, "tlv"), "bare").ok === false,
+    "parser: the two framings do NOT cross-parse — framing is a real distinction, which is why the seam exists and the fixture must pin it");
+  {
+    const tampered = DYNAMIC_FIXTURE.slice(0, -1) + (DYNAMIC_FIXTURE.endsWith("0") ? "1" : "0");
+    const midTamper = DYNAMIC_FIXTURE.replace("4880.73", "4880.74");
+    check(R.parseRaastP2pPayload(tampered).ok === false && R.parseRaastP2pPayload(midTamper).ok === false &&
+          R.parseRaastP2pPayload("00020111023004" + IBAN_MEZN).ok === false,
+      "parser: a flipped CRC digit, a flipped amount digit, and a truncated payload are all rejected — the CRC is verified, never assumed");
+  }
+  {
+    let codes = [];
+    for (const [input, code] of [
+      [{ iban: "03001234567" }, "iban:alias"],
+      [{ iban: IBAN_MEZN, amount: 99999999.99 }, "amountTooLong"],
+      [{ iban: IBAN_MEZN, particulars: "بل #5" }, "badParticulars"],
+      [{ iban: IBAN_MEZN, particulars: "x".repeat(31) }, "badParticulars"],
+      [{ iban: IBAN_MEZN, fiName: "A".repeat(26) }, "fiName:fiTooLong"],
+    ]) {
+      try { R.buildRaastP2pPayload(input); codes.push("NO-THROW"); }
+      catch (e) { codes.push(e.code); }
+    }
+    check(codes.join(",") === "iban:alias,amountTooLong,badParticulars,badParticulars,fiName:fiTooLong",
+      "builder guards: an alias IBAN, an over-length amount, Urdu or 31-char particulars, and a 26-char FI name each refuse with their codes — never a malformed payload");
+  }
+
+  /* ---- the QR matrix fixture (the reference encoder, pinned) ---- */
+  check(qrLib.QR_ERROR_CORRECTION === "M" && qrLib.QR_QUIET_ZONE_MODULES === 4,
+    "qr: error-correction level M (the payment-QR convention, §3.7) and the 4-module quiet zone");
+  {
+    const FIXTURE_ROWS = [
+      "#######.###........###...#.#..#######",
+      "#.....#..#..#.###..#...###....#.....#",
+      "#.###.#......#.###...##.#...#.#.###.#",
+      "#.###.#.####..#..##.#....###..#.###.#",
+      "#.###.#.#.##.#...#..#..#.####.#.###.#",
+      "#.....#.###.#.####.##....##.#.#.....#",
+      "#######.#.#.#.#.#.#.#.#.#.#.#.#######",
+      "........###.##.##....#....#.#........",
+      "#...#.#####.#..##..##.....#.######..#",
+      ".##.......#..##...##..#.##.#.#.##..#.",
+      "..##.###..##.#.#.#.#.####..###..####.",
+      ".##..#...#...#####.###.#..####...###.",
+      "...#..#..###..#......##.#...#.#..##.#",
+      "#.#..#..##...#..#.#.###..##.##.##..#.",
+      ".#.#..#...##..####.....#...#.#.#.###.",
+      "##.###...#...##.###.#.##....#.#..###.",
+      "....###.###.......##..#.##..#.#..##.#",
+      ".#.#....####.##.##.##.....##.#.##..#.",
+      "###...#..#.#....#...#.#..###.#.#.###.",
+      "###..#..#.#.#....##..##.#....##..###.",
+      ".###..##..#..###.########...#.#..##.#",
+      ".##.##.##..##...##....######.#.##..#.",
+      "...#..##.##....#..#.####..###..#.#.#.",
+      "#......#.##.....#...##.##.####...###.",
+      "....#####.##.#..#..##...#.#.#.#..##.#",
+      "##.##......#..#...##..#.##.#.#.##..#.",
+      "..#..##.#...##.#...#.#.#..####.#.###.",
+      "........###.##.#########......#..###.",
+      "##.#.##.##.##....##.###.#...#######.#",
+      "........#.......#....#.#.####...#..#.",
+      "#######.#####..#.#.....#.##.#.#.####.",
+      "#.....#..#.#....####..#....##...####.",
+      "#.###.#.#.###.#...##..#...#.########.",
+      "#.###.#..####.#.#..##..###....#.....#",
+      "#.###.#..#..#...#.#.##.#...##.#..##..",
+      "#.....#.....###..#...#.#..#....#.###.",
+      "#######.#..##..##..#.##......########",
+    ];
+    const m = qrLib.qrModuleRows(STATIC_FIXTURE);
+    check(m.size === 37 && JSON.stringify(m.rows) === JSON.stringify(FIXTURE_ROWS),
+      "qr: the reference encoder's 37×37 module matrix for the static fixture payload, pinned byte-for-byte — any encoder or payload drift breaks this anchor");
+    const m2 = qrLib.qrModuleRows(STATIC_FIXTURE);
+    check(JSON.stringify(m2.rows) === JSON.stringify(m.rows),
+      "qr: the matrix is deterministic across calls (auto version, byte mode, EC M)");
+  }
+
+  /* ---- resolveRaastBlock: which path prints (§3.4/§3.5) ---- */
+  const baseInput = {
+    enabled: true, imagePresent: false, iban: IBAN_MEZN, fiName: "Meezan Bank",
+    size: "m", thermal: false,
+  };
+  const billDoc = (over) => ({ kind: "bill", billNo: 101, total: 4880.73, dynamic: true, ...over });
+  check(R.resolveRaastBlock({ ...baseInput, enabled: false, doc: billDoc() }).path === "none" &&
+        R.resolveRaastBlock({ ...baseInput, doc: { kind: "other" } }).path === "none" &&
+        R.resolveRaastBlock({ ...baseInput, doc: { kind: "other" }, imagePresent: true }).path === "none",
+    "resolve: the showRaastQr toggle off ⇒ nothing, and documents outside bill/quotation/order/poster never carry a Raast block (§1.5) — even with an image uploaded");
+  {
+    const img = R.resolveRaastBlock({ ...baseInput, imagePresent: true, doc: billDoc() });
+    const imgNoIban = R.resolveRaastBlock({ ...baseInput, imagePresent: true, iban: null, doc: billDoc() });
+    check(img.path === "image" && img.iban === IBAN_MEZN &&
+          imgNoIban.path === "image" && imgNoIban.iban === null,
+      "resolve: the bank-issued IMAGE wins whenever it exists (Path 1) — the generated path steps aside; the IBAN text line rides only when an IBAN is also on record");
+  }
+  {
+    const dyn = R.resolveRaastBlock({ ...baseInput, doc: billDoc() });
+    const parsed = dyn.path === "generated" ? R.parseRaastP2pPayload(dyn.payload) : null;
+    check(dyn.path === "generated" && dyn.dynamic === true && parsed !== null && parsed.ok &&
+          parsed.objects.amount === "4880.73" && parsed.objects.particulars === "Bill #101" &&
+          parsed.objects.initiation === "12",
+      "resolve: a dynamic bill QR carries the bill TOTAL + \"Bill #101\" — what the bill charges, reconcilable by number (§3.4)");
+    const stat = R.resolveRaastBlock({ ...baseInput, doc: billDoc({ dynamic: false }) });
+    const sp = stat.path === "generated" ? R.parseRaastP2pPayload(stat.payload) : null;
+    check(stat.path === "generated" && stat.dynamic === false && sp !== null && sp.ok &&
+          sp.objects.amount === undefined && sp.objects.particulars === "Bill #101" &&
+          sp.objects.initiation === "11",
+      "resolve: dynamic off ⇒ a static bill code (no amount object) that still carries the bill number");
+    const zero = R.resolveRaastBlock({ ...baseInput, doc: billDoc({ total: 0 }) });
+    const zp = zero.path === "generated" ? R.parseRaastP2pPayload(zero.payload) : null;
+    check(zero.path === "generated" && zero.dynamic === false && zp !== null && zp.ok &&
+          zp.objects.amount === undefined,
+      "resolve: a zero-total bill never embeds a zero amount — it falls back to the static code");
+  }
+  {
+    const quote = R.resolveRaastBlock({ ...baseInput, doc: { kind: "quotation" } });
+    const order = R.resolveRaastBlock({ ...baseInput, doc: { kind: "order" } });
+    const poster = R.resolveRaastBlock({ ...baseInput, doc: { kind: "poster" } });
+    const qp = quote.path === "generated" ? R.parseRaastP2pPayload(quote.payload) : null;
+    check(qp !== null && qp.ok && qp.objects.amount === undefined && qp.objects.particulars === undefined &&
+          order.path === "generated" && poster.path === "generated",
+      "resolve: quotations, orders and the counter poster are STATIC, always — an estimate never hardens into a payment demand (§3.4)");
+  }
+  check(R.resolveRaastBlock({ ...baseInput, iban: "PK00MEZN0001234567890123", doc: billDoc() }).path === "none" &&
+        R.resolveRaastBlock({ ...baseInput, iban: null, doc: billDoc() }).path === "none" &&
+        R.resolveRaastBlock({ ...baseInput, iban: "03001234567", doc: billDoc() }).path === "none",
+    "resolve: no valid IBAN and no image ⇒ no block — a checksum-failing IBAN or an alias in settings (however it got there) prints nothing");
+  check(R.raastQrSizeMm("s", false) === 22 && R.raastQrSizeMm("m", false) === 28 && R.raastQrSizeMm("l", false) === 36 &&
+        R.raastQrSizeMm("l", true) === 28 && R.raastQrSizeMm("m", true) === 28 && R.raastQrSizeMm("s", true) === 22,
+    "resolve: sizes s/m/l = 22/28/36mm on paper; thermal caps at 28mm whatever the template asks (§3.5)");
+
+  /* ---- i18n: parity + the honesty wording is really there ---- */
+  check(Object.keys(i18n.en).length === 3136 && Object.keys(i18n.ur).length === 3136,
+    "i18n: the dictionary now carries 3,054 keys, EN ≡ UR (E3 pin amendment: +35 Raast keys — 34 print.raast + billing.wa.raastLine); E4 pin amendment: +49 pin keys; F5 pin amendment: +1 sync.online key; G1 pin amendment: +8 biz keys; G2 pin amendment: +36 plan keys; G3 pin amendment: +89 platform keys; G4 pin amendment: +47 keys (35 renew.* + 12 platform.*); G6 pin amendment: +25 backup.* keys; H1 pin amendment: +51 loyalty keys; H3 pin amendment: +108 storefront keys; WA pin amendment: +109 WhatsApp keys");
+  check(i18n.en["print.raast.provisional"].includes("pending verification") &&
+        i18n.ur["print.raast.provisional"].includes("تصدیق باقی") &&
+        i18n.en["print.raast.honest"].includes("has not yet been verified") &&
+        i18n.en["billing.wa.raastLine"].includes("{iban}") &&
+        !i18n.en["print.raast.pathGenerated"].toLowerCase().includes("verified") &&
+        i18n.en["print.raast.pathImage"].toLowerCase().includes("verified path"),
+    "i18n honesty: the generated path is labelled 'pending verification' in BOTH languages and 'not yet been verified' in the explainer; only the bank-image path is called verified; the WhatsApp line carries the IBAN placeholder");
+
+  /* ---- source invariants: purity, the seam's isolation, wiring ---- */
+  const raastSrc = fs.readFileSync("/home/hatch/workspace/ai-dukaan-ai/web/lib/raast.ts", "utf8");
+  const qrSrc = fs.readFileSync("/home/hatch/workspace/ai-dukaan-ai/web/lib/qr.ts", "utf8");
+  check(!/makeEntry|guardPostings|postEntry|writeBatch|setDoc|addDoc|firebase/.test(raastSrc) &&
+        !/makeEntry|guardPostings|postEntry|writeBatch|setDoc|addDoc|firebase/.test(qrSrc),
+    "source: neither Raast module touches a posting path, the store or Firestore — Phase E posts NOTHING (invariant 1)");
+  {
+    const chromeSrc = fs.readFileSync("/home/hatch/workspace/ai-dukaan-ai/web/components/PrintChrome.tsx", "utf8");
+    const qrComponentSrc = fs.readFileSync("/home/hatch/workspace/ai-dukaan-ai/web/components/QrCode.tsx", "utf8");
+    const settingsSrc = fs.readFileSync("/home/hatch/workspace/ai-dukaan-ai/web/components/RaastSettings.tsx", "utf8");
+    const sheetSrc = fs.readFileSync("/home/hatch/workspace/ai-dukaan-ai/web/components/DocPrintSheet.tsx", "utf8");
+    check(!/frameObject|crcObjectFor|RAAST_FRAMING/.test(chromeSrc + qrComponentSrc + settingsSrc) &&
+          (raastSrc.match(/frameObject\(/g) || []).length >= 3,
+      "source: the framing decision exists ONLY inside lib/raast (frameObject/crcObjectFor + the RAAST_FRAMING seam) — no component frames, prefixes or checksums a payload");
+    check(chromeSrc.includes("resolveRaastBlock") && chromeSrc.includes("QrCode") &&
+          sheetSrc.includes("billNo: bill.billNo") && sheetSrc.includes("total: bill.total"),
+      "source: the footer resolves its Raast block through lib/raast and renders the one QrCode component; the bill sheet passes its number + total into the footer");
+    check(qrComponentSrc.includes("#ffffff") && qrComponentSrc.includes("#000000") &&
+          !/var\(--/.test(qrComponentSrc),
+      "source: the QR renders black on white, hard-coded — no theme token can reach the matrix (invariant 3's sharpest case)");
+  }
+  check((fs.readFileSync("/home/hatch/workspace/ai-dukaan-ai/web/components/StoreProvider.tsx", "utf8")
+        .match(/makeEntry\(/g) || []).length === 24,
+    "source: still exactly 24 makeEntry calls in the store — E3 composed no entry, template or refType");
+  check(!/raastIban|raastFiName/.test(fs.readFileSync("/home/hatch/workspace/ai-dukaan-ai/web/lib/seed.ts", "utf8")) &&
+        !/raastIban/.test(fs.readFileSync("/home/hatch/workspace/ai-dukaan-ai/web/lib/seed-data.json", "utf8")),
+    "source: the seed ships no Raast IBAN — absence is the default, and a shop that never opens the Raast card prints exactly what it printed before E3 (§10.2)");
+
+  /* ---- rules: E3 changes none ---- */
+  check(crypto.createHash("sha256")
+        .update(stripG1Blocks(stripG2Blocks(fs.readFileSync("/home/hatch/workspace/ai-dukaan-ai/firebase/firestore.rules", "utf8"))), "utf8")
+        .digest("hex") === "04807268c2c1891c070e1cc34443fe4c3892ea35dde739718499e392c661f859",
+    "rules: the file is byte-identical to the pre-E3 file (SHA pinned) — Raast rides the owner settings doc + the existing branding match; E3 adds no rules (G1 same-check amendment: the four G1 spans are stripped first — v9's only other deltas, strip-proven in the G1 suite)");
+
+  /* ---- seed regression: Raast is not journal data ---- */
+  const journal = seed.getSeedJournal(products, sales, purchases, payments, expenses, credits);
+  const normalizedE3 = journal.map((e) => { const { ts, ...rest } = e; return rest; });
+  const shaE3 = crypto.createHash("sha256").update(JSON.stringify(normalizedE3), "utf8").digest("hex");
+  const allRangeE3 = reports.resolveReportRange("custom", null, { from: "2000-01-01", to: "2100-12-31" });
+  const tbE3 = reports.trialBalance(journal, allRangeE3);
+  check(journal.length === 21 && shaE3 === "e17e5bda19e87de698b0c0a37e923f9b396bc387e2092b2ffbbd7d60d4971168" &&
+        eq(ledger.accountBalance(journal, "inventory"), 272805) &&
+        eq(ledger.cashBalance(journal), 50000) &&
+        eq(ledger.payablesTotal(journal), 27900) &&
+        eq(ledger.receivablesTotal(journal), 5500) &&
+        eq(tbE3.totalDebits, tbE3.totalCredits),
+    "seed regression: the frozen identities stand — 21 entries, the seed-journal SHA, inventory 272,805 / cash 50,000 / payables 27,900 / receivables 5,500, trial balance zero. A QR is a rendering of a settings string, never an entry in the journal");
+}
+
+/* =============================== G1 (Phase G · G1 — tenancy foundation) =============================== */
+{
+  suite("G1", null);
+  const NOW = "2026-10-23T00:00:00.000Z";
+  const A = "bizA";
+  const B = "bizB";
+  const rulesG1 = fs.readFileSync(
+    "/home/hatch/workspace/ai-dukaan-ai/firebase/firestore.rules", "utf8");
+  const readSrc = (p) => fs.readFileSync("/home/hatch/workspace/ai-dukaan-ai/web/" + p, "utf8");
+
+  /* ---- the resolver truth table (design §1.3/§6.2) ---- */
+  const MIRROR_A = ["staff@a.pk", "both@a.pk"];
+  const member = (role, source) =>
+    role === undefined
+      ? { email: "staff@a.pk", addedBy: A, addedAt: NOW, source: source ?? "invite" }
+      : { email: "staff@a.pk", role, addedBy: A, addedAt: NOW, source: source ?? "invite" };
+  const res = (over) =>
+    tenancy.resolveAccess({
+      callerUid: "u-x", callerEmail: "staff@a.pk", businessId: A,
+      staffEmails: MIRROR_A, membership: null, staffIndex: null,
+      ...over,
+    });
+
+  let r = res({ callerUid: A, callerEmail: "owner@a.pk" });
+  check(r.access && r.role === "owner" && r.via === "owner",
+    "resolver: the owner resolves as owner in their own business (uid match)");
+  r = res({ callerUid: "u-mgr", membership: member("manager") });
+  check(r.access && r.role === "manager" && r.via === "membership",
+    "resolver: a claimed membership grants its role (manager)");
+  r = res({ callerUid: "u-cash", membership: member("cashier") });
+  check(r.access && r.role === "cashier" && r.via === "membership",
+    "resolver: a claimed membership grants its role (cashier)");
+  r = res({ callerUid: "u-norole", membership: member(undefined, "staff") });
+  check(r.access && r.role === "manager" && r.via === "membership",
+    "resolver: a membership doc WITHOUT a role resolves to manager — the legacy default, on the new leg too");
+  r = res({ callerUid: "u-leg", staffIndex: { ownerUid: A, role: "accountant" } });
+  check(r.access && r.role === "accountant" && r.via === "legacy",
+    "resolver: a pre-G staff member with no membership still resolves through the legacy staffIndex leg");
+  r = res({ callerUid: "u-leg2", staffIndex: { ownerUid: A } });
+  check(r.access && r.role === "manager" && r.via === "legacy",
+    "resolver: a legacy staffIndex doc without a role resolves to manager");
+  r = res({ callerUid: "u-stranger", callerEmail: "nobody@x.pk" });
+  check(!r.access && r.role === "none" && r.via === null,
+    "resolver: a stranger — no membership, no index, not on the mirror — is denied (this is also the state of a merely INVITED email: an unclaimed invite confers nothing)");
+  r = res({
+    callerUid: "u-removed", callerEmail: "gone@a.pk", staffEmails: ["staff@a.pk"],
+    membership: { email: "gone@a.pk", role: "manager", addedBy: A, addedAt: NOW, source: "invite" },
+  });
+  check(!r.access && r.via === null,
+    "resolver: a REMOVED member is denied even though their membership doc still exists — the removal cut the staffEmails mirror, and the membership leg requires the mirror (R-G4: the next read denies)");
+  r = res({ callerUid: "u-mem", membership: member("manager"), staffIndex: null });
+  check(r.access && r.via === "membership",
+    "resolver: with staffIndex deleted, the membership leg alone grants — the legs are independent by design");
+  r = res({
+    callerUid: "u-div", membership: member("cashier"),
+    staffIndex: { ownerUid: A, role: "accountant" },
+  });
+  check(r.access && r.role === "cashier" && r.via === "membership",
+    "resolver: when both legs could grant, the MEMBERSHIP role wins — it is the G-era record (amendment #1's order)");
+  /* cross-business isolation: the same person, resolved against B */
+  r = tenancy.resolveAccess({
+    callerUid: "u-both", callerEmail: "both@a.pk", businessId: B,
+    staffEmails: ["other@b.pk"], membership: null,
+    staffIndex: { ownerUid: A, role: "manager" },
+  });
+  check(!r.access && r.via === null,
+    "isolation: a member of A read against business B (not a member there; their staffIndex points at A) is denied — membership in one business is not a skeleton key");
+  const rA = res({ callerUid: "u-both", callerEmail: "both@a.pk", membership: { email: "both@a.pk", role: "manager", addedBy: A, addedAt: NOW, source: "invite" } });
+  const rB = tenancy.resolveAccess({
+    callerUid: "u-both", callerEmail: "both@a.pk", businessId: B,
+    staffEmails: ["both@a.pk"],
+    membership: { email: "both@a.pk", role: "cashier", addedBy: B, addedAt: NOW, source: "invite" },
+    staffIndex: null,
+  });
+  check(rA.access && rA.role === "manager" && rB.access && rB.role === "cashier",
+    "resolver: roles are PER-BUSINESS — the same person is manager in A and cashier in B");
+
+  /* ---- counters + month keys (design §2.3) ---- */
+  check(tenancy.pktMonthKey("2026-10-01T00:30:00.000Z") === "2026-10" &&
+        tenancy.pktMonthKey("2026-10-31T20:30:00.000Z") === "2026-11",
+    "counters: the month key is Asia/Karachi's — Oct 31 20:30 UTC is already November in PKT");
+  const migBills = [
+    { ts: "2026-10-05T10:00:00.000Z", status: "final" },
+    { ts: "2026-10-06T10:00:00.000Z", status: "final" },
+    { ts: "2026-10-07T10:00:00.000Z", status: "held" },
+    { ts: "2026-09-15T10:00:00.000Z", status: "final" },
+  ];
+  const migSales = [
+    { ts: "2026-10-02T09:00:00.000Z" },
+    { ts: "2026-08-02T09:00:00.000Z" },
+  ];
+  check(tenancy.countMonthlyInvoiceEvents(migBills, migSales, tenancy.pktMonthKey(NOW)) === 3,
+    "counters: the monthly invoice count is non-held bills + counter sales in the PKT month (2 + 1 = 3; the held bill never counts)");
+
+  /* ---- the §7.2 lazy migration ---- */
+  const mig = tenancy.planMigration({
+    ownerUid: "own1", ownerEmail: "o@x.pk", shopName: "Madina",
+    phone: "0300", staffEmails: ["ghost@x.pk"], registryExists: false,
+    bills: migBills, sales: migSales, nowISO: NOW,
+  });
+  check(mig.length === 3 && mig.every((w) => w.kind !== "set" || !w.path.startsWith("users/")),
+    "migration: exactly registry + counters + event, and NO write path enters any users/{uid} tree (the users-tree diff is empty by construction)");
+  const migReg = mig.find((w) => w.kind === "set" && w.path === "businesses/own1");
+  check(!!migReg && migReg.data.plan.planId === "founding" &&
+        migReg.data.plan.modulesTier === "advanced" &&
+        migReg.data.plan.usersLimit === 10 && migReg.data.plan.invoiceLimit === 10000 &&
+        migReg.data.plan.assignedBy === "migration" && migReg.data.plan.tierRank === 3 &&
+        migReg.data.plan.trialEndsAt === null && migReg.data.plan.periodTo === null &&
+        migReg.data.status === "active" && migReg.data.enforce === false,
+    "migration: a pre-G shop receives the FOUNDING comp assignment — Advanced limits (10 users / 10,000 invoices), no expiry of any kind (both date fields null), enforcement off (design §7.2)");
+  const migCtr = mig.find((w) => w.kind === "set" && w.path === "businessCounters/own1");
+  check(!!migCtr && migCtr.data.invoiceCount === 3 && migCtr.data.memberCount === 1 &&
+        migCtr.data.invoiceMonth === "2026-10" && migCtr.data.baseline === "migration",
+    "migration: counters initialise from a LABELLED baseline (this month's 3 invoice events, the PKT month key, memberCount = the staff mirror's size — membership DOCS wait for each staffer's own first G sign-in, the only client that knows their uid)");
+  const migEvt = mig.find((w) => w.kind === "add" && w.collection === "businessEvents");
+  check(!!migEvt && migEvt.data.kind === "business.migrated" && migEvt.data.actor === "own1",
+    "migration: the migration itself is a businessEvents entry, written by the owner");
+  check(tenancy.planMigration({
+    ownerUid: "own1", ownerEmail: "o@x.pk", shopName: "Madina", phone: "0300",
+    staffEmails: [], registryExists: true, bills: migBills, sales: migSales, nowISO: NOW,
+  }).length === 0,
+    "migration: idempotent — with the registry doc present, a second sign-in plans ZERO writes");
+  {
+    const journalG1 = seed.getSeedJournal(products, sales, purchases, payments, expenses, credits);
+    const normG1 = journalG1.map((e) => { const { ts, ...rest } = e; return rest; });
+    const shaG1 = crypto.createHash("sha256").update(JSON.stringify(normG1), "utf8").digest("hex");
+    check(journalG1.length === 21 && shaG1 === "e17e5bda19e87de698b0c0a37e923f9b396bc387e2092b2ffbbd7d60d4971168" &&
+          eq(ledger.accountBalance(journalG1, "inventory"), 272805) &&
+          eq(ledger.cashBalance(journalG1), 50000) &&
+          eq(ledger.payablesTotal(journalG1), 27900) &&
+          eq(ledger.receivablesTotal(journalG1), 5500),
+      "migration identity: the frozen seed stands after the G1 migration — 21 entries, the seed SHA, inventory 272,805 / cash 50,000 / payables 27,900 / receivables 5,500. Tenancy is metadata; the journal never hears about it");
+  }
+
+  /* ---- the §4.3 trial birth ---- */
+  const birth = tenancy.planTrialBirth({
+    ownerUid: "new1", ownerEmail: "n@x.pk", shopName: "New Shop", phone: "", nowISO: NOW,
+  });
+  const birthReg = birth.find((w) => w.kind === "set" && w.path === "businesses/new1");
+  check(birth.length === 3 && !!birthReg &&
+        birthReg.data.plan.planId === "trial" && birthReg.data.plan.usersLimit === 2 &&
+        birthReg.data.plan.invoiceLimit === 200 && birthReg.data.plan.modulesTier === "standard" &&
+        birthReg.data.plan.assignedBy === "signup" &&
+        birthReg.data.plan.trialEndsAt === "2026-11-06T00:00:00.000Z",
+    "trial birth: a new business is born on the trial snapshot (2 users / 200 invoices / standard, +14 days exactly) — never on limits it did not earn");
+  check(tenancy.foundingPlanSnapshot(NOW).trialEndsAt === null &&
+        tenancy.trialPlanSnapshot(NOW).trialEndsAt === "2026-11-06T00:00:00.000Z",
+    "plans: the founding snapshot's expiry is null (no expiry, ever); the trial snapshot's end is start + 14d");
+
+  /* ---- invite → claim (design §1.3) ---- */
+  const invite = { email: "new@x.pk", role: "cashier", status: "pending", invitedBy: A, createdAt: NOW };
+  const claim = tenancy.planClaim({
+    businessId: A, callerUid: "u-new", callerEmail: "new@x.pk",
+    invite, existingMembership: null, nowISO: NOW,
+  });
+  check(claim.ok && claim.role === "cashier" &&
+        claim.writes.some((w) => w.kind === "set" && w.path === "businessMembers/bizA/members/u-new" &&
+          w.data.role === "cashier" && w.data.source === "invite") &&
+        claim.writes.some((w) => w.kind === "update" && w.path === "businessInvites/bizA/invites/new@x.pk" &&
+          w.data.status === "claimed" && w.data.claimedBy === "u-new") &&
+        claim.writes.some((w) => w.kind === "index" && w.businessId === A && w.role === "cashier") &&
+        claim.writes.some((w) => w.kind === "add" && w.collection === "businessEvents" && w.data.kind === "membership.claimed"),
+    "claim: a pending invite claims into a membership WITH THE INVITED ROLE, marks the invite claimed, indexes the business, and writes its audit event — one plan, one batch");
+  check(tenancy.planClaim({ businessId: A, callerUid: "u-x", callerEmail: "other@x.pk", invite, existingMembership: null, nowISO: NOW }).reason === "email-mismatch",
+    "claim: a signed-in account whose email is NOT the invited email cannot claim it — the invite belongs to the email, not to whoever finds it");
+  check(tenancy.planClaim({ businessId: A, callerUid: "u-x", callerEmail: "new@x.pk", invite: null, existingMembership: null, nowISO: NOW }).reason === "no-invite" &&
+        tenancy.planClaim({ businessId: A, callerUid: "u-x", callerEmail: "new@x.pk", invite: { ...invite, status: "claimed" }, existingMembership: null, nowISO: NOW }).reason === "already-claimed" &&
+        tenancy.planClaim({ businessId: A, callerUid: "u-x", callerEmail: "new@x.pk", invite: { ...invite, status: "revoked" }, existingMembership: null, nowISO: NOW }).reason === "not-pending",
+    "claim: no invite → refused; an invite claimed by SOMEONE ELSE → refused; a non-pending invite → refused");
+  const reclaim = tenancy.planClaim({
+    businessId: A, callerUid: "u-new", callerEmail: "new@x.pk",
+    invite: { ...invite, status: "claimed", claimedBy: "u-new", claimedAt: NOW },
+    existingMembership: { email: "new@x.pk", role: "cashier", addedBy: A, addedAt: NOW, source: "invite" },
+    nowISO: NOW,
+  });
+  check(reclaim.ok && reclaim.writes.length === 0,
+    "claim: the SAME member re-claiming is an idempotent no-op — a second device does not churn the membership");
+  const claimNoRole = tenancy.planClaim({
+    businessId: A, callerUid: "u-nr", callerEmail: "nr@x.pk",
+    invite: { email: "nr@x.pk", status: "pending", invitedBy: A, createdAt: NOW },
+    existingMembership: null, nowISO: NOW,
+  });
+  check(claimNoRole.ok && claimNoRole.role === "manager",
+    "claim: an invite carrying no role claims as manager — the standing default");
+
+  /* ---- the legacy backfill (§7.2) ---- */
+  const bf = tenancy.planLegacyBackfill({
+    businessId: A, callerUid: "u-old", callerEmail: "old@x.pk",
+    staffIndex: { ownerUid: A, email: "old@x.pk", role: "accountant" },
+    existingMembership: null, nowISO: NOW,
+  });
+  check(bf.length === 3 &&
+        bf.some((w) => w.kind === "set" && w.path === "businessMembers/bizA/members/u-old" && w.data.source === "staff" && w.data.role === "accountant") &&
+        bf.some((w) => w.kind === "add" && w.data.kind === "membership.backfilled"),
+    "backfill: a legacy member's first G sign-in mirrors their staffIndex relationship into a membership (source 'staff', role carried) + index + audit event");
+  check(tenancy.planLegacyBackfill({
+    businessId: A, callerUid: "u-old", callerEmail: "old@x.pk",
+    staffIndex: { ownerUid: B, email: "old@x.pk", role: "accountant" },
+    existingMembership: null, nowISO: NOW,
+  }).length === 0 &&
+  tenancy.planLegacyBackfill({
+    businessId: A, callerUid: "u-old", callerEmail: "old@x.pk",
+    staffIndex: { ownerUid: A, email: "old@x.pk", role: "accountant" },
+    existingMembership: { businessId: A, memberUid: "u-old", email: "old@x.pk", role: "accountant", source: "staff", joinedAt: NOW },
+    nowISO: NOW,
+  }).length === 0,
+    "backfill: nothing is written when the index points at ANOTHER business, or when the membership already exists");
+
+  /* ---- the switcher index (design §1.4) ---- */
+  const healed = tenancy.healIndex(
+    [{ businessId: A, role: "manager" }, { businessId: B, role: "manager" }],
+    { [A]: { businessId: A, memberUid: "u1", email: "e@x.pk", role: "cashier", source: "invite", joinedAt: NOW }, [B]: null }
+  );
+  check(healed.kept.length === 1 && healed.kept[0].businessId === A && healed.kept[0].role === "cashier" &&
+        healed.dropped.length === 1 && healed.dropped[0] === B,
+    "switcher healing: an entry whose membership doc is gone DROPS OUT (and is reported); a surviving entry's role refreshes from the membership doc — the index can drift, the memberships cannot lie");
+  const switcherList = tenancy.buildSwitcherList({
+    own: { businessId: "me", name: "My Shop" },
+    entries: [{ businessId: "z9", role: "manager" }, { businessId: "a1", role: "cashier" }],
+    names: { z9: "Zed Traders", a1: "Alpha Store" },
+  });
+  check(switcherList.length === 3 && switcherList[0].own === true &&
+        switcherList[1].name === "Alpha Store" && switcherList[2].name === "Zed Traders",
+    "switcher: own business first, memberships after, sorted by display name");
+  check(tenancy.indexWith([{ businessId: A, role: "manager" }], { businessId: A, role: "cashier" }).length === 1 &&
+        tenancy.membershipStatusFor("a@x.pk", [{ email: "a@x.pk" }], []) === "joined" &&
+        tenancy.membershipStatusFor("b@x.pk", [], [{ email: "b@x.pk", status: "pending" }]) === "pending" &&
+        tenancy.membershipStatusFor("c@x.pk", [], []) === "legacy",
+    "switcher/settings: the index upsert dedupes by business; the staff-row chip reads joined / pending / legacy from memberships + invites");
+
+  /* ---- rules v9 part 1 (design §6) ---- */
+  check(crypto.createHash("sha256").update(stripG1Blocks(stripG2Blocks(rulesG1)), "utf8").digest("hex") ===
+        "04807268c2c1891c070e1cc34443fe4c3892ea35dde739718499e392c661f859",
+    "rules: STRIP PROOF — v9 minus the four delimited G1 spans (header note, amendment #1 restored to the exact v8 text, helpers, platform blocks) is byte-for-byte the v8 file (its pinned SHA). Additive except the ONE named amendment (G3 same-check amendment: the shared strip helpers first cut the delimited G3 span — a pure addition after the G1 span, strip-proven against the pre-G3 v9 SHA in the G3 suite)");
+  check(rulesG1.includes("v9 vs v8:") &&
+        rulesG1.includes("match /businesses/{businessId}") &&
+        rulesG1.includes("match /businessMembers/{businessId}") &&
+        rulesG1.includes("match /businessInvites/{businessId}") &&
+        rulesG1.includes("match /userMemberships/{memberUid}") &&
+        rulesG1.includes("match /businessCounters/{businessId}") &&
+        rulesG1.includes("match /platformAdmins/{adminUid}") &&
+        rulesG1.includes("match /businessEvents/{eventId}"),
+    "rules: all seven platform collections exist as designed (§1.2) — registry, members, invites, switcher index, counters, admins, audit log");
+  const g1Span = rulesG1.slice(rulesG1.indexOf("// ---- Phase G · G1: platform collections (START)"));
+  check(g1Span.includes("match /businessEvents/{eventId}") &&
+        g1Span.slice(g1Span.indexOf("match /businessEvents")).includes("allow update, delete: if false;") &&
+        g1Span.slice(g1Span.indexOf("match /businessCounters"), g1Span.indexOf("match /businessEvents")).includes("allow update: if canAccess(businessId) && counterArithmeticOk(businessId);") &&
+        g1Span.slice(g1Span.indexOf("match /businessCounters"), g1Span.indexOf("match /businessEvents")).includes("allow delete: if false;"),
+    "rules: the audit log is create-only for EVERYONE; the counters' write leg is now G2's batch-paired arithmetic (canAccess + counterArithmeticOk; delete still never) — G2 same-check amendment: part 2 landed the named amendment this check anticipated");
+  const usersRegion = rulesG1.slice(
+    rulesG1.indexOf("match /users/{uid}"),
+    rulesG1.indexOf("// ---- Phase G · G1: platform collections (START)"));
+  check(!usersRegion.includes("platformAdmins") &&
+        rulesG1.includes("return isBusinessOwner(uid) || isMemberOf(uid) || isStaffOf(uid);") &&
+        rulesG1.includes(".data.ownerUid == uid"),
+    "rules: §2.3's doctrine is structural — NO platform-admin leg exists anywhere in the users namespace; amendment #1 orders owner → membership → legacy, and the v8 staffIndex body survives verbatim as the fallback leg (FR2 same-check amendment: the first leg is now isBusinessOwner — uid match OR registry leg — so a generated business's owner passes the same gate; the doctrine is unchanged, the leg widened)");
+  const bizBlock = g1Span.slice(g1Span.indexOf("match /businesses/{businessId}"),
+    g1Span.indexOf("match /businessMembers"));
+  check(bizBlock.includes("businessBirthOk(businessId)") &&
+        rulesG1.includes("function businessBirthOk(businessId)") &&
+        rulesG1.includes("function selfClaimOk(businessId)") &&
+        rulesG1.includes("function isMemberOf(uid)"),
+    "rules: the registry's create is birth-shape-validated (trial XOR founding), and the membership leg + vouched self-claim helpers exist as designed");
+
+  /* ---- i18n: every new string in both languages ---- */
+  const BIZ_KEYS = ["biz.switchBusiness", "biz.yourBusiness", "biz.businessFallback",
+    "biz.memberJoined", "biz.memberPending", "biz.memberLegacy",
+    "biz.noAccessTitle", "biz.noAccessBody"];
+  check(BIZ_KEYS.every((k) => typeof i18n.en[k] === "string" && i18n.en[k].length > 0 &&
+                             typeof i18n.ur[k] === "string" && i18n.ur[k].length > 0) &&
+        Object.keys(i18n.en).length === 3136 && Object.keys(i18n.ur).length === 3136,
+    "i18n: all 8 new biz.* keys exist in EN and UR (dictionary 3,054 after the H1 pin amendment (+51 loyalty keys; H3 pin amendment: +108 storefront keys; WA pin amendment: +109 WhatsApp keys; G6 had added +25 backup.* keys; G4 had added +47: 35 renew.* + 12 platform.*; G3 had added +89 platform.* over G2's 2,625), parity kept) — the switcher, chips and no-access state never render a raw key");
+
+  /* ---- source wiring ---- */
+  const authSrc = readSrc("components/AuthProvider.tsx");
+  const storeSrcG1 = readSrc("components/StoreProvider.tsx");
+  check(authSrc.includes("collectionGroup") && authSrc.includes("businessInvites") &&
+        authSrc.includes("userMemberships") && authSrc.includes("switchBusiness") &&
+        authSrc.includes("planClaim") && authSrc.includes("planLegacyBackfill"),
+    "source: AuthProvider resolves the session through the tenancy planners — claim (collection-group invite scan) → backfill → healed index — and exposes the switcher state");
+  check(storeSrcG1.includes("ensureBusinessRegistry") && storeSrcG1.includes("createTrialRegistry") &&
+        storeSrcG1.includes("businessInvites") && storeSrcG1.includes("businessEvents") &&
+        storeSrcG1.includes("Timestamp.fromDate") &&
+        (storeSrcG1.match(/makeEntry\(/g) || []).length === 24,
+    "source: the store runs the registry migration + trial birth, writes invites/events in its staff batches, and converts the trial end to a Firestore Timestamp at the write seam (the rules validate it as one) — and still composes exactly 24 journal entries (tenancy posts nothing)");
+  check(readSrc("components/AppShell.tsx").includes("BusinessSwitcher") &&
+        !readSrc("components/Sidebar.tsx").includes("BusinessSwitcher") &&
+        readSrc("components/AuthGate.tsx").includes("biz.noAccessTitle") &&
+        readSrc("components/SettingsView.tsx").includes("membershipStatusFor"),
+    "source: the switcher lives in the TOP HEADER (AppShell) and NOT the sidebar (the owner's shell standard); the gate carries the no-access state; settings shows the membership chips");
+  check(!readSrc("lib/tenancy.ts").includes("firebase"),
+    "purity: lib/tenancy imports no Firebase — the planners are pure, so demo mode (which never calls them) is untouched by construction");
+}
+
+/* =============================== G2 (Phase G · G2 — plans, counters, enforcement) =============================== */
+{
+  suite("G2", null); // Phase G · G2 — the plan catalogue, the derived plan state, the batch-riding counters, staged enforcement (design §3/§4/§6/§8-G2)
+
+  const rulesG2 = fs.readFileSync(
+    "/home/hatch/workspace/ai-dukaan-ai/firebase/firestore.rules", "utf8"
+  );
+  const ISO0 = "2026-10-06T00:00:00.000Z"; // a Tuesday in the shop's first month
+  const regOf = (plan, extra) => ({
+    ownerUid: "o1", ownerEmail: "o@x.pk", name: "Shop", phone: "", city: "",
+    createdAt: ISO0, status: "active", enforce: true, plan, ...(extra || {}),
+  });
+
+  /* ---- the catalogue (design §3.1) + the module partition (§3.3) ---- */
+  const allModules = [
+    ...plans.CORE_MODULES, ...plans.DOCUMENTS_MODULES,
+    ...plans.OPERATIONS_MODULES, ...plans.ADVANCED_MODULES,
+    ...plans.GROWTH_MODULES,
+  ];
+  check(plans.CORE_MODULES.length === 26 && plans.DOCUMENTS_MODULES.length === 6 &&
+        plans.OPERATIONS_MODULES.length === 2 && plans.ADVANCED_MODULES.length === 7 &&
+        plans.GROWTH_MODULES.length === 2 &&
+        new Set(allModules).size === 43 &&
+        Object.keys(perm.PERMISSION_MATRIX).every((m) => allModules.includes(m)),
+    "catalogue: the 43 PermModules are partitioned exactly once — Core 26 + Documents 6 + Operations 2 + Advanced 7 + Growth 2 (H1 pin amendment: loyalty entered via GROWTH_MODULES at the Standard seam, Phase H design §5.1; H3 pin amendment: storefront joins ADVANCED_MODULES, Phase H design §2.6; WA pin amendment: whatsapp joins GROWTH_MODULES beside loyalty at the Standard seam, Phase H design §3.1/§5.1), no module in two sets, none missing");
+  check(plans.MODULE_SETS.core.length === 26 && plans.MODULE_SETS.standard.length === 36 &&
+        plans.MODULE_SETS.advanced.length === 43 &&
+        plans.tierIncludesModule("core", "billing") && !plans.tierIncludesModule("core", "quotations") &&
+        plans.tierIncludesModule("standard", "quotations") && plans.tierIncludesModule("standard", "warehouses") &&
+        !plans.tierIncludesModule("standard", "payroll") && plans.tierIncludesModule("advanced", "payroll") &&
+        plans.tierIncludesModule("advanced", "fiscalClose") &&
+        !plans.tierIncludesModule("core", "loyalty") && plans.tierIncludesModule("standard", "loyalty") &&
+        plans.tierIncludesModule("advanced", "loyalty") && plans.moduleMinTier("loyalty") === "standard" &&
+        !plans.tierIncludesModule("core", "whatsapp") && plans.tierIncludesModule("standard", "whatsapp") &&
+        plans.tierIncludesModule("advanced", "whatsapp") && plans.moduleMinTier("whatsapp") === "standard" &&
+        !plans.tierIncludesModule("standard", "storefront") && plans.tierIncludesModule("advanced", "storefront") &&
+        plans.moduleMinTier("storefront") === "advanced",
+    "catalogue: the tier sets are cumulative (Core ⊂ Standard ⊂ Advanced) and the seams fall where §3.3 puts them (H1: loyalty joins at Standard; H3: storefront is Advanced-only, design §2.6; WA: whatsapp joins at Standard beside loyalty, design §3.1)");
+  check(plans.moduleMinTier("billing") === "core" && plans.moduleMinTier("cheques") === "standard" &&
+        plans.moduleMinTier("jobTracker") === "standard" && plans.moduleMinTier("loans") === "advanced",
+    "catalogue: moduleMinTier reads the partition back (door labels + tier gates share one source)");
+  check(plans.PLAN_CATALOGUE.trial.priceMonthlyPKR === 0 && plans.PLAN_CATALOGUE.trial.usersLimit === 2 &&
+        plans.PLAN_CATALOGUE.trial.invoiceLimit === 200 && plans.PLAN_CATALOGUE.trial.modulesTier === "standard" &&
+        plans.PLAN_CATALOGUE.basic.priceMonthlyPKR === 1500 && plans.PLAN_CATALOGUE.basic.usersLimit === 3 &&
+        plans.PLAN_CATALOGUE.basic.invoiceLimit === 500 && plans.PLAN_CATALOGUE.standard.priceMonthlyPKR === 2500 &&
+        plans.PLAN_CATALOGUE.standard.usersLimit === 5 && plans.PLAN_CATALOGUE.standard.invoiceLimit === 2000 &&
+        plans.PLAN_CATALOGUE.advanced.priceMonthlyPKR === 4000 && plans.PLAN_CATALOGUE.advanced.usersLimit === 10 &&
+        plans.PLAN_CATALOGUE.advanced.invoiceLimit === 10000 &&
+        plans.PLAN_CATALOGUE.enterprise.priceMonthlyPKR === null && plans.PLAN_CATALOGUE.enterprise.usersLimit === null &&
+        plans.ANNUAL_MONTHS_CHARGED === 10,
+    "catalogue: the five tiers carry the §3.1 anchors (prices are owner-to-confirm data — design Q1); annual is 10 × monthly; Enterprise is custom (nulls in the catalogue, set at assignment)");
+
+  /* ---- snapshots: enforcement reads the ASSIGNMENT, never the catalogue (§3.2) ---- */
+  const trialSnap = plans.snapshotFor("trial", ISO0, { assignedBy: "signup" });
+  const trialG1 = tenancy.trialPlanSnapshot(ISO0);
+  check(trialSnap.planId === trialG1.planId && trialSnap.usersLimit === trialG1.usersLimit &&
+        trialSnap.invoiceLimit === trialG1.invoiceLimit && trialSnap.modulesTier === trialG1.modulesTier &&
+        trialSnap.trialEndsAt === trialG1.trialEndsAt && trialSnap.periodTo === null &&
+        trialSnap.trialEndsAt === "2026-10-20T00:00:00.000Z",
+    "snapshot: snapshotFor('trial') is G1's birth shape field-for-field — 2 users, the 200 pool, Standard modules, the end exactly +14 days out");
+  const foundSnap = plans.snapshotFor("founding", ISO0, { assignedBy: "migration" });
+  const foundG1 = tenancy.foundingPlanSnapshot(ISO0);
+  check(foundSnap.planId === foundG1.planId && foundSnap.usersLimit === foundG1.usersLimit &&
+        foundSnap.invoiceLimit === foundG1.invoiceLimit && foundSnap.modulesTier === foundG1.modulesTier &&
+        foundSnap.periodTo === null && foundSnap.trialEndsAt === null,
+    "snapshot: snapshotFor('founding') is G1's migration shape — Advanced set + limits, no expiry of any kind");
+  const cappedSnap = plans.snapshotFor("basic", ISO0, {
+    assignedBy: "admin", invoiceLimit: 7, periodTo: "2026-11-06T00:00:00.000Z",
+  });
+  check(plans.planGate(regOf(cappedSnap), { invoiceMonth: "2026-10", invoiceCount: 7, memberCount: 0 }, ISO0).refusal === "invoice-cap" &&
+        plans.planGate(regOf(cappedSnap), { invoiceMonth: "2026-10", invoiceCount: 6, memberCount: 0 }, ISO0).refusal === null,
+    "snapshot: a Basic shop ASSIGNED a 7-invoice cap is refused at 7 — the catalogue's 500 is never consulted mid-period (§3.2's whole point)");
+  const entSnap = plans.snapshotFor("enterprise", ISO0, {
+    assignedBy: "admin", usersLimit: 25, invoiceLimit: null, periodTo: "2027-10-06T00:00:00.000Z",
+  });
+  check(entSnap.usersLimit === 25 && entSnap.invoiceLimit === 0 &&
+        plans.planGate(regOf(entSnap), { invoiceMonth: "2026-10", invoiceCount: 999999, memberCount: 24 }, ISO0).refusal === null,
+    "snapshot: Enterprise assignment stores its explicit user cap and 0 = unlimited invoices — no count ever caps it");
+
+  /* ---- the plan-state truth table, at the boundary instants (§3.6) ---- */
+  const END = "2026-11-05T19:00:00.000Z"; // 2026-11-06 00:00 PKT
+  const trialAt = plans.snapshotFor("trial", "2026-10-22T19:00:00.000Z", { assignedBy: "signup" });
+  check(trialAt.trialEndsAt === END, "state: the trial fixture's end is the intended instant");
+  check(plans.derivePlanState(regOf(trialAt), "2026-11-05T18:59:59.999Z") === "trial" &&
+        plans.derivePlanState(regOf(trialAt), END) === "trial" &&
+        plans.derivePlanState(regOf(trialAt), "2026-11-05T19:00:00.001Z") === "grace" &&
+        plans.derivePlanState(regOf(trialAt), "2026-12-05T19:00:00.000Z") === "grace" &&
+        plans.derivePlanState(regOf(trialAt), "2026-12-05T19:00:00.001Z") === "readonly",
+    "state: trial — the end instant itself still belongs to the trial; grace runs through end + 30 days INCLUSIVE; read-only begins 1ms later");
+  const paidAt = plans.snapshotFor("standard", ISO0, { assignedBy: "admin", periodTo: END });
+  check(plans.derivePlanState(regOf(paidAt), END) === "active" &&
+        plans.derivePlanState(regOf(paidAt), "2026-11-05T19:00:00.001Z") === "grace" &&
+        plans.derivePlanState(regOf(paidAt), "2026-12-05T19:00:00.000Z") === "grace" &&
+        plans.derivePlanState(regOf(paidAt), "2026-12-05T19:00:00.001Z") === "readonly",
+    "state: a paid period follows the same boundary table (active → grace → readonly)");
+  check(plans.derivePlanState(regOf(paidAt, { status: "suspended" }), ISO0) === "suspended" &&
+        plans.derivePlanState(regOf(foundSnap), "2100-01-01T00:00:00.000Z") === "founding" &&
+        plans.derivePlanState(null, ISO0) === "none" &&
+        plans.derivePlanState(regOf(plans.snapshotFor("basic", ISO0, { assignedBy: "admin" })), ISO0) === "active",
+    "state: suspension overlays every state; founding never expires (year 2100 still founding); no registry is 'none'; a dateless paid shape reads 'active' rather than bricking the shop");
+  check(["none", "trial", "active", "founding"].every((s) => plans.stateAllowsPosting(s)) &&
+        ["grace", "readonly", "suspended"].every((s) => !plans.stateAllowsPosting(s)),
+    "state: posting is allowed in none/trial/active/founding and denied in grace/readonly/suspended — reads are never state-gated (§3.7)");
+  check(plans.rulesPlanPostable(regOf(paidAt, { enforce: false }), "2026-12-06T00:00:00.000Z") === true &&
+        plans.rulesPlanPostable(regOf(paidAt), "2026-12-06T00:00:00.000Z") === false &&
+        plans.rulesPlanPostable(regOf(paidAt, { status: "suspended", enforce: false }), ISO0) === true &&
+        plans.rulesPlanPostable(regOf(paidAt, { status: "suspended" }), ISO0) === false &&
+        plans.rulesPlanPostable(null, ISO0) === true,
+    "state: the rules mirror — with enforce FALSE everything posts (observation), even past expiry, even suspended; the identical facts refuse the moment the flag flips; no registry always posts");
+
+  /* ---- counter integrity (design §4.2's checkpoint suite) ---- */
+  const ctr = (invoiceMonth, invoiceCount, memberCount) => ({ invoiceMonth, invoiceCount, memberCount });
+  check((() => {
+    const before = ctr("2026-10", 57, 1);
+    const rolled = plans.nextInvoiceCounter(before, paidAt, "2026-10-31T19:30:00.000Z");
+    const sameMonth = plans.nextInvoiceCounter(before, paidAt, "2026-10-31T18:59:59.000Z");
+    return rolled.invoiceMonth === "2026-11" && rolled.invoiceCount === 1 &&
+      sameMonth.invoiceMonth === "2026-10" && sameMonth.invoiceCount === 58 &&
+      rolled.memberCount === 1;
+  })(),
+    "counter: the month roll is PKT's — Oct 31 19:30Z is already November in Karachi (roll to 1); 18:59:59Z is still October (+1)");
+  check((() => {
+    const at199 = ctr("2026-10", 199, 0);
+    const at200 = plans.nextInvoiceCounter(at199, trialAt, "2026-11-02T00:00:00.000Z");
+    const at201 = plans.nextInvoiceCounter(at200, trialAt, "2026-11-02T01:00:00.000Z");
+    return at200.invoiceMonth === "2026-10" && at200.invoiceCount === 200 &&
+      plans.invoiceEventAllowed(at199, at200, trialAt) === true &&
+      plans.invoiceEventAllowed(at200, at201, trialAt) === false;
+  })(),
+    "counter: the trial pool NEVER rolls — the count accumulates across the month boundary a 14-day trial can cross; the 200th pool invoice posts, the 201st is denied");
+  check(plans.counterTransitionOk(ctr("2026-10", 5, 1), ctr("2026-10", 6, 1), "invoice") &&
+        plans.counterTransitionOk(ctr("2026-10", 5, 1), ctr("2026-11", 1, 1), "invoice") &&
+        !plans.counterTransitionOk(ctr("2026-10", 5, 1), ctr("2026-10", 7, 1), "invoice") &&
+        !plans.counterTransitionOk(ctr("2026-10", 5, 1), ctr("2026-09", 1, 1), "invoice") &&
+        !plans.counterTransitionOk(ctr("2026-10", 5, 1), ctr("2026-10", 4, 1), "invoice") &&
+        !plans.counterTransitionOk(ctr("2026-10", 5, 1), ctr("2026-10", 6, 2), "invoice"),
+    "counter: the doc's own arithmetic admits exactly +1 / a forward roll to 1 — never +2, never backwards, and NEVER a decrease (a voided bill keeps its count: the invoice was issued; only the month roll resets)");
+  check(plans.counterTransitionOk(ctr("2026-10", 5, 1), ctr("2026-10", 5, 2), "member-plus") &&
+        plans.counterTransitionOk(ctr("2026-10", 5, 1), ctr("2026-10", 5, 0), "member-minus") &&
+        !plans.counterTransitionOk(ctr("2026-10", 5, 1), ctr("2026-10", 5, 3), "member-plus") &&
+        !plans.counterTransitionOk(ctr("2026-10", 5, 0), ctr("2026-10", 5, -1), "member-minus") &&
+        !plans.counterTransitionOk(ctr("2026-10", 5, 1), ctr("2026-10", 6, 2), "member-plus") &&
+        !plans.counterTransitionOk(
+          { ...ctr("2026-10", 5, 1), baseline: { invoiceCount: 5 } },
+          { ...ctr("2026-10", 6, 1), baseline: { invoiceCount: 9 } }, "invoice"),
+    "counter: seat transitions are exactly ±1 (never below 0), the other family never moves in the same write, and the migration baseline marker is untouchable");
+  check((() => {
+    // A week at the desk, replayed: post, hold, finalize, void, sell.
+    let c = ctr("2026-10", 0, 0);
+    const step = (next) => {
+      const ok = plans.counterTransitionOk(c, next, "invoice");
+      c = next;
+      return ok;
+    };
+    const s1 = step(plans.nextInvoiceCounter(c, paidAt, "2026-10-06T10:00:00.000Z")); // bill posts
+    const heldNoWrite = c.invoiceCount === 1; // the held bill writes NOTHING
+    const s2 = step(plans.nextInvoiceCounter(c, paidAt, "2026-10-06T11:00:00.000Z")); // held bill finalized = posts NOW
+    const voidNoWrite = c.invoiceCount === 2; // voiding the first bill writes NOTHING
+    const s3 = step(plans.nextInvoiceCounter(c, paidAt, "2026-10-06T12:00:00.000Z")); // counter sale
+    return s1 && s2 && s3 && heldNoWrite && voidNoWrite && c.invoiceCount === 3;
+  })(),
+    "counter: held/resumed bills count exactly once, at posting — a hold writes nothing, its finalize writes the +1; a void writes nothing back; three postings, count 3");
+  check(plans.memberCapOk(ctr("2026-10", 0, 1), trialAt) === true &&
+        plans.memberCapOk(ctr("2026-10", 0, 2), trialAt) === false &&
+        plans.planMemberRefusal(regOf(trialAt), ctr("2026-10", 0, 0)) === null &&
+        plans.planMemberRefusal(regOf(trialAt), ctr("2026-10", 0, 1)) === "member-cap" &&
+        plans.planMemberRefusal(regOf(trialAt, { enforce: false }), ctr("2026-10", 0, 1)) === null,
+    "counter: the user cap counts seats + the owner against usersLimit (trial: 1 seat fits, the 2nd seat's invite is refused client-side) — and refuses nothing while enforce is false");
+  check(plans.planInvoiceRefusal(regOf(paidAt), ctr("2026-10", 2000, 0), ISO0) === "invoice-cap" &&
+        plans.planInvoiceRefusal(regOf(paidAt), ctr("2026-10", 1999, 0), ISO0) === null &&
+        plans.planInvoiceRefusal(regOf(paidAt), ctr("2026-10", 2000, 0), "2026-12-06T00:00:00.000Z") === "state",
+    "gate: at the limit the client refuses 'invoice-cap' BEFORE the write; one below it proceeds; in grace the refusal is 'state' (state precedes cap, the rules' own order)");
+
+  /* ---- derived actuals: the observation surface's other side ---- */
+  const actBills = [
+    { ts: "2026-10-05T10:00:00.000Z", status: "paid" },
+    { ts: "2026-10-06T10:00:00.000Z", status: "held" },
+    { ts: "2026-10-07T10:00:00.000Z", status: "voided" },
+    { ts: "2026-09-07T10:00:00.000Z", status: "paid" },
+  ];
+  const actSales = [
+    { ts: "2026-10-02T09:00:00.000Z", billId: null, kind: "sale" },
+    { ts: "2026-10-05T10:01:00.000Z", billId: "b1", kind: "sale" },
+    { ts: "2026-10-05T10:02:00.000Z", billId: "b1", kind: "sale" },
+    { ts: "2026-10-08T09:00:00.000Z", billId: null, kind: "return" },
+    { ts: "2026-09-02T09:00:00.000Z", billId: null, kind: "sale" },
+  ];
+  const actual = plans.deriveActualCounters(actBills, actSales, ["a@x.pk", "b@x.pk"], regOf(paidAt), "2026-10-20T00:00:00.000Z");
+  check(actual.invoiceCount === 3 && actual.memberCount === 2,
+    "actuals: derived from the collections, the month holds 3 invoice events (paid + voided bills + the counter sale) — held bills, bill line rows and return rows are NOT events; members are the mirror's size");
+  const trialEarly = plans.snapshotFor("trial", "2026-10-01T00:00:00.000Z", { assignedBy: "signup" });
+  check(tenancy.countMonthlyInvoiceEvents(actBills, actSales, "2026-10") === 3 &&
+        plans.deriveActualCounters(actBills, actSales, [], regOf(trialEarly), "2026-10-20T00:00:00.000Z").invoiceCount === 3,
+    "actuals: tenancy's counter and the trial pool window agree on the same fixtures (G2 tightened the count to the rules' event definition — a bill's rows no longer inflate it)");
+  check(plans.refTypeTierOk(paidAt, "payroll_accrual") === false &&
+        plans.refTypeTierOk(plans.snapshotFor("advanced", ISO0, { assignedBy: "admin", periodTo: END }), "payroll_accrual") === true &&
+        plans.refTypeTierOk(paidAt, "job_material") === true &&
+        plans.refTypeTierOk(plans.snapshotFor("basic", ISO0, { assignedBy: "admin", periodTo: END }), "job_material") === false &&
+        plans.refTypeTierOk(plans.snapshotFor("basic", ISO0, { assignedBy: "admin", periodTo: END }), "bill") === true &&
+        plans.collectionTierOk(paidAt, "jobs") === true && plans.collectionTierOk(paidAt, "boms") === false &&
+        Object.keys(plans.COLLECTION_CREATE_TIER).length === 6,
+    "tiers: the refType/collection gates mirror §4.1 — payroll needs Advanced, job material Standard, a bill is Core everywhere; the collection list is the named six");
+
+  /* ---- rules v9 part 2: text + strip proofs ---- */
+  check(crypto.createHash("sha256").update(stripG2Blocks(rulesG2), "utf8").digest("hex") ===
+        "5a960a502cf11ab7b721eec7a6ff80ee4cb17ac27ea47e2523b20b9fb3b18e3a",
+    "rules: STRIP PROOF — v9 final minus every delimited G2 span (amendments restored to their exact part-1 text) is byte-for-byte v9 part 1 (its pinned SHA) (G3 same-check amendment: the G3 span is cut first by the shared helper — it did not exist in part 1, so the pin asserts exactly what it asserted)");
+  check(crypto.createHash("sha256").update(stripG1Blocks(stripG2Blocks(rulesG2)), "utf8").digest("hex") ===
+        "04807268c2c1891c070e1cc34443fe4c3892ea35dde739718499e392c661f859",
+    "rules: STRIP PROOF composed — minus G2 spans, then G1 spans, the file is byte-for-byte v8: part 2 is additive except amendment #2 and the three platform-block amendments, each in its own span (G3 same-check amendment: the G3 span is cut first by the shared helper)");
+  check((rulesG2.match(/planPostable\(uid\)/g) || []).length === 16 &&
+        (rulesG2.match(/planTierOk\(uid, 'advanced'\)/g) || []).length === 5 &&
+        (rulesG2.match(/invoiceEventOk\(uid\)/g) || []).length === 4 &&
+        rulesG2.includes("function planState(uid)") && rulesG2.includes("duration.value(720, 'h')") &&
+        rulesG2.includes("duration.value(312, 'h')") && rulesG2.includes("duration.value(360, 'h')"),
+    "rules: amendment #2's shape — planPostable on all 14 A5 create legs (16 occurrences incl. definition + the pairing helper), Advanced tier on the 5 named creates, the invoice pairing on bills create/update + sales create, grace 720h in the state mirror, the §4.3 birth window at 312h–360h");
+  check(rulesG2.includes("allow update: if canAccess(businessId) && counterArithmeticOk(businessId);") &&
+        rulesG2.includes("memberCounterPaired(businessId, 1)") &&
+        rulesG2.includes("memberCounterPaired(businessId, -1)") &&
+        rulesG2.includes("memberCapOk(businessId)") &&
+        rulesG2.includes("request.resource.data.get('billId', null) == null") &&
+        rulesG2.includes("request.resource.data.get('status', '') == 'held' || invoiceEventOk(uid)"),
+    "rules: the counter legs — the doc's arithmetic update, the seat pairing on invites (+1) and removals (−1), the claim-leg cap, and the bills/sales invoice-event shapes (held births pair nothing; only bill-less sale rows pair)");
+  check(rulesG2.split("\n").filter((l) => l.includes("allow read")).every((l) =>
+          !/planPostable|planTierOk|planState|planEnforced|invoiceEventOk|memberCapOk|counterArithmeticOk/.test(l)),
+    "rules: NO read line names a plan function — suspension and expiry deny writes, never reads (§3.6/§3.7's data rights, pinned so no later phase can quietly gate a read)");
+
+  /* ---- i18n: the plan strings ---- */
+  const planKeys = Object.keys(i18n.en).filter((k) => k.startsWith("plan."));
+  check(planKeys.length === 36 && planKeys.every((k) => k in i18n.ur) &&
+        Object.keys(i18n.en).length === 3136,
+    "i18n: 36 plan.* keys (names, states, banners, limit copy, the panel) with full EN ≡ UR parity — dictionary 3,054 (G3: +89 platform keys; G4: +47 renew/platform keys; G6: +25 backup.* keys; H1 pin amendment: +51 loyalty keys; H3 pin amendment: +108 storefront keys; WA pin amendment: +109 WhatsApp keys))");
+
+  /* ---- source wiring ---- */
+  const storeSrcG2 = fs.readFileSync("/home/hatch/workspace/ai-dukaan-ai/web/components/StoreProvider.tsx", "utf8");
+  const authSrcG2 = fs.readFileSync("/home/hatch/workspace/ai-dukaan-ai/web/components/AuthProvider.tsx", "utf8");
+  check(storeSrcG2.includes('doc(db, "businessCounters", uid)') && storeSrcG2.includes('doc(db, "businesses", uid)') &&
+        (storeSrcG2.match(/rideInvoiceCounter\(batch, ctx\.db, ctx\.uid\)/g) || []).length === 2 &&
+        storeSrcG2.includes("rideMemberCounter(batch, ctx.db, ctx.uid, 1)") &&
+        storeSrcG2.includes("rideMemberCounter(batch, ctx.db, ctx.uid, -1)") &&
+        (storeSrcG2.match(/planInvoiceCheck\(\)\) return false/g) || []).length === 2,
+    "source: the store subscribes registry + counters for every role; the invoice counter rides BOTH posting batches (postBill, recordSale); the seat rides invite +1 / removal −1; both posting paths pre-check the gate");
+  check(!/enforce:\s*true/.test(storeSrcG2) && !/enforce:\s*true/.test(authSrcG2) &&
+        !/enforce:\s*true/.test(fs.readFileSync("/home/hatch/workspace/ai-dukaan-ai/web/lib/plans.ts", "utf8")) &&
+        !/enforce:\s*true/.test(fs.readFileSync("/home/hatch/workspace/ai-dukaan-ai/web/lib/tenancy.ts", "utf8")),
+    "source: enforce:true appears NOWHERE in the shipping code — no live business ends G2 enforced; the flip is a platform act (G3), per business, later (§6.3)");
+  const sidebarSrcG2 = fs.readFileSync("/home/hatch/workspace/ai-dukaan-ai/web/components/Sidebar.tsx", "utf8");
+  const shellSrcG2 = fs.readFileSync("/home/hatch/workspace/ai-dukaan-ai/web/components/AppShell.tsx", "utf8");
+  const settingsSrcG2 = fs.readFileSync("/home/hatch/workspace/ai-dukaan-ai/web/components/SettingsView.tsx", "utf8");
+  const panelSrcG2 = fs.readFileSync("/home/hatch/workspace/ai-dukaan-ai/web/components/PlanPanel.tsx", "utf8");
+  check(sidebarSrcG2.includes("tierIncludesModule") && sidebarSrcG2.includes("sb-link locked") &&
+        shellSrcG2.includes("plan.trialBanner") && shellSrcG2.includes("plan.lockedBody") &&
+        shellSrcG2.includes("plan.suspendedBanner") &&
+        settingsSrcG2.includes("<PlanPanel />") && panelSrcG2.includes("deriveActualCounters") &&
+        panelSrcG2.includes("plan.panel.enforceOff"),
+    "source: the surfaces are wired — locked sidebar doors from the snapshot tier, the shell's state + refusal banners and locked route panel, and the settings observation panel comparing counter vs derived actual");
+
+  /* ---- frozen seed identities ---- */
+  const journalG2 = seed.getSeedJournal(products, sales, purchases, payments, expenses, credits);
+  const shaG2 = crypto.createHash("sha256")
+    .update(JSON.stringify(journalG2.map((e) => { const { ts, ...rest } = e; return rest; })), "utf8")
+    .digest("hex");
+  const tbG2 = reports.trialBalance(journalG2, reports.resolveReportRange("custom", null, { from: "2000-01-01", to: "2100-12-31" }));
+  check(journalG2.length === 21 && shaG2 === "e17e5bda19e87de698b0c0a37e923f9b396bc387e2092b2ffbbd7d60d4971168" &&
+        eq(ledger.accountBalance(journalG2, "inventory"), 272805) &&
+        eq(ledger.accountBalance(journalG2, "cash"), 50000) &&
+        eq(ledger.payablesTotal(journalG2), 27900) && eq(ledger.receivablesTotal(journalG2), 5500) &&
+        eq(tbG2.totalDebits, tbG2.totalCredits),
+    "seed: frozen identities intact — 21 entries, the pinned SHA, Inventory 272,805 · Cash 50,000 · payables 27,900 · receivables 5,500, TB balanced");
+  check((storeSrcG2.match(/makeEntry\(/g) || []).length === 24,
+    "seed: still exactly 24 makeEntry( sites — G2 composed no entry, template or refType; the plan layer only gates and counts");
+}
+
+
+/* =============================== G3 (Phase G · G3 — super admin console) =============================== */
+{
+  suite("G3", null); // Phase G · G3 — the super admin console: closed-list privacy, aggregates, the audit law (design §2/§3.5/§6.1/§8-G3)
+
+  const NOW3 = "2026-10-23T00:00:00.000Z";
+  const ADMIN = "admin-1";
+  const rulesG3 = fs.readFileSync(
+    "/home/hatch/workspace/ai-dukaan-ai/firebase/firestore.rules", "utf8");
+  const readSrc3 = (p) => fs.readFileSync("/home/hatch/workspace/ai-dukaan-ai/web/" + p, "utf8");
+  const reg3 = (bid, plan, extra) => ({
+    ownerUid: bid, ownerEmail: bid + "@x.pk", name: "Shop " + bid, phone: "0300",
+    city: "Sargodha", createdAt: "2026-10-01T00:00:00.000Z",
+    status: "active", enforce: false, plan, ...(extra || {}),
+  });
+
+  /* ---- fixture businesses: one per derived state ---- */
+  const trialSnap3 = plans.snapshotFor("trial", "2026-10-20T00:00:00.000Z", { assignedBy: "signup" });
+  const bizTrial = reg3("bizTrial", trialSnap3);
+  const bizStd = reg3("bizStd", plans.snapshotFor("standard", "2026-10-16T00:00:00.000Z", { assignedBy: "admin", periodTo: "2026-11-15T00:00:00.000Z" }));
+  const bizGrace = reg3("bizGrace", plans.snapshotFor("basic", "2026-09-10T00:00:00.000Z", { assignedBy: "admin", periodTo: "2026-10-10T00:00:00.000Z" }));
+  const bizSusp = reg3("bizSusp", plans.snapshotFor("advanced", "2026-10-01T00:00:00.000Z", { assignedBy: "admin", periodTo: "2027-01-01T00:00:00.000Z" }), { status: "suspended", enforce: true });
+  const bizFound = reg3("bizFound", plans.snapshotFor("founding", "2026-10-01T00:00:00.000Z", { assignedBy: "migration" }));
+  const ctr3 = {
+    bizTrial: { invoiceMonth: "2026-10", invoiceCount: 137, memberCount: 1 },
+    bizStd: { invoiceMonth: "2026-10", invoiceCount: 1540, memberCount: 3 },
+    bizGrace: { invoiceMonth: "2026-10", invoiceCount: 480, memberCount: 2 },
+    bizSusp: { invoiceMonth: "2026-10", invoiceCount: 9000, memberCount: 9 },
+    bizFound: { invoiceMonth: "2026-10", invoiceCount: 55, memberCount: 4 },
+  };
+  const statsStd = {
+    lastActiveAt: "2026-10-22T10:00:00.000Z", lastDayCloseAt: "2026-10-21T19:00:00.000Z",
+    docCounts: { products: 120, bills: 1540, customers: 210 }, versions: ["web"],
+  };
+  const payments3 = [
+    { id: "p1", businessId: "bizStd", amount: 2500, method: "raast", reference: "R-1", periodFrom: "2026-10-15T00:00:00.000Z", periodTo: "2026-11-15T00:00:00.000Z", planId: "standard", state: "confirmed", submittedBy: "bizStd", confirmedBy: ADMIN, submittedAt: "2026-10-14T00:00:00.000Z", confirmedAt: "2026-10-05T09:00:00.000Z" },
+    { id: "p2", businessId: "bizGrace", amount: 1500, method: "bank", reference: "B-2", periodFrom: "2026-09-10T00:00:00.000Z", periodTo: "2026-10-10T00:00:00.000Z", planId: "basic", state: "confirmed", submittedBy: "bizGrace", confirmedBy: ADMIN, submittedAt: "2026-09-09T00:00:00.000Z", confirmedAt: "2026-09-15T09:00:00.000Z" },
+    { id: "p3", businessId: "bizStd", amount: 2500, method: "raast", reference: "R-3", periodFrom: "2026-11-15T00:00:00.000Z", periodTo: "2026-12-15T00:00:00.000Z", planId: "standard", state: "submitted", submittedBy: "bizStd", confirmedBy: null, submittedAt: "2026-10-22T08:00:00.000Z", confirmedAt: null },
+    { id: "p4", businessId: "bizGrace", amount: 1500, method: "cash", reference: "C-4", periodFrom: "2026-11-10T00:00:00.000Z", periodTo: "2026-12-10T00:00:00.000Z", planId: "basic", state: "submitted", submittedBy: "bizGrace", confirmedBy: null, submittedAt: "2026-10-21T08:00:00.000Z", confirmedAt: null },
+    { id: "p5", businessId: "bizTrial", amount: 2500, method: "jazzcash", reference: "J-5", periodFrom: "2026-11-03T00:00:00.000Z", periodTo: "2026-12-03T00:00:00.000Z", planId: "standard", state: "rejected", submittedBy: "bizTrial", confirmedBy: ADMIN, submittedAt: "2026-10-20T08:00:00.000Z", confirmedAt: "2026-10-20T09:00:00.000Z", note: "Reference not found" },
+  ];
+
+  /* ---- aggregates reconcile BY HAND (§8-G3's checkpoint) ---- */
+  const agg = platform.platformAggregates(
+    [bizTrial, bizStd, bizGrace, bizSusp, bizFound], ctr3, payments3, NOW3);
+  check(agg.totalBusinesses === 5 &&
+        agg.byPlan.trial === 1 && agg.byPlan.standard === 1 && agg.byPlan.basic === 1 &&
+        agg.byPlan.advanced === 1 && agg.byPlan.founding === 1 &&
+        agg.byState.trial === 1 && agg.byState.active === 1 && agg.byState.grace === 1 &&
+        agg.byState.suspended === 1 && agg.byState.founding === 1 &&
+        agg.suspended === 1 && agg.enforced === 1,
+    "aggregates: five fixture businesses reconcile by hand — one per plan, one per DERIVED state (trial/active/grace/suspended/founding), one suspended, one enforced");
+  check(agg.invoicesThisMonth === 1540 + 480 + 9000 + 55 &&
+        agg.trialPoolUsed === 137,
+    "aggregates: invoices this month = Σ the non-trial hard counters on the current PKT month (11,075); the trial contributes its POOL separately (137 of 200) — a trial counter never rolls into a month");
+  check(agg.confirmedRevenueTotal === 4000 &&
+        agg.confirmedRevenueByMonth["2026-10"] === 2500 &&
+        agg.confirmedRevenueByMonth["2026-09"] === 1500 &&
+        agg.pendingPayments === 2,
+    "aggregates: confirmed revenue sums CONFIRMED payments only, by PKT month of confirmation (Oct 2,500 + Sep 1,500); the two submitted records are the pending queue, the rejected one is neither");
+
+  /* ---- directory derivation + filters ---- */
+  const rowStd = platform.directoryEntry(bizStd, ctr3.bizStd, statsStd, NOW3);
+  check(rowStd.state === "active" && rowStd.planId === "standard" &&
+        rowStd.invoiceCount === 1540 && rowStd.invoiceLimit === 2000 &&
+        rowStd.memberCount === 3 && rowStd.usersLimit === 5 &&
+        rowStd.lastActiveAt === "2026-10-22T10:00:00.000Z" && rowStd.enforce === false,
+    "directory: a row carries the registry label fields, the DERIVED state (never a stored one), counter vs snapshot limit, and the SOFT last-active — each figure's source visible in its shape");
+  const allRows = [bizTrial, bizStd, bizGrace, bizSusp, bizFound].map((b) =>
+    platform.directoryEntry(b, ctr3[b.ownerUid], b.ownerUid === "bizStd" ? statsStd : null, NOW3));
+  check(platform.filterDirectory(allRows, { query: "bizgr" }).length === 1 &&
+        platform.filterDirectory(allRows, { query: "sargodha" }).length === 5 &&
+        platform.filterDirectory(allRows, { state: "grace" }).length === 1 &&
+        platform.filterDirectory(allRows, { status: "suspended" }).length === 1 &&
+        platform.filterDirectory(allRows, { planId: "founding" }).length === 1 &&
+        platform.filterDirectory(allRows, { enforce: "on" }).length === 1 &&
+        platform.filterDirectory(allRows, {}).length === 5,
+    "directory: search (id/city) and the plan/state/status/enforce filters each cut the fixture set exactly");
+
+  /* ---- the act planners + the audit law ---- */
+  const actResults = [];
+  const eventOf = (res) => res.writes.find((w) => w.kind === "add" && w.collection === "businessEvents");
+  const assignStd = platform.planAssignPlan({
+    businessId: "bizTrial", current: bizTrial, planId: "standard",
+    periodTo: "2026-11-23T00:00:00.000Z", actor: ADMIN, now: NOW3,
+  });
+  actResults.push(assignStd);
+  check(assignStd.ok && assignStd.writes[0].kind === "update" &&
+        assignStd.writes[0].path === "businesses/bizTrial" &&
+        assignStd.writes[0].data.plan.planId === "standard" &&
+        assignStd.writes[0].data.plan.usersLimit === 5 &&
+        assignStd.writes[0].data.plan.invoiceLimit === 2000 &&
+        assignStd.writes[0].data.plan.assignedBy === "admin" &&
+        eventOf(assignStd).data.kind === "plan.assigned" &&
+        eventOf(assignStd).data.detail.before.planId === "trial" &&
+        eventOf(assignStd).data.detail.after.planId === "standard",
+    "act assign: the assignment IS the snapshot (catalogue limits copied in, admin-stamped) and its event carries before/after plan summaries — the §3.2 doctrine executed by the planner");
+  const assignEnt = platform.planAssignPlan({
+    businessId: "bizStd", current: bizStd, planId: "enterprise",
+    periodTo: "2027-10-23T00:00:00.000Z", usersLimit: 25, invoiceLimit: null,
+    actor: ADMIN, now: NOW3,
+  });
+  actResults.push(assignEnt);
+  check(assignEnt.ok && assignEnt.writes[0].data.plan.usersLimit === 25 &&
+        assignEnt.writes[0].data.plan.invoiceLimit === 0 &&
+        assignEnt.writes[0].data.plan.modulesTier === "advanced",
+    "act assign: Enterprise takes its limits from the ASSIGNMENT (25 users explicit; null invoices stored as 0 = unlimited) — the catalogue's nulls are never a limit");
+  const assignNoPeriod = platform.planAssignPlan({
+    businessId: "bizTrial", current: bizTrial, planId: "basic", actor: ADMIN, now: NOW3,
+  });
+  actResults.push(assignNoPeriod);
+  check(!assignNoPeriod.ok && assignNoPeriod.reason === "period-required" && assignNoPeriod.writes.length === 0,
+    "act assign: a priced tier without a period end is refused — a paid assignment cannot be born dateless from the console either");
+  const retrial = platform.planAssignPlan({
+    businessId: "bizStd", current: bizStd, planId: "trial", actor: ADMIN, now: NOW3,
+  });
+  const compTrial = platform.planAssignPlan({
+    businessId: "bizStd", current: bizStd, planId: "trial", compTrial: true, actor: ADMIN, now: NOW3,
+  });
+  actResults.push(retrial, compTrial);
+  check(!retrial.ok && retrial.reason === "retrial-needs-comp" &&
+        compTrial.ok && eventOf(compTrial).data.kind === "plan.compTrial" &&
+        compTrial.writes[0].data.plan.trialEndsAt === "2026-11-06T00:00:00.000Z",
+    "act assign: re-trial is refused as a silent assignment and lands ONLY as an explicit comp — its own event kind, a fresh +14d trial end (§3.4)");
+  const extend = platform.planExtendPeriod({
+    businessId: "bizGrace", current: bizGrace, newEnd: "2026-11-30T00:00:00.000Z", actor: ADMIN, now: NOW3,
+  });
+  const extendTrial = platform.planExtendPeriod({
+    businessId: "bizTrial", current: bizTrial, newEnd: "2026-11-20T00:00:00.000Z", actor: ADMIN, now: NOW3,
+  });
+  const extendFound = platform.planExtendPeriod({
+    businessId: "bizFound", current: bizFound, newEnd: "2027-01-01T00:00:00.000Z", actor: ADMIN, now: NOW3,
+  });
+  const extendBack = platform.planExtendPeriod({
+    businessId: "bizGrace", current: bizGrace, newEnd: "2026-10-01T00:00:00.000Z", actor: ADMIN, now: NOW3,
+  });
+  actResults.push(extend, extendTrial, extendFound, extendBack);
+  check(extend.ok && extend.writes[0].data.plan.periodTo === "2026-11-30T00:00:00.000Z" &&
+        eventOf(extend).data.detail.field === "periodTo" &&
+        eventOf(extend).data.detail.before === "2026-10-10T00:00:00.000Z" &&
+        extendTrial.ok && eventOf(extendTrial).data.detail.field === "trialEndsAt" &&
+        !extendFound.ok && extendFound.reason === "no-expiry" &&
+        !extendBack.ok && extendBack.reason === "not-later",
+    "act extend: only the end moves (periodTo for paid, trialEndsAt for trial), the event names field + before/after; founding has no end to extend and a backwards 'extension' is refused");
+  const suspend = platform.planSetStatus({
+    businessId: "bizStd", current: bizStd, status: "suspended", reason: "non-payment", actor: ADMIN, now: NOW3,
+  });
+  const suspendNoReason = platform.planSetStatus({
+    businessId: "bizStd", current: bizStd, status: "suspended", actor: ADMIN, now: NOW3,
+  });
+  const activate = platform.planSetStatus({
+    businessId: "bizSusp", current: bizSusp, status: "active", actor: ADMIN, now: NOW3,
+  });
+  const statusNoChange = platform.planSetStatus({
+    businessId: "bizStd", current: bizStd, status: "active", actor: ADMIN, now: NOW3,
+  });
+  actResults.push(suspend, suspendNoReason, activate, statusNoChange);
+  check(suspend.ok && suspend.writes[0].data.status === "suspended" &&
+        eventOf(suspend).data.kind === "business.suspended" &&
+        eventOf(suspend).data.detail.before === "active" &&
+        eventOf(suspend).data.detail.after === "suspended" &&
+        eventOf(suspend).data.detail.reason === "non-payment" &&
+        !suspendNoReason.ok && suspendNoReason.reason === "reason-required" &&
+        activate.ok && eventOf(activate).data.kind === "business.activated" &&
+        !statusNoChange.ok && statusNoChange.reason === "no-change",
+    "act status: suspension demands its reason (§2.2) and logs before/after + reason; activation mirrors it; a no-op flip is refused, not logged");
+  check(platform.countersAgree(ctr3.bizStd, { invoicesReported: 1540, membersJoined: 3 }) === true &&
+        platform.countersAgree(ctr3.bizStd, { invoicesReported: 1400, membersJoined: 3 }) === false &&
+        platform.countersAgree(ctr3.bizStd, { invoicesReported: null, membersJoined: 4 }) === false &&
+        platform.countersAgree(ctr3.bizStd, { invoicesReported: null, membersJoined: 2 }) === true &&
+        platform.countersAgree(null, { invoicesReported: 0, membersJoined: 0 }) === false,
+    "enforce check: agreement = the reported bill count EQUALS the counter, and joined members never exceed seats (seats also hold unclaimed invites); no counter doc is never agreement");
+  const enforceOk = platform.planSetEnforce({
+    businessId: "bizStd", current: bizStd, enforce: true, counters: ctr3.bizStd,
+    actual: { invoicesReported: 1540, membersJoined: 3 }, actor: ADMIN, now: NOW3,
+  });
+  const enforceBlocked = platform.planSetEnforce({
+    businessId: "bizStd", current: bizStd, enforce: true, counters: ctr3.bizStd,
+    actual: { invoicesReported: 1400, membersJoined: 3 }, actor: ADMIN, now: NOW3,
+  });
+  const enforceForced = platform.planSetEnforce({
+    businessId: "bizStd", current: bizStd, enforce: true, counters: ctr3.bizStd,
+    actual: { invoicesReported: 1400, membersJoined: 3 }, confirmed: true, actor: ADMIN, now: NOW3,
+  });
+  const enforceOff = platform.planSetEnforce({
+    businessId: "bizSusp", current: bizSusp, enforce: false, counters: ctr3.bizSusp,
+    actual: { invoicesReported: 1, membersJoined: 0 }, actor: ADMIN, now: NOW3,
+  });
+  actResults.push(enforceOk, enforceBlocked, enforceForced, enforceOff);
+  check(enforceOk.ok && eventOf(enforceOk).data.kind === "enforce.enabled" &&
+        eventOf(enforceOk).data.detail.countersAgree === true &&
+        !enforceBlocked.ok && enforceBlocked.reason === "counter-disagreement" &&
+        enforceForced.ok && eventOf(enforceForced).data.detail.countersAgree === false &&
+        eventOf(enforceForced).data.detail.confirmedDespiteDisagreement === true &&
+        enforceOff.ok && eventOf(enforceOff).data.kind === "enforce.disabled",
+    "act enforce: agreeing figures flip freely; disagreeing figures REFUSE until the admin confirms — and the confirmation itself is recorded in the event (never silent); flipping OFF never needs agreement (§6.3's safety valve, wielded honestly)");
+  const confirm3 = platform.planConfirmPayment({
+    payment: payments3[2], business: bizStd, actor: ADMIN, now: NOW3,
+  });
+  const confirmAgain = platform.planConfirmPayment({
+    payment: payments3[0], business: bizStd, actor: ADMIN, now: NOW3,
+  });
+  const confirmMismatch = platform.planConfirmPayment({
+    payment: payments3[3], business: bizStd, actor: ADMIN, now: NOW3,
+  });
+  actResults.push(confirm3, confirmAgain, confirmMismatch);
+  check(confirm3.ok && confirm3.writes.length === 3 &&
+        confirm3.writes[0].path === "platformPayments/p3" &&
+        confirm3.writes[0].data.state === "confirmed" &&
+        confirm3.writes[0].data.confirmedBy === ADMIN &&
+        confirm3.writes[1].path === "businesses/bizStd" &&
+        confirm3.writes[1].data.plan.periodTo === "2026-12-15T00:00:00.000Z" &&
+        confirm3.writes[1].data.plan.periodFrom === "2026-11-15T00:00:00.000Z" &&
+        eventOf(confirm3).data.kind === "payment.confirmed" &&
+        eventOf(confirm3).data.detail.amount === 2500 &&
+        !confirmAgain.ok && confirmAgain.reason === "not-submitted" &&
+        !confirmMismatch.ok && confirmMismatch.reason === "business-mismatch",
+    "act confirm: ONE plan — payment signed confirmed, period extended + snapshot refreshed from the payment's own terms, event with amount + before/after; a settled record cannot re-confirm and another business's payment cannot confirm against this registry");
+  const reject4 = platform.planRejectPayment({
+    payment: payments3[3], note: "Slip unreadable", actor: ADMIN, now: NOW3,
+  });
+  const rejectNoNote = platform.planRejectPayment({
+    payment: payments3[3], actor: ADMIN, now: NOW3,
+  });
+  actResults.push(reject4, rejectNoNote);
+  check(reject4.ok && reject4.writes[0].data.state === "rejected" &&
+        reject4.writes[0].data.note === "Slip unreadable" &&
+        eventOf(reject4).data.kind === "payment.rejected" &&
+        !rejectNoNote.ok && rejectNoNote.reason === "note-required",
+    "act reject: the note the owner sees is mandatory (§3.5) and rides both the record and the event");
+  const queue = platform.paymentQueue(payments3);
+  check(queue.length === 2 && queue[0].id === "p4" && queue[1].id === "p3",
+    "queue: submitted only, OLDEST first — the admin works the queue in the order the money arrived");
+  const grant = platform.planGrantAdmin({
+    uid: "u-new", email: "new@x.pk", existing: null, actor: ADMIN, now: NOW3,
+  });
+  const grantDup = platform.planGrantAdmin({
+    uid: "admin-2", email: "two@x.pk",
+    existing: { email: "two@x.pk", addedAt: NOW3, addedBy: ADMIN }, actor: ADMIN, now: NOW3,
+  });
+  const revoke = platform.planRevokeAdmin({
+    uid: "admin-2", adminUids: [ADMIN, "admin-2"], actor: ADMIN, now: NOW3,
+  });
+  const revokeSelf = platform.planRevokeAdmin({
+    uid: ADMIN, adminUids: [ADMIN, "admin-2"], actor: ADMIN, now: NOW3,
+  });
+  const revokeLast = platform.planRevokeAdmin({
+    uid: "admin-2", adminUids: ["admin-2"], actor: ADMIN, now: NOW3,
+  });
+  const revokeStranger = platform.planRevokeAdmin({
+    uid: "u-nobody", adminUids: [ADMIN, "admin-2"], actor: ADMIN, now: NOW3,
+  });
+  actResults.push(grant, grantDup, revoke, revokeSelf, revokeLast, revokeStranger);
+  check(grant.ok && grant.writes[0].kind === "set" &&
+        grant.writes[0].path === "platformAdmins/u-new" &&
+        grant.writes[0].data.addedBy === ADMIN &&
+        eventOf(grant).data.businessId === "platform" &&
+        eventOf(grant).data.kind === "admin.granted" &&
+        !grantDup.ok && grantDup.reason === "already-admin" &&
+        revoke.ok && revoke.writes[0].kind === "delete" &&
+        revoke.writes[0].path === "platformAdmins/admin-2" &&
+        eventOf(revoke).data.kind === "admin.revoked" &&
+        !revokeSelf.ok && revokeSelf.reason === "self-revoke" &&
+        !revokeLast.ok && revokeLast.reason === "last-admin" &&
+        !revokeStranger.ok && revokeStranger.reason === "not-admin",
+    "act admins: a grant writes the doc + a 'platform' event; revocation deletes + logs — and the guards hold: no self-revoke, the LAST admin cannot be revoked, a non-admin cannot be 'revoked', a duplicate grant is refused");
+
+  /* ---- audit completeness: NO silent acts (§8-G3) ---- */
+  check(platform.CONSOLE_ACTS.every((n) => typeof platform[n] === "function") &&
+        platform.CONSOLE_ACTS.length === 9,
+    "audit: the console's act list is closed and enumerable — all 9 named planners exist (G4 added planSavePlatformConfig) (an act not on this list is an unaudited act, and this suite would fail)");
+  check(actResults.every((r) => !r.ok || (
+          r.writes.filter((w) => w.kind === "add" && w.collection === "businessEvents").length === 1 &&
+          r.writes[r.writes.length - 1].kind === "add" &&
+          r.writes[r.writes.length - 1].collection === "businessEvents")) &&
+        actResults.every((r) => r.ok || r.writes.length === 0) &&
+        actResults.every((r) => !r.ok || (
+          eventOf(r).data.actor === ADMIN && typeof eventOf(r).data.kind === "string")),
+    "audit: across EVERY act fixture above — each successful plan carries EXACTLY ONE businessEvents entry, as its LAST write (the act and its event land in one batch or not at all); each refusal plans ZERO writes; every event names its actor");
+
+  /* ---- snapshot history from the log (§2.2) ---- */
+  const histEvents = [
+    { businessId: "bizStd", kind: "plan.assigned", actor: ADMIN, at: "2026-10-16T00:00:00.000Z",
+      detail: { before: { planId: "trial" }, after: { planId: "standard", periodTo: "2026-11-15T00:00:00.000Z", trialEndsAt: null } } },
+    { businessId: "bizStd", kind: "business.suspended", actor: ADMIN, at: "2026-10-18T00:00:00.000Z",
+      detail: { before: "active", after: "suspended", reason: "non-payment" } },
+    { businessId: "bizStd", kind: "payment.confirmed", actor: ADMIN, at: "2026-10-22T00:00:00.000Z",
+      detail: { paymentId: "p3", amount: 2500, after: { planId: "standard", periodTo: "2026-12-15T00:00:00.000Z", trialEndsAt: null } } },
+  ];
+  const hist = platform.snapshotHistory(histEvents);
+  check(hist.length === 2 && hist[0].kind === "payment.confirmed" &&
+        hist[0].periodTo === "2026-12-15T00:00:00.000Z" &&
+        hist[1].kind === "plan.assigned" && hist[1].planId === "standard",
+    "history: the detail's plan history is the EVENT LOG read back (assignments + confirmations, newest first) — status events carry no snapshot and are skipped; there is no second record to drift");
+
+  /* ---- rules: the G3 span + strip proof ---- */
+  check(crypto.createHash("sha256").update(stripG3Blocks(stripH3Blocks(stripWaBlocks(stripFR2Blocks(rulesG3)))), "utf8").digest("hex") ===
+        "89e84a29bfa17185ded0ee3c98ab6a4c5ffb2a70dc239ab3356106daf14802a5",
+    "rules: STRIP PROOF — v9 + G3 minus the ONE delimited G3 span is byte-for-byte the pre-G3 v9 file (its pinned SHA): G3's rules change is purely additive, in its span (H3 same-check amendment: the shared strip helper first cuts the delimited H3 spans — v10's only other deltas, strip-proven against the v9 SHA in the H3 suite) (WA same-check amendment: the helper first cuts the delimited WhatsApp spans too — the v10 amendment's only other deltas, strip-proven against the H3-final v10 SHA in the WA suite) (FR2 same-check amendment: stripFR2Blocks runs first — v11 minus FR2 is v10, strip-proven in the FR2 suite)");
+  const g3Span = rulesG3.slice(
+    rulesG3.indexOf("// ---- Phase G · G3: platform collections II (START) ----"),
+    rulesG3.indexOf("// ---- Phase G · G3: platform collections II (END) ----"));
+  check(g3Span.includes("match /businessStats/{businessId}") &&
+        g3Span.includes("match /platformPayments/{paymentId}") &&
+        g3Span.includes("match /platformConfig/{docId}"),
+    "rules: the G3 span lands §6.1's remaining three blocks — soft telemetry, renewal records, platform config");
+  const statsBlock = g3Span.slice(g3Span.indexOf("match /businessStats"), g3Span.indexOf("match /platformPayments"));
+  const payBlock = g3Span.slice(g3Span.indexOf("match /platformPayments"), g3Span.indexOf("match /platformConfig"));
+  const configBlock = g3Span.slice(g3Span.indexOf("match /platformConfig"));
+  check(statsBlock.includes("allow read: if isOwner(businessId) || isPlatformAdmin();") &&
+        statsBlock.includes("allow create, update: if isOwner(businessId);") &&
+        statsBlock.includes("allow delete: if false;") &&
+        configBlock.includes("allow read: if isSignedIn();") &&
+        configBlock.includes("allow create, update: if isPlatformAdmin();"),
+    "rules: telemetry is owner-written + owner/admin-read (a shop reports ITSELF; the platform never writes a shop's figures); config is signed-in-readable, admin-written display data (§6.1)");
+  check(payBlock.includes("request.resource.data.get('state', '') == 'submitted'") &&
+        payBlock.includes("request.resource.data.get('businessId', '') == request.auth.uid") &&
+        payBlock.includes("resource.data.get('state', '') in ['confirmed', 'rejected']") &&
+        payBlock.includes("request.resource.data.get('confirmedBy', '') == request.auth.uid") &&
+        payBlock.includes("hasOnly(['state', 'confirmedBy', 'confirmedAt', 'note'])") &&
+        payBlock.includes("allow delete: if false;"),
+    "rules: a payment is BORN submitted in its owner's own name (no client mints a confirmed payment); only an admin moves submitted → confirmed/rejected, signing with their own uid, touching exactly the four settlement fields; delete never");
+
+  /* ---- the PRIVACY suite (§2.3's doctrine as tests) ---- */
+  const usersRegion3 = rulesG3.slice(
+    rulesG3.indexOf("match /users/{uid}"),
+    rulesG3.indexOf("// ---- Phase G · G1: platform collections (START)"));
+  const tenantMatches = [...usersRegion3.matchAll(/match \/([a-zA-Z]+)\/\{/g)].map((m) => m[1]);
+  check(tenantMatches.length >= 35 &&
+        ["journal", "products", "customers", "bills", "sales", "employees", "payrollRuns", "loans"].every((c) => tenantMatches.includes(c)),
+    "privacy: the tenant enumeration is complete — " + tenantMatches.length + " named collections under users/{uid} (journal, products, customers, bills, sales, payroll, loans among them); the suite below speaks for EVERY one, not a sample");
+  const tenantSegments = usersRegion3.split(/match \/([a-zA-Z]+)\//).slice(1);
+  let adminFreeBlocks = tenantMatches.length > 0;
+  for (let i = 0; i < tenantSegments.length; i += 2) {
+    if (tenantSegments[i + 1].includes("isPlatformAdmin") || tenantSegments[i + 1].includes("platformAdmins")) {
+      adminFreeBlocks = false;
+    }
+  }
+  check(adminFreeBlocks && !usersRegion3.includes("isPlatformAdmin"),
+    "privacy: EVERY tenant collection's block is admin-free — no read leg, no write leg, no helper call names the platform grant; an admin's read of a shop's books fails at the same catch-all as a stranger's (§2.3, enforced by rules, not policy)");
+  check(rulesG3.includes("match /{document=**}") &&
+        rulesG3.includes("allow read, write: if false;"),
+    "privacy: the catch-all still denies everything unlisted — the platform collections are the ONLY new doors G opened, and they are all outside the tenant namespace");
+  const platRegion3 = rulesG3.slice(rulesG3.indexOf("// ---- Phase G · G1: platform collections (START)"));
+  const platBlock = (name, next) => platRegion3.slice(platRegion3.indexOf(name), next ? platRegion3.indexOf(next) : undefined);
+  check(platBlock("match /businesses/{businessId}", "match /businessMembers").includes("|| isPlatformAdmin()") &&
+        platBlock("match /businessCounters/{businessId}", "match /platformAdmins").includes("|| isPlatformAdmin()") &&
+        platBlock("match /businessEvents/{eventId}", "// ---- Phase G · G1: platform collections (END)").includes("allow read: if isPlatformAdmin()") &&
+        platBlock("match /businessStats/{businessId}", "match /platformPayments").includes("isPlatformAdmin()") &&
+        platBlock("match /platformPayments/{paymentId}", "match /platformConfig").includes("allow read: if isPlatformAdmin()"),
+    "privacy: the platform's OWN surfaces read fine for an admin — registry, counters, events, telemetry, payments (the closed list, working as designed; the denial above is surgical, not a blanket outage)");
+  check(platBlock("match /platformAdmins/{adminUid}", "match /businessEvents").includes("allow create, delete: if isPlatformAdmin();") &&
+        !platBlock("match /platformAdmins/{adminUid}", "match /businessEvents").includes("allow create, delete: if request.auth"),
+    "privacy: NO self-grant — platformAdmins create/delete require an EXISTING admin; the only first doc is the owner's manual Firebase-console act, outside the rules entirely (§2.1)");
+  check([...platform.CONSOLE_READ_COLLECTIONS].join(",") ===
+        "businesses,businessCounters,businessStats,businessEvents,platformPayments,platformAdmins,platformConfig" &&
+        platform.CONSOLE_READ_COLLECTIONS.every((c) => !c.includes("/")),
+    "privacy: the console's read list is CLOSED and pinned — seven top-level platform collections (G4 added platformConfig: platform display data), no tenant path among them; adding a name here is a design change that fails this suite until §2.3 is amended");
+
+  /* ---- i18n: the console strings ---- */
+  const platKeys = Object.keys(i18n.en).filter((k) => k.startsWith("platform."));
+  check(platKeys.length === 101 && platKeys.every((k) => typeof i18n.ur[k] === "string" && i18n.ur[k].length > 0) &&
+        Object.keys(i18n.en).length === 3136 && Object.keys(i18n.ur).length === 3136,
+    "i18n: all 101 platform.* keys exist in EN and UR (dictionary 3,054 (G4 pin amendment: +12 platform.*; G6: +25 backup.* keys; H1 pin amendment: +51 loyalty keys; H3 pin amendment: +108 storefront keys; WA pin amendment: +109 WhatsApp keys) — the config editor + the amount-mismatch flag) — the console is bilingual like every other surface; the platform team works in the same two languages");
+
+  /* ---- source wiring + the console's own closed list ---- */
+  const platLibSrc = readSrc3("lib/platform.ts");
+  check(!platLibSrc.includes("firebase") && !platLibSrc.includes("users/${"),
+    "purity: lib/platform imports no Firebase and constructs no tenant path — the planners are pure, so the privacy list is a property of the code, not of its callers");
+  const platDataSrc = readSrc3("components/PlatformData.tsx");
+  check(!platDataSrc.includes("users/") && !platDataSrc.includes("StoreProvider") &&
+        !platDataSrc.includes("makeEntry(") && !platDataSrc.includes("lib/selectors") &&
+        !platDataSrc.includes("lib/ledger") && !platDataSrc.includes("lib/reports") &&
+        platDataSrc.includes("platformAdmins") && platDataSrc.includes("businessEvents"),
+    "source: the console's data layer has NO import path to tenant data — no store, no selectors/ledger/reports, no `users/` path anywhere; it reads only platform collections and executes the lib's plans");
+  check(["components/PlatformConsole.tsx", "components/PlatformDetail.tsx", "components/PlatformAdmins.tsx"].every((f) => {
+          const s = readSrc3(f);
+          return !s.includes("users/") && !s.includes("useStore") && !s.includes("StoreProvider");
+        }),
+    "source: no console component touches the shop store or a tenant path — a shopkeeper-admin's console session cannot leak one hat into the other");
+  const shellSrc3 = readSrc3("components/AppShell.tsx");
+  const platBranch = shellSrc3.slice(shellSrc3.indexOf("if (isPlatform)"), shellSrc3.indexOf("if (isAuth)"));
+  check(shellSrc3.includes('"/platform"') && platBranch.length > 0 &&
+        !platBranch.includes("<Sidebar") && !platBranch.includes("<AuthGate") &&
+        !platBranch.includes("BusinessSwitcher") && platBranch.includes("platform.badge"),
+    "source: /platform renders in its OWN minimal shell — no shop sidebar, no shop AuthGate (no redirect games, no no-access hijack), no business switcher; the platform badge is always on it, so the two hats are never confused");
+  check(readSrc3("app/platform/page.tsx").includes("PlatformConsole") &&
+        (readSrc3("components/StoreProvider.tsx").match(/makeEntry\(/g) || []).length === 24,
+    "source: the /platform route mounts the console; the store still composes exactly 24 journal entries — the platform layer posts nothing, ever");
+
+  /* ---- frozen seed identities ---- */
+  const journalG3 = seed.getSeedJournal(products, sales, purchases, payments, expenses, credits);
+  const shaG3 = crypto.createHash("sha256")
+    .update(JSON.stringify(journalG3.map((e) => { const { ts, ...rest } = e; return rest; })), "utf8")
+    .digest("hex");
+  const tbG3 = reports.trialBalance(journalG3, reports.resolveReportRange("custom", null, { from: "2000-01-01", to: "2100-12-31" }));
+  check(journalG3.length === 21 && shaG3 === "e17e5bda19e87de698b0c0a37e923f9b396bc387e2092b2ffbbd7d60d4971168" &&
+        eq(ledger.accountBalance(journalG3, "inventory"), 272805) &&
+        eq(ledger.accountBalance(journalG3, "cash"), 50000) &&
+        eq(ledger.payablesTotal(journalG3), 27900) && eq(ledger.receivablesTotal(journalG3), 5500) &&
+        eq(tbG3.totalDebits, tbG3.totalCredits),
+    "seed: frozen identities intact — 21 entries, the pinned SHA, Inventory 272,805 · Cash 50,000 · payables 27,900 · receivables 5,500, TB balanced. The platform administers businesses; it has never touched a journal");
+}
+
+
+/* =============================== G4 (Phase G · G4 — renewal flow + trial lifecycle) =============================== */
+{
+  suite("G4", null); // Phase G · G4 — the owner renewal surface's pure core (lib/renewal), the platformConfig act + amount check (lib/platform), the lifecycle banners, and the full scripted lifecycle walk (design §3.4–§3.6/§8-G4)
+
+  const readSrc4 = (p) => fs.readFileSync("/home/hatch/workspace/ai-dukaan-ai/web/" + p, "utf8");
+  const rulesG4 = fs.readFileSync(
+    "/home/hatch/workspace/ai-dukaan-ai/firebase/firestore.rules", "utf8"
+  );
+  const shaRulesG4 = crypto.createHash("sha256").update(stripH3Blocks(stripWaBlocks(stripFR2Blocks(rulesG4))), "utf8").digest("hex");
+  const journalG4 = seed.getSeedJournal(products, sales, purchases, payments, expenses, credits);
+  const shaJournalG4 = () =>
+    crypto.createHash("sha256")
+      .update(JSON.stringify(journalG4.map((e) => { const { ts, ...rest } = e; return rest; })), "utf8")
+      .digest("hex");
+  const SEED_SHA = "e17e5bda19e87de698b0c0a37e923f9b396bc387e2092b2ffbbd7d60d4971168";
+  const walkWrites = []; // every platform write the walk produces — swept at the end for tenant paths
+
+  /* ---- the quote arithmetic (§3.5) ---- */
+  const T0 = "2027-01-01T00:00:00.000Z";
+  const birthR = tenancy.planTrialBirth({
+    ownerUid: "bizR", ownerEmail: "r@x.pk", shopName: "Renewal Shop", phone: "", nowISO: T0,
+  });
+  const regTrial = birthR.find((w) => w.kind === "set" && w.path === "businesses/bizR").data;
+  check(regTrial.plan.planId === "trial" && regTrial.plan.trialEndsAt === "2027-01-15T00:00:00.000Z" &&
+        shaJournalG4() === SEED_SHA,
+    "walk 0 · trial birth: the lifecycle shop is born on the trial snapshot (ends 2027-01-15); the seed journal's SHA stands");
+  const q1 = renewal.renewalQuote(regTrial, "basic", "monthly", "2027-01-06T00:00:00.000Z");
+  check(q1.ok && q1.quote.amount === 1500 &&
+        q1.quote.periodFrom === "2027-01-15T00:00:00.000Z" && q1.quote.periodTo === "2027-02-15T00:00:00.000Z",
+    "quote: mid-trial, a monthly Basic purchase is priced 1,500 FROM the catalogue and starts the day the trial ends — bought time is never overlapped or lost");
+  const q2 = renewal.renewalQuote(regTrial, "standard", "annual", "2027-01-06T00:00:00.000Z");
+  check(q2.ok && q2.quote.amount === 25000 && q2.quote.periodTo === "2028-01-15T00:00:00.000Z",
+    "quote: annual = 10 × monthly (§3.1) — Standard annual is 25,000 for a full year from the trial's end");
+  const regMonthEnd = { ...regTrial, status: "active",
+    plan: { ...plans.snapshotFor("basic", "2026-12-31T00:00:00.000Z", { assignedBy: "admin" }),
+            periodFrom: "2026-12-31T00:00:00.000Z", periodTo: "2027-01-31T00:00:00.000Z", trialEndsAt: null } };
+  const q3 = renewal.renewalQuote(regMonthEnd, "basic", "monthly", "2027-01-10T00:00:00.000Z");
+  check(q3.ok && q3.quote.periodFrom === "2027-01-31T00:00:00.000Z" && q3.quote.periodTo === "2027-02-28T00:00:00.000Z" &&
+        renewal.addMonthsISO("2027-01-31T00:00:00.000Z", 12) === "2028-01-31T00:00:00.000Z",
+    "quote: an early renewal extends from the CURRENT period end (not from today), and month arithmetic clamps at month end (Jan 31 + 1mo = Feb 28, + 12mo = next Jan 31)");
+  check(!renewal.renewalQuote(null, "basic", "monthly", T0).ok &&
+        renewal.renewalQuote(null, "basic", "monthly", T0).reason === "no-registry" &&
+        renewal.renewalQuote(regTrial, "trial", "monthly", T0).reason === "not-purchasable" &&
+        renewal.renewalQuote(regTrial, "founding", "monthly", T0).reason === "not-purchasable" &&
+        renewal.renewalQuote(regTrial, "enterprise", "monthly", T0).reason === "custom-plan" &&
+        renewal.renewalQuote({ ...regTrial, plan: tenancy.foundingPlanSnapshot(T0) }, "basic", "monthly", T0).reason === "not-applicable",
+    "quote refusals: no registry / the trial itself / founding / a custom Enterprise price are never quoted a catalogue figure; a founding shop is told renewal does not apply at all");
+
+  /* ---- the submission plan (§3.5) ---- */
+  const subBase = {
+    registry: regTrial, businessId: "bizR", planId: "standard", billing: "monthly",
+    method: "raast", reference: "FT-778899", actor: "bizR", now: "2027-01-06T00:00:00.000Z",
+  };
+  const sub1 = renewal.planRenewalSubmission({ ...subBase, ownerNote: "Paid via my Raast app" });
+  walkWrites.push(...(sub1.ok ? sub1.writes : []));
+  check(sub1.ok && sub1.writes.length === 1 && sub1.writes[0].kind === "add" &&
+        sub1.writes[0].collection === "platformPayments" &&
+        sub1.writes[0].data.state === "submitted" && sub1.writes[0].data.businessId === "bizR" &&
+        sub1.writes[0].data.submittedBy === "bizR" && sub1.writes[0].data.amount === 2500 &&
+        sub1.writes[0].data.planId === "standard" && sub1.writes[0].data.billingPeriod === "monthly" &&
+        sub1.writes[0].data.periodFrom === "2027-01-15T00:00:00.000Z" &&
+        sub1.writes[0].data.periodTo === "2027-02-15T00:00:00.000Z" &&
+        sub1.writes[0].data.ownerNote === "Paid via my Raast app" &&
+        sub1.writes[0].data.confirmedBy === null && sub1.writes[0].data.confirmedAt === null,
+    "submission: exactly ONE platform write — a platformPayments record born `submitted` in the owner's own name (the rules' create shape), the amount composed from the catalogue (never caller-supplied), the owner note riding along, settlement fields empty");
+  const subNoNote = renewal.planRenewalSubmission(subBase);
+  check(subNoNote.ok && !("ownerNote" in subNoNote.writes[0].data),
+    "submission: no owner note, no ownerNote field — the record carries only what was supplied");
+  check(renewal.planRenewalSubmission({ ...subBase, actor: "someone-else" }).reason === "not-owner" &&
+        renewal.planRenewalSubmission({ ...subBase, reference: "   " }).reason === "reference-required" &&
+        renewal.planRenewalSubmission({ ...subBase, method: "card" }).reason === "bad-method" &&
+        renewal.planRenewalSubmission({ ...subBase, registry: null }).reason === "no-registry" &&
+        [renewal.planRenewalSubmission({ ...subBase, actor: "x" }),
+         renewal.planRenewalSubmission({ ...subBase, reference: "" })]
+          .every((r) => !r.ok && r.writes.length === 0),
+    "submission refusals write NOTHING: only the owner submits for their own business, a payment reference is mandatory (it is the admin's matching key), the method is one of the five rails, and a registry must exist");
+
+  /* ---- the amount check (§3.5: flagged, never settled) ---- */
+  check(platform.paymentAmountCheck({ planId: "standard", amount: 2500, billingPeriod: "monthly", periodFrom: "2027-01-15T00:00:00.000Z", periodTo: "2027-02-15T00:00:00.000Z" }) === "ok" &&
+        platform.paymentAmountCheck({ planId: "standard", amount: 25000, billingPeriod: "annual", periodFrom: "2027-01-15T00:00:00.000Z", periodTo: "2028-01-15T00:00:00.000Z" }) === "ok" &&
+        platform.paymentAmountCheck({ planId: "standard", amount: 2400, billingPeriod: "monthly", periodFrom: "2027-01-15T00:00:00.000Z", periodTo: "2027-02-15T00:00:00.000Z" }) === "mismatch" &&
+        platform.paymentAmountCheck({ planId: "standard", amount: 2500, billingPeriod: "annual", periodFrom: "2027-01-15T00:00:00.000Z", periodTo: "2028-01-15T00:00:00.000Z" }) === "mismatch" &&
+        platform.paymentAmountCheck({ planId: "enterprise", amount: 9999, periodFrom: "2027-01-15T00:00:00.000Z", periodTo: "2027-02-15T00:00:00.000Z" }) === "custom" &&
+        platform.paymentAmountCheck({ planId: "advanced", amount: 40000, periodFrom: "2027-01-15T00:00:00.000Z", periodTo: "2028-01-15T00:00:00.000Z" }) === "ok" &&
+        platform.paymentAmountCheck({ planId: "advanced", amount: 4000, periodFrom: "2027-01-15T00:00:00.000Z", periodTo: "2028-01-15T00:00:00.000Z" }) === "mismatch",
+    "amount check: the queue compares every record against catalogue × period — exact matches pass, under/over-payments and monthly-priced 'annual' records FLAG as mismatches, Enterprise reads custom (nothing to compare), and a legacy record without a billing period infers its span from its own dates");
+
+  /* ---- the platformConfig act (§3.5/§8-G4 item 3) ---- */
+  const cfgFields = {
+    raastNumber: "0300-1234567", iban: "PK36ABCD0000000000000000", bankName: "Meezan Bank",
+    accountTitle: "CodeHubb", instructions: "Send to the Raast number, then submit the FT id.", supportContact: "support@codehubb.com",
+  };
+  const cfgSave1 = platform.planSavePlatformConfig({
+    config: cfgFields, current: null, actor: "admin-1", now: "2027-01-02T00:00:00.000Z",
+  });
+  walkWrites.push(...(cfgSave1.ok ? cfgSave1.writes : []));
+  check(cfgSave1.ok && cfgSave1.writes.length === 2 &&
+        cfgSave1.writes[0].kind === "set" && cfgSave1.writes[0].path === "platformConfig/main" &&
+        cfgSave1.writes[0].data.raastNumber === "0300-1234567" &&
+        cfgSave1.writes[0].data.updatedBy === "admin-1" &&
+        cfgSave1.writes[0].data.updatedAt === "2027-01-02T00:00:00.000Z" &&
+        cfgSave1.writes[1].kind === "add" && cfgSave1.writes[1].collection === "businessEvents" &&
+        cfgSave1.writes[1].data.businessId === "platform" &&
+        cfgSave1.writes[1].data.kind === "platformConfig.updated" &&
+        cfgSave1.writes[1].data.detail.changed.length === 6,
+    "config act: the first save creates platformConfig/main AND its audit event in one plan — the event rides under the reserved 'platform' business id with every field named as changed");
+  const cfgSaved = cfgSave1.writes[0].data;
+  const cfgSave2 = platform.planSavePlatformConfig({
+    config: { ...cfgFields, iban: "PK00NEWBANK000000000000000" },
+    current: cfgSaved, actor: "admin-1", now: "2027-01-03T00:00:00.000Z",
+  });
+  walkWrites.push(...(cfgSave2.ok ? cfgSave2.writes : []));
+  check(cfgSave2.ok &&
+        JSON.stringify(cfgSave2.writes[1].data.detail.changed) === "[\"iban\"]" &&
+        cfgSave2.writes[1].data.detail.before.iban === "PK36ABCD0000000000000000" &&
+        cfgSave2.writes[1].data.detail.after.iban === "PK00NEWBANK000000000000000",
+    "config act: a later save's event names ONLY what changed, with before/after — the §2.3 audit doctrine holds for platform content too");
+  check(platform.CONSOLE_ACTS.includes("planSavePlatformConfig") &&
+        platform.CONSOLE_READ_COLLECTIONS.includes("platformConfig") &&
+        platform.PLATFORM_CONFIG_DOC_ID === "main",
+    "config: the act is on the console's closed act list and the collection on its closed read list — the editor is an audited console surface, not a side door");
+
+  /* ---- the lifecycle banner derivation (§3.4/§3.6) ---- */
+  const viewAt = (reg, now) => plans.planViewOf(reg, null, now);
+  const bTrial = renewal.lifecycleBanner(viewAt(regTrial, "2027-01-06T00:00:00.000Z"), "2027-01-06T00:00:00.000Z");
+  const bApproach = renewal.lifecycleBanner(viewAt(regTrial, "2027-01-09T00:00:00.000Z"), "2027-01-09T00:00:00.000Z");
+  const bUrgent = renewal.lifecycleBanner(viewAt(regTrial, "2027-01-14T12:00:00.000Z"), "2027-01-14T12:00:00.000Z");
+  check(bTrial.kind === "trial" && bTrial.daysLeft === 9 &&
+        bApproach.kind === "trial-approaching" && bApproach.daysLeft === 6 &&
+        bUrgent.kind === "trial-urgent" && bUrgent.daysLeft === 1,
+    "banner: the trial countdown tiers by the days left — plain countdown beyond a week, approaching inside 7 days, urgent on the last day — the §3.4 notice points, derived from the same state the shell renders");
+  const bGrace = renewal.lifecycleBanner(viewAt(regTrial, "2027-01-20T00:00:00.000Z"), "2027-01-20T00:00:00.000Z");
+  const bReadonly = renewal.lifecycleBanner(viewAt(regTrial, "2027-02-20T00:00:00.000Z"), "2027-02-20T00:00:00.000Z");
+  check(bGrace.kind === "grace" && bGrace.daysElapsed === 5 && bGrace.graceLeft === 25 &&
+        bReadonly.kind === "readonly",
+    "banner: grace names the days elapsed AND the days of grace left (trial end + 30d, inclusive); past the grace end the banner is the read-only fact");
+  check(renewal.lifecycleBanner(viewAt(regMonthEnd, "2027-01-10T00:00:00.000Z"), "2027-01-10T00:00:00.000Z") === null &&
+        renewal.lifecycleBanner(viewAt({ ...regTrial, plan: tenancy.foundingPlanSnapshot(T0) }, "2027-01-06T00:00:00.000Z"), "2027-01-06T00:00:00.000Z") === null,
+    "banner: a healthy active shop and a founding shop see NO lifecycle banner — banners are state facts, not nagging");
+  check(renewal.latestSuspensionReason([
+          { businessId: "bizR", kind: "business.suspended", actor: "admin-1", at: "2027-01-03T00:00:00.000Z", detail: { reason: "Chargeback abuse" } },
+          { businessId: "bizR", kind: "business.activated", actor: "admin-1", at: "2027-01-04T00:00:00.000Z", detail: {} },
+        ]) === null &&
+        renewal.latestSuspensionReason([
+          { businessId: "bizR", kind: "business.activated", actor: "admin-1", at: "2027-01-02T00:00:00.000Z", detail: {} },
+          { businessId: "bizR", kind: "business.suspended", actor: "admin-1", at: "2027-01-03T00:00:00.000Z", detail: { reason: "Chargeback abuse" } },
+        ]) === "Chargeback abuse" &&
+        renewal.latestSuspensionReason([]) === null,
+    "banner: the suspension reason is the LATEST suspension act's recorded reason — a later activation clears it, so the banner never accuses a reinstated shop (§2.4)");
+
+  /* ---- THE LIFECYCLE WALK (§8-G4's checkpoint) ----
+   * trial birth → trading → trial expiry → grace (posting
+   * denied, reads/exports never gated) → payment submitted →
+   * admin confirms → active with the extended period →
+   * period runs out → grace → readonly → renewal again →
+   * active. The shop journal's SHA is spot-asserted at
+   * EVERY step: platform acts never touch the journal. */
+  let reg = regTrial;
+  check(plans.derivePlanState(reg, "2027-01-10T00:00:00.000Z") === "trial" &&
+        plans.rulesPlanPostable({ ...reg, enforce: true }, "2027-01-10T00:00:00.000Z") === true &&
+        shaJournalG4() === SEED_SHA,
+    "walk 1 · trading: mid-trial the shop trades and (under enforcement) posts freely; journal SHA unchanged");
+  check(plans.derivePlanState(reg, "2027-01-15T00:00:00.000Z") === "trial" &&
+        plans.derivePlanState(reg, "2027-01-15T00:00:00.001Z") === "grace" &&
+        plans.derivePlanState(reg, "2027-02-14T00:00:00.000Z") === "grace" &&
+        plans.derivePlanState(reg, "2027-02-14T00:00:00.001Z") === "readonly" &&
+        shaJournalG4() === SEED_SHA,
+    "walk 2 · expiry: the trial's end instant still belongs to the trial; grace runs 30 further days inclusive; read-only begins 1 ms later — no act, no flag, pure derivation; journal SHA unchanged");
+  check(plans.rulesPlanPostable({ ...reg, enforce: true }, "2027-01-20T00:00:00.000Z") === false &&
+        rulesG4.includes("allow read: if canAccess(uid);") &&
+        !/allow read:[^;]*plan/i.test(rulesG4),
+    "walk 3 · grace posture: under enforcement, posting is DENIED in grace — while the rules' read seam carries NO plan condition at all, so the shop's data (and its export) stays fully readable; the lock is on writing, never on seeing; journal SHA unchanged");
+  const S1 = "2027-01-20T10:00:00.000Z";
+  const walkSub1 = renewal.planRenewalSubmission({
+    registry: reg, businessId: "bizR", planId: "standard", billing: "monthly",
+    method: "raast", reference: "FT-WALK-1", actor: "bizR", now: S1,
+  });
+  walkWrites.push(...(walkSub1.ok ? walkSub1.writes : []));
+  check(walkSub1.ok && walkSub1.writes[0].data.periodFrom === S1 &&
+        walkSub1.writes[0].data.periodTo === "2027-02-20T10:00:00.000Z" &&
+        walkSub1.writes[0].data.amount === 2500 && shaJournalG4() === SEED_SHA,
+    "walk 4 · submission in grace: a grace shop CAN submit (the remedy is never blocked, §2.4) — the purchased month runs from the submission instant (the trial's end is already past), priced from the catalogue; journal SHA unchanged");
+  const payWalk1 = { ...walkSub1.writes[0].data, id: "payW1" };
+  const C1 = "2027-01-21T09:00:00.000Z";
+  const confirmW1 = platform.planConfirmPayment({ payment: payWalk1, business: reg, actor: "admin-1", now: C1 });
+  walkWrites.push(...(confirmW1.ok ? confirmW1.writes : []));
+  check(confirmW1.ok && confirmW1.writes[0].data.state === "confirmed" &&
+        confirmW1.writes[0].data.confirmedAt === C1 &&
+        confirmW1.writes[1].data.plan.planId === "standard" &&
+        confirmW1.writes[1].data.plan.periodFrom === S1 &&
+        confirmW1.writes[1].data.plan.periodTo === "2027-02-20T10:00:00.000Z" &&
+        confirmW1.writes[1].data.plan.trialEndsAt === null &&
+        shaJournalG4() === SEED_SHA,
+    "walk 5 · confirmation: the console settles the record and the registry's snapshot refreshes FROM THE PAYMENT'S OWN TERMS — the period the owner bought at submission is honoured verbatim, so confirmation lag can never eat purchased time; the trial converts to paid; journal SHA unchanged");
+  reg = { ...reg, plan: confirmW1.writes[1].data.plan };
+  check(plans.derivePlanState(reg, C1) === "active" &&
+        plans.rulesPlanPostable({ ...reg, enforce: true }, C1) === true &&
+        renewal.lifecycleBanner(viewAt(reg, C1), C1) === null && shaJournalG4() === SEED_SHA,
+    "walk 6 · active again: state derives back to active, posting resumes by derivation alone (no flag surgery), the banner clears; journal SHA unchanged");
+  check(plans.derivePlanState(reg, "2027-02-20T10:00:00.000Z") === "active" &&
+        plans.derivePlanState(reg, "2027-02-20T10:00:00.001Z") === "grace" &&
+        plans.derivePlanState(reg, "2027-03-22T10:00:00.000Z") === "grace" &&
+        plans.derivePlanState(reg, "2027-03-22T10:00:00.001Z") === "readonly" &&
+        renewal.lifecycleBanner(viewAt(reg, "2027-03-25T08:00:00.000Z"), "2027-03-25T08:00:00.000Z").kind === "readonly" &&
+        shaJournalG4() === SEED_SHA,
+    "walk 7 · the period runs out: active through its end instant, grace for 30 days, then read-only — the second descent needs no one's hand; journal SHA unchanged");
+  const S2 = "2027-03-25T08:00:00.000Z";
+  const walkSub2 = renewal.planRenewalSubmission({
+    registry: reg, businessId: "bizR", planId: "advanced", billing: "annual",
+    method: "bank", reference: "IBFT-WALK-2", actor: "bizR", now: S2,
+  });
+  walkWrites.push(...(walkSub2.ok ? walkSub2.writes : []));
+  const confirmW2 = walkSub2.ok
+    ? platform.planConfirmPayment({ payment: { ...walkSub2.writes[0].data, id: "payW2" }, business: reg, actor: "admin-1", now: "2027-03-25T12:00:00.000Z" })
+    : { ok: false, writes: [] };
+  walkWrites.push(...(confirmW2.ok ? confirmW2.writes : []));
+  check(walkSub2.ok && walkSub2.writes[0].data.amount === 40000 &&
+        walkSub2.writes[0].data.periodTo === "2028-03-25T08:00:00.000Z" && confirmW2.ok &&
+        shaJournalG4() === SEED_SHA,
+    "walk 8 · renewal from read-only: even a read-only shop submits (the remedy is never blocked) — an annual Advanced year at 40,000 from the submission instant, confirmed the same day; journal SHA unchanged");
+  reg = { ...reg, plan: confirmW2.writes[1].data.plan };
+  check(plans.derivePlanState(reg, "2027-03-25T12:00:00.000Z") === "active" &&
+        reg.plan.planId === "advanced" && shaJournalG4() === SEED_SHA,
+    "walk 9 · active on the new plan: the shop stands active on Advanced for the purchased year — the full lifecycle (trial → grace → paid → lapse → read-only → renewed) closed by derivation alone; journal SHA unchanged");
+  const qEarly = renewal.renewalQuote(reg, "basic", "monthly", "2027-06-01T00:00:00.000Z");
+  check(qEarly.ok && qEarly.quote.periodFrom === "2028-03-25T08:00:00.000Z" &&
+        qEarly.quote.periodTo === "2028-04-25T08:00:00.000Z" && qEarly.quote.amount === 1500,
+    "walk 10 · early renewal stacks: buying again mid-period extends from the CURRENT period end (2028-03-25), never from today — purchased time is additive, always");
+
+  /* ---- the rejected branch (§3.5) ---- */
+  const regGrace = regTrial; // still in grace at S1 below
+  const rejSub = renewal.planRenewalSubmission({
+    registry: regGrace, businessId: "bizR", planId: "basic", billing: "monthly",
+    method: "jazzcash", reference: "JC-BAD-1", actor: "bizR", now: S1,
+  });
+  const rejPay = { ...rejSub.writes[0].data, id: "payRJ" };
+  const rejected = platform.planRejectPayment({
+    payment: rejPay, note: "Slip unreadable — resend a clear photo", actor: "admin-1", now: "2027-01-21T09:30:00.000Z",
+  });
+  walkWrites.push(...(rejected.ok ? rejected.writes : []));
+  const resub = renewal.planRenewalSubmission({
+    registry: regGrace, businessId: "bizR", planId: "basic", billing: "monthly",
+    method: "jazzcash", reference: "JC-GOOD-2", actor: "bizR", now: "2027-01-21T10:00:00.000Z",
+  });
+  check(rejSub.ok && rejected.ok && rejected.writes[0].data.state === "rejected" &&
+        rejected.writes[0].data.note === "Slip unreadable — resend a clear photo" &&
+        rejected.writes.length === 2 &&
+        plans.derivePlanState(regGrace, "2027-01-21T10:00:00.000Z") === "grace" &&
+        resub.ok && shaJournalG4() === SEED_SHA,
+    "rejected branch: rejection settles ONLY the record (no registry write — the shop stays exactly where it was, in grace) and the admin's note rides the record the owner reads; the resubmission path plans cleanly; journal SHA unchanged");
+
+  /* ---- the walk's write sweep + frozen identities ---- */
+  check(walkWrites.length > 0 &&
+        walkWrites.every((w) => !(w.path || "").startsWith("users/") && w.collection !== "journal") &&
+        walkWrites.every((w) => w.kind !== "set" || w.path === "platformConfig/main" || (w.path || "").startsWith("businesses/") || (w.path || "").startsWith("platformPayments/")),
+    "sweep: across the whole walk, NO platform write touches a tenant path — submissions and settlements land only on platformPayments / businesses / platformConfig / businessEvents; the shop's books are never a platform write's target");
+  check(shaRulesG4 === "734f6ba4cebc9c19203e0d022b810a7e1c76e57fd644d040abbe2a421ad7d3ad" &&
+        journalG4.length === 21 && shaJournalG4() === SEED_SHA &&
+        eq(ledger.accountBalance(journalG4, "inventory"), 272805) &&
+        eq(ledger.accountBalance(journalG4, "cash"), 50000) &&
+        eq(ledger.payablesTotal(journalG4), 27900) && eq(ledger.receivablesTotal(journalG4), 5500),
+    "frozen: rules v9 is byte-identical (G4 needed NO rules change — the G3 blocks already carried the renewal surface), and the seed identities stand — 21 entries, the pinned SHA, Inventory 272,805 · Cash 50,000 · payables 27,900 · receivables 5,500 (H3 same-check amendment: the hash runs over stripH3Blocks(rules) — v10 minus the H3 spans IS v9, strip-proven in the H3 suite) (WA same-check amendment: the hash runs over stripH3Blocks(stripWaBlocks(rules)) — the amended v10 minus the WhatsApp spans is the H3-final v10, strip-proven in the WA suite) (FR2 same-check amendment: the hash runs over stripH3Blocks(stripWaBlocks(stripFR2Blocks(rules))) — v11 minus FR2 is v10, strip-proven in the FR2 suite)");
+
+  /* ---- i18n: the renewal strings ---- */
+  const renewKeys = Object.keys(i18n.en).filter((k) => k.startsWith("renew."));
+  const planKeysG4 = Object.keys(i18n.en).filter((k) => k.startsWith("plan."));
+  check(renewKeys.length === 35 &&
+        renewKeys.every((k) => typeof i18n.ur[k] === "string" && i18n.ur[k].length > 0) &&
+        planKeysG4.length === 36 &&
+        Object.keys(i18n.en).length === 3136 && Object.keys(i18n.ur).length === 3136,
+    "i18n: all 35 new renew.* keys exist in EN and UR (dictionary 3,054 (G4 pin amendment: +47 = 35 renew.* + 12 platform.*; G6: +25 backup.* keys; H1 pin amendment: +51 loyalty keys; H3 pin amendment: +108 storefront keys; WA pin amendment: +109 WhatsApp keys); the plan.* count stays 36 — the renewal surface is bilingual like every other surface");
+
+  /* ---- source wiring ---- */
+  const storeSrcG4 = readSrc4("components/StoreProvider.tsx");
+  check(storeSrcG4.includes('collection(db, "platformPayments")') &&
+        storeSrcG4.includes('doc(db, "platformConfig"') &&
+        storeSrcG4.includes('collection(db, "businessEvents")') &&
+        storeSrcG4.includes("planRenewalSubmission") &&
+        (storeSrcG4.match(/makeEntry\(/g) || []).length === 24,
+    "source: the store subscribes the owner's own payments + the platform config + the business's own events, and executes the renewal plan — while still composing exactly 24 journal entries (a renewal is a platform write, never a sale)");
+  const panelSrcG4 = readSrc4("components/PlanPanel.tsx");
+  check(panelSrcG4.includes("renewalQuote") && panelSrcG4.includes("submitRenewalPayment") &&
+        panelSrcG4.includes("ownPayments") && panelSrcG4.includes("platformConfig"),
+    "source: the Settings plan panel grew its action half — quote preview, instructions from the platform config, the submission, and the business's own payment history");
+  const platDataSrcG4 = readSrc4("components/PlatformData.tsx");
+  const cfgSrcG4 = readSrc4("components/PlatformConfig.tsx");
+  const consoleSrcG4 = readSrc4("components/PlatformConsole.tsx");
+  const payQueueSrcG4 = readSrc4("components/PlatformPayments.tsx");
+  check(platDataSrcG4.includes('collection(db, "platformConfig")') &&
+        cfgSrcG4.includes("planSavePlatformConfig") &&
+        consoleSrcG4.includes("PlatformConfig") && consoleSrcG4.includes("platform.tab.config") &&
+        payQueueSrcG4.includes("paymentAmountCheck") && payQueueSrcG4.includes("platform.pay.mismatch"),
+    "source: the console grew the config tab + editor (saving through the audited act), and the payment queue flags catalogue mismatches inline");
+  const shellSrcG4 = readSrc4("components/AppShell.tsx");
+  check(shellSrcG4.includes("lifecycleBanner") && shellSrcG4.includes("renew.cta") &&
+        shellSrcG4.includes("suspensionReason") && shellSrcG4.includes("plan.suspendedBanner"),
+    "source: the shell banner renders lib/renewal's lifecycle derivation — countdown tiers, grace with its days left, read-only, suspension with its reason — with the renewal path into Settings on the renewable states");
+  const renewalSrc = readSrc4("lib/renewal.ts");
+  check(!renewalSrc.includes("firebase") && !renewalSrc.includes("enforce: true") &&
+        !readSrc4("lib/platform.ts").includes("enforce: true"),
+    "purity: lib/renewal is Firebase-free pure planning, and enforcement stays OFF in every line of shipping code (staged rollout, §6) — G4 ships the lifecycle, not the lock");
+}
+
+/* =============================== G6 (Phase G · G6 — backup & restore, design §9) =============================== */
+{
+  suite("G6", null);
+  const NOW6 = "2026-10-23T12:00:00.000Z";
+  const A6 = "bizA6";
+  const B6 = "bizB6";
+  const J6 = (v) => JSON.parse(JSON.stringify(v));
+  const readSrc6 = (p) => fs.readFileSync("/home/hatch/workspace/ai-dukaan-ai/web/" + p, "utf8");
+
+  /* ---- SHA-256 known answers + the journal fingerprint ---- */
+  check(backup.sha256Hex("") === "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855" &&
+        backup.sha256Hex("abc") === "ba7816bf8f01cfea414140de5dae2223b00361a396177a9cb410ff61f20015ad" &&
+        backup.sha256Hex("دکان ایپ") === crypto.createHash("sha256").update("دکان ایپ", "utf8").digest("hex") &&
+        backup.sha256Hex("x".repeat(100000)) === crypto.createHash("sha256").update("x".repeat(100000), "utf8").digest("hex"),
+    "sha256: lib/backup's self-contained SHA-256 reproduces the published known answers (empty, abc) and Node's crypto on Urdu text and a 100 KB input — the fingerprint's hash is not taken on faith");
+  check(backup.journalFingerprint(journal) === "e17e5bda19e87de698b0c0a37e923f9b396bc387e2092b2ffbbd7d60d4971168",
+    "fingerprint: fed the frozen seed journal, lib/backup's fingerprint IS the B1-recorded e17e5bda…1168 — the manifest's fingerprint and the audit's frozen identity are one computation (drop ts, JSON, SHA-256)");
+  {
+    const retimed = journal.map((e) => ({ ...e, ts: "2030-01-01T00:00:00.000Z" }));
+    const tampered = J6(journal);
+    tampered[0].lines[0].debit += 1;
+    check(backup.journalFingerprint(retimed) === backup.journalFingerprint(journal) &&
+          backup.journalFingerprint(tampered) !== backup.journalFingerprint(journal),
+      "fingerprint: blind to wall-clock ts (the B1 normalization drops it) and sensitive to a single rupee in a single line — a restore that altered money could not pass it");
+  }
+
+  /* ---- the fixture shop: the seed business, assembled as the
+   * store assembles it (same getters, same empty collections) ---- */
+  const prods6 = seed.getSeedProducts();
+  const customers6 = seed.getSeedCustomers();
+  const employees6 = seed.getSeedEmployees();
+  const orders6 = seed.getSeedSaleOrders(customers6, prods6);
+  const shopCollections = {
+    products: prods6,
+    sales,
+    bills: [],
+    suppliers: seed.getSeedSuppliers(),
+    purchases,
+    supplierPayments: payments,
+    expenses,
+    credits,
+    customers: customers6,
+    returns: [],
+    adjustments: [],
+    dayCloses: [],
+    cashEntries: [],
+    journal,
+    accounts,
+    taxSlabs: seed.getSeedTaxSlabs(),
+    periods: [],
+    quotations: seed.getSeedQuotations(customers6, prods6),
+    saleOrders: orders6,
+    deliveryChallans: seed.getSeedDeliveryChallans(orders6),
+    purchaseOrders: [],
+    notes: [],
+    purchaseReturns: [],
+    cheques: [],
+    warehouses: seed.getSeedWarehouses(),
+    stockLevels: seed.getSeedStockLevels(prods6),
+    stockTransfers: seed.getSeedStockTransfers(prods6),
+    boms: seed.getSeedBoms(prods6),
+    productionOrders: seed.getSeedProductionOrders(prods6, seed.getSeedBoms(prods6)),
+    jobs: seed.getSeedJobs(customers6),
+    employees: employees6,
+    attendance: seed.getSeedAttendance(employees6),
+    payrollRuns: [seed.getSeedPayrollRunDraft(employees6, seed.getSeedAttendance(employees6))],
+    loans: seed.getSeedLoans(),
+    branding: [],
+    waTemplates: [],
+    waCampaigns: [],
+    waSends: [],
+  };
+  const ownerDoc6 = {
+    ...seed.getSeedSettings(),
+    staffEmails: ["staff@shop.pk"],
+    staff: [{ email: "staff@shop.pk", role: "manager", addedAt: NOW6 }],
+  };
+  const mig6 = tenancy.planMigration({
+    ownerUid: A6, ownerEmail: "owner@shop.pk", shopName: "Madina General Store",
+    phone: "0300", staffEmails: ["staff@shop.pk"], registryExists: false,
+    bills: [], sales: [], nowISO: NOW6,
+  });
+  const platformRaw6 = {
+    registry: mig6.find((w) => w.path === `businesses/${A6}`).data,
+    counters: mig6.find((w) => w.path === `businessCounters/${A6}`).data,
+    stats: null,
+    members: [{ key: "uid-staff-1", data: { email: "staff@shop.pk", role: "manager", addedBy: A6, addedAt: NOW6, source: "staff" } }],
+    invites: [{ key: "pending@shop.pk", data: { email: "pending@shop.pk", role: "cashier", status: "pending", invitedBy: A6, createdAt: NOW6 } }],
+    events: [
+      { key: "evt-mig", data: mig6.find((w) => w.kind === "add").data },
+      { key: "evt-foreign", data: { businessId: "bizFOREIGN", kind: "plan.assigned", actor: "admin1", at: NOW6, detail: {} } },
+    ],
+    payments: [
+      { key: "pay-1", data: { businessId: A6, amount: 2500, method: "raast", reference: "R-1", periodFrom: "2026-10-01", periodTo: "2026-11-01", planId: "standard", state: "confirmed", submittedBy: A6, confirmedBy: "admin1" } },
+      { key: "pay-foreign", data: { businessId: "bizFOREIGN", amount: 999, method: "cash", reference: "X", periodFrom: "2026-10-01", periodTo: "2026-11-01", planId: "basic", state: "confirmed", submittedBy: "bizFOREIGN" } },
+    ],
+  };
+  const file6 = backup.assembleBackup({
+    businessId: A6, exportedAt: NOW6, exportedBy: "web",
+    owner: ownerDoc6, collections: shopCollections, platform: platformRaw6,
+  });
+
+  /* ---- assembly ---- */
+  check(backup.TENANT_COLLECTIONS.length === 38 &&
+        backup.TENANT_COLLECTIONS.every((n) => Array.isArray(file6.collections[n]) &&
+          file6.manifest.counts[n] === shopCollections[n].length) &&
+        file6.manifest.totalDocs === 1 + backup.TENANT_COLLECTIONS.reduce((a, n) => a + shopCollections[n].length, 0) &&
+        file6.manifest.journalCount === 21,
+    "assembly: the manifest counts every one of the 38 tenant collections exactly, totalDocs = owner + Σ collections, journalCount 21 (WA pin amendment: 35 → 38 — waTemplates/waCampaigns/waSends join the manifest, design §3.3)");
+  {
+    const storeSrc6 = readSrc6("components/StoreProvider.tsx");
+    const subscribed = new Set([...storeSrc6.matchAll(/sub<[^>]+>\("([a-zA-Z]+)"/g)].map((m) => m[1]));
+    check(subscribed.size === 38 && backup.TENANT_COLLECTIONS.every((n) => subscribed.has(n)),
+      "assembly: lib/backup's collection list is exactly the set StoreProvider subscribes — the backup cannot silently miss a collection the app writes (source-pinned) (WA pin amendment: 35 → 38 subscriptions)");
+  }
+  check(file6.collections.journal.every((e, i, arr) =>
+          i === 0 || String(arr[i - 1].ts) < String(e.ts) ||
+          (String(arr[i - 1].ts) === String(e.ts) && String(arr[i - 1].id) <= String(e.id))) &&
+        file6.manifest.journalFingerprint === backup.journalFingerprint(file6.collections.journal),
+    "assembly: the exported journal rides in the store's own order (ts, then id) and the manifest fingerprint is computed over exactly the exported array");
+  check(file6.platform.events.length === 1 && file6.platform.payments.length === 1 &&
+        file6.platform.events[0].data.businessId === A6 && file6.platform.payments[0].data.businessId === A6 &&
+        file6.manifest.platformCounts.events === 1 && file6.manifest.platformCounts.payments === 1 &&
+        file6.manifest.platformCounts.members === 1 && file6.manifest.platformCounts.registry === 1,
+    "assembly: the platform slice is the business's OWN only — the foreign business's event and payment handed to the assembler are filtered out at the lib seam (§9), and the platform counts say so");
+  check(backup.docsEqual(file6.owner, ownerDoc6) &&
+        backup.verifyBackup(file6).ok === true &&
+        backup.verifyBackup(J6(file6)).ok === true,
+    "assembly: the owner doc rides verbatim, and the file verifies — in memory and after a JSON write/read round-trip (the file as a file still matches its manifest)");
+
+  /* ---- the tamper ladder: verification before any write ---- */
+  const tamper = (fn) => { const f = J6(file6); fn(f); return f; };
+  check(backup.verifyBackup(tamper((f) => { f.manifest.counts.bills += 1; })).problem === "manifest-mismatch" &&
+        backup.verifyBackup(tamper((f) => { f.collections.journal[0].lines[0].debit += 5; })).problem === "manifest-mismatch" &&
+        backup.verifyBackup(tamper((f) => { f.collections.products.pop(); })).problem === "manifest-mismatch" &&
+        backup.verifyBackup(tamper((f) => { f.manifest.platformCounts.members = 9; })).problem === "manifest-mismatch" &&
+        backup.verifyBackup(tamper((f) => { f.manifest.journalFingerprint = "0".repeat(64); })).problem === "manifest-mismatch",
+    "verify: a tampered count, a tampered journal line, a dropped document, a tampered platform count and a forged fingerprint EACH fail the recompute — the manifest is a proof, not a label");
+  check(backup.verifyBackup(tamper((f) => { f.formatVersion = 99; })).problem === "unknown-format" &&
+        backup.verifyBackup(tamper((f) => { f.manifest.schemaVersion = 7; })).problem === "unknown-format" &&
+        backup.verifyBackup(tamper((f) => { f.kind = "something-else"; })).problem === "not-a-backup" &&
+        backup.verifyBackup(null).problem === "not-a-backup" &&
+        backup.verifyBackup(tamper((f) => { delete f.manifest; })).problem === "not-a-backup",
+    "verify: an unknown format version (file or manifest schema) is refused as unknown-format — a future format is refused or converted, never misread — and non-backups are refused as not-a-backup");
+
+  /* ---- selector digest: the round-trip's measuring instrument ---- */
+  const allRange6 = reports.resolveReportRange("custom", null, { from: "2000-01-01", to: "2100-12-31" });
+  function digest6(cols) {
+    const j = cols.journal;
+    const tb = reports.trialBalance(j, allRange6);
+    const perCustomer = {};
+    for (const c of cols.credits) {
+      const k = ledger.creditKey(c);
+      perCustomer[k] = ledger.customerOutstanding(cols.credits, k);
+    }
+    const perSupplier = {};
+    for (const s of cols.suppliers) {
+      perSupplier[s.id] = ledger.supplierBalance(cols.purchases, cols.supplierPayments, s.id, cols.purchaseReturns);
+    }
+    const perAccount = {};
+    for (const a of cols.accounts) perAccount[a.id] = ledger.moneyAccountBalance(j, a);
+    const perProduct = {};
+    for (const p of cols.products) perProduct[p.id] = stock.rowsTotal(cols.stockLevels, p.id);
+    return {
+      tb: [tb.totalDebits, tb.totalCredits, tb.closingDebits, tb.closingCredits, tb.balanced],
+      tbRows: tb.rows.map((r) => [r.account, r.debitTotal, r.creditTotal, r.closing]),
+      inventory: ledger.accountBalance(j, "inventory"),
+      cash: ledger.cashBalance(j),
+      payables: ledger.payablesTotal(j),
+      receivables: ledger.receivablesTotal(j),
+      perCustomer, perSupplier, perAccount, perProduct,
+      counts: Object.fromEntries(backup.TENANT_COLLECTIONS.map((n) => [n, (cols[n] || []).length])),
+    };
+  }
+  const sourceDigest6 = digest6(shopCollections);
+
+  /* ---- restore into a fresh namespace ---- */
+  const bornOwner6 = { shopName: "New Shop", staffEmails: [], staff: [] };
+  const freshTarget6 = { ...backup.emptyNamespace(), owner: bornOwner6 };
+  const plan6 = backup.planRestore({ file: file6, targetBusinessId: B6, target: freshTarget6, actorUid: B6, nowISO: NOW6 });
+  check(plan6.ok === true && plan6.alreadyRestored === false && plan6.skipped === 0,
+    "restore: a fresh, empty namespace plans cleanly — nothing skipped, nothing already there");
+  check(plan6.ok && plan6.writes.filter((w) => w.kind === "set").length === file6.manifest.totalDocs + 2 &&
+        plan6.writes.every((w) => w.kind !== "set" ||
+          w.path.startsWith(`users/${B6}`) || w.path.startsWith(`businessMembers/${B6}/`) || w.path.startsWith(`businessInvites/${B6}/`)) &&
+        !plan6.writes.some((w) => w.kind === "set" && w.path.includes(A6)),
+    "restore: the plan writes every tenant document + the owner doc + the re-keyed membership and invite — and NO write path enters the SOURCE business's namespace (users-tree purity, target side)");
+  {
+    const sets6 = plan6.writes.map((w, i) => [w, i]).filter(([w]) => w.kind === "set");
+    const ownerIdx = sets6.find(([w]) => w.path === `users/${B6}`)[1];
+    const lastSetIdx = sets6[sets6.length - 1][1];
+    const lastWrite = plan6.writes[plan6.writes.length - 1];
+    check(ownerIdx === lastSetIdx && lastWrite.kind === "add" && lastWrite.collection === "businessEvents" &&
+          lastWrite.data.kind === "restore.performed" && lastWrite.data.businessId === B6 &&
+          lastWrite.data.detail.sourceBusinessId === A6 &&
+          lastWrite.data.detail.journalFingerprint === file6.manifest.journalFingerprint,
+      "restore: the owner doc lands LAST among the data writes (the source shop's period lock can never gate the transplant's own dated creates) and the plan's final write is the restore.performed platform event citing the source business + the manifest fingerprint");
+  }
+  check(plan6.ok && plan6.writes.filter((w) => w.kind === "set" && w.path.includes("/journal/"))
+          .every((w) => backup.docsEqual(w.data, file6.collections.journal.find((e) => String(e.id) === w.path.split("/").pop()))),
+    "restore: every journal write is the backup's own document, byte for byte — a transplant of data, never a composed posting (restore's journal effect is zero BY CONSTRUCTION)");
+
+  const restored6 = backup.applyRestoreWrites(backup.emptyNamespace(), B6, plan6.writes);
+  check(restored6.owner !== null && backup.docsEqual(restored6.owner, file6.owner) &&
+        backup.journalFingerprint(backup.sortJournalDocs(restored6.collections.journal)) === file6.manifest.journalFingerprint &&
+        restored6.collections.journal.length === 21,
+    "round-trip: backup → empty namespace → restore reproduces the journal exactly — recomputed fingerprint equals the manifest's, 21 entries, owner doc verbatim");
+  check(backup.canonicalJson(digest6(restored6.collections)) === backup.canonicalJson(sourceDigest6),
+    "round-trip: EVERY selector reads the restored business identically to the source — trial balance (rows + totals), inventory/cash/payables/receivables, per-customer outstanding, per-supplier balances, per-account money balances, per-product stock rows, all counts");
+  {
+    const j = restored6.collections.journal;
+    check(ledger.accountBalance(j, "inventory") === 272805 && ledger.cashBalance(j) === 50000 &&
+          ledger.payablesTotal(j) === 27900 && ledger.receivablesTotal(j) === 5500,
+      "round-trip: the frozen seed identities stand on the restored business — inventory 272,805 · cash 50,000 · payables 27,900 · receivables 5,500 (and TB 0 via the digest)");
+  }
+  check(restored6.members.length === 1 && restored6.members[0].key === "uid-staff-1" &&
+        restored6.members[0].data.role === "manager" && restored6.invites.length === 1 &&
+        restored6.events.length === 1 && restored6.events[0].kind === "restore.performed",
+    "round-trip: the team lands in the restored business — the membership and the pending invite re-keyed with their roles, and exactly one restore.performed event recorded");
+
+  /* ---- the refusal truth table ---- */
+  const planInto = (target, file) =>
+    backup.planRestore({ file: file ?? file6, targetBusinessId: B6, target, actorUid: B6, nowISO: NOW6 });
+  {
+    const altered = backup.emptyNamespace();
+    altered.collections.journal = J6(file6.collections.journal);
+    altered.collections.journal[0] = { ...altered.collections.journal[0], lines: altered.collections.journal[0].lines.map((l, i) => i === 0 ? { ...l, debit: l.debit + 1 } : l) };
+    const p = planInto(altered);
+    check(p.ok === false && p.reason === "target-not-empty" && p.writes.length === 0 &&
+          p.conflicts.some((c) => c.includes("/journal/")),
+      "refusal: a target whose journal holds the backup's entry with ONE line altered is refused target-not-empty, naming the entry — the live book is never overwritten");
+  }
+  {
+    const extra = backup.emptyNamespace();
+    extra.collections.journal = [...J6(file6.collections.journal),
+      { id: "j-foreign", memo: "not from the backup", refType: "seed", ref: null, ts: NOW6, lines: [] }];
+    const p = planInto(extra);
+    check(p.ok === false && p.reason === "target-not-empty" && p.conflicts.some((c) => c.endsWith("/journal/j-foreign")),
+      "refusal: a target with a journal entry the backup does not contain is refused — an existing journal, however small, closes the door (design §9's emptiness law)");
+  }
+  {
+    const stray = backup.emptyNamespace();
+    stray.collections.cheques = [{ id: "chq-1", amount: 500 }];
+    const p = planInto(stray);
+    check(p.ok === false && p.reason === "target-not-empty" && p.conflicts.some((c) => c.includes("/cheques/chq-1")),
+      "refusal: a single stray document in ANY collection (here a cheque) refuses the restore — emptiness is probed across the whole namespace, not just the journal");
+  }
+  {
+    const memberTarget = backup.emptyNamespace();
+    memberTarget.members = [{ key: "uid-other", data: { email: "other@x.pk", role: "cashier", addedBy: B6, addedAt: NOW6, source: "invite" } }];
+    const p = planInto(memberTarget);
+    check(p.ok === false && p.reason === "target-not-empty" && p.conflicts.some((c) => c.startsWith("businessMembers/")),
+      "refusal: a membership the target gained on its own refuses the restore — the transplant does not silently overwrite the target's own acts");
+  }
+  check(planInto(backup.emptyNamespace(), tamper((f) => { f.manifest.counts.sales += 2; })).reason === "manifest-mismatch" &&
+        planInto(backup.emptyNamespace(), tamper((f) => { f.formatVersion = 2; })).reason === "unknown-format" &&
+        planInto(backup.emptyNamespace(), { hello: "world" }).reason === "not-a-backup",
+    "refusal: the planner surfaces the verification ladder unchanged — manifest-mismatch, unknown-format, not-a-backup — before the target is even considered");
+
+  /* ---- resume + idempotence ---- */
+  {
+    const dataWrites = plan6.writes.slice(0, -1); // all but the event
+    const half = Math.floor(dataWrites.length / 2);
+    const partial = backup.applyRestoreWrites(backup.emptyNamespace(), B6, dataWrites.slice(0, half));
+    const plan2 = backup.planRestore({ file: file6, targetBusinessId: B6, target: partial, actorUid: B6, nowISO: NOW6 });
+    const appliedPaths = new Set(dataWrites.slice(0, half).filter((w) => w.kind === "set").map((w) => w.path));
+    check(plan2.ok === true && plan2.skipped === half &&
+          plan2.writes.every((w) => w.kind !== "set" || !appliedPaths.has(w.path)) &&
+          plan2.writes[plan2.writes.length - 1].kind === "add",
+      "resume: an interrupted restore re-plans exactly the missing remainder — every already-written document skipped byte-identically, no write repeated, the completion event still last");
+    const finished = backup.applyRestoreWrites(partial, B6, plan2.writes);
+    check(backup.canonicalJson(digest6(finished.collections)) === backup.canonicalJson(sourceDigest6) &&
+          finished.events.length === 1,
+      "resume: the resumed restore lands byte-identical to the single-run restore (same selector digest) with exactly ONE restore.performed event");
+    const plan3 = backup.planRestore({ file: file6, targetBusinessId: B6, target: finished, actorUid: B6, nowISO: NOW6 });
+    check(plan3.ok === true && plan3.alreadyRestored === true && plan3.writes.length === 0 && plan3.event === null,
+      "resume: re-running a completed restore is a clean no-op — zero writes, no second event (the audit log records the act once)");
+  }
+
+  /* ---- surface + invariant wiring ---- */
+  {
+    const backupSrc = readSrc6("lib/backup.ts");
+    const panelSrc = readSrc6("components/BackupPanel.tsx");
+    const settingsSrc = readSrc6("components/SettingsView.tsx");
+    const storeSrc = readSrc6("components/StoreProvider.tsx");
+    check(!/^import/m.test(backupSrc) && !backupSrc.includes("firebase"),
+      "purity: lib/backup imports nothing — no Firebase, no ledger, no store; the planner cannot compose a journal entry because it has no composition machinery (the F/G pure-lib discipline)");
+    check((storeSrc.match(/makeEntry\(/g) || []).length === 24,
+      "invariant: the store still composes exactly 24 makeEntry( sites — backup/restore added none (restore writes documents; it never posts)");
+    check(settingsSrc.includes('{!isStaff && mode !== "demo" && <BackupPanel />}') &&
+          !panelSrc.includes("derivePlanState") && !panelSrc.includes("planView") && !panelSrc.includes("planState"),
+      "surface: the backup card mounts owner-only outside demo, and the panel never consults plan state — export stays available in trial, grace, read-only and suspended alike (§3.7's data right, enforced by absence)");
+    check(crypto.createHash("sha256").update(stripH3Blocks(stripWaBlocks(stripFR2Blocks(fs.readFileSync("/home/hatch/workspace/ai-dukaan-ai/firebase/firestore.rules", "utf8")))), "utf8").digest("hex") ===
+          "734f6ba4cebc9c19203e0d022b810a7e1c76e57fd644d040abbe2a421ad7d3ad",
+      "rules: G6 changes no rules — v9 FINAL byte-identical (SHA 734f6ba4…); restore rides the owner's own existing legs and backup is reads only (H3 same-check amendment: the hash runs over stripH3Blocks(rules) — v10 minus the H3 spans IS v9, strip-proven in the H3 suite; G6's own verdict stands: H3's backup-slice growth rides the platform collections, not new rules) (WA same-check amendment: the composed strip also cuts the delimited WhatsApp spans — the amended v10 minus WhatsApp is the H3-final v10, strip-proven in the WA suite; WA's backup-slice growth rides the tenant manifest, not new rules legs beyond its own member-scoped spans) (FR2 same-check amendment: the strip first cuts the delimited FR2 spans — v11 minus FR2 is v10)");
+    const backupKeys = Object.keys(i18n.en).filter((k) => k.startsWith("backup."));
+    check(backupKeys.length === 25 && backupKeys.every((k) => typeof i18n.ur[k] === "string" && i18n.ur[k].length > 0 && i18n.en[k].length > 0),
+      "i18n: all 25 backup.* keys exist in EN and UR with real copy — the backup surface is bilingual like every other surface (dictionary 3,054 after the WA pin amendment (+109 WhatsApp keys); 2,945 after H3; 2,837 after H1; 2,786 after G6)");
+  }
+}
+
+/* ================================ H1 ================================ */
+suite("H1", null); // Phase H · H1 — loyalty journal core (design §1 doctrine, §5.1 catalogue, §6 H1)
+{
+  const S = loyalty.resolveLoyaltySettings({ loyalty: { enabled: true } });
+  const CUST = "h1-cust";
+  const T = (d) => `${d}T05:00:00.000Z`; // 10:00 PKT the same day
+
+  /* ---- settings resolver: absent block = defaults + OFF ---- */
+  const off = loyalty.resolveLoyaltySettings({});
+  check(off.enabled === false && off.earnRsPerPointBase === 100 && off.pointValueRs === 1 &&
+        off.redeemCapPct === 50 && off.expiryMonths === 12 && off.silverAt === 500 &&
+        off.goldAt === 2000 && off.silverMult === 1.25 && off.goldMult === 1.5,
+    "resolver: an absent loyalty block resolves to the design's Q1 defaults with the programme OFF (opt-in)");
+  const partial = loyalty.resolveLoyaltySettings({ loyalty: { enabled: true, pointValueRs: 2, earnRsPerPointBase: -5, silverMult: 0.5 } });
+  check(partial.enabled === true && partial.pointValueRs === 2 && partial.earnRsPerPointBase === 100 && partial.silverMult === 1.25,
+    "resolver: owner values win field-by-field; invalid figures (negative base, sub-1 multiplier) fall back to defaults");
+
+  /* ---- the two additive COA codes + their registry followers ---- */
+  check(coa.ACCOUNT_CODES.length === 30 && coa.ACCOUNT_CODES[28] === "loyalty_payable" && coa.ACCOUNT_CODES[29] === "expense_loyalty",
+    "COA: exactly two codes appended (28→30), since \"H\" — every prior code keeps its place");
+  const lpMeta = coa.accountMeta("loyalty_payable");
+  const elMeta = coa.accountMeta("expense_loyalty");
+  check(lpMeta.type === "liability" && lpMeta.normalBalance === "credit" && lpMeta.since === "H" &&
+        elMeta.type === "expense" && elMeta.normalBalance === "debit" && elMeta.since === "H",
+    "COA: loyalty_payable is a credit-normal liability; expense_loyalty a debit-normal expense");
+  check(tally.TALLY_LEDGER_MAP.loyalty_payable.name === "Customer Loyalty Payable" &&
+        tally.TALLY_LEDGER_MAP.loyalty_payable.group === "Current Liabilities" &&
+        tally.TALLY_LEDGER_MAP.expense_loyalty.name === "Loyalty Programme Cost" &&
+        tally.TALLY_LEDGER_MAP.expense_loyalty.group === "Indirect Expenses" &&
+        tally.TALLY_VOUCHER_TYPE_BY_REFTYPE.loyalty_earn === "Journal" &&
+        tally.TALLY_VOUCHER_TYPE_BY_REFTYPE.loyalty_expire === "Journal",
+    "Tally: both codes map to their ledgers/groups; loyalty_earn + loyalty_expire export as Journal vouchers");
+  check(fiscal.plAccountCodes().includes("expense_loyalty") && !fiscal.plAccountCodes().includes("loyalty_payable") &&
+        fiscal.balanceSheetAccountCodes().includes("loyalty_payable"),
+    "FY close: expense_loyalty sweeps BY TYPE from the registry; the liability is never swept and rides the balance sheet");
+
+  /* ---- the frozen seed carries no loyalty ---- */
+  check(ledger.accountNormalBalance(journal, "loyalty_payable") === 0 &&
+        ledger.accountBalance(journal, "expense_loyalty") === 0 &&
+        loyalty.loyaltyCustomerIds(journal).length === 0 &&
+        !journal.some((e) => e.refType === "loyalty_earn" || e.refType === "loyalty_expire"),
+    "seed: both new codes read ZERO on the frozen seed journal and no loyalty entries exist there");
+  const seedNorm = journal.map((e) => { const { ts, ...rest } = e; return rest; });
+  check(crypto.createHash("sha256").update(JSON.stringify(seedNorm), "utf8").digest("hex") ===
+        "e17e5bda19e87de698b0c0a37e923f9b396bc387e2092b2ffbbd7d60d4971168",
+    "seed: the frozen journal fingerprint (SHA e17e5bda…1168) stands — H1 changed no seed content");
+
+  /* ---- plan gating (design §5.1/§5.2) ---- */
+  check(plans.moduleMinTier("loyalty") === "standard" &&
+        !plans.tierIncludesModule("core", "loyalty") && plans.tierIncludesModule("standard", "loyalty") &&
+        plans.REFTYPE_MIN_TIER.loyalty_expire === "standard" && !("loyalty_earn" in plans.REFTYPE_MIN_TIER),
+    "plans: loyalty joins the catalogue at Standard via GROWTH_MODULES; only loyalty_expire is tier-mapped (the earn rides the bill's Core invoice leg)");
+  check(perm.can("owner", "loyalty", "write") && perm.can("manager", "loyalty", "write") &&
+        perm.can("accountant", "loyalty", "view") && !perm.can("accountant", "loyalty", "write") &&
+        !perm.can("cashier", "loyalty", "view") && perm.can("cashier", "billing", "write"),
+    "RBAC: loyalty row — owner/manager full, accountant read, cashier none (the cashier's points tender rides the billing row)");
+
+  /* ---- makeEntry site discipline (design §6 H1) ---- */
+  const storeSrc = fs.readFileSync("/home/hatch/workspace/ai-dukaan-ai/web/components/StoreProvider.tsx", "utf8");
+  const loyaltySrc = fs.readFileSync("/home/hatch/workspace/ai-dukaan-ai/web/lib/loyalty.ts", "utf8");
+  check((storeSrc.match(/makeEntry\(/g) || []).length === 24,
+    "sites: StoreProvider still holds exactly 24 makeEntry( sites — loyalty added none there");
+  check((loyaltySrc.match(/makeEntry\(/g) || []).length === 3,
+    "sites: lib/loyalty.ts holds exactly the design's 3 named loyalty compositions (earn, clawback, expiry) — 24 + 3 = 27 posting compositions, redemption adds none (it is a leg)");
+
+  /* ---- the lifecycle walk ------------------------------------ */
+  let J = [];
+  const tbZero = (arr) => coa.ACCOUNT_CODES.reduce((a, c) => a + ledger.accountBalance(arr, c), 0) === 0;
+  const identities = (arr) => {
+    if (!tbZero(arr)) return false;
+    const gl = ledger.accountNormalBalance(arr, "loyalty_payable");
+    const byCust = loyalty.loyaltyRupeesByCustomer(arr);
+    let sum = 0;
+    for (const v of byCust.values()) sum += v;
+    if (!eq(gl, sum)) return false;
+    for (const [cid, rs] of byCust) {
+      const pos = loyalty.customerLoyalty(arr, cid, S, "2027-06-01T00:00:00.000Z");
+      if (!eq(pos.rupees, rs)) return false;
+      if (!eq(pos.rupees, pos.vintages.reduce((a, v) => a + v.rsUnspent, 0))) return false;
+    }
+    return true;
+  };
+  const billWithEarn = (id, billNo, total, cost, ts, extraLines = [], payload = null) => {
+    const e = ledger.makeEntry(`Bill #${billNo}`, "bill", id, [
+      { account: "cash", debit: total - (extraLines.reduce((a, l) => a + l.debit, 0)), credit: 0 },
+      ...extraLines,
+      { account: "cogs", debit: cost, credit: 0 },
+      { account: "sales_revenue", debit: 0, credit: total },
+      { account: "inventory", debit: 0, credit: cost },
+    ], { ts });
+    if (payload) Object.assign(e, payload);
+    J.push(e);
+    const earn = loyalty.buildLoyaltyEarnEntry({
+      journal: J, bill: { id, billNo, customerId: CUST, total }, settings: S, ts,
+    });
+    if (earn) J.push(earn);
+    return earn;
+  };
+
+  // Step 1 — earn on a cash bill (Standard tier).
+  const earn1 = billWithEarn("h1-b1", 1, 10000, 6000, T("2026-01-05"));
+  check(!!earn1 && earn1.refType === "loyalty_earn" && earn1.refId === "h1-b1" && earn1.points === 100 &&
+        earn1.rsPerPoint === 1 && earn1.loyaltyExpiryMonths === 12 && earn1.loyaltyTierMult === 1 &&
+        earn1.lines[0].account === "expense_loyalty" && earn1.lines[0].debit === 100 &&
+        earn1.lines[1].account === "loyalty_payable" && earn1.lines[1].credit === 100 && earn1.lines[1].ref === CUST,
+    "earn: Dr expense_loyalty / Cr loyalty_payable (ref = customer) at 1 pt per Rs 100, with rate + horizon + multiplier snapshots on the entry");
+  check(identities(J), "step 1 (first earn): TB == 0 and both audit identities hold");
+
+  // Step 2 — earn across bills, crossing Silver then Gold (speed only).
+  billWithEarn("h1-b2", 2, 150000, 90000, T("2026-02-01"));
+  const earn3 = billWithEarn("h1-b3", 3, 10000, 6000, T("2026-02-02"));
+  check(!!earn3 && earn3.points === 125 && earn3.loyaltyTierMult === 1.25,
+    "tiers: at 1,600 trailing points the customer is Silver — the next earn runs at 1.25× SPEED (125 pts on Rs 10,000)");
+  billWithEarn("h1-b4", 4, 40000, 24000, T("2026-02-03"));
+  const earn5 = billWithEarn("h1-b5", 5, 10000, 6000, T("2026-02-04"));
+  check(!!earn5 && earn5.points === 150 && earn5.loyaltyTierMult === 1.5,
+    "tiers: at 2,225 trailing points the customer is Gold — earn speed 1.5× (150 pts on Rs 10,000), the point still worth Rs 1");
+  const posAfterEarns = loyalty.customerLoyalty(J, CUST, S, T("2026-02-04"));
+  check(posAfterEarns.points === 2375 && eq(posAfterEarns.rupees, 2375) && posAfterEarns.tier === "gold",
+    "position: 2,375 points = Rs 2,375 after five bills (100 + 1,500 + 125 + 500 + 150)");
+  check(identities(J), "step 2 (tier-crossing earns): TB == 0 and both audit identities hold");
+
+  // Step 3 — redeem as a split tender INSIDE the bill entry.
+  const q6 = loyalty.loyaltyRedemptionQuote(J, CUST, 500, loyalty.loyaltyRedeemCapRs(2000, S));
+  check(q6.points === 500 && eq(q6.rs, 500), "redeem quote: 500 points settle Rs 500 (under the 50% cap of a Rs 2,000 bill)");
+  const earn6 = billWithEarn("h1-b6", 6, 2000, 1200, T("2026-02-05"),
+    [{ account: "loyalty_payable", debit: 500, credit: 0, ref: CUST }],
+    { loyaltyPointsUsed: 500 });
+  const b6Entry = J.find((e) => e.refId === "h1-b6" && e.refType === "bill");
+  check(!!b6Entry && b6Entry.loyaltyPointsUsed === 500 &&
+        b6Entry.lines.some((l) => l.account === "loyalty_payable" && l.debit === 500 && l.ref === CUST) &&
+        !!earn6 && earn6.points === 30,
+    "redeem: the Dr loyalty_payable leg rides INSIDE bill #6's entry beside the cash leg (payload carries the count); the bill still earns (30 pts at Gold speed on its full total)");
+  const posAfterRedeem = loyalty.customerLoyalty(J, CUST, S, T("2026-02-05"));
+  check(posAfterRedeem.points === 1905 &&
+        posAfterRedeem.vintages[0].pointsUnspent === 0 && posAfterRedeem.vintages[1].pointsUnspent === 1100,
+    "FIFO: redemption consumed the oldest vintage first (bill #1's 100 gone, bill #2's vintage down to 1,100)");
+  check(identities(J), "step 3 (split-tender redemption): TB == 0 and both audit identities hold");
+
+  // Step 4 — partial return: proportional re-credit (points, never
+  // cash) + the floored clawback companion.
+  const rec1 = loyalty.loyaltyRecreditForReturn(J, { id: "h1-b6", total: 2000 }, 1000, false);
+  check(rec1.points === 250 && eq(rec1.rs, 250),
+    "return: half of bill #6 given back re-credits half its tender — 250 points as POINTS (fold-priced LIFO restore)");
+  const ret1 = ledger.makeEntry("Return against Bill #6", "return", "h1-b6", [
+    { account: "sales_revenue", debit: 1000, credit: 0 },
+    { account: "inventory", debit: 600, credit: 0 },
+    { account: "loyalty_payable", debit: 0, credit: rec1.rs, ref: CUST },
+    { account: "cash", debit: 0, credit: 750 },
+    { account: "cogs", debit: 0, credit: 600 },
+  ], { ts: T("2026-02-06") });
+  ret1.loyaltyPointsReturned = rec1.points;
+  J.push(ret1);
+  const clawPts1 = loyalty.loyaltyClawbackPoints({ journal: J, bill: { id: "h1-b6", total: 2000 }, refundTotalRs: 1000, priorRefundedRs: 0, completesBill: false });
+  const claw1 = loyalty.buildLoyaltyClawbackEntry({
+    journal: J, bill: { id: "h1-b6", billNo: 6, customerId: CUST },
+    clawPoints: clawPts1, refId: "h1-cn-1", memo: "Loyalty points taken back — return on Bill #6", ts: T("2026-02-06"),
+  });
+  check(clawPts1 === 15 && !!claw1 && claw1.points === -15 && claw1.refType === "loyalty_earn" &&
+        claw1.refId === "h1-cn-1" && claw1.loyaltySourceBillId === "h1-b6" &&
+        claw1.lines[0].account === "loyalty_payable" && claw1.lines[0].debit === 15,
+    "clawback: floor(30 × 1,000/2,000) = 15 points taken back as a negative-points loyalty_earn entry citing the credit note, naming its source bill");
+  J.push(claw1);
+  check(loyalty.customerLoyalty(J, CUST, S, T("2026-02-06")).points === 2140 && identities(J),
+    "step 4 (partial return): position 1,905 + 250 re-credited − 15 clawed = 2,140; TB == 0, identities hold");
+
+  // Step 5 — the completing return absorbs the exact remainders.
+  const rec2 = loyalty.loyaltyRecreditForReturn(J, { id: "h1-b6", total: 2000 }, 1000, true);
+  const ret2 = ledger.makeEntry("Return against Bill #6", "return", "h1-b6", [
+    { account: "sales_revenue", debit: 1000, credit: 0 },
+    { account: "inventory", debit: 600, credit: 0 },
+    { account: "loyalty_payable", debit: 0, credit: rec2.rs, ref: CUST },
+    { account: "cash", debit: 0, credit: 750 },
+    { account: "cogs", debit: 0, credit: 600 },
+  ], { ts: T("2026-02-07") });
+  ret2.loyaltyPointsReturned = rec2.points;
+  J.push(ret2);
+  // priorRefundedRs is the store's own reading of the first
+  // return's SaleReturn doc: cash refund 750 + udhaar reduction 0
+  // + points re-credit Rs 250 = the full Rs 1,000 give-back.
+  const clawPts2 = loyalty.loyaltyClawbackPoints({ journal: J, bill: { id: "h1-b6", total: 2000 }, refundTotalRs: 1000, priorRefundedRs: 1000, completesBill: true });
+  const claw2 = loyalty.buildLoyaltyClawbackEntry({
+    journal: J, bill: { id: "h1-b6", billNo: 6, customerId: CUST },
+    clawPoints: clawPts2, refId: "h1-cn-2", memo: "Loyalty points taken back — return on Bill #6", ts: T("2026-02-07"),
+  });
+  if (claw2) J.push(claw2);
+  const posAfterReturns = loyalty.customerLoyalty(J, CUST, S, T("2026-02-07"));
+  check(rec2.points === 250 && clawPts2 === 15 && posAfterReturns.points === 2375 &&
+        posAfterReturns.vintages.find((v) => v.billId === "h1-b6").pointsUnspent === 0 &&
+        posAfterReturns.vintages[0].pointsUnspent === 100 && posAfterReturns.vintages[1].pointsUnspent === 1500,
+    "completing return: the tender restores in full (vintages #1/#2 whole again), the earn is clawed to zero — position back to exactly 2,375");
+  check(identities(J), "step 5 (completing return): TB == 0 and both audit identities hold");
+
+  // Step 6 — void: the mirror reverses the tender whole, and the
+  // earn reversal companion takes the earn back in full.
+  const q7 = loyalty.loyaltyRedemptionQuote(J, CUST, 1000, loyalty.loyaltyRedeemCapRs(3000, S));
+  const earn7 = billWithEarn("h1-b7", 7, 3000, 1800, T("2026-02-08"),
+    [{ account: "loyalty_payable", debit: q7.rs, credit: 0, ref: CUST }],
+    { loyaltyPointsUsed: q7.points });
+  check(q7.points === 1000 && !!earn7 && earn7.points === 45 &&
+        loyalty.customerLoyalty(J, CUST, S, T("2026-02-08")).points === 1420,
+    "void setup: bill #7 spends 1,000 points and earns 45 — position 1,420");
+  const voidEntry = ledger.makeEntry("Bill #7 voided", "bill_void", "h1-b7", [
+    { account: "sales_revenue", debit: 3000, credit: 0 },
+    { account: "inventory", debit: 1800, credit: 0 },
+    { account: "cash", debit: 0, credit: 2000 },
+    { account: "loyalty_payable", debit: 0, credit: 1000, ref: CUST },
+    { account: "cogs", debit: 0, credit: 1800 },
+  ], { ts: T("2026-02-09") });
+  voidEntry.loyaltyPointsReturned = 1000;
+  J.push(voidEntry);
+  const earnBack = (earn7.points ?? 0) - loyalty.billLoyaltyClawedPoints(J, "h1-b7");
+  const voidClaw = loyalty.buildLoyaltyClawbackEntry({
+    journal: J, bill: { id: "h1-b7", billNo: 7, customerId: CUST },
+    clawPoints: earnBack, refId: "h1-b7", memo: "Loyalty earn reversed — Bill #7 voided",
+    ts: T("2026-02-09"), reversesId: earn7.id,
+  });
+  if (voidClaw) J.push(voidClaw);
+  check(loyalty.customerLoyalty(J, CUST, S, T("2026-02-09")).points === 2375 &&
+        loyalty.billLoyaltyEarnEntry(J, "h1-b7") === null && identities(J),
+    "step 6 (void): tender restored whole by the mirror + earn reversed in full (marked reversed) — position exactly 2,375; TB == 0, identities hold");
+
+  // Step 7 — FY close sweeps the cost, never the liability.
+  const fyRange = periods.fiscalYearRange(null, "2026-02-10T00:00:00.000Z");
+  const closeEntry = fiscal.buildFiscalClosingEntry(J, fyRange, "per-h1-1");
+  const loyCloseLine = closeEntry ? closeEntry.lines.find((l) => l.account === "expense_loyalty") : null;
+  check(!!closeEntry && !!loyCloseLine && eq(loyCloseLine.credit, 2375) && loyCloseLine.debit === 0 &&
+        !closeEntry.lines.some((l) => l.account === "loyalty_payable"),
+    "FY close: the closing entry sweeps expense_loyalty's full Rs 2,375 to retained earnings and never touches loyalty_payable");
+  J.push(closeEntry);
+  check(ledger.accountBalance(J, "expense_loyalty") === 0 &&
+        eq(ledger.accountNormalBalance(J, "loyalty_payable"), 2375) && identities(J),
+    "step 7 (post-close): programme cost reads zero in the new year while the Rs 2,375 liability carries forward untouched");
+
+  // Step 8 — expiry: derived due-list, owner-posted cost release.
+  const due = loyalty.loyaltyExpiryDue(J, "2027-01-05T10:00:00.000Z", CUST);
+  const totalsBefore = loyalty.loyaltyProgrammeTotals(J, "2027-01-05T10:00:00.000Z");
+  check(due.length === 1 && due[0].vintage.billId === "h1-b1" && due[0].vintage.pointsUnspent === 100 &&
+        totalsBefore.expiredUnpostedPoints === 100 && eq(totalsBefore.liabilityRs, 2375),
+    "expiry: only bill #1's vintage is due at its snapshotted 12 months — and until posted it still sits IN the liability (nothing expires on its own)");
+  const expEntry = loyalty.buildLoyaltyExpiryEntry({
+    customerId: CUST, customerName: "H1 Customer", vintage: due[0].vintage, ts: "2027-01-05T10:00:00.000Z",
+  });
+  check(!!expEntry && expEntry.refType === "loyalty_expire" && expEntry.refId === due[0].vintage.earnEntryId &&
+        expEntry.points === 100 && expEntry.lines[0].account === "loyalty_payable" && expEntry.lines[0].debit === 100 &&
+        expEntry.lines[1].account === "expense_loyalty" && expEntry.lines[1].credit === 100,
+    "expiry release: Dr loyalty_payable / Cr expense_loyalty at the vintage's snapshot rate — a COST release, never revenue (no sales_revenue line)");
+  J.push(expEntry);
+  check(loyalty.customerLoyalty(J, CUST, S, "2027-01-06T00:00:00.000Z").points === 2275 &&
+        eq(ledger.accountBalance(J, "expense_loyalty"), -100) && identities(J),
+    "step 8 (expiry posted): position 2,275; the release lands as a Rs 100 credit in the new FY's programme cost; TB == 0, identities hold");
+  const spentVintage = loyalty.customerLoyalty(J, CUST, S, "2027-01-06T00:00:00.000Z").vintages.find((v) => v.billId === "h1-b6");
+  check(loyalty.buildLoyaltyExpiryEntry({ customerId: CUST, customerName: "H1 Customer", vintage: spentVintage, ts: "2027-01-06T00:00:00.000Z" }) === null,
+    "expiry: a fully-spent vintage composes no release (null, not a zero entry)");
+
+  /* ---- the report (customers family) ---- */
+  const rep = loyalty.loyaltyReport(J, { fromTs: "2026-01-01T00:00:00.000Z", toTs: "2026-03-01T00:00:00.000Z" });
+  check(rep.earnedPoints === 2450 && rep.redeemedPoints === 1500 && rep.recreditedPoints === 1500 &&
+        rep.clawedPoints === 75 && rep.expiredPoints === 0 && eq(rep.liabilityRs, 2375) &&
+        rep.rows.length === 1 && rep.rows[0].points === 2375 && eq(rep.rows[0].rupees, 2375),
+    "report: Jan–Feb movements earned 2,450 / redeemed 1,500 / re-credited 1,500 / clawed 75, closing liability Rs 2,375 — the same fold the desk reads");
+
+  /* ---- Tally: the customer's loyalty ledger is a party ledger ---- */
+  const tallyRange = reports.resolveReportRange("custom", null, { from: "2026-01-01", to: "2026-12-31" });
+  const model = tally.buildTallyExport(J, { customers: [{ id: CUST, name: "H1 Customer" }], suppliers: [] }, { shopName: "Madina General Store" }, tallyRange);
+  const partyMaster = model.masters.find((m) => m.name === "H1 Customer");
+  const costMaster = model.masters.find((m) => m.name === "Loyalty Programme Cost");
+  check(!!partyMaster && partyMaster.group === "Current Liabilities" && partyMaster.isParty === true &&
+        !!costMaster && costMaster.group === "Indirect Expenses",
+    "Tally export: the customer's points sit in a per-customer ledger under Current Liabilities; the programme cost under Indirect Expenses");
+
+  /* ---- guardrails ---- */
+  const posNow = loyalty.customerLoyalty(J, CUST, S, "2027-01-06T00:00:00.000Z");
+  const overBalance = loyalty.loyaltyRedemptionQuote(J, CUST, 999999, 100000000);
+  check(overBalance.points === posNow.redeemablePoints && eq(overBalance.rs, 2275),
+    "guardrail: a redemption can never exceed the derived balance — the quote clamps to 2,275 spendable points");
+  const overCap = loyalty.loyaltyRedemptionQuote(J, CUST, 2275, loyalty.loyaltyRedeemCapRs(100, S));
+  check(eq(overCap.rs, 50) && overCap.points === 50,
+    "guardrail: the 50% redeem cap binds — a Rs 100 bill takes at most Rs 50 of points");
+  check(loyalty.buildLoyaltyEarnEntry({ journal: J, bill: { id: "h1-walk", billNo: 99, customerId: null, total: 5000 }, settings: S, ts: T("2026-02-10") }) === null &&
+        loyalty.loyaltyEarnQuote(J, CUST, 50, S, T("2026-02-10")) === null,
+    "guardrail: walk-in bills earn nothing, and a bill under the Rs 100 base earns nothing");
+  check(loyalty.loyaltyEarnQuote(J, CUST, 10000, off, T("2026-02-10")) === null &&
+        loyalty.buildLoyaltyEarnEntry({ journal: J, bill: { id: "h1-off", billNo: 98, customerId: CUST, total: 10000 }, settings: off, ts: T("2026-02-10") }) === null &&
+        loyalty.loyaltyRedemptionQuote(J, CUST, 100, 100000).points === 100,
+    "guardrail: disabling the programme stops future earns — existing balances remain redeemable (the quote never consults the on/off switch)");
+
+  /* ---- snapshot rates: a point is worth what its EARN said ---- */
+  const S2 = loyalty.resolveLoyaltySettings({ loyalty: { enabled: true, pointValueRs: 2 } });
+  let J2 = [];
+  const e2bill = ledger.makeEntry("Bill #1", "bill", "h1x-b1", [
+    { account: "cash", debit: 10000, credit: 0 },
+    { account: "sales_revenue", debit: 0, credit: 10000 },
+  ], { ts: T("2026-03-01") });
+  J2.push(e2bill);
+  const e2arn = loyalty.buildLoyaltyEarnEntry({ journal: J2, bill: { id: "h1x-b1", billNo: 1, customerId: CUST, total: 10000 }, settings: S2, ts: T("2026-03-01") });
+  J2.push(e2arn);
+  const qSnap = loyalty.loyaltyRedemptionQuote(J2, CUST, 100, 100000);
+  check(!!e2arn && e2arn.points === 100 && eq(e2arn.lines[0].debit, 200) && qSnap.points === 100 && eq(qSnap.rs, 200),
+    "snapshots: earned at Rs 2/point, the vintage carries Rs 200 of liability and redeems at Rs 200 even after the setting returns to Rs 1 — the rate is the entry's, not today's");
+
+  /* ---- clawback flooring: the remainder stays with the customer ---- */
+  let J3 = [];
+  J3.push(ledger.makeEntry("Bill #1", "bill", "h1y-b1", [
+    { account: "cash", debit: 300, credit: 0 },
+    { account: "sales_revenue", debit: 0, credit: 300 },
+  ], { ts: T("2026-03-01") }));
+  J3.push(loyalty.buildLoyaltyEarnEntry({ journal: J3, bill: { id: "h1y-b1", billNo: 1, customerId: CUST, total: 300 }, settings: S, ts: T("2026-03-01") }));
+  const clawSeq = [];
+  let prior = 0;
+  for (const completes of [false, false, true]) {
+    const pts = loyalty.loyaltyClawbackPoints({ journal: J3, bill: { id: "h1y-b1", total: 300 }, refundTotalRs: 100, priorRefundedRs: prior, completesBill: completes });
+    clawSeq.push(pts);
+    const ce = loyalty.buildLoyaltyClawbackEntry({ journal: J3, bill: { id: "h1y-b1", billNo: 1, customerId: CUST }, clawPoints: pts, refId: `h1y-ret-${clawSeq.length}`, memo: "clawback", ts: T("2026-03-02") });
+    if (ce) J3.push(ce);
+    prior += 100;
+  }
+  check(clawSeq.join(",") === "1,1,1" && loyalty.customerLoyalty(J3, CUST, S, T("2026-03-03")).points === 0,
+    "clawback flooring: a 3-point earn returned in thirds claws floor-wise 1 + 1 and the completing return absorbs the last 1 — never more than was earned");
+
+  /* ---- no rules surface for loyalty (design doctrine) ---- */
+  const rulesSrc = fs.readFileSync("/home/hatch/workspace/ai-dukaan-ai/firebase/firestore.rules", "utf8");
+  check(!stripH3Blocks(stripWaBlocks(stripFR2Blocks(rulesSrc))).includes("loyalty") &&
+        crypto.createHash("sha256").update(stripH3Blocks(stripWaBlocks(stripFR2Blocks(rulesSrc))), "utf8").digest("hex") === "734f6ba4cebc9c19203e0d022b810a7e1c76e57fd644d040abbe2a421ad7d3ad",
+    "rules: H1 adds NO rules block and no collection — firestore.rules stays v9 FINAL byte-identical; loyalty lives entirely inside the existing journal + bills legs (H3 same-check amendment: both prongs run over stripH3Blocks(rules) — the ONLY 'loyalty' string in v10 is H3's named §5.2 amendment inside its delimited span, asserted in the H3 suite; stripped, the file is v9 and loyalty-free exactly as H1 left it) (WA same-check amendment: both prongs run over the composed strip — the WhatsApp spans carry no 'loyalty' string either, asserted in the WA suite) (FR2 same-check amendment: the strip first cuts the delimited FR2 spans — v11 minus FR2 is v10, strip-proven in the FR2 suite)");
+
+  /* ---- i18n parity for the new strings ---- */
+  const loyPart = require("./out/i18n/parts/loyalty.js");
+  const loyKeys = Object.keys(loyPart.enLoyalty);
+  check(Object.keys(i18n.en).length === 3136 && Object.keys(i18n.ur).length === 3136 &&
+        loyKeys.length === 51 && Object.keys(loyPart.urLoyalty).length === 51 &&
+        loyKeys.every((k) => typeof i18n.ur[k] === "string" && i18n.ur[k].length > 0 && i18n.en[k].length > 0),
+    "i18n: 51 loyalty keys with real EN + UR copy (dictionary 3,054, EN ≡ UR — H1 pin amendment; H3 pin amendment: +108 storefront keys; WA pin amendment: +109 WhatsApp keys)");
+}
+
+/* =============================== H3 =============================== */
+{
+  suite("H3", null); // Phase H · H3 — the online storefront: published snapshot + slug rules, the create-only public inbox, exactly-once conversion with drift, the lit/dark derivation, rules v10 + strip proof, the backup slice, and the full order journey (design §2/§5.2)
+
+  const readSrcH3 = (p) => fs.readFileSync("/home/hatch/workspace/ai-dukaan-ai/web/" + p, "utf8");
+  const rulesH3 = fs.readFileSync("/home/hatch/workspace/ai-dukaan-ai/firebase/firestore.rules", "utf8");
+  const NOW_H3 = "2026-10-23T10:00:00.000Z";
+  const BIZ_H3 = "bizH3";
+  const settingsH3 = { shopName: "Madina General Store", phone: "0301-2345678" };
+  const productsH3 = [
+    { id: "p-rice", name: "Rice Basmati 5kg", urduName: "چاول باسمتی", category: "Grocery", salePrice: 1450, costPrice: 1200, stockQty: 40, reorderLevel: 5, unit: "bag" },
+    { id: "p-oil", name: "Cooking Oil 5L", category: "Grocery", salePrice: 2600, costPrice: 2450, stockQty: 3, reorderLevel: 5, unit: "tin" },
+    { id: "p-soap", name: "Soap Bar", category: "Care", salePrice: 120, costPrice: 80, stockQty: 0, reorderLevel: 2, unit: "pc" },
+    { id: "p-tea", name: "Tea 500g", category: "Grocery", salePrice: 950, costPrice: 800, stockQty: 12, reorderLevel: 3, unit: "pack" },
+  ];
+  const byPid = (docH3, pid) => docH3.products.find((p) => p.productId === pid);
+
+  /* ---- slug rules (§2.2/§2.6) ---- */
+  check(storefront.slugOk("madina-store") && storefront.slugOk("a1b") &&
+        storefront.slugOk("x".repeat(40)) && storefront.slugProblem("madina-store") === null,
+    "slug: lowercase letters/digits with single hyphens pass, at the 3..40 bounds");
+  check(storefront.slugProblem("") === "too-short" && storefront.slugProblem("ab") === "too-short",
+    "slug: under 3 chars is too-short");
+  check(storefront.slugProblem("x".repeat(41)) === "too-long",
+    "slug: over 40 chars is too-long");
+  check(storefront.slugProblem("Madina") === "bad-chars" && storefront.slugProblem("my shop") === "bad-chars" &&
+        storefront.slugProblem("-lead") === "bad-chars" && storefront.slugProblem("trail-") === "bad-chars" &&
+        storefront.slugProblem("double--hyphen") === "bad-chars" && storefront.slugProblem("under_score") === "bad-chars",
+    "slug: capitals, spaces, edge hyphens, double hyphens and underscores are bad-chars — no silent rewriting of a printed slug");
+  check(storefront.slugProblem("demo") === "reserved" && storefront.slugProblem("platform") === "reserved" &&
+        !storefront.slugOk("s") && !storefront.slugOk("storefront") &&
+        storefront.suggestSlug("Madina General Store") === "madina-general-store" &&
+        storefront.slugOk(storefront.suggestSlug("Madina General Store")),
+    "slug: route-colliding and lying slugs are refused (demo is the §5.3 preview's, never a shop's; the app's own route names likewise); the name suggestion is itself valid");
+
+  /* ---- stock bands (§2.2: bands, never counts) ---- */
+  check(storefront.stockBandFor({ stockQty: 0, reorderLevel: 5 }) === "out" &&
+        storefront.stockBandFor({ stockQty: -2, reorderLevel: 5 }) === "out" &&
+        storefront.stockBandFor({ stockQty: 5, reorderLevel: 5 }) === "low" &&
+        storefront.stockBandFor({ stockQty: 6, reorderLevel: 5 }) === "in" &&
+        storefront.stockBandFor({ stockQty: 1, reorderLevel: 0 }) === "in",
+    "bands: out at/below zero, low at/below the reorder level, in above it — the boundaries are the product's own reorder level");
+
+  /* ---- the snapshot (§2.2) ---- */
+  const snap1 = storefront.assembleStorefrontSnapshot({
+    businessId: BIZ_H3, slug: "madina-store", settings: settingsH3, city: "Sargodha",
+    logoDataUrl: null, products: productsH3, previous: null, nowISO: NOW_H3,
+  });
+  check(snap1.businessId === BIZ_H3 && snap1.slug === "madina-store" && snap1.shopName === "Madina General Store" &&
+        snap1.phone === "0301-2345678" && snap1.city === "Sargodha" && snap1.enabled === true &&
+        snap1.publishedAt === NOW_H3 && snap1.updatedAt === NOW_H3 && snap1.currency === "PKR" &&
+        !("tagline" in snap1) && !("notice" in snap1) && !("logoRef" in snap1),
+    "snapshot: the doc carries shop identity + PKR + the publish stamps; optional fields ride only when set");
+  check(Object.keys(byPid(snap1, "p-rice")).sort().join(",") === "category,name,nameUr,price,productId,sort,stockState,unit" &&
+        Object.keys(byPid(snap1, "p-oil")).sort().join(",") === "category,name,price,productId,sort,stockState,unit",
+    "snapshot: a product entry is exactly {productId, name, price, unit, stockState, sort} + nameUr/category only when the product has them");
+  {
+    const scan = (v, acc) => {
+      if (v && typeof v === "object") for (const [k, x] of Object.entries(v)) { acc.push(k); scan(x, acc); }
+      return acc;
+    };
+    const keys = scan(snap1, []);
+    check(!keys.includes("costPrice") && !keys.includes("stockQty") && !keys.includes("urduName"),
+      "snapshot: DEEP SCAN — no cost price, no stock count, no internal field name anywhere in the published doc (bands, never counts; prices, never costs)");
+  }
+  check(byPid(snap1, "p-rice").stockState === "in" && byPid(snap1, "p-oil").stockState === "low" &&
+        byPid(snap1, "p-soap").stockState === "out" && byPid(snap1, "p-tea").stockState === "in" &&
+        snap1.products.map((p) => p.productId).join(",") === "p-soap,p-oil,p-rice,p-tea" &&
+        snap1.products.every((p, i) => p.sort === i),
+    "snapshot: bands derive from live stock at publish; products sort category → name with sequential sort stamps");
+  const snapHidden = storefront.assembleStorefrontSnapshot({
+    businessId: BIZ_H3, slug: "madina-store", settings: settingsH3, city: "Sargodha",
+    logoDataUrl: null, products: productsH3, excludedProductIds: ["p-tea"], previous: snap1, nowISO: NOW_H3,
+  });
+  const snapStillHidden = storefront.assembleStorefrontSnapshot({
+    businessId: BIZ_H3, slug: "madina-store", settings: settingsH3, city: "Sargodha",
+    logoDataUrl: null, products: productsH3, previous: snapHidden, nowISO: NOW_H3,
+  });
+  const snapShown = storefront.assembleStorefrontSnapshot({
+    businessId: BIZ_H3, slug: "madina-store", settings: settingsH3, city: "Sargodha",
+    logoDataUrl: null, products: productsH3, includeProductIds: ["p-tea"], previous: snapHidden, nowISO: NOW_H3,
+  });
+  check(byPid(snapHidden, "p-tea").stockState === "hidden" &&
+        byPid(snapStillHidden, "p-tea").stockState === "hidden" &&
+        byPid(snapShown, "p-tea").stockState === "in" &&
+        snapHidden.publishedAt === NOW_H3 && snapHidden.enabled === true,
+    "snapshot: hiding is STICKY across re-publishes (the hidden set is the previous doc's ∪ exclusions − inclusions) until the owner deliberately re-shows; publishedAt and enabled carry from the previous doc");
+  check(storefront.storefrontContentEqual(snap1, { ...snap1, publishedAt: "2027-01-01T00:00:00.000Z", updatedAt: "2027-01-01T00:00:00.000Z" }) &&
+        !storefront.storefrontContentEqual(snap1, storefront.assembleStorefrontSnapshot({
+          businessId: BIZ_H3, slug: "madina-store", settings: settingsH3, city: "Sargodha", logoDataUrl: null,
+          products: productsH3.map((p) => (p.id === "p-rice" ? { ...p, salePrice: 1500 } : p)), previous: snap1, nowISO: NOW_H3,
+        })),
+    "snapshot: the auto-republish seam — content equality ignores the stamps alone and breaks on a real price move, so the subscription's own echo never loops a write");
+
+  /* ---- lit / dark (§2.6: the read rule derives from the assignment snapshot) ---- */
+  const regH3 = (plan, extra) => ({
+    ownerUid: BIZ_H3, ownerEmail: "o@x.pk", name: "Shop", phone: "", city: "",
+    createdAt: "2026-10-01T00:00:00.000Z", status: "active", enforce: false, plan, ...(extra || {}),
+  });
+  const advActive = regH3(plans.snapshotFor("advanced", "2026-10-01T00:00:00.000Z", { assignedBy: "admin", periodTo: "2026-11-01T00:00:00.000Z" }));
+  const advGrace = regH3(plans.snapshotFor("advanced", "2026-09-01T00:00:00.000Z", { assignedBy: "admin", periodTo: "2026-10-10T00:00:00.000Z" }));
+  const founding = regH3(plans.snapshotFor("founding", "2026-10-01T00:00:00.000Z", { assignedBy: "migration" }));
+  const trial = regH3(plans.snapshotFor("trial", "2026-10-20T00:00:00.000Z", { assignedBy: "signup" }));
+  const standard = regH3(plans.snapshotFor("standard", "2026-10-01T00:00:00.000Z", { assignedBy: "admin", periodTo: "2026-11-01T00:00:00.000Z" }));
+  check(storefront.storefrontLit(advActive, snap1, NOW_H3) === true &&
+        storefront.storefrontLit(founding, snap1, NOW_H3) === true,
+    "lit: an Advanced shop in its paid period and a founding shop are lit");
+  check(storefront.storefrontLit(trial, snap1, NOW_H3) === false &&
+        storefront.storefrontLit(standard, snap1, NOW_H3) === false &&
+        storefront.storefrontLit(advGrace, snap1, NOW_H3) === false &&
+        storefront.storefrontLit(regH3(advActive.plan, { status: "suspended" }), snap1, NOW_H3) === false &&
+        storefront.storefrontLit(advActive, { ...snap1, enabled: false }, NOW_H3) === false &&
+        storefront.storefrontLit(null, snap1, NOW_H3) === false &&
+        storefront.storefrontLit(advActive, null, NOW_H3) === false,
+    "dark: trial (Standard modules), Standard tier, grace, suspension, a switched-off snapshot, no registry and no snapshot are EACH dark — the store is lit exactly while its plan is active/founding, per §2.6");
+  check(storefront.storefrontLitState("advanced", "active", snap1) === storefront.storefrontLit(advActive, snap1, NOW_H3) &&
+        storefront.storefrontLitState("standard", "active", snap1) === false &&
+        storefront.storefrontLitState("advanced", "grace", snap1) === false,
+    "lit: the desk's PlanView door (storefrontLitState) is the same rule over the same inputs");
+
+  /* ---- the inbox shape (§2.4: create-only, shape-validated) ---- */
+  const goodOrder = {
+    businessId: BIZ_H3, slug: "madina-store", customerName: "Ahmed Raza", phone: "0301-2345678",
+    lines: [{ productId: "p-rice", qty: 2 }], fulfilment: "pickup", createdAt: NOW_H3, state: "new",
+  };
+  check(storefront.storeOrderShapeOk(goodOrder) &&
+        storefront.storeOrderShapeOk({ ...goodOrder, note: "please pack separately" }),
+    "inbox: a well-formed public order passes (note optional)");
+  check(!storefront.storeOrderShapeOk({ ...goodOrder, coupon: "SAVE10" }) &&
+        !storefront.storeOrderShapeOk({ ...goodOrder, total: 2900 }),
+    "inbox: ANY extra key refuses the shape — the public cannot smuggle fields (a claimed total above all) into the shop's paperwork");
+  check(!storefront.storeOrderShapeOk({ ...goodOrder, state: "converted" }) &&
+        !storefront.storeOrderShapeOk({ ...goodOrder, state: "dismissed" }) &&
+        !storefront.storeOrderShapeOk({ ...goodOrder, createdAt: "not-a-date" }) &&
+        !storefront.storeOrderShapeOk({ ...goodOrder, slug: "Demo" }),
+    "inbox: a preset state, a non-date createdAt and an un-slug all refuse — an order is born `new`, timestamped, for a real store");
+  check(!storefront.storeOrderShapeOk({ ...goodOrder, lines: [{ productId: "p-rice", qty: 0 }] }) &&
+        !storefront.storeOrderShapeOk({ ...goodOrder, lines: [{ productId: "p-rice", qty: 1000 }] }) &&
+        !storefront.storeOrderShapeOk({ ...goodOrder, lines: [{ productId: "p-rice", qty: 1.5 }] }) &&
+        !storefront.storeOrderShapeOk({ ...goodOrder, lines: [{ productId: "p-rice", qty: 1, price: 1 }] }) &&
+        !storefront.storeOrderShapeOk({ ...goodOrder, lines: [] }) &&
+        !storefront.storeOrderShapeOk({ ...goodOrder, lines: Array.from({ length: 51 }, () => ({ productId: "p-rice", qty: 1 })) }),
+    "inbox: line hostility refuses — qty 0 / 1000 / fractional, a line carrying its own price, no lines, 51 lines");
+  check(!storefront.storeOrderShapeOk({ ...goodOrder, customerName: "x".repeat(61) }) &&
+        !storefront.storeOrderShapeOk({ ...goodOrder, customerName: "   " }) &&
+        !storefront.storeOrderShapeOk({ ...goodOrder, phone: "123" }) &&
+        !storefront.storeOrderShapeOk({ ...goodOrder, phone: "0".repeat(20) }) &&
+        !storefront.storeOrderShapeOk({ ...goodOrder, note: "x".repeat(301) }) &&
+        !storefront.storeOrderShapeOk({ ...goodOrder, fulfilment: "cod" }),
+    "inbox: scalar hostility refuses — oversized/blank name, implausible phones, an oversized note, an unknown fulfilment");
+  const composed = storefront.composeStoreOrder(
+    { customerName: "  Ahmed Raza ", phone: "0301-2345678", note: " ", fulfilment: "delivery",
+      lines: [{ productId: "p-rice", qty: 2 }, { productId: "p-rice", qty: 3 }, { productId: "p-oil", qty: 1 }] },
+    { businessId: BIZ_H3, slug: "madina-store", nowISO: NOW_H3 }
+  );
+  check(composed !== null && composed.lines.length === 2 &&
+        composed.lines.find((l) => l.productId === "p-rice").qty === 5 &&
+        composed.customerName === "Ahmed Raza" && !("note" in composed) && composed.state === "new" &&
+        storefront.storeOrderShapeOk(composed) &&
+        storefront.composeStoreOrder(
+          { customerName: "A", phone: "0301-2345678", fulfilment: "pickup",
+            lines: [{ productId: "p-rice", qty: 600 }, { productId: "p-rice", qty: 600 }] },
+          { businessId: BIZ_H3, slug: "madina-store", nowISO: NOW_H3 }) === null,
+    "inbox: compose trims, omits an empty note, MERGES duplicate lines — and a merge that overflows the qty bound refuses the whole order rather than clamping it");
+
+  /* ---- the public page model (snapshot alone, no tenant access) ---- */
+  const model = storefront.storefrontPageModel(snapHidden);
+  check(model.shopName === "Madina General Store" && model.groups.length === 2 &&
+        model.groups[0].category === "Care" && model.groups[1].category === "Grocery" &&
+        model.cards.length === 3 && !model.cards.some((c) => c.productId === "p-tea"),
+    "page model: built from the snapshot literal ALONE (this fixture never touched a tenant collection) — hidden products are absent, groups keep publish order");
+  check(model.cards.find((c) => c.productId === "p-soap").orderable === false &&
+        model.cards.find((c) => c.productId === "p-oil").orderable === true &&
+        Object.keys(model.cards[0]).sort().join(",") === "category,name,orderable,price,productId,stockState,unit",
+    "page model: out-of-stock is visible but not orderable; a card is exactly the public fields (the Urdu name rides only when published)");
+
+  /* ---- conversion (§2.5: re-priced, drift shown, exactly-once) ---- */
+  const customersH3 = [
+    { id: "cu-1", name: "Ahmed Raza", phone: "+92 301 2345678", address: "", note: "", ts: NOW_H3 },
+  ];
+  const orderH3 = { id: "ord-1", ...goodOrder, lines: [{ productId: "p-rice", qty: 2 }, { productId: "p-oil", qty: 1 }] };
+  const planClean = storefront.planStoreConversion(orderH3, snap1, productsH3, customersH3);
+  check(planClean !== null && planClean.droppedCount === 0 &&
+        planClean.drift.every((d) => !d.priceChanged && !d.productMissing) &&
+        planClean.customer !== null && planClean.customer.id === "cu-1",
+    "conversion: a clean order plans with zero drift, and the customer is phone-matched across formats (0301… ≡ +92 301…) — an offer to the member, never a silent merge");
+  const productsMoved = productsH3.map((p) => (p.id === "p-rice" ? { ...p, salePrice: 1500 } : p)).filter((p) => p.id !== "p-oil");
+  const planDrift = storefront.planStoreConversion(orderH3, snap1, productsMoved, customersH3);
+  check(planDrift !== null && planDrift.lines.length === 1 && planDrift.lines[0].unitPrice === 1500 &&
+        planDrift.drift.find((d) => d.productId === "p-rice").priceChanged === true &&
+        planDrift.drift.find((d) => d.productId === "p-rice").publishedPrice === 1450 &&
+        planDrift.drift.find((d) => d.productId === "p-rice").livePrice === 1500 &&
+        planDrift.drift.find((d) => d.productId === "p-oil").productMissing === true &&
+        planDrift.droppedCount === 1,
+    "conversion: drift is SHOWN with both prices (published 1,450 → live 1,500), the SO re-prices to LIVE, and a deleted product drops out flagged — never silently repriced, never silently kept");
+  check(storefront.planStoreConversion({ ...orderH3, lines: [{ productId: "p-oil", qty: 1 }] }, snap1, productsMoved, customersH3) === null &&
+        storefront.planStoreConversion({ ...orderH3, state: "converted" }, snap1, productsH3, customersH3) === null &&
+        storefront.planStoreConversion({ ...orderH3, state: "dismissed" }, snap1, productsH3, customersH3) === null,
+    "conversion: an order whose every product vanished refuses, and a converted or dismissed order NEVER plans again — the state is the exactly-once claim");
+  const soH3 = storefront.buildStoreSaleOrder(orderH3, planDrift, {
+    number: "SO-1", customerId: "cu-1", customerName: "Ahmed Raza", customerPhone: "+92 301 2345678",
+    products: productsMoved, taxSlabs: [], settings: settingsH3, nowISO: NOW_H3,
+  });
+  check(soH3.status === "open" && soH3.number === "SO-1" && soH3.sourceType === "storefront" &&
+        soH3.sourceOrderId === "ord-1" && soH3.total === 3000 && soH3.lines.length === 1,
+    "conversion: the born sale order is `open`, numbered, stamped with its storefront origin, and totals the LIVE-priced lines (2 × 1,500)");
+  check(storefront.storeOrderCounts([orderH3, { ...orderH3, id: "o2", state: "converted" }, { ...orderH3, id: "o3", state: "dismissed" }]).fresh === 1 &&
+        storefront.storeOrderCounts([orderH3, { ...orderH3, id: "o2", state: "converted" }, { ...orderH3, id: "o3", state: "dismissed" }]).converted === 1,
+    "conversion: the inbox headline counts derive from the rows (1 fresh / 1 converted / 1 dismissed) — never a stored counter");
+
+  /* ---- the full journey: publish → order → convert → SO → challan → bill → TB 0 ---- */
+  const journeyOrder = { id: "ord-9", ...storefront.composeStoreOrder(
+    { customerName: "Ahmed Raza", phone: "0301-2345678", fulfilment: "pickup", lines: [{ productId: "p-rice", qty: 2 }] },
+    { businessId: BIZ_H3, slug: "madina-store", nowISO: NOW_H3 }) };
+  const journeyPlan = storefront.planStoreConversion(journeyOrder, snap1, productsH3, customersH3);
+  const journeySO = { id: "so-9", ...storefront.buildStoreSaleOrder(journeyOrder, journeyPlan, {
+    number: "SO-9", customerId: "cu-1", customerName: "Ahmed Raza", customerPhone: "0301-2345678",
+    products: productsH3, taxSlabs: [], settings: settingsH3, nowISO: NOW_H3 }) };
+  const journeyChallan = {
+    id: "dc-9", number: "DC-9", orderId: "so-9", status: "dispatched",
+    lines: journeySO.lines.map((l) => ({ ...l })),
+  };
+  const journeyJournal = seed.getSeedJournal(products, sales, purchases, payments, expenses, credits);
+  const billTax = tax.computeBillTaxes([{ total: 2900, qty: 2, slab: null }], 0);
+  const billEntry = ledger.makeEntry("Bill — converted from DC-9", "bill", "b-9", [
+    { account: "cash", debit: billTax.total, credit: 0 },
+    { account: "cogs", debit: 2400, credit: 0 },
+    { account: "sales_revenue", debit: 0, credit: 2900 },
+    { account: "inventory", debit: 0, credit: 2400 },
+  ]);
+  journeyJournal.push(billEntry);
+  const journeyBill = {
+    id: "b-9", status: "paid", sourceType: "challan", sourceId: "dc-9",
+    items: [{ productId: "p-rice", qty: 2, sourceProductId: "p-rice" }],
+  };
+  const tbFold = journeyJournal.reduce((a, e) => a + e.lines.reduce((x, l) => x + l.debit - l.credit, 0), 0);
+  check(ledger.entryBalances(billEntry) && tbFold === 0 &&
+        eq(ledger.accountBalance(journeyJournal, "cash"), 50000 + 2900) &&
+        eq(ledger.accountBalance(journeyJournal, "inventory"), 272805 - 2400),
+    "journey: the bill the journey ends in balances, the journal's trial balance stays 0, and cash/inventory move by exactly the bill's amounts over the frozen seed");
+  check(docs.deriveOrderStatus(journeySO, [journeyBill], [journeyChallan]) === "fulfilled" &&
+        docs.deriveChallanStatus(journeyChallan, [journeyBill]) === "billed",
+    "journey: SO → challan → bill derives fulfilled/billed through the ordinary Phase B machinery — the storefront added no fulfilment state of its own");
+  {
+    const handSO = { ...journeySO, sourceType: null, sourceOrderId: null };
+    const handEntry = ledger.makeEntry("Bill — converted from DC-9", "bill", "b-9", [
+      { account: "cash", debit: billTax.total, credit: 0 },
+      { account: "cogs", debit: 2400, credit: 0 },
+      { account: "sales_revenue", debit: 0, credit: 2900 },
+      { account: "inventory", debit: 0, credit: 2400 },
+    ]);
+    const stripEntry = (e) => { const { id, ts, ...rest } = e; return rest; };
+    check(handSO.sourceType === null && JSON.stringify(stripEntry(handEntry)) === JSON.stringify(stripEntry(billEntry)),
+      "journey: the converted order's bill entry is identical to a hand-made order's in every journal-bearing field (memo, refType, refId, lines — only the entry's own id/stamp differ, as any two entries' do): a storefront origin leaves no fingerprint in the journal");
+  }
+
+  /* ---- rules v10 (§5.2: v9 + the H3 spans, nothing else) ---- */
+  check(crypto.createHash("sha256").update(stripH3Blocks(stripWaBlocks(stripFR2Blocks(rulesH3))), "utf8").digest("hex") ===
+        "734f6ba4cebc9c19203e0d022b810a7e1c76e57fd644d040abbe2a421ad7d3ad",
+    "rules: STRIP PROOF — v10 minus the four delimited H3 spans (header note, the §5.2 amendment restored to its exact v9 text, helpers, storefront blocks) is byte-for-byte v9 FINAL (SHA 734f6ba4…): H3's rules change is exactly its spans (WA same-check amendment: the strip first cuts the delimited WhatsApp spans — the amended file minus WhatsApp is the H3-final v10, strip-proven in the WA suite) (FR2 same-check amendment: the strip first cuts the delimited FR2 spans — v11 minus FR2 is v10, strip-proven in the FR2 suite; the FR2 storefront-pin change sits inside the H3 span and is swallowed by the H3 strip)");
+  const h3Span = rulesH3.slice(
+    rulesH3.indexOf("// ---- Phase H · H3: storefront blocks (START) ----"),
+    rulesH3.indexOf("// ---- Phase H · H3: storefront blocks (END) ----"));
+  check(h3Span.includes("match /storefronts/{slug}") && h3Span.includes("match /storeOrders/{orderId}") &&
+        h3Span.includes("storefrontLit(resource.data.get('businessId'") &&
+        h3Span.includes("allow delete: if false"),
+    "rules: the blocks span lands both collections — the snapshot read gated on the lit derivation, deletes closed (slugs are never recycled, inbox paper is never destroyed)");
+  check(h3Span.includes("storeOrderCreateOk()") && h3Span.includes("hasOnly(['state', 'convertedSoId', 'convertedBy',") &&
+        h3Span.includes("'convertedAt', 'dismissedBy', 'dismissedAt'])") &&
+        h3Span.includes("request.resource.data.get('state', '') in ['converted', 'dismissed']") &&
+        h3Span.includes("resource.data.get('state', '') == 'new'") &&
+        h3Span.includes("isBusinessOwner(resource.data.get('businessId', ''))"),
+    "rules: the inbox is create-only for the public, its one update is the member state flip out of `new` over exactly the conversion keys, and a snapshot update can never change hands (the anti-hijack businessId pin) (FR2 same-check amendment: the pin is now isBusinessOwner — uid match OR registry leg — the same anti-hijack property, registry-aware so a generated business's owner can update its own snapshot)");
+  const amendSpan = rulesH3.slice(
+    rulesH3.indexOf("// ---- Phase H · H3 amendment (journal tier list) (START) ----"),
+    rulesH3.indexOf("// ---- Phase H · H3 amendment (journal tier list) (END) ----"));
+  check(amendSpan.includes("'loyalty_expire'") && !stripH3Blocks(stripWaBlocks(stripFR2Blocks(rulesH3))).includes("loyalty"),
+    "rules: §5.2 amendment #1 is exactly the one named string — 'loyalty_expire' joins the Standard tier list inside its span, and the stripped file carries no loyalty text at all (H1's rules posture intact) (WA same-check amendment: the prong runs over the composed strip — the WhatsApp spans carry no 'loyalty' string either)");
+  check(rulesH3.includes("function storefrontLit(") && rulesH3.includes("function storeOrderCreateOk(") &&
+        rulesH3.includes("createdAt', null) == request.time") &&
+        JSON.parse(fs.readFileSync("/home/hatch/workspace/ai-dukaan-ai/firebase/firestore.indexes.json", "utf8"))
+          .indexes.some((ix) => ix.collectionGroup === "storeOrders"),
+    "rules: the H3 helpers derive lit-ness from the registry and pin the order's createdAt to the server clock; the storeOrders composite index ships with the rules");
+
+  /* ---- the backup slice (G6 manifest gains the H3 collections) ---- */
+  const emptyCols = Object.fromEntries(backup.TENANT_COLLECTIONS.map((n) => [n, []]));
+  emptyCols.journal = seed.getSeedJournal(products, sales, purchases, payments, expenses, credits)
+    .map((e) => ({ key: e.id, data: e }));
+  const fileH3 = backup.assembleBackup({
+    businessId: BIZ_H3, exportedAt: NOW_H3, exportedBy: "web",
+    owner: { shopName: "Madina General Store" }, collections: emptyCols,
+    platform: {
+      registry: null, counters: null, stats: null, members: [], invites: [], events: [], payments: [],
+      storefront: { key: "madina-store", data: { ...snap1 } },
+      storeOrders: [
+        { key: "ord-1", data: { ...goodOrder } },
+        { key: "ord-x", data: { ...goodOrder, businessId: "another-shop" } },
+      ],
+    },
+  });
+  check(fileH3.platform.storefront !== null && fileH3.platform.storefront.key === "madina-store" &&
+        fileH3.platform.storeOrders.length === 1 && fileH3.manifest.platformCounts.storefront === 1 &&
+        fileH3.manifest.platformCounts.storeOrders === 1 && backup.verifyBackup(fileH3).ok === true,
+    "backup: the manifest gains the snapshot + inbox (the business's OWN only — a foreign order handed to the assembler is filtered at the seam) and the file verifies");
+  {
+    const foreignFront = backup.assembleBackup({
+      businessId: BIZ_H3, exportedAt: NOW_H3, exportedBy: "web",
+      owner: { shopName: "Madina General Store" }, collections: emptyCols,
+      platform: {
+        registry: null, counters: null, stats: null, members: [], invites: [], events: [], payments: [],
+        storefront: { key: "other-shop", data: { ...snap1, businessId: "another-shop", slug: "other-shop" } },
+        storeOrders: [],
+      },
+    });
+    check(foreignFront.platform.storefront === null && foreignFront.manifest.platformCounts.storefront === 0,
+      "backup: a snapshot whose businessId is not the business's own never rides the file — the public face in a backup is the shop's own or nothing");
+  }
+  {
+    const legacy = JSON.parse(JSON.stringify(fileH3));
+    delete legacy.platform.storefront;
+    delete legacy.platform.storeOrders;
+    delete legacy.manifest.platformCounts.storefront;
+    delete legacy.manifest.platformCounts.storeOrders;
+    check(backup.verifyBackup(legacy).ok === true,
+      "backup: a pre-H3 (G6-shaped) file — no storefront slice, no new counts — still verifies: the tolerance is deliberate, old backups stay readable");
+  }
+  {
+    const targetEmpty = { owner: null, collections: Object.fromEntries(backup.TENANT_COLLECTIONS.map((n) => [n, []])), members: [], invites: [], storefront: null, storeOrders: [] };
+    const plan = backup.planRestore({ file: fileH3, targetBusinessId: BIZ_H3, target: targetEmpty, actorUid: BIZ_H3, nowISO: NOW_H3 });
+    check(plan.ok === true &&
+          plan.writes.some((w) => w.path === "storefronts/madina-store") &&
+          plan.writes.some((w) => w.path === "storeOrders/ord-1"),
+      "backup: a restore into an empty namespace plans the snapshot and the inbox back as documents — no journal entry is composed for either (they are not money)");
+    const planForeignSlug = backup.planRestore({
+      file: fileH3, targetBusinessId: BIZ_H3, actorUid: BIZ_H3, nowISO: NOW_H3,
+      target: { ...targetEmpty, storefront: { key: "someone-else", data: { businessId: BIZ_H3, slug: "someone-else" } } },
+    });
+    check(planForeignSlug.ok === false && planForeignSlug.conflicts.some((c) => c.startsWith("storefronts/")),
+      "backup: a target already wearing a DIFFERENT slug refuses — a restore never steals or overwrites another storefront's name");
+  }
+
+  /* ---- invariants + wiring ---- */
+  const storeSrcH3 = readSrcH3("components/StoreProvider.tsx");
+  const publicSrcH3 = readSrcH3("components/StorefrontPublicView.tsx");
+  check((storeSrcH3.match(/makeEntry\(/g) || []).length === 24 &&
+        !readSrcH3("lib/storefront.ts").includes("makeEntry("),
+    "invariant: the store still composes exactly 24 makeEntry( sites and lib/storefront composes NONE — the storefront is documents and a snapshot, never a posting");
+  check(!publicSrcH3.includes("users/") && !publicSrcH3.includes("setDoc") && !publicSrcH3.includes("updateDoc") &&
+        publicSrcH3.includes("storeOrders") && publicSrcH3.includes("serverTimestamp()"),
+    "invariant: the public page's source touches NO tenant path and holds no set/update verb at all — its only write is the inbox create, server-timestamped");
+  check(perm.accessOf("owner", "storefront") === "full" && perm.accessOf("manager", "storefront") === "full" &&
+        perm.accessOf("accountant", "storefront") === "read" && perm.accessOf("cashier", "storefront") === "none" &&
+        readSrcH3("lib/nav.ts").includes('"/storefront"'),
+    "wiring: the storefront matrix row is owner/manager full, accountant read, cashier none — and the desk is in the nav (plan-gated to Advanced by the sidebar's tier seam)");
+  const storePart = require("./out/i18n/parts/store.js");
+  check(Object.keys(storePart.enStore).length === 109 && Object.keys(storePart.urStore).length === 109 &&
+        Object.keys(storePart.enStore).every((k) => typeof storePart.urStore[k] === "string" && storePart.urStore[k].length > 0 && storePart.enStore[k].length > 0) &&
+        Object.keys(i18n.en).length === 3136 && Object.keys(i18n.ur).length === 3136,
+    "i18n: the 109 storefront keys (desk store.* + public shop.* + nav.storefront + the receipt caption) carry real EN + UR copy — dictionary 3,077, EN ≡ UR (H3 pin amendment: 108; WA pin amendment: +109 WhatsApp keys; H6 pin amendment: +1 shop.consentLabel, the checkout consent tick; footer-fix pin amendment: +5 shell.footerCol* footer category headings; Fix Round 1 pin amendment: +14 keys (1 dc.backlog + 9 rep.bs.* + 4 fin.fy.openStock.*))");
+}
+
+/* ============================== WA ============================== */
+{
+  suite("WA", null); // Phase H · WhatsApp — consent-first marketing: the consent truth table + import guard, live audience derivations (udhaar FIFO aging, points-expiring via the H1 fold, tier, inactivity, storefront origin, service-due), the campaign lifecycle (draft → launch → queue → per-recipient confirm → log), template rendering, snapshot tier gating, the rules v10-amendment strip proof, the backup slice, i18n (design §3/§5.2)
+
+  const readSrcWA = (p) => fs.readFileSync("/home/hatch/workspace/ai-dukaan-ai/web/" + p, "utf8");
+  const rulesWA = fs.readFileSync("/home/hatch/workspace/ai-dukaan-ai/firebase/firestore.rules", "utf8");
+  const NOW_WA = "2026-11-15T10:00:00.000Z";
+  const settingsWA = {
+    shopName: "Madina General Store",
+    phone: "0301-2345678",
+    loyalty: { enabled: true },
+    whatsapp: { serviceIntervalDays: 90 },
+  };
+
+  /* ---- consent: the truth table (design §3.2) ---- */
+  check(whatsapp.customerOptedIn({ id: "x" }) === false &&
+        whatsapp.customerOptedIn({ id: "x", waOptIn: false }) === false &&
+        whatsapp.customerOptedIn({ id: "x", waOptIn: true }) === true,
+    "consent: absent and false are the same answer — NO; only an explicit true opts in (default OFF)");
+  check(JSON.stringify(whatsapp.waConsentPatch("counter", true, NOW_WA)) ===
+        JSON.stringify({ waOptIn: true, waOptInAt: NOW_WA, waOptInSource: "counter" }) &&
+        JSON.stringify(whatsapp.waConsentPatch("storefront", false, NOW_WA)) ===
+        JSON.stringify({ waOptIn: false, waOptInAt: NOW_WA, waOptInSource: "storefront" }),
+    "consent: the stamp always writes all three fields — state, moment, source — for grants AND revocations (a history of one, never a silent flag)");
+  const imported = whatsapp.stripImportConsent({
+    name: "Bought List", phone: "0300-0000000", waOptIn: "yes", waOptInAt: "2020-01-01", waOptInSource: "import",
+  });
+  check(!("waOptIn" in imported) && !("waOptInAt" in imported) && !("waOptInSource" in imported) &&
+        imported.name === "Bought List" && whatsapp.customerOptedIn(imported) === false,
+    "consent: import can NEVER set it — a parsed row claiming consent (even a 'yes' column, even a source of 'import') comes out with every consent field removed: no consent laundering through a spreadsheet");
+  check(whatsapp.resolveWaSettings({}).serviceIntervalDays === 90 &&
+        whatsapp.resolveWaSettings({ whatsapp: { serviceIntervalDays: 30 } }).serviceIntervalDays === 30 &&
+        whatsapp.resolveWaSettings({ whatsapp: { serviceIntervalDays: -5 } }).serviceIntervalDays === 90,
+    "settings: the service interval resolves field-by-field — absent/invalid degrade to the 90-day default the module pins where the design names no number");
+
+  /* ---- phone + links (the house wa.me pattern) ---- */
+  check(whatsapp.waIntlPhone("0300-1112233") === "923001112233" &&
+        whatsapp.waIntlPhone("+92 300 1112233") === "923001112233" &&
+        whatsapp.waPhoneOk("0300-1112233") === true && whatsapp.waPhoneOk("123") === false,
+    "phone: local numbers normalise to international digits exactly as the bill share composes them; a 3-digit stub is not a recipient");
+  check(whatsapp.waMeLink("0300-1112233", "Salam alaikum").startsWith("https://wa.me/923001112233?text="),
+    "transport: the v1 link is the product's proven wa.me pattern with the message pre-filled — opening it is the shopkeeper's act; nothing here sends");
+
+  /* ---- template rendering ---- */
+  check(whatsapp.renderWaMessage("Salam {name}, Rs {amount} due at {shop}; {points} pts; code {xyz}",
+          { name: "Ahmad", shop: "Madina", points: 2500, amount: 3000.4 }) ===
+        "Salam Ahmad, Rs 3000 due at Madina; 2500 pts; code {xyz}",
+    "render: {name}/{shop}/{points}/{amount} substitute per recipient (amount rounds to whole rupees) and an unknown {token} is left standing — visible paper, not a silent gap");
+
+  /* ---- fixtures: five customers, one of each story ---- */
+  const custWA = [
+    { id: "wa-al", name: "Ahmad Ali", phone: "0300-1112233", address: "", note: "", ts: "2026-01-01T00:00:00.000Z", waOptIn: true, waOptInAt: "2026-10-01T00:00:00.000Z", waOptInSource: "counter" },
+    { id: "wa-bina", name: "Bilal Hussain", phone: "0321-4445566", address: "", note: "", ts: "2026-01-01T00:00:00.000Z", waOptIn: true, waOptInAt: "2026-10-02T00:00:00.000Z", waOptInSource: "storefront" },
+    { id: "wa-cid", name: "Chaudhry Iqbal", phone: "0333-7778899", address: "", note: "", ts: "2026-01-01T00:00:00.000Z" },
+    { id: "wa-dal", name: "Daud Khan", phone: "0345-9990011", address: "", note: "", ts: "2026-01-01T00:00:00.000Z", waOptIn: true, waOptInAt: "2026-10-03T00:00:00.000Z", waOptInSource: "counter" },
+    { id: "wa-eza", name: "Ehsan Ullah", phone: "123", address: "", note: "", ts: "2026-01-01T00:00:00.000Z", waOptIn: true, waOptInAt: "2026-10-04T00:00:00.000Z", waOptInSource: "counter" },
+  ];
+  const creditsWA = [
+    { id: "cr-al-1", customerId: "wa-al", kind: "credit", amount: 5000, dayOffset: 20, ts: "2026-10-26T00:00:00.000Z", note: "" },
+    { id: "cr-al-2", customerId: "wa-al", kind: "repayment", amount: 2000, dayOffset: 5, ts: "2026-11-10T00:00:00.000Z", note: "" },
+    { id: "cr-bi-1", customerId: "wa-bina", kind: "credit", amount: 1000, dayOffset: 40, ts: "2026-10-06T00:00:00.000Z", note: "" },
+    { id: "cr-bi-2", customerId: "wa-bina", kind: "credit", amount: 500, dayOffset: 3, ts: "2026-11-12T00:00:00.000Z", note: "" },
+    { id: "cr-bi-3", customerId: "wa-bina", kind: "repayment", amount: 1200, dayOffset: 1, ts: "2026-11-14T00:00:00.000Z", note: "" },
+    { id: "cr-ci-1", customerId: "wa-cid", kind: "credit", amount: 9000, dayOffset: 30, ts: "2026-10-16T00:00:00.000Z", note: "" },
+  ];
+  const posAl = whatsapp.customerUdhaarPosition(creditsWA, "wa-al");
+  const posBi = whatsapp.customerUdhaarPosition(creditsWA, "wa-bina");
+  check(posAl.outstanding === 3000 && posAl.oldestAgeDays === 20,
+    "udhaar: one customer's position folds his own rows only — Rs 5,000 given, Rs 2,000 repaid, Rs 3,000 standing at 20 days");
+  check(posBi.outstanding === 300 && posBi.oldestAgeDays === 3,
+    "udhaar FIFO: repayments retire the OLDEST credit first — Rs 1,200 against (1,000 @ 40d + 500 @ 3d) leaves Rs 300 standing at 3 days, not Rs 300 at 40 (the aging report's own allocation)");
+
+  /* loyalty journal: real H1 earn entries for al (gold, expiring)
+   * and bina (standard, fresh) */
+  const J_WA = [];
+  const earnFor = (cid, billId, total, ts) => {
+    J_WA.push(ledger.makeEntry(`Bill #${billId}`, "bill", billId, [
+      { account: "cash", debit: total, credit: 0 },
+      { account: "cogs", debit: Math.round(total * 0.6), credit: 0 },
+      { account: "sales_revenue", debit: 0, credit: total },
+      { account: "inventory", debit: 0, credit: Math.round(total * 0.6) },
+    ], { ts }));
+    const earn = loyalty.buildLoyaltyEarnEntry({
+      journal: J_WA,
+      bill: { id: billId, billNo: 1, customerId: cid, total },
+      settings: loyalty.resolveLoyaltySettings({ loyalty: { enabled: true } }),
+      ts,
+    });
+    if (earn) J_WA.push(earn);
+    return earn;
+  };
+  const earnAl = earnFor("wa-al", "wa-b-al", 250000, "2025-11-20T05:00:00.000Z");
+  earnFor("wa-bina", "wa-b-bi", 10000, "2026-10-01T05:00:00.000Z");
+  check(!!earnAl && earnAl.points === 2500,
+    "fixtures: al's earn is a real H1 entry — 2,500 points on Rs 250,000 at the standard speed, vintage expiring 2026-11-20");
+
+  const dataWA = {
+    customers: custWA,
+    credits: creditsWA,
+    journal: J_WA,
+    bills: [
+      { id: "wa-bill-al", customerId: "wa-al", status: "paid", ts: "2026-11-10T05:00:00.000Z", total: 1200 },
+      { id: "wa-bill-bi", customerId: "wa-bina", status: "paid", ts: "2026-08-01T05:00:00.000Z", total: 800 },
+    ],
+    saleOrders: [
+      { id: "wa-so-1", customerId: "wa-bina", sourceType: "storefront" },
+      { id: "wa-so-2", customerId: "wa-al", sourceType: "phone" },
+    ],
+    jobs: [
+      { id: "wa-job-al", customerId: "wa-al", status: "delivered", ts: "2026-07-01T05:00:00.000Z" },
+      { id: "wa-job-bi", customerId: "wa-bina", status: "delivered", ts: "2026-11-01T05:00:00.000Z" },
+    ],
+    settings: settingsWA,
+    nowISO: NOW_WA,
+  };
+  const idsOf = (aud) => whatsapp.resolveWaAudience(aud, dataWA).map((c) => c.id).join(",");
+
+  /* ---- audiences: live derivations, consent filter LAST ---- */
+  check(idsOf({ kind: "all_opted_in" }) === "wa-al,wa-bina,wa-dal,wa-eza",
+    "audience all_opted_in: every opted-in customer in directory order — cid (never consented) is absent, eza (bad number) is present: validity is a send-time judgement, not an audience one");
+  check(idsOf({ kind: "udhaar_outstanding", minRs: 1, minDays: 7 }) === "wa-al",
+    "audience udhaar: amount AND age both bind — al (3,000 @ 20d) in; bina (300 @ 3d) out on age; cid (9,000 @ 30d) out on consent alone");
+  check(whatsapp.waSegmentMatches({ kind: "udhaar_outstanding", minRs: 1, minDays: 7 }, custWA[2], dataWA) === true &&
+        !whatsapp.resolveWaAudience({ kind: "udhaar_outstanding", minRs: 1, minDays: 7 }, dataWA).some((c) => c.id === "wa-cid"),
+    "audience doctrine: the SEGMENT test alone admits cid — it is the resolver's consent filter, applied last for every kind, that excludes him; there is no path around it");
+  check(idsOf({ kind: "points_expiring", withinDays: 7 }) === "wa-al",
+    "audience points_expiring: al's H1 vintage (2,500 pts, expires 2026-11-20) is inside the 7-day horizon at 2026-11-15; bina's fresh vintage (expires 2027-10-01) is not");
+  check(idsOf({ kind: "tier", tier: "gold" }) === "wa-al" && idsOf({ kind: "tier", tier: "silver" }) === "",
+    "audience tier: the H1 fold's derived tier — al is Gold on 2,500 trailing points; nobody is Silver");
+  check(idsOf({ kind: "inactive", days: 60 }) === "wa-bina,wa-dal,wa-eza",
+    "audience inactive: bina's last bill is 106 days old; dal and eza have never bought (no bill in N days is literally true); al bought 5 days ago");
+  check(idsOf({ kind: "storefront_customers" }) === "wa-bina",
+    "audience storefront: only orders BORN from the storefront count (sourceType) — al's phone order does not make him a store customer");
+  check(idsOf({ kind: "service_due" }) === "wa-al",
+    "audience service_due: al's delivered job is 137 days old against the 90-day settings interval; bina's is 14 days old; the interval is settings, not a campaign param");
+  const suggWA = whatsapp.waSuggestedReminders(dataWA);
+  check(suggWA.udhaarCount === 1 && suggWA.pointsExpiringCount === 1 && suggWA.serviceDueCount === 1 && suggWA.serviceIntervalDays === 90,
+    "suggestions: today's counts (udhaar ≥ 7d, points ≤ 7d, service-due) run the full resolution — consent filter included — and suggest nothing about cid despite his 9,000 @ 30d");
+
+  /* ---- launch: the send log materialises (design §3.4) ---- */
+  const campaignWA = {
+    id: "wac-1", name: "Fixture campaign", templateId: "wat-1",
+    audience: { kind: "all_opted_in" }, resolvedCount: null,
+    createdBy: "owner-1", ts: NOW_WA, state: "draft",
+  };
+  let nWA = 0;
+  const planWA = whatsapp.planWaLaunch(campaignWA, dataWA, () => `was-${++nWA}`);
+  check(planWA.resolvedCount === 4 && planWA.sends.length === 4 &&
+        planWA.sends.every((s) => s.state === "queued" && s.campaignId === "wac-1") &&
+        planWA.sends[0].phone === "0300-1112233" && planWA.sends[3].phone === "123",
+    "launch: one queued row per resolved recipient, resolvedCount stamped, phones stamped from the customer docs AS THEY STAND at launch (the log records where each message was aimed)");
+
+  /* ---- the queue walk: confirm, opt-out, bad number ---- */
+  const byIdWA = (arr, id) => arr.find((s) => s.id === id);
+  let sendsWA = [...planWA.sends];
+  const step1 = whatsapp.waQueueStep(sendsWA, custWA, null);
+  check(step1 !== null && step1.send.id === "was-1" && step1.action === "send",
+    "queue: the head is the first non-terminal row, and a consented, valid recipient is workable");
+  const openedWA = whatsapp.waSendTransition(step1.send, "opened", custWA[0]);
+  const sentWA = whatsapp.waSendTransition(openedWA, "sent", custWA[0]);
+  check(openedWA.state === "opened" && sentWA.state === "sent",
+    "queue: queued → opened (the wa.me tap) → sent (the shopkeeper's own confirmation — the ONLY thing 'sent' has ever meant here)");
+  sendsWA = sendsWA.map((s) => (s.id === "was-1" ? sentWA : s));
+  const binaSent = whatsapp.waSendTransition(byIdWA(sendsWA, "was-2"), "sent", custWA[1]);
+  sendsWA = sendsWA.map((s) => (s.id === "was-2" ? binaSent : s));
+  /* dal opts OUT after launch — the send-time re-check governs */
+  const custAfterOptOut = custWA.map((c) =>
+    c.id === "wa-dal" ? { ...c, ...whatsapp.waConsentPatch("counter", false, NOW_WA) } : c);
+  const stepDal = whatsapp.waQueueStep(sendsWA, custAfterOptOut, null);
+  check(stepDal !== null && stepDal.send.id === "was-3" && stepDal.action === "skip-optout",
+    "queue re-check: dal opted out AFTER launch — at his turn the queue reads the customer doc AS IT STANDS NOW and the verdict is skip-optout, however clean the launch was");
+  const dalLanded = whatsapp.waSendTransition(stepDal.send, "sent", custAfterOptOut.find((c) => c.id === "wa-dal"));
+  check(dalLanded.state === "skipped_optout",
+    "queue re-check: the re-check OVERRIDES the act — even the 'I sent it' tap lands the row in skipped_optout; he is never, ever recorded as sent");
+  sendsWA = sendsWA.map((s) => (s.id === "was-3" ? dalLanded : s));
+  const stepEza = whatsapp.waQueueStep(sendsWA, custAfterOptOut, null);
+  const ezaLanded = stepEza ? whatsapp.waSendTransition(stepEza.send, "opened", custAfterOptOut.find((c) => c.id === "wa-eza")) : null;
+  check(stepEza !== null && stepEza.action === "skip-invalid" && ezaLanded !== null && ezaLanded.state === "skipped_invalid",
+    "queue re-check: eza's stamped number is not WhatsApp-reachable — the row lands in skipped_invalid rather than opening a dead chat");
+  sendsWA = sendsWA.map((s) => (s.id === "was-4" ? ezaLanded : s));
+  const progWA = whatsapp.waCampaignProgress(sendsWA);
+  check(progWA.total === 4 && progWA.sent === 2 && progWA.skippedOptout === 1 && progWA.skippedInvalid === 1 &&
+        progWA.terminal === 4 && progWA.complete === true && whatsapp.waQueueStep(sendsWA, custAfterOptOut, null) === null,
+    "lifecycle: 2 sent + 1 skipped_optout + 1 skipped_invalid = every row terminal — progress.complete is what closes the campaign to done");
+  const cursorStep = whatsapp.waQueueStep(planWA.sends, custWA, "was-1");
+  check(cursorStep !== null && cursorStep.send.id === "was-2" &&
+        whatsapp.waQueueStep(planWA.sends, custWA, null).send.id === "was-1" &&
+        planWA.sends.every((s) => s.state === "queued"),
+    "queue cursor: 'skip for now' writes NOTHING — the session cursor steps past was-1, and next session (no cursor) the same row resurfaces at the head, still queued, because it was never sent and the log does not pretend otherwise");
+  check(whatsapp.waQueueMessage("Assalam-o-Alaikum {name}, Rs {amount} outstanding at {shop}; you have {points} points.", custWA[0], dataWA) ===
+        "Assalam-o-Alaikum Ahmad Ali, Rs 3000 outstanding at Madina General Store; you have 2500 points.",
+    "queue message: the campaign template renders with the recipient's LIVE facts — name, the shop's name, the H1-fold points, the FIFO udhaar amount");
+
+  /* ---- plan gates: the snapshot governs (design §5.1) ---- */
+  const basicViewWA = {
+    snapshot: plans.snapshotFor("basic", "2026-10-06T00:00:00.000Z", { assignedBy: "signup" }),
+    enforce: true, suspended: false, state: "active", counters: null,
+  };
+  const standardViewWA = {
+    snapshot: plans.snapshotFor("standard", "2026-10-06T00:00:00.000Z", { assignedBy: "signup" }),
+    enforce: true, suspended: false, state: "active", counters: null,
+  };
+  check(plans.tierIncludesModule("standard", "whatsapp") === true && whatsapp.waModuleAllowed(basicViewWA) === false,
+    "gating: the live CATALOGUE grants whatsapp at Standard — and a Basic-SNAPSHOT shop is still refused: the gate reads the assignment snapshot, never the catalogue (the G doctrine)");
+  check(whatsapp.waModuleAllowed(standardViewWA) === true && whatsapp.waSendingAllowed(standardViewWA) === true,
+    "gating: a Standard snapshot in an active state passes both gates");
+  check(whatsapp.waModuleAllowed({ ...standardViewWA, state: "grace" }) === true &&
+        whatsapp.waSendingAllowed({ ...standardViewWA, state: "grace" }) === false &&
+        whatsapp.waSendingAllowed({ ...standardViewWA, state: "suspended" }) === false,
+    "gating: plan expiry degrades SENDING only (invariant 5) — in grace/suspension the module stays allowed (desk, templates, history readable) while launching and queueing stop");
+  check(whatsapp.waModuleAllowed(null) === true && whatsapp.waSendingAllowed(null) === true,
+    "gating: a null plan view (demo, pre-G registry-less shop) gates nothing, exactly as every G surface behaves");
+  check(perm.can("owner", "whatsapp", "write") && perm.can("manager", "whatsapp", "write") &&
+        perm.can("accountant", "whatsapp", "view") && !perm.can("accountant", "whatsapp", "write") &&
+        !perm.can("cashier", "whatsapp", "view"),
+    "RBAC: the whatsapp row — owner/manager full, accountant read, cashier none (the rules' narrowed read leg mirrors it)");
+
+  /* ---- rules: the v10 amendment + strip proofs ---- */
+  check(crypto.createHash("sha256").update(stripWaBlocks(stripH6Blocks(stripFR2Blocks(rulesWA))), "utf8").digest("hex") ===
+        "4a4107296db055eef16670a3f0f4f3d1fd68a5b3b41e270bab85edb051ef12b2",
+    "rules: STRIP PROOF — the amended v10 minus the two delimited WhatsApp spans (header note, wa collections) is byte-for-byte the H3-final v10 (SHA 4a410729…): the WhatsApp rules change is exactly its spans (lineage: H6 amendment — stripH6Blocks runs first since H6; the H6 order-consent span nests inside the H3 helpers, so the composed v9 proof below needed no H6 step) (FR2 same-check amendment: stripFR2Blocks runs first of all — v11 minus FR2 is v10, strip-proven in the FR2 suite)");
+  check(crypto.createHash("sha256").update(stripH3Blocks(stripWaBlocks(stripFR2Blocks(rulesWA))), "utf8").digest("hex") ===
+        "734f6ba4cebc9c19203e0d022b810a7e1c76e57fd644d040abbe2a421ad7d3ad",
+    "rules: the composed strip still lands on v9 FINAL (SHA 734f6ba4…) — WhatsApp + H3 spans together are the whole delta from v9 (FR2 same-check amendment: stripFR2Blocks runs first — v11 minus FR2 is v10)");
+  const waSpan = rulesWA.slice(
+    rulesWA.indexOf("// ---- Phase H · WhatsApp: wa collections (START) ----"),
+    rulesWA.indexOf("// ---- Phase H · WhatsApp: wa collections (END) ----"));
+  const waHead = rulesWA.slice(
+    rulesWA.indexOf("// ---- Phase H · WhatsApp: rules v10 header note (START) ----"),
+    rulesWA.indexOf("// ---- Phase H · WhatsApp: rules v10 header note (END) ----"));
+  check(waSpan.includes("match /waTemplates/{templateId}") && waSpan.includes("match /waCampaigns/{campaignId}") &&
+        waSpan.includes("match /waSends/{sendId}") &&
+        (waSpan.match(/hasRole\(uid, \['owner', 'manager', 'accountant'\]\)/g) || []).length === 3 &&
+        (waSpan.match(/allow delete: if false/g) || []).length === 2 &&
+        waSpan.includes("allow create, update, delete: if hasRole(uid, ['owner', 'manager'])"),
+    "rules: the wa span lands all three collections — reads narrowed to owner/manager/accountant on every one, template writes owner/manager incl. delete, campaigns + the send log delete-closed (history is not deleted)");
+  check(!waSpan.includes("loyalty") && !waHead.includes("loyalty") && !waSpan.includes("planPostable") && !waSpan.includes("createInOpenPeriod"),
+    "rules: the WhatsApp spans carry no 'loyalty' string (H1's strip prong stays honest) and NO plan/period legs — these docs assert no money fact; plan gating is the client snapshot gates' job (paper-doc precedent)");
+
+  /* ---- backup: the manifest gains the three collections ---- */
+  const emptyColsWA = Object.fromEntries(backup.TENANT_COLLECTIONS.map((n) => [n, []]));
+  emptyColsWA.journal = journal;
+  const tplDocWA = { id: "wat-1", name: "Fixture offer", kind: "promo", body: "Salam {name}", createdBy: "owner-1", ts: NOW_WA };
+  const campDocWA = { ...campaignWA, state: "done", resolvedCount: 4 };
+  const sendDocWA = { id: "was-1", campaignId: "wac-1", customerId: "wa-al", phone: "0300-1112233", state: "sent", ts: NOW_WA };
+  emptyColsWA.waTemplates = [tplDocWA];
+  emptyColsWA.waCampaigns = [campDocWA];
+  emptyColsWA.waSends = [sendDocWA];
+  const fileWA = backup.assembleBackup({
+    businessId: "bizWA", exportedAt: NOW_WA, exportedBy: "web",
+    owner: { shopName: "Madina General Store", staffEmails: [], staff: [] },
+    collections: emptyColsWA,
+    platform: { registry: null, counters: null, stats: null, members: [], invites: [], events: [], payments: [], storefront: null },
+  });
+  check(fileWA.manifest.counts.waTemplates === 1 && fileWA.manifest.counts.waCampaigns === 1 &&
+        fileWA.manifest.counts.waSends === 1 && backup.verifyBackup(fileWA).ok === true,
+    "backup: the three WhatsApp collections ride the manifest with their counts, and the file verifies");
+  const planRestoreWA = backup.planRestore({
+    file: fileWA, targetBusinessId: "bizWA2",
+    target: { ...backup.emptyNamespace(), owner: { shopName: "New Shop", staffEmails: [], staff: [] } },
+    actorUid: "bizWA2", nowISO: NOW_WA,
+  });
+  check(planRestoreWA.ok === true &&
+        ["waTemplates/wat-1", "waCampaigns/wac-1", "waSends/was-1"].every((tail) =>
+          planRestoreWA.writes.some((w) => w.kind === "set" && w.path === `users/bizWA2/${tail}`)),
+    "backup: the restore plan writes the WhatsApp docs into the TARGET business's own users tree — and no path enters the source namespace");
+  const restoredWA = backup.applyRestoreWrites(backup.emptyNamespace(), "bizWA2", planRestoreWA.writes);
+  check(backup.docsEqual(restoredWA.collections.waTemplates[0], tplDocWA) &&
+        backup.docsEqual(restoredWA.collections.waCampaigns[0], campDocWA) &&
+        backup.docsEqual(restoredWA.collections.waSends[0], sendDocWA),
+    "backup round-trip: template, campaign and send-log row survive backup → empty namespace → restore byte-for-byte");
+
+  /* ---- wiring + journal discipline ---- */
+  const storeSrcWA = readSrcWA("components/StoreProvider.tsx");
+  check((storeSrcWA.match(/makeEntry\(/g) || []).length === 24 &&
+        !readSrcWA("lib/whatsapp.ts").includes("makeEntry("),
+    "journal discipline: marketing moves no money — the store's makeEntry site count stays exactly 24 and lib/whatsapp composes no entry at all");
+  check(readSrcWA("lib/nav.ts").includes('"/whatsapp"') &&
+        readSrcWA("components/Sidebar.tsx").includes('"/whatsapp": "whatsapp"') &&
+        readSrcWA("components/WhatsAppView.tsx").includes("waMeLink") &&
+        readSrcWA("components/WhatsAppView.tsx").includes("advanceWaSend"),
+    "wiring: the desk is in the nav under the whatsapp matrix module, and the view drives the store's queue actions over the wa.me pattern");
+  const waPart = require("./out/i18n/parts/wa.js");
+  check(Object.keys(waPart.enWa).length === 109 && Object.keys(waPart.urWa).length === 109 &&
+        Object.keys(waPart.enWa).every((k) => typeof waPart.urWa[k] === "string" && waPart.urWa[k].length > 0 && waPart.enWa[k].length > 0) &&
+        Object.keys(i18n.en).length === 3136 && Object.keys(i18n.ur).length === 3136,
+    "i18n: the 109 WhatsApp keys carry real EN + UR copy — dictionary 3,054, EN ≡ UR (WA pin amendment)");
+  const tbWA = reports.trialBalance(journal, { from: "2000-01-01", to: "2100-01-01" });
+  check(ledger.accountBalance(journal, "inventory") === 272805 && ledger.cashBalance(journal) === 50000 &&
+        ledger.payablesTotal(journal) === 27900 && ledger.receivablesTotal(journal) === 5500 &&
+        tbWA.totalDebits === tbWA.totalCredits,
+    "frozen: the seed identities stand untouched by the whole WhatsApp build — Inventory 272,805 · Cash 50,000 · payables 27,900 · receivables 5,500 · TB 0");
+}
+
+suite("PSFA", null); // Phase H · PS/FA — Pashto + Farsi language packs: four-locale parity gates, the review manifest + badge state machine, the drift-refusing review merge, Naskh/RTL wiring (design §4)
+{
+  const reviewL = require("./out/i18n/review.js");
+  const mergeToolL = require("./review-merge.js");
+  const readSrcL = (p) => fs.readFileSync("/home/hatch/workspace/ai-dukaan-ai/web/" + p, "utf8");
+  const manifestL = JSON.parse(readSrcL("lib/i18n/review-manifest.json"));
+  const enKeysL = Object.keys(i18n.en).sort();
+  const tokSetL = (s) => [...new Set([...s.matchAll(/\{(\w+)\}/g)].map((m) => m[1]))].sort().join(",");
+
+  check(enKeysL.length === 3136 && Object.keys(i18n.ps).length === 3136 && Object.keys(i18n.fa).length === 3136,
+    "i18n: four locales at 3,077 keys each (PS/FA pin amendment: +3 settings.lang keys over the WA-era 3,054; H6 pin amendment: +1 shop.consentLabel, the storefront consent tick, drafted in PS/FA like every H6 key; footer-fix pin amendment: +5 shell.footerCol* footer category headings, drafted in PS/FA like every draft key; Fix Round 1 pin amendment: +14 keys (1 dc.backlog + 9 rep.bs.* + 4 fin.fy.openStock.*), drafted in PS/FA like every draft key)");
+  check(JSON.stringify(Object.keys(i18n.ps).sort()) === JSON.stringify(enKeysL) &&
+        JSON.stringify(Object.keys(i18n.fa).sort()) === JSON.stringify(enKeysL),
+    "i18n: PS and FA key sets are exactly EN's — no missing, no extra (§4.4)");
+  check(enKeysL.every((k) => typeof i18n.ps[k] === "string" && i18n.ps[k].length > 0 &&
+        typeof i18n.fa[k] === "string" && i18n.fa[k].length > 0),
+    "i18n: every PS/FA value is a non-empty string — completeness is content, not just keys");
+  check(enKeysL.every((k) => tokSetL(i18n.ps[k]) === tokSetL(i18n.en[k]) &&
+        tokSetL(i18n.fa[k]) === tokSetL(i18n.en[k]) && tokSetL(i18n.ur[k]) === tokSetL(i18n.en[k])),
+    "i18n: {placeholder} token sets match EN in UR/PS/FA for every key — interpolation cannot strand a token in any locale");
+  const wlL = new Set(manifestL.copyThroughAllowed ?? []);
+  check(enKeysL.every((k) =>
+        (i18n.ps[k] !== i18n.en[k] || !/[A-Za-z]/.test(i18n.en[k]) || wlL.has(k)) &&
+        (i18n.fa[k] !== i18n.en[k] || !/[A-Za-z]/.test(i18n.en[k]) || wlL.has(k))),
+    "i18n: no un-translated English copy-through in PS/FA beyond the manifest's whitelist (brands, tech tokens, format-only strings, single-letter codes)");
+  check([...wlL].every((k) => k in i18n.en),
+    "manifest: every copyThroughAllowed entry names a real key");
+  check(JSON.stringify(Object.keys(manifestL.ps.states).sort()) === JSON.stringify(enKeysL) &&
+        JSON.stringify(Object.keys(manifestL.fa.states).sort()) === JSON.stringify(enKeysL),
+    "manifest: every PS/FA key carries a state and every state names a real key — an unaccounted key cannot exist (§4.1)");
+  check(enKeysL.every((k) => manifestL.ps.states[k] === "draft" && manifestL.fa.states[k] === "draft") &&
+        manifestL.ps.reviewer === null && manifestL.fa.reviewer === null,
+    "manifest: at this increment every PS/FA key is a labelled DRAFT and no reviewer is recorded — no review has happened and none is claimed");
+  check(reviewL.localeIsDraft("ps") === true && reviewL.localeIsDraft("fa") === true &&
+        reviewL.localeIsDraft("ur") === false && reviewL.localeIsDraft("en") === false,
+    "badge: PS/FA wear the Draft preview label; EN/UR never do (§4.2)");
+  const sumL = reviewL.localeReview("ps");
+  check(sumL !== null && sumL.total === 3136 && sumL.reviewed === 0 && sumL.complete === false && sumL.reviewer === null,
+    "badge: localeReview(ps) reports 0/3,077 reviewed — derived from the manifest, never stored");
+  check(reviewL.reviewStateOf("ps", "billing.title") === "draft" && reviewL.reviewStateOf("en", "billing.title") === null,
+    "manifest: reviewStateOf reads per-key state; EN is untracked");
+  check(reviewL.reviewSummary({ a: "reviewed", b: "reviewed" }).complete === true &&
+        reviewL.reviewSummary({ a: "reviewed", b: "draft" }).complete === false &&
+        reviewL.reviewSummary({}).complete === false,
+    "badge state machine: 100% reviewed drops the badge; any draft (or an empty map) keeps it — per language, independently");
+  check(i18n.langDir("en") === "ltr" && i18n.langDir("ur") === "rtl" && i18n.langDir("ps") === "rtl" && i18n.langDir("fa") === "rtl" &&
+        i18n.isRtlLang("ps") && i18n.isNaskhLang("ps") && i18n.isNaskhLang("fa") && !i18n.isNaskhLang("ur"),
+    "direction truth table: en LTR; ur/ps/fa RTL; Naskh = ps/fa only (Nastaliq stays UR's, §4.5)");
+  check(JSON.stringify(i18n.LANGS) === JSON.stringify(["en", "ur", "ps", "fa"]) && i18n.DICTS.ps === i18n.ps &&
+        i18n.translate("ps", "settings.langDraftPreview") === "مسوده" &&
+        i18n.translate("fa", "settings.langDraftPreview").length > 0 &&
+        i18n.translate("fa", "settings.langDraftPreview") !== "Draft preview",
+    "locales: LANGS widen to four; translate() serves PS/FA from their own dictionaries (the badge label is dictionary copy in all four languages)");
+  const cssL = readSrcL("app/globals.css");
+  check(cssL.includes("--font-naskh") && cssL.includes('html[lang="ps"]') && cssL.includes('html[lang="fa"]') && cssL.includes(".naskh"),
+    "fonts (web): a Naskh-first system stack + ps/fa typography rules join Nastaliq — no downloadable webfont added (§4.5)");
+  check(readSrcL("components/ReportPrintSheet.tsx").includes("isNaskhLang") &&
+        readSrcL("components/DocPrintSheet.tsx").includes("ps-AF-u-nu-latn") &&
+        readSrcL("components/DocPrintSheet.tsx").includes("fa-AF-u-nu-latn"),
+    "print (web): report/doc sheets route PS/FA to the Naskh class and the Afghan locales with Latin digits forced — the same browser pipeline, no new print engine, no Jalali");
+  check(readSrcL("components/LangToggle.tsx").includes("localeIsDraft") && readSrcL("components/SettingsView.tsx").includes("localeIsDraft"),
+    "badge wiring: the header picker and Settings both derive the Draft preview label from the manifest — the demo shell uses the same picker, so the showroom wears the same badge (§4.2)");
+  check(readSrcL("components/LangProvider.tsx").includes('saved === "ps"') && readSrcL("app/layout.tsx").includes("l==='ps'"),
+    "wiring: stored ps/fa selections survive reload and the pre-paint script paints the right lang/dir before hydration");
+  const dictL = { a: "A", b: "B", c: "C" };
+  const statesL = { a: "draft", b: "draft", c: "draft" };
+  const csvHeadL = "key,surface,en,ur,draft,corrected,seen";
+  const rowsL = mergeToolL.parsePack([csvHeadL, "a,common,A,ا,A,AA,1", "b,common,B,ب,B,,1", "c,common,C,ج,C,,"].join("\n"));
+  const planL = mergeToolL.planMerge({ rows: rowsL, dict: dictL, states: statesL, reviewer: "Test Reviewer" });
+  check(planL.ok && planL.updates.length === 1 && planL.updates[0].key === "a" && planL.updates[0].to === "AA" &&
+        JSON.stringify(planL.flips) === JSON.stringify(["a", "b"]),
+    "review merge: the reviewer's correction replaces the draft and exactly the seen keys flip draft → reviewed — nothing else moves (§4.3a/b)");
+  const planDriftKeysL = mergeToolL.planMerge({ rows: rowsL.slice(0, 2), dict: dictL, states: statesL, reviewer: "T" });
+  check(!planDriftKeysL.ok && planDriftKeysL.errors.some((e) => e.type === "drift-keys"),
+    "review merge: a pack whose key set has drifted from the current dictionary is REFUSED — a stale pack reviews a product that no longer exists (§4.3c)");
+  const rowsStaleL = mergeToolL.parsePack([csvHeadL, "a,common,A,ا,STALE,AA,1", "b,common,B,ب,B,,1", "c,common,C,ج,C,,"].join("\n"));
+  const planStaleL = mergeToolL.planMerge({ rows: rowsStaleL, dict: dictL, states: statesL, reviewer: "T" });
+  check(!planStaleL.ok && planStaleL.errors.some((e) => e.type === "drift-base" && e.key === "a"),
+    "review merge: a seen row reviewed against text the product no longer has is REFUSED, not silently merged");
+  const planNoNameL = mergeToolL.planMerge({ rows: rowsL, dict: dictL, states: statesL, reviewer: "" });
+  check(!planNoNameL.ok && planNoNameL.errors.some((e) => e.type === "no-reviewer"),
+    "review merge: no anonymous review — a merge without a reviewer's name is refused (§4.1)");
+  const planAgainL = mergeToolL.planMerge({ rows: rowsL, dict: dictL, states: { a: "reviewed", b: "reviewed", c: "draft" }, reviewer: "T" });
+  check(planAgainL.ok && planAgainL.flips.length === 0 && planAgainL.alreadyReviewed.length === 2 && planAgainL.updates.length === 1,
+    "review merge: states never move backwards — reviewed keys stay reviewed (a fresh correction on one still lands as a re-review)");
+  const packRowsL = mergeToolL.parsePack(readSrcL("lib/i18n/review-packs/ps-review-pack.csv"));
+  check(packRowsL.length === 3136 && packRowsL[0].key.startsWith("billing.") &&
+        fs.existsSync("/home/hatch/workspace/ai-dukaan-ai/web/lib/i18n/review-packs/fa-review-pack.csv") &&
+        fs.existsSync("/home/hatch/workspace/ai-dukaan-ai/web/lib/i18n/review-packs/ps-review-pack.md") &&
+        fs.existsSync("/home/hatch/workspace/ai-dukaan-ai/web/lib/i18n/review-packs/fa-review-pack.md"),
+    "review packs: a CSV + a readable sheet per language, one row per key, money surfaces first (§4.3)");
+  const tbL = reports.trialBalance(journal, { from: "2000-01-01", to: "2100-12-31" });
+  check(journal.length === 21 && ledger.accountBalance(journal, "inventory") === 272805 &&
+        ledger.cashBalance(journal) === 50000 && tbL.totalDebits === tbL.totalCredits,
+    "frozen: two new languages changed no money — seed journal 21 entries, Inventory 272,805, Cash 50,000, TB 0");
+}
+
+suite("H6", null); // Phase H · H6 — the release-audit fixes: web backup tolerance, the storefront checkout consent tick, demo loyalty completeness, Dart day-close alignment + exporter determinism (PHASE-H-RELEASE-AUDIT.md)
+{
+  const readSrcH6 = (p) => fs.readFileSync("/home/hatch/workspace/ai-dukaan-ai/" + p, "utf8");
+  const JH6 = (v) => JSON.parse(JSON.stringify(v));
+
+  /* ---- fix 1: web backup tolerance (the Dart twin's rule) ---- */
+  const g6H6 = JSON.parse(readSrcH6("harness/fixtures/g6-core.json"));
+  check(backup.verifyBackup(g6H6.file).ok === true,
+    "backup (fix 1): the FROZEN g6 fixture file — a genuine pre-WhatsApp backup (35 tenant collections, no WA counts) — now VERIFIES on web; until H6 web refused it as not-a-backup while the Dart twin restored it (the §9 data right governs)");
+  const planH6 = backup.planRestore({ file: g6H6.file, targetBusinessId: g6H6.targetBusinessId, target: backup.emptyNamespace(), actorUid: g6H6.targetBusinessId, nowISO: g6H6.nowISO });
+  check(planH6.ok === true && planH6.writes.filter((w) => /waTemplates|waCampaigns|waSends/.test(w.path ?? "")).length === 0,
+    "backup (fix 1): the frozen file also PLANS a restore — the WhatsApp-era collections restore EMPTY; no writes are invented for them");
+  check(g6H6.verifyCases.every((c) => { const r = backup.verifyBackup(c.file); return c.expect === null ? r.ok === true : (r.ok === false && r.problem === c.expect); }),
+    "backup (fix 1): the tamper ladder still refuses, each with its pinned reason — count +1, one journal digit, format 99, schema 7, non-backup");
+  const waLieH6 = JH6(g6H6.file); waLieH6.collections.waTemplates = [{ id: "wt-smuggled" }];
+  check(backup.verifyBackup(waLieH6).ok === false && backup.verifyBackup(waLieH6).problem === "manifest-mismatch",
+    "backup (fix 1): tolerance is not blindness — a WA document the manifest does not count still refuses as manifest-mismatch");
+  const badH6 = JH6(g6H6.file); badH6.collections.waSends = "nope";
+  check(backup.verifyBackup(badH6).ok === false && backup.verifyBackup(badH6).problem === "not-a-backup",
+    "backup (fix 1): a collection PRESENT but not an array is still corruption (not-a-backup) — only ABSENCE is tolerated");
+
+  /* ---- fix 2: the storefront checkout consent tick ---- */
+  const rulesH6 = readSrcH6("firebase/firestore.rules");
+  check(crypto.createHash("sha256").update(stripFR2Blocks(rulesH6), "utf8").digest("hex") === "f10b2ee07ceb0c5a583f3762fa021222fb1a9a90832bf566956ae157372220ba",
+    "rules (fix 2): rules v10 FINAL as amended by H6 — pinned SHA f10b2ee0… (the rollout artifact; 1,489 lines) (FR2 same-check amendment: the hash runs over stripFR2Blocks(rules) — v11 minus FR2 is v10, strip-proven in the FR2 suite)");
+  check(crypto.createHash("sha256").update(stripH6Blocks(stripFR2Blocks(rulesH6)), "utf8").digest("hex") === "e556c92e9e27c0234ade367b4f16a9b294287bd1388385d2a10296b185017295",
+    "rules (fix 2): stripH6 alone reproduces the WA-era v10 FINAL (SHA e556c92e…) byte-for-byte — the H6 delta is exactly its two delimited spans (FR2 same-check amendment: stripFR2Blocks runs first — v11 minus FR2 is v10)");
+  check(crypto.createHash("sha256").update(stripH3Blocks(stripWaBlocks(stripFR2Blocks(rulesH6))), "utf8").digest("hex") === "734f6ba4cebc9c19203e0d022b810a7e1c76e57fd644d040abbe2a421ad7d3ad",
+    "rules (fix 2): the fully composed strip still lands on v9 FINAL (SHA 734f6ba4…) — the chain extended H6 → WA → H3 and proven in both directions (FR2 same-check amendment: stripFR2Blocks runs first — v11 minus FR2 is v10)");
+  const orderFnH6 = rulesH6.slice(rulesH6.indexOf("function storeOrderCreateOk()"), rulesH6.indexOf("function storeOrderCreateOk()") + 2800);
+  check(orderFnH6.includes("'createdAt', 'state', 'waOptIn']") && orderFnH6.includes("(!keys.hasAny(['waOptIn']) || d.get('waOptIn', false) == true)"),
+    "rules (fix 2): the order's exactly-keyed shape gains exactly ONE key — waOptIn — admitted only as exactly true (absent ≡ unticked ≡ no consent)");
+  const coH6 = { businessId: "biz-h6", slug: "h6-shop", nowISO: "2026-10-15T10:00:00.000Z" };
+  const baseInH6 = { customerName: "Test Customer", phone: "0300-1234567", fulfilment: "pickup", lines: [{ productId: "p1", qty: 2 }] };
+  const tickedH6 = storefront.composeStoreOrder({ ...baseInH6, waOptIn: true }, coH6);
+  const untickedH6 = storefront.composeStoreOrder({ ...baseInH6 }, coH6);
+  const falseH6 = storefront.composeStoreOrder({ ...baseInH6, waOptIn: false }, coH6);
+  check(tickedH6 !== null && tickedH6.waOptIn === true && storefront.storeOrderShapeOk(tickedH6) === true &&
+        untickedH6 !== null && !("waOptIn" in untickedH6) && storefront.storeOrderShapeOk(untickedH6) === true &&
+        falseH6 !== null && !("waOptIn" in falseH6),
+    "consent (fix 2): the composer stamps waOptIn ONLY from an explicit true — unticked and false both compose the key ABSENT (≡ no consent)");
+  check(storefront.storeOrderShapeOk({ ...untickedH6, waOptIn: false }) === false &&
+        storefront.storeOrderShapeOk({ ...untickedH6, waOptIn: "yes" }) === false &&
+        storefront.storeOrderShapeOk({ ...untickedH6, waOptIn: 1 }) === false,
+    "consent (fix 2): the shape mirror rejects every non-true waOptIn — false, a string, a number (the rules guard's twin, both clients)");
+  const provH6 = readSrcH6("web/components/StoreProvider.tsx");
+  check(provH6.includes("order.waOptIn === true") && provH6.includes('waConsentPatch("storefront", true, nowISO)') && !provH6.includes("opts?.waOptIn"),
+    "consent (fix 2): conversion stamps consent (source \"storefront\") from the ORDER's flag alone, in the conversion batch — the desk-toggle plumbing (opts) is gone from the provider");
+  const pubH6 = readSrcH6("web/components/StorefrontPublicView.tsx");
+  check(pubH6.includes('t("shop.consentLabel")') && pubH6.includes("waOptIn: waConsent"),
+    "consent (fix 2): the public checkout form carries the customer's OWN tick (shop.consentLabel) and composes it onto the order — the demo preview still never writes");
+  const viewH6 = readSrcH6("web/components/StorefrontView.tsx");
+  check(viewH6.includes("order.waOptIn === true") && !viewH6.includes("setWaOptIn"),
+    "consent (fix 2): the desk inbox only DISPLAYS the customer's tick (a badge when the order carries it) — its capture checkbox is removed");
+  check(typeof i18n.en["shop.consentLabel"] === "string" && i18n.en["shop.consentLabel"].length > 0 &&
+        i18n.ur["shop.consentLabel"].length > 0 && i18n.ps["shop.consentLabel"].length > 0 && i18n.fa["shop.consentLabel"].length > 0 &&
+        i18n.ps["shop.consentLabel"] !== i18n.en["shop.consentLabel"] && i18n.fa["shop.consentLabel"] !== i18n.en["shop.consentLabel"],
+    "consent (fix 2): shop.consentLabel exists in all four locales — first-person checkout copy; PS/FA carry it as labelled machine drafts like every PS/FA key (dictionary 3,063)");
+
+  /* ---- fix 3: demo loyalty completeness ---- */
+  const frozenH6 = seed.getSeedJournal(seed.getSeedProducts(), seed.getSeedSales(), seed.getSeedPurchases(), seed.getSeedSupplierPayments(), seed.getSeedExpenses(), seed.getSeedCredits());
+  check(frozenH6.length === 21 && backup.journalFingerprint(frozenH6) === "e17e5bda19e87de698b0c0a37e923f9b396bc387e2092b2ffbbd7d60d4971168",
+    "demo (fix 3): the CLOUD seed is untouched — getSeedJournal still composes exactly the frozen 21 (SHA e17e5bda…); the loyalty story is a separate demo-only getter the seeder never calls");
+  const demoH6 = [...frozenH6, ...seed.getDemoLoyaltyEntries(seed.getSeedCustomers())];
+  const demoSettingsH6 = loyalty.resolveLoyaltySettings(seed.getDemoSettings());
+  const nowH6 = new Date().toISOString();
+  const tbH6 = reports.trialBalance(demoH6, { from: "2000-01-01", to: "2100-12-31" });
+  check(demoH6.length === 29 && demoH6.every((e) => ledger.entryBalances(e)) && tbH6.totalDebits === tbH6.totalCredits,
+    "demo (fix 3): the demo journal is the frozen 21 + 8 loyalty entries (4 bills + 4 earns composed by the REAL earn composer) — every entry balances, TB 0");
+  const cu1H6 = loyalty.customerLoyalty(demoH6, "cu-1", demoSettingsH6, nowH6);
+  const cu2H6 = loyalty.customerLoyalty(demoH6, "cu-2", demoSettingsH6, nowH6);
+  const totalsH6 = loyalty.loyaltyProgrammeTotals(demoH6, nowH6);
+  check(cu1H6.points === 70 && cu1H6.rupees === 70 && cu2H6.points === 250 && cu2H6.rupees === 250 &&
+        totalsH6.liabilityRs === 320 && ledger.accountBalance(demoH6, "loyalty_payable") === -320,
+    "demo (fix 3): the story lands as told — cu-1 holds 70 pts / Rs 70 (200 earned − 150 redeemed + 20 earned), cu-2 holds 250 / Rs 250, and the programme liability is Rs 320 in the fold AND the GL");
+  check(demoSettingsH6.enabled === true && loyalty.resolveLoyaltySettings(seed.getSeedSettings()).enabled === false,
+    "demo (fix 3): the programme is ON in the demo settings only (getDemoSettings) — the production seed's absent loyalty block still resolves OFF, and the demo stays hermetic (local state, no writes leave it)");
+
+  /* ---- fix 4: day-close fixture + exporter determinism ---- */
+  const h6fxH6 = JSON.parse(readSrcH6("harness/fixtures/h6-core.json"));
+  check(JSON.stringify(ledger.dayCloseSummary(h6fxH6.inputs)) === JSON.stringify(h6fxH6.expected),
+    "day-close (fix 4): the h6 fixture's expected block IS the web derivation over its crafted inputs — cheque/points parts, voided + held bills, a credit part, a counter sale, cheque expense/repayment/supplier rows and a reversal all exercised (the Dart port is pinned to the same fixture by h6_fixtures_test.dart)");
+  const h2fxH6 = JSON.parse(readSrcH6("harness/fixtures/h2-core.json"));
+  check(h2fxH6.fyCloseCase.entry.id === "h2-e21" && h2fxH6.steps.find((s) => s.name === "fy-close").appended[0].id === "h2-e21",
+    "exporters (fix 4): h2's FY-close case and its walk now carry the SAME stamped id (h2-e21) — the wall-clock id the H4 incident recovered by search (j-mvks8hhtl) is gone BY CONSTRUCTION (stamp before capture)");
+  check(crypto.createHash("md5").update(readSrcH6("harness/fixtures/h2-core.json")).digest("hex") === "9fd58f6dc0bf285d29e995bd06473be1" &&
+        crypto.createHash("md5").update(readSrcH6("harness/fixtures/g6-core.json")).digest("hex") === "22194673de3f6d3120501ae32a20bb2b" &&
+        crypto.createHash("md5").update(readSrcH6("harness/fixtures/h6-core.json")).digest("hex") === "15e612822a4a399bce89a5317ff22a4c",
+    "exporters (fix 4): the re-baselined fixtures are pinned — h2 md5 9fd58f6d… (one field: the stamped close id), g6 md5 22194673… (the current assemble shape: H3 slice + WA collections, zero value changes), h6 md5 15e61282…; seed timestamps in g6/h2 are pinned to the 2026-10-23 fixture epoch so re-export is byte-stable on any day");
+  const ciH6 = readSrcH6(".github/workflows/app-ci.yml");
+  check(ciH6.includes("fixtures-export-g6.js") && ciH6.includes("fixtures-export-h2.js") && ciH6.includes("fixtures-export-h6.js"),
+    "exporters (fix 4): the CI freshness gate's membership is DELIBERATE — g6 + h2 + h6 exporters join f1–f5/g5/h4/h5 in it (the gate comment + this audit record why they were excluded until determinism was fixed)");
+}
+
+
+/* ============================== FR1 ============================== */
+/* Fix Round 1 — the five findings of the owner's live test of
+ * 2026-10-24 (report: your_files/dukaan-ai-live-test-report-
+ * 2026-10-24.md). Every check reproduces the LIVE failure shape
+ * first (the pre-fix derivation, computed inline, disagrees) and
+ * then the fixed derivation. Root causes in PRODUCTION.md. */
+suite("FR1", null);
+{
+  const readFR1 = (p) => fs.readFileSync("/home/hatch/workspace/ai-dukaan-ai/" + p, "utf8");
+  const storeSrcFR1 = readFR1("web/components/StoreProvider.tsx");
+  const ALL_RANGE = {
+    fromDate: "2000-01-01", toDate: "2100-12-31",
+    fromTs: "2000-01-01T00:00:00.000Z", toTs: "2100-01-01T00:00:00.000Z",
+  };
+
+  /* ---- F1: the cloud settings parse dropped the loyalty block ----
+   * The live shop's owner doc is Phase-C-era shaped; the loyalty
+   * block the Settings save merges onto it is exactly what
+   * `updateSettings` writes. The pre-fix store rebuilt settings
+   * from the snapshot through a hand-maintained field list that
+   * never included `loyalty` (nor raast/storefront/whatsapp/
+   * slug), so the resolver read absence as OFF forever. */
+  const legacyDocFR1 = {
+    shopName: "Madina General Store",
+    address: "Main Bazaar Road, Near Jamia Masjid",
+    phone: "0301-2345678",
+    staffEmails: ["helper@example.com"],
+    staff: [{ email: "Helper@Example.com", role: "cashier", addedAt: "2026-03-01T00:00:00.000Z" }],
+    defaultSalesTaxSlabId: null,
+    defaultPurchaseTaxSlabId: null,
+    fiscalYearStartMonth: 7,
+    fiscalYearStartDay: 1,
+    lockedThrough: "",
+    phaseA: { rbacV1: true },
+    phaseC: { stockV1: true },
+    phaseD: { hrV1: true },
+    docSeries: { bill: "B-" },
+    jobStages: ["Received", "Done"],
+    printDesign: { accent: "#0f766e" },
+    shopNameAlt: "مدینہ جنرل اسٹور",
+    loyalty: { enabled: true, earnRsPerPointBase: 50, pointValueRs: 1, redeemCapPct: 40 },
+    raastIban: "PK36MEZN0001234567890123",
+    raastFiName: "Meezan Bank",
+    storefront: { published: true, heroTitle: "Madina" },
+    storefrontSlug: "madina-general",
+    whatsapp: { serviceIntervalDays: 90 },
+  };
+  const parsedFR1 = settingsLib.settingsFromOwnerDoc(legacyDocFR1);
+  const resolvedFR1 = loyalty.resolveLoyaltySettings(parsedFR1);
+  check(parsedFR1.loyalty && parsedFR1.loyalty.enabled === true &&
+        resolvedFR1.enabled === true && resolvedFR1.earnRsPerPointBase === 50 &&
+        resolvedFR1.redeemCapPct === 40,
+    "F1: a legacy-shaped owner doc's saved loyalty block survives the settings parse — the resolver reads the programme ON with the owner's own terms (the live shop's toggle reverted because this parse dropped the field, not because the write failed)");
+  check(parsedFR1.raastIban === "PK36MEZN0001234567890123" && parsedFR1.raastFiName === "Meezan Bank" &&
+        parsedFR1.storefrontSlug === "madina-general" &&
+        parsedFR1.storefront && parsedFR1.storefront.published === true &&
+        parsedFR1.whatsapp && parsedFR1.whatsapp.serviceIntervalDays === 90,
+    "F1: the same dropped families all survive now — the Raast pair, the storefront block + slug, and the WhatsApp block were lost by the same inline whitelist");
+  const bareFR1 = settingsLib.settingsFromOwnerDoc({ shopName: "X" });
+  check(bareFR1.loyalty === undefined &&
+        loyalty.resolveLoyaltySettings(bareFR1).enabled === false &&
+        bareFR1.shopName === "X" && bareFR1.lockedThrough === "",
+    "F1: a doc WITHOUT the blocks still parses to absence ⇒ the resolver's defaults (programme OFF until the owner switches it on) — the fix invents nothing");
+  const staffFR1 = settingsLib.parseStaff([
+    { email: "  A@B.COM ", role: "cashier", addedAt: "t1" },
+    { email: "a@b.com", role: "owner", addedAt: "t2" },
+    { email: "c@d.com", role: "bogus", addedAt: "t3" },
+    { email: "", role: "cashier" },
+  ]);
+  check(staffFR1.length === 2 && staffFR1[0].email === "a@b.com" && staffFR1[0].role === "cashier" &&
+        staffFR1[1].role === "manager",
+    "F1: parseStaff (moved with the parse into lib/settings) still trims/lowercases, dedupes, and resolves unknown roles to the legacy default");
+  check(storeSrcFR1.includes("settingsFromOwnerDoc(snap.data() ?? {})") &&
+        storeSrcFR1.includes('from "@/lib/settings"') &&
+        !storeSrcFR1.includes("(d.defaultSalesTaxSlabId as string | null)"),
+    "F1 source: the store's snapshot handler calls lib/settings' parse — the inline field-by-field rebuild (the bug) is gone, so a future settings family cannot be dropped by a forgotten list again");
+
+  /* ---- F4: receivables aging ignored credit-note reversals ----
+   * The live sequence: pre-existing udhaar 5,500; a Rs 300 bill on
+   * credit; Rs 100 repaid; a Rs 150 credit note. Finance said
+   * 5,550 (signed subledger — right); aging said 5,700 (its FIFO
+   * skipped the negative reversal row entirely). */
+  const crFR1 = (id, customerId, kind, amount, billId, dayOffset) => ({
+    id, customerId, customerName: customerId, customerPhone: "", kind, amount,
+    method: "cash", accountId: null, voucherNo: null, note: "", billId, dayOffset,
+    ts: "2026-10-24T05:00:00.000Z",
+  });
+  const creditsFR1 = [
+    crFR1("fr1-c1", "fr1-cust-1", "credit", 5500, "fr1-bill-old", 70),
+    crFR1("fr1-c2", "fr1-cust-1", "credit", 300, "fr1-bill-test", 0),
+    crFR1("fr1-c3", "fr1-cust-1", "repayment", 100, null, 0),
+    crFR1("fr1-c4", "fr1-cust-1", "credit", -150, "fr1-bill-test", 0),
+    crFR1("fr1-c5", "fr1-cust-2", "credit", 200, "fr1-bill-a", 45),
+    crFR1("fr1-c6", "fr1-cust-2", "credit", 400, "fr1-bill-b", 10),
+    crFR1("fr1-c7", "fr1-cust-2", "credit", -50, "fr1-bill-b", 0),
+    crFR1("fr1-c8", "fr1-cust-2", "repayment", 150, null, 0),
+  ];
+  const agingFR1 = ledger.receivablesAging(creditsFR1);
+  check(eq(agingFR1.total, 5950) && eq(agingFR1.old, 5400) && eq(agingFR1.mid, 50) && eq(agingFR1.current, 500),
+    "F4: the live scenario ages correctly — cust-1: 5,500 − 100 repaid = 5,400 in the >60d bucket + the test bill's 300 − 150 CN = 150 current; cust-2: 50 in the 31–60d bucket + 350 current; total 5,950 (pre-fix aging reported cust-1 alone at 5,700)");
+  const sumOutstandingFR1 = ["fr1-cust-1", "fr1-cust-2"]
+    .map((k) => Math.max(0, ledger.customerOutstanding(creditsFR1, k)))
+    .reduce((a, b) => a + b, 0);
+  check(eq(agingFR1.total, sumOutstandingFR1),
+    "F4: the aging total equals Σ positive customerOutstanding by construction — aging and Finance can never disagree again");
+  const billStubFR1 = (id, customerId) => ({ id, customerId, customerName: customerId, customerPhone: "" });
+  check(eq(ledger.billCreditOutstanding(creditsFR1, billStubFR1("fr1-bill-test", "fr1-cust-1")).outstanding, 150) &&
+        eq(ledger.billCreditOutstanding(creditsFR1, billStubFR1("fr1-bill-b", "fr1-cust-2")).outstanding, 350),
+    "F4: the per-bill outstanding (the lot model aging now shares) nets each reversal against its OWN bill — the CN reduced bill-test to 150, bill-b to 350");
+  const udh1FR1 = whatsapp.customerUdhaarPosition(creditsFR1, "fr1-cust-1");
+  const udh2FR1 = whatsapp.customerUdhaarPosition(creditsFR1, "fr1-cust-2");
+  check(eq(udh1FR1.outstanding, 5550) && udh1FR1.oldestAgeDays === 70 &&
+        eq(udh2FR1.outstanding, 400) && udh2FR1.oldestAgeDays === 45,
+    "F4: the WhatsApp udhaar position (which carried its own copy of the same FIFO defect) reads the same lots — and a today's-dated reversal does NOT make its bill younger (bill-b's lot keeps age 10, cust-2's oldest open lot stays 45)");
+  const purchasesFR1 = [{ id: "fr1-p1", supplierId: "fr1-sup-1", total: 1000, dayOffset: 70, ts: "2026-08-14T05:00:00.000Z" }];
+  const pRetsFR1 = [{ id: "fr1-pr1", purchaseId: "fr1-p1", supplierId: "fr1-sup-1", items: [], payableOffset: 300, refundAmount: 0, method: null, accountId: null, dayOffset: 0, ts: "2026-10-24T05:00:00.000Z" }];
+  const paymentsFR1 = [{ id: "fr1-sp1", supplierId: "fr1-sup-1", amount: 200, dayOffset: 0, ts: "2026-10-24T05:00:00.000Z", method: "cash" }];
+  const payAgingFR1 = ledger.payablesAging(purchasesFR1, paymentsFR1, pRetsFR1);
+  check(eq(payAgingFR1.total, 500) && eq(payAgingFR1.old, 500) &&
+        eq(ledger.supplierBalance(purchasesFR1, paymentsFR1, "fr1-sup-1", pRetsFR1), 500),
+    "F4 mirror: payables aging already netted debit-note returns per purchase (Phase B4's design) — purchase 1,000 − DN 300 − paid 200 = 500 in the >60d bucket, agreeing with supplierBalance; no change needed and now regression-pinned");
+
+  /* ---- F3: the day close's "today" widened every day ----
+   * Root cause: dayOffset is a creation-day stamp (always written
+   * 0, never recomputed), so on 24-Oct the live shop's 22-Oct rows
+   * still counted as today. The fix derives the effective offset
+   * from the row's ts at load (lib/periods dayOffsetForTs). */
+  check(periods.dayOffsetForTs("2026-10-22T05:00:00.000Z", "2026-10-24") === 2 &&
+        periods.dayOffsetForTs("2026-10-24T05:00:00.000Z", "2026-10-24") === 0 &&
+        periods.dayOffsetForTs("2026-10-24T19:30:00.000Z", "2026-10-24") === 0 &&
+        periods.dayOffsetForTs("not-a-date", "2026-10-24", 7) === 7,
+    "F3: dayOffsetForTs derives whole PKT business days from ts — 22-Oct is 2 on 24-Oct; a post-midnight-PKT stamp floors at 0 (never negative); an unparseable ts keeps the caller's fallback");
+  const tillFR1 = accounts.find((a) => a.legacyFor === "cash");
+  const L_FR1 = (account, debit, credit) => ({ account, debit, credit });
+  const walkRawFR1 = [
+    ledger.makeEntry("Sale day 1", "bill", null, [L_FR1("cash", 1000, 0), L_FR1("sales_revenue", 0, 1000)], { ts: "2026-10-22T05:00:00.000Z", dayOffset: 0 }),
+    ledger.makeEntry("Sale day 2", "bill", null, [L_FR1("cash", 500, 0), L_FR1("sales_revenue", 0, 500)], { ts: "2026-10-24T05:00:00.000Z", dayOffset: 0 }),
+    ledger.makeEntry("Rent day 2", "expense", null, [L_FR1("expense_rent", 200, 0), L_FR1("cash", 0, 200)], { ts: "2026-10-24T06:00:00.000Z", dayOffset: 0 }),
+  ];
+  const rebaseFR1 = (rows) => rows.map((r) => ({ ...r, dayOffset: periods.dayOffsetForTs(r.ts, "2026-10-24", r.dayOffset) }));
+  const walkFR1 = rebaseFR1(walkRawFR1);
+  check(ledger.accountDayNet(walkRawFR1, tillFR1, 0) === 1300 &&
+        ledger.accountDayNet(walkFR1, tillFR1, 0) === 300 &&
+        ledger.moneyAccountBalance(walkFR1, tillFR1) === 1300,
+    "F3: with the live shape (every stamp 0) the journal's 'today' net reads 1,300 — two days folded together; after the load re-base it reads exactly day 2's 300, and the till balance is untouched at 1,300");
+  const openingFR1 = ledger.moneyAccountBalance(walkFR1, tillFR1) - ledger.accountDayNet(walkFR1, tillFR1, 0);
+  const billsRawFR1 = [
+    { id: "fr1-b1", billNo: 1, status: "completed", dayOffset: 0, ts: "2026-10-22T05:00:00.000Z", payments: [{ method: "cash", amount: 1000 }] },
+    { id: "fr1-b2", billNo: 2, status: "completed", dayOffset: 0, ts: "2026-10-24T05:00:00.000Z", payments: [{ method: "cash", amount: 500 }] },
+  ];
+  const expRawFR1 = [{ id: "fr1-e1", amount: 200, method: "cash", dayOffset: 0, ts: "2026-10-24T06:00:00.000Z" }];
+  const dcArgsFR1 = (bills, exps) => ({
+    sales: [], bills, expenses: exps, credits: [], supplierPayments: [],
+    returnsRefundCash: 0, cashIn: 0, cashOut: 0, openingCash: openingFR1,
+  });
+  const dcFixedFR1 = ledger.dayCloseSummary(dcArgsFR1(rebaseFR1(billsRawFR1), rebaseFR1(expRawFR1)));
+  const dcBuggyFR1 = ledger.dayCloseSummary(dcArgsFR1(billsRawFR1, expRawFR1));
+  check(openingFR1 === 1000 && eq(dcFixedFR1.expectedCash, 1300) &&
+        eq(ledger.expectedCloseForAccount(walkFR1, tillFR1, openingFR1), 1300) &&
+        eq(dcBuggyFR1.expectedCash, 2300),
+    "F3: counter ≡ journal by construction after the re-base — opening 1,000 (pre-today balance, not the old double-counting full balance) + today's 500 − 200 = 1,300 = the journal expectation; the same documents un-rebased overstate 'today' at 2,300 (the live counter-vs-journal gap's mechanism)");
+  const closesFR1 = [{ id: "fr1-dc1", dateISO: "2026-10-22", dayOffset: 0, ts: "2026-10-22T15:00:00.000Z" }];
+  check(closesFR1.find((d) => d.dateISO === "2026-10-24") === undefined &&
+        closesFR1.find((d) => d.dayOffset === 0) !== undefined,
+    "F3: a close belongs to its dateISO — the 22-Oct close (stamp frozen at 0) is NOT today's close under the fixed predicate, while the old dayOffset predicate matched it forever");
+  const dcViewFR1 = readFR1("web/components/DayCloseView.tsx");
+  check((storeSrcFR1.match(/rebaseAges\(/g) || []).length >= 2 && storeSrcFR1.includes("dayOffsetForTs") &&
+        dcViewFR1.includes("dateISO === todayPktISO()") && dcViewFR1.includes("dateISO: todayPktISO()") &&
+        dcViewFR1.includes("dc.backlog") && dcViewFR1.includes("journalClose.opening"),
+    "F3 source: the store re-bases at BOTH load paths (cloud snapshot mapper + local load); the day-close screen matches closes by dateISO, stamps the PKT business date (not the UTC slice), offers the journal-derived pre-today opening, and labels the un-closed backlog");
+
+  /* ---- F2: the Balance Sheet report ----
+   * Presentation (stated): point-in-time "as at" the range end;
+   * Assets (+ the purchases clearing line, when non-zero) =
+   * Liabilities + Equity + the unclosed Result to date. */
+  const bsSeedFR1 = fiscal.balanceSheetReport(journal, ALL_RANGE);
+  const panelSeedFR1 = new Map(fiscal.balanceSheetBalances(journal, ALL_RANGE.toTs).map((r) => [r.account, r.balance]));
+  check(bsSeedFR1.balanced && bsSeedFR1.difference === 0 &&
+        eq(bsSeedFR1.totalAssets, bsSeedFR1.totalLiabilitiesEquity),
+    "F2: the Balance Sheet balances on the frozen seed journal");
+  check(eq(bsSeedFR1.assets.find((r) => r.account === "inventory").balance, 272805) &&
+        eq(bsSeedFR1.assets.find((r) => r.account === "cash").balance, 50000) &&
+        bsSeedFR1.assets.every((r) => eq(r.balance, panelSeedFR1.get(r.account))) &&
+        bsSeedFR1.liabilities.every((r) => eq(r.balance, panelSeedFR1.get(r.account))),
+    "F2: the statement's rows ARE the FY panel's balanceSheetBalances figures (inventory 272,805 · cash 50,000 on the seed) — one derivation, two presentations");
+  const plRawFR1 = fiscal.plAccountCodes().reduce((a, c) => a + ledger.accountBalance(journal, c), 0);
+  check(eq(bsSeedFR1.resultToDate, -plRawFR1),
+    "F2: the result-to-date line is exactly the net of the P&L accounts at the same instant (fy_close entries included), so the identity Assets = Liabilities + Equity + Result is the trial balance's zero restated");
+  const T_FR1 = (ts) => ({ ts, dayOffset: 0 });
+  const walkBSFR1 = [
+    ledger.makeEntry("Capital in", "cashbook", null, [L_FR1("cash", 100000, 0), L_FR1("capital", 0, 100000)], T_FR1("2026-02-10T05:00:00.000Z")),
+    ledger.makeEntry("Stock bought on credit", "purchase", null, [L_FR1("inventory", 40000, 0), L_FR1("payables", 0, 40000)], T_FR1("2026-02-11T05:00:00.000Z")),
+    ledger.makeEntry("Sale", "bill", null, [L_FR1("cash", 25000, 0), L_FR1("sales_revenue", 0, 25000)], T_FR1("2026-02-12T05:00:00.000Z")),
+    ledger.makeEntry("COGS", "bill", null, [L_FR1("cogs", 15000, 0), L_FR1("inventory", 0, 15000)], T_FR1("2026-02-12T05:01:00.000Z")),
+    ledger.makeEntry("Rent", "expense", null, [L_FR1("expense_rent", 5000, 0), L_FR1("cash", 0, 5000)], T_FR1("2026-02-13T05:00:00.000Z")),
+    ledger.makeEntry("Drawings", "cashbook", null, [L_FR1("drawings", 2000, 0), L_FR1("cash", 0, 2000)], T_FR1("2026-02-14T05:00:00.000Z")),
+    ledger.makeEntry("Supplier paid", "supplier_payment", null, [L_FR1("payables", 10000, 0), L_FR1("cash", 0, 10000)], T_FR1("2026-02-15T05:00:00.000Z")),
+  ];
+  const bsWalkFR1 = fiscal.balanceSheetReport(walkBSFR1, ALL_RANGE);
+  check(bsWalkFR1.balanced && eq(bsWalkFR1.totalAssets, 133000) &&
+        eq(bsWalkFR1.liabilitiesTotal, 30000) && eq(bsWalkFR1.equityTotal, 98000) &&
+        eq(bsWalkFR1.resultToDate, 5000) &&
+        eq(bsWalkFR1.equity.find((r) => r.account === "drawings").balance, -2000),
+    "F2: a trading walk states exactly — assets 133,000 (cash 108,000 + stock 25,000) = payables 30,000 + equity 98,000 (capital 100,000 − drawings 2,000, shown as a negative contribution) + result 5,000");
+  const bsClearFR1 = fiscal.balanceSheetReport([
+    ...walkBSFR1,
+    ledger.makeEntry("Purchase mid-clearing", "purchase", null, [L_FR1("purchases", 8000, 0), L_FR1("payables", 0, 8000)], T_FR1("2026-02-16T05:00:00.000Z")),
+  ], ALL_RANGE);
+  check(eq(bsClearFR1.clearing, 8000) && eq(bsClearFR1.totalAssets, 141000) && bsClearFR1.balanced,
+    "F2: an uncleared purchases balance appears as its own assets-side line and the statement still balances to the paisa (141,000 = 141,000)");
+  const fyRangeFR1 = periods.fiscalYearRange({}, "2026-02-10T05:00:00.000Z");
+  const closeFR1 = fiscal.buildFiscalClosingEntry(walkBSFR1, fyRangeFR1, "per-fr1-1");
+  const bsClosedFR1 = fiscal.balanceSheetReport([...walkBSFR1, closeFR1], ALL_RANGE);
+  check(!!closeFR1 && eq(bsClosedFR1.resultToDate, 0) &&
+        eq(bsClosedFR1.equity.find((r) => r.account === "retained_earnings").balance, 5000) &&
+        eq(bsClosedFR1.totalAssets, 133000) && bsClosedFR1.balanced,
+    "F2: after the FY close the result line reads 0 and the year's 5,000 sits in retained earnings — the statement total does not move and it still balances");
+  const reportsViewFR1 = readFR1("web/components/ReportsView.tsx");
+  check(reportsViewFR1.includes('"balancesheet"') && reportsViewFR1.includes("balanceSheetReport(journal, range)") &&
+        typeof fiscal.balanceSheetReport === "function",
+    "F2 source: the Balance Sheet is a first-class Reports catalogue entry built on lib/fiscal's balanceSheetReport over the live journal + range");
+
+  /* ---- F5: the opening-stock owner path ----
+   * There is NO general manual journal in this app (by design);
+   * the minimal correct path is one composed entry: Dr inventory
+   * (class-split) / Cr capital — never a P&L account. */
+  const productsFR1 = [
+    { id: "fr1-p1", name: "Goods", stockQty: 10, costPrice: 1000, salePrice: 1200, stockClass: null },
+    { id: "fr1-p2", name: "Raw", stockQty: 5, costPrice: 2000, salePrice: 2600, stockClass: "raw" },
+  ];
+  const journalGapFR1 = [
+    ledger.makeEntry("Bought goods", "purchase", null, [L_FR1("inventory", 4000, 0), L_FR1("payables", 0, 4000)], T_FR1("2026-10-20T05:00:00.000Z")),
+    ledger.makeEntry("Bought raw", "purchase", null, [L_FR1("inventory_raw", 12000, 0), L_FR1("payables", 0, 12000)], T_FR1("2026-10-20T05:01:00.000Z")),
+  ];
+  const gapFR1 = fiscal.openingStockGap(journalGapFR1, productsFR1);
+  check(eq(gapFR1.shelf, 20000) && eq(gapFR1.book, 16000) && eq(gapFR1.gap, 4000) && eq(gapFR1.rawGap, 0),
+    "F5: the gap is shelf − book on today's figures (20,000 − 16,000 = 4,000), and the raw share clamps at 0 when the raw BOOK already exceeds the raw shelf");
+  const entryFR1 = fiscal.buildOpeningStockEntry(gapFR1.gap, gapFR1.rawGap, { ts: "2026-10-24T05:00:00.000Z" });
+  check(!!entryFR1 && entryFR1.refType === "opening_stock" && ledger.entryBalances(entryFR1) &&
+        entryFR1.lines.length === 2 &&
+        entryFR1.lines[0].account === "inventory" && eq(entryFR1.lines[0].debit, 4000) &&
+        entryFR1.lines[1].account === "capital" && eq(entryFR1.lines[1].credit, 4000),
+    "F5: the opening entry is exactly Dr inventory / Cr capital (capital — the owner's own investment; no P&L account is touched, so no period result is corrupted)");
+  check(eq(fiscal.openingStockGap([...journalGapFR1, entryFR1], productsFR1).gap, 0) &&
+        fiscal.balanceSheetReport([...journalGapFR1, entryFR1], ALL_RANGE).balanced,
+    "F5: after posting, the gap reads 0 and the Balance Sheet still balances — the divergence the FY checklist reports is healed by the entry, not by editing history");
+  const gapBFR1 = fiscal.openingStockGap(journalGapFR1.slice(0, 1).concat([
+    ledger.makeEntry("Bought raw", "purchase", null, [L_FR1("inventory_raw", 6000, 0), L_FR1("payables", 0, 6000)], T_FR1("2026-10-20T05:01:00.000Z")),
+  ]), productsFR1);
+  const entryBFR1 = fiscal.buildOpeningStockEntry(gapBFR1.gap, gapBFR1.rawGap, { ts: "2026-10-24T05:00:00.000Z" });
+  const lineBFR1 = (a) => entryBFR1.lines.find((l) => l.account === a);
+  check(eq(gapBFR1.gap, 10000) && eq(gapBFR1.rawGap, 4000) && entryBFR1.lines.length === 3 &&
+        eq(lineBFR1("inventory").debit, 6000) && eq(lineBFR1("inventory_raw").debit, 4000) &&
+        eq(lineBFR1("capital").credit, 10000) && ledger.entryBalances(entryBFR1),
+    "F5: with a raw shortfall the entry class-splits through the C3 seam — Dr inventory 6,000 + Dr inventory_raw 4,000 / Cr capital 10,000");
+  check(fiscal.buildOpeningStockEntry(0, 0) === null && fiscal.buildOpeningStockEntry(-500, 0) === null &&
+        eq(fiscal.openingStockGap([...journalGapFR1, entryFR1], productsFR1).gap, 0),
+    "F5: no positive gap, no entry — zero/negative amounts compose nothing");
+  const rulesFR1 = readFR1("firebase/firestore.rules");
+  check(!rulesFR1.includes("opening_stock") && plans.REFTYPE_MIN_TIER.opening_stock === undefined &&
+        tally.TALLY_VOUCHER_TYPE_BY_REFTYPE.opening_stock === "Journal",
+    "F5: NO rules amendment was needed — opening_stock is unlisted in both tier maps (client + rules mirror), so it rides the Core default exactly like the legacy refTypes; its Tally voucher is a Journal");
+  const fyPanelFR1 = readFR1("web/components/FiscalClosePanel.tsx");
+  check(fyPanelFR1.includes("openingStockGap") && fyPanelFR1.includes("fin.fy.openStock.action") &&
+        fyPanelFR1.includes("postOpeningStock") && storeSrcFR1.includes("buildOpeningStockEntry"),
+    "F5 source: the action lives where the owner sees the divergence — the fiscal panel's stock row, offering the live gap through the owner-gated store action that composes in lib/fiscal");
+}
+
+
+suite("FR2", null); // Fix Round 2 — demo opt-in, clear-to-trash, multi-business (the owner's 2026-10-24 redefinition, replacing the 'Start fresh' proposal)
+{
+  const FR2_NOW = "2026-10-24T07:00:00.000Z";
+  const demoDocsFR2 = demoLib.demoSetDocs();
+  const demoIdsFR2 = demoLib.demoSetIds();
+  const summaryFR2 = demoLib.demoSummary();
+
+  /* ---- FR2·1: the demo set is exactly the live demo seed's figures ---- */
+  check(summaryFR2.products === 25 && summaryFR2.customers === 3 &&
+        summaryFR2.suppliers === 2 && summaryFR2.salesRows === 347 &&
+        summaryFR2.journalEntries === 29 && summaryFR2.stockCost === 272805 &&
+        summaryFR2.stockRetail === 303250,
+    "FR2 demo: the set the owner is shown before seeding is the live demo seed's own figures — 25 products, 3 customers, 2 suppliers, 347 sale rows, 29 journal entries, stock 272,805 cost / 303,250 retail (the figures the live demo business carries, not a new invented set)");
+  check(demoLib.cloudDemoHasGodown() === false &&
+        demoDocsFR2.warehouses.length === 1 && demoDocsFR2.warehouses[0].id === "wh-main" &&
+        demoDocsFR2.accounts.length === 5 &&
+        demoDocsFR2.bills.length === 0 && demoDocsFR2.returns.length === 0 &&
+        demoDocsFR2.adjustments.length === 0 && demoDocsFR2.dayCloses.length === 0 &&
+        demoDocsFR2.cashEntries.length === 0,
+    "FR2 demo: the cloud set carries the Godown nowhere (demo-mode-only flavour, filtered exactly as seedNamespace did) and no bills/returns/adjustments/day-closes/cash-entries — the cloud demo is the sales + journal seed only, plus the 5 structural money accounts and the single default warehouse");
+  const seedJournalFR2 = seed.getSeedJournal(
+    seed.getSeedProducts(), seed.getSeedSales(), seed.getSeedPurchases(),
+    seed.getSeedSupplierPayments(), seed.getSeedExpenses(), seed.getSeedCredits());
+  check(demoDocsFR2.journal.length === 29 &&
+        demoDocsFR2.journal.slice(0, 21).every((e, i) => e.id === seedJournalFR2[i].id) &&
+        demoDocsFR2.journal.filter((e) => e.refType === "loyalty_earn").length === 4 &&
+        demoDocsFR2.journal.length - seedJournalFR2.length === 8,
+    "FR2 demo: the 29 journal entries are the frozen 21 (ids identical to the seed journal) plus 8 demo entries — 4 loyalty bills + 4 loyalty earns — the demo journal is the frozen seed's journal, extended, never rewritten");
+
+  /* ---- FR2·1: the seed plan — 438 writes against a skeleton, 0 when full ---- */
+  {
+    const skeletonIds = {
+      accounts: new Set(demoDocsFR2.accounts.map((d) => d.id)),
+      warehouses: new Set(demoDocsFR2.warehouses.map((d) => d.id)),
+    };
+    const planSkeleton = demoLib.planDemoSeed(skeletonIds);
+    const planCounts = planSkeleton.reduce((acc, w) => {
+      acc[w.collection] = (acc[w.collection] || 0) + 1;
+      return acc;
+    }, {});
+    check(planSkeleton.length === 438 && planCounts.products === 25 &&
+          planCounts.sales === 347 && planCounts.journal === 29 &&
+          planCounts.customers === 3 && planCounts.suppliers === 2 &&
+          planCounts.stockLevels === 25 && planCounts.taxSlabs === 1 &&
+          planCounts.purchases === 1 && planCounts.supplierPayments === 1 &&
+          planCounts.expenses === 2 && planCounts.credits === 2 &&
+          !("accounts" in planCounts) && !("warehouses" in planCounts),
+      "FR2 demo: against a skeleton (accounts + warehouse already present) the seed plan is exactly 438 writes, and it never rewrites the structural pair — the plan is the demo set minus what is already there, so re-running it over a seeded business writes nothing");
+    const fullIds = {};
+    for (const [k, v] of Object.entries(demoDocsFR2)) fullIds[k] = new Set(v.map((d) => d.id));
+    check(demoLib.planDemoSeed(fullIds).length === 0,
+      "FR2 demo: over a fully seeded business the plan is empty — re-add is a no-op unless rows were deleted, never a duplicate seed");
+    const added = demoLib.summarizeSeedWrites(planSkeleton);
+    const writtenProducts = planSkeleton.filter((w) => w.collection === "products").map((w) => w.data);
+    const writtenCost = writtenProducts.reduce((n, pr) => n + (pr.stockQty || 0) * (pr.costPrice || 0), 0);
+    const writtenRetail = writtenProducts.reduce((n, pr) => n + (pr.stockQty || 0) * (pr.salePrice || 0), 0);
+    check(added.products === 25 && added.journal === 29 && added.sales === 347 &&
+          added.customers === 3 && added.suppliers === 2 && added.stockLevels === 25 &&
+          writtenCost === 272805 && writtenRetail === 303250,
+      "FR2 demo: the post-seed summary is computed from the writes actually committed — per-collection counts plus the written products' stock at cost and retail — and it reproduces the pre-list figures exactly: what the owner was promised is what the store confirms");
+  }
+
+  /* ---- FR2·1: classification — content decides, never the flag ---- */
+  {
+    const idsOnly = (docs) => Object.fromEntries(
+      Object.entries(docs).map(([k, v]) => [k, v.map((d) => ({ id: d.id }))]));
+    check(demoLib.classifyBusinessContent({}) === "empty" &&
+          demoLib.classifyBusinessContent({ accounts: [{ id: "acc-till" }], warehouses: [{ id: "wh-main" }] }) === "empty",
+      "FR2 demo: an empty business and a skeleton-only business both classify 'empty' — structural docs are never content, so a fresh business is seedable and a skeleton is not 'real data'");
+    check(demoLib.classifyBusinessContent(idsOnly(demoDocsFR2)) === "demo-only",
+      "FR2 demo: the full demo set classifies 'demo-only'");
+    const minusOne = idsOnly(demoDocsFR2);
+    minusOne.products = minusOne.products.slice(0, -1);
+    check(demoLib.classifyBusinessContent(minusOne) === "demo-only",
+      "FR2 demo: a demo business with one demo row deleted is still 'demo-only' — deletion of demo rows does not turn the business real, so re-add stays available");
+    check(demoLib.classifyBusinessContent({ products: [{ id: "p-mh123abc" }] }) === "real" &&
+          demoLib.classifyBusinessContent({ ...idsOnly(demoDocsFR2), bills: [{ id: "bill-real-1" }] }) === "real",
+      "FR2 demo: one user-created row — timestamp-shaped ids can never equal a demo id — turns the business 'real', and a demo set plus one real bill is 'real': demo seeding is refused there, so demo seed can never mix into a real book");
+  }
+
+  /* ---- FR2·2: trash chunking — 400k chars, order-free, corruption-refusing ---- */
+  {
+    const payload = "x".repeat(900166);
+    const chunks = trashLib.chunkBackupJson(payload);
+    check(chunks.length === 3 && chunks[0].data.length === 400000 &&
+          chunks[1].data.length === 400000 && chunks[2].data.length === 100166,
+      "FR2 trash: a 900,166-char backup splits into 3 chunks of at most 400,000 chars — well under the 1 MiB Firestore document limit even for multi-byte text, and the live 154 KB backup fits in ONE chunk");
+    check(trashLib.reassembleChunks(chunks) === payload &&
+          trashLib.reassembleChunks([...chunks].reverse()) === payload,
+      "FR2 trash: reassembly is order-free — document return order is meaningless, the index does the ordering");
+    check(trashLib.reassembleChunks([chunks[0], chunks[2]]) === null &&
+          trashLib.reassembleChunks(chunks.slice(0, 2), chunks.length) === null &&
+          trashLib.reassembleChunks(chunks, chunks.length + 1) === null &&
+          trashLib.reassembleChunks([]) === null,
+      "FR2 trash: a middle gap, a truncated tail, and a wrong manifest count are all refused as null — the reassembler never hands verifyBackup a spliced file");
+  }
+
+  /* ---- FR2·2: trash manifest + expiry — read-time, never a cron ---- */
+  {
+    const manifest = trashLib.trashManifestFor({
+      trashId: "trash-fr2-1",
+      backup: { manifest: { businessId: "biz-fr2-1", counts: { products: 2, journal: 1 }, totalDocs: 4, journalCount: 1, journalFingerprint: "aa".repeat(32) } },
+      clearedAtISO: FR2_NOW,
+      replacedTrashId: null,
+    }).manifest;
+    check(manifest.businessId === "biz-fr2-1" && manifest.source === "clear" &&
+          manifest.clearedAt === FR2_NOW && manifest.expiresAt === "2026-11-23T07:00:00.000Z" &&
+          manifest.totalDocs === 4 && manifest.journalCount === 1 &&
+          manifest.journalFingerprint === "aa".repeat(32) && manifest.status === "active",
+      "FR2 trash: the manifest carries businessId, clearedAt, expiresAt = clearedAt + 30 days exactly, doc counts and the journal fingerprint copied verbatim from the backup manifest — panel and file cannot disagree");
+    check(trashLib.trashPanelState(manifest, FR2_NOW) === "active" &&
+          trashLib.trashPanelState(manifest, "2026-11-22T07:00:00.000Z") === "active" &&
+          trashLib.trashPanelState(manifest, "2026-11-23T07:00:01.000Z") === "expired" &&
+          trashLib.trashPanelState({ ...manifest, status: "restored" }, "2026-12-25T07:00:00.000Z") === "restored" &&
+          trashLib.trashPanelState({ ...manifest, status: "deleted" }, FR2_NOW) === "deleted",
+      "FR2 trash: 'expired' is DERIVED at read time — active at clear and at 29 days, expired 1 second past 30 days, with no cron and no stored flag; restored/deleted come from the stored status and survive past expiry");
+    check(trashLib.canRestoreFromTrash(manifest, FR2_NOW) === true &&
+          trashLib.canRestoreFromTrash(manifest, "2026-11-23T07:00:01.000Z") === false &&
+          trashLib.canRestoreFromTrash({ ...manifest, status: "restored" }, FR2_NOW) === false &&
+          trashLib.canRestoreFromTrash({ ...manifest, status: "deleted" }, FR2_NOW) === false,
+      "FR2 trash: restore is offered only for an active, unexpired snapshot — expired, restored and deleted snapshots all refuse, so a consumed trash entry is never restorable again");
+    check(trashLib.clearReplacesTrash([manifest, { ...manifest, trashId: "old", status: "restored" }]) === manifest &&
+          trashLib.clearReplacesTrash([{ ...manifest, status: "restored" }]) === null,
+      "FR2 trash: a new clear replaces only an ACTIVE snapshot, and only after the confirm — restored/deleted/expired snapshots are not 'replaced', they are already gone");
+  }
+
+  /* ---- FR2·2: clear → trash → restore, end to end over the model ---- */
+  {
+    const ownerFR2 = { shopName: "Demo Shop", demoState: "seeded" };
+    const backupFR2 = backup.assembleBackup({
+      businessId: "biz-fr2-demo", exportedAt: FR2_NOW, exportedBy: "web",
+      owner: ownerFR2, collections: demoDocsFR2,
+      platform: { registry: null, members: [], invites: [], counters: null, stats: null, events: [], payments: [], storefront: null, storeOrders: [] },
+    });
+    check(backup.verifyBackup(backupFR2).ok === true,
+      "FR2 trash: the pre-clear backup verifies before it is ever written to trash — a corrupt snapshot is never stored");
+    const trashDoc = trashLib.trashManifestFor({
+      trashId: "trash-fr2-demo", backup: backupFR2, clearedAtISO: FR2_NOW, replacedTrashId: null,
+    });
+    const chunksFR2 = trashLib.chunkBackupJson(JSON.stringify(backupFR2));
+    check(trashDoc.manifest.totalDocs === backupFR2.manifest.totalDocs &&
+          trashDoc.manifest.journalFingerprint === backupFR2.manifest.journalFingerprint &&
+          trashDoc.manifest.chunkCount === chunksFR2.length,
+      "FR2 trash: clear→snapshot counts ≡ pre-clear counts — the trash manifest is the backup manifest, not a recount");
+    const reassembled = trashLib.reassembleChunks(chunksFR2, trashDoc.manifest.chunkCount);
+    const restoredBackup = JSON.parse(reassembled);
+    check(backup.verifyBackup(restoredBackup).ok === true &&
+          restoredBackup.manifest.journalFingerprint === backupFR2.manifest.journalFingerprint,
+      "FR2 trash: the reassembled snapshot verifies and carries the exact pre-clear journal fingerprint — the trash round-trip is lossless");
+    const emptied = backup.emptyNamespace();
+    const countTenant = (cols) => Object.values(cols).reduce((n, arr) => n + arr.length, 0);
+    check(countTenant(emptied.collections) === 0,
+      "FR2 trash: the wipe leaves 0 tenant docs in the model — the business is empty, so the restore guard opens");
+    const planFR2 = backup.planRestore({
+      file: restoredBackup, targetBusinessId: "biz-fr2-demo", target: emptied,
+      actorUid: "user-fr2-uid", nowISO: FR2_NOW,
+    });
+    check(planFR2.ok === true,
+      "FR2 trash: restore-from-trash into the emptied business is allowed by the existing pipeline, guard and all");
+    const appliedFR2 = backup.applyRestoreWrites(emptied, "biz-fr2-demo", planFR2.writes);
+    check(backup.journalFingerprint(appliedFR2.collections.journal) === backupFR2.manifest.journalFingerprint &&
+          countTenant(appliedFR2.collections) === backupFR2.manifest.totalDocs - 1,
+      "FR2 trash: restore-from-trash into the emptied business reproduces the exact journal fingerprint and the exact tenant doc count — the book comes back entry for entry");
+    const nonEmpty = { ...emptied, collections: { ...emptied.collections, products: [{ id: "p-new-1" }] } };
+    const refusedFR2 = backup.planRestore({
+      file: restoredBackup, targetBusinessId: "biz-fr2-demo", target: nonEmpty,
+      actorUid: "user-fr2-uid", nowISO: FR2_NOW,
+    });
+    check(refusedFR2.ok === false && refusedFR2.reason === "target-not-empty" &&
+          refusedFR2.conflicts.length === 1 &&
+          refusedFR2.conflicts[0] === "users/biz-fr2-demo/products/p-new-1",
+      "FR2 trash: restore into a business that gained new data after clearing is refused by the existing empty-business guard — never merged, the existing refusal stands");
+    check(trashLib.canRestoreFromTrash(trashDoc.manifest, "2026-11-23T07:00:01.000Z") === false,
+      "FR2 trash: the same snapshot, 30 days later, cannot restore — expiry is a read-time gate on the manifest, not a deletion of the data");
+  }
+
+  /* ---- FR2·3: multi-business — the phase plans ---- */
+  {
+    const nb = { businessId: "biz-fr2-gen-001", ownerUid: "user-fr2-uid", ownerEmail: "o@x.com", name: "Second Shop", phone: "0300-1", address: "Main Road", nowISO: FR2_NOW };
+    const p1 = tenancy.planNewBusinessPhase1(nb);
+    const reg = p1.find((w) => w.path === "businesses/biz-fr2-gen-001");
+    check(reg && reg.data.ownerUid === "user-fr2-uid" && reg.data.plan.planId === "trial" &&
+          reg.data.plan.usersLimit === 2 && reg.data.plan.invoiceLimit === 200 &&
+          reg.data.enforce === false && reg.data.plan.assignedBy === "signup" &&
+          !JSON.stringify(p1).includes("founding") &&
+          p1.some((w) => w.collection === "businessEvents" && w.data.kind === "business.created"),
+      "FR2 multi: phase 1 births a GENERATED business on Free Trial — ownerUid is the creator's uid (never the business id), limits 2 users / 200 invoices, enforce false, and founding appears nowhere: the founding comp plan is pre-G only, by construction");
+    const p2 = tenancy.planNewBusinessPhase2(nb);
+    const ctr = p2.find((w) => w.path === "businessCounters/biz-fr2-gen-001");
+    const idx = p2.find((w) => w.kind === "index" && w.businessId === "biz-fr2-gen-001");
+    check(ctr && ctr.data.invoiceCount === 0 && ctr.data.invoiceMonth === tenancy.pktMonthKey(FR2_NOW) &&
+          idx && idx.uid === "user-fr2-uid" && idx.role === "owner" &&
+          !p2.some((w) => (w.path ?? "").startsWith("businessMembers/")),
+      "FR2 multi: phase 2 zeroes the birth-month counters and writes the creator's switcher index entry with role 'owner' — and writes NO members doc: an owner is never a member of their own business");
+    const skel = tenancy.newBusinessSkeleton(nb);
+    check(skel.ownerDoc.demoState === "none" && skel.ownerDoc.seedV2 === true &&
+          skel.accounts.length === 5 && skel.warehouse.id === "wh-main" &&
+          skel.ownerDoc.shopName === "Second Shop" &&
+          skel.ownerDoc.phone === "0300-1" && skel.ownerDoc.address === "Main Road" &&
+          skel.ownerDoc.lockedThrough === "",
+      "FR2 multi: the new-business skeleton is EMPTY content — demoState none, 5 money accounts, the default warehouse, the creation form's name/phone/address, no lock — so a new business starts exactly as item 1 requires");
+    check(tenancy.newBusinessInputOk({ name: "Second Shop", phone: "0300-1", address: "Main Road" }) === true &&
+          tenancy.newBusinessInputOk({ name: "   ", phone: "", address: "" }) === false &&
+          tenancy.newBusinessInputOk({ name: "x".repeat(61), phone: "", address: "" }) === false,
+      "FR2 multi: creation input validation — name required, 1–60 chars; phone ≤ 16; address ≤ 200");
+  }
+
+  /* ---- FR2·3: healing, switcher ordering, active picking, migration identity ---- */
+  {
+    const healed = tenancy.healIndex(
+      [{ businessId: "biz-fr2-gen-001", role: "owner" }, { businessId: "biz-fr2-gone", role: "manager" }],
+      { "biz-fr2-gone": null },
+      ["biz-fr2-gen-001"]
+    );
+    check(healed.kept.length === 1 && healed.kept[0].businessId === "biz-fr2-gen-001" && healed.kept[0].role === "owner" &&
+          healed.dropped.length === 1 && healed.dropped[0] === "biz-fr2-gone",
+      "FR2 multi: healing keeps an owner-owned business even though it has no membership doc — without this carve-out every additionally-owned business would vanish on the next sign-in");
+    const list = tenancy.buildSwitcherList({
+      own: { businessId: "user-fr2-uid", name: "First Shop" },
+      entries: [
+        { businessId: "biz-fr2-gen-001", role: "owner", own: true },
+        { businessId: "biz-fr2-member", role: "manager" },
+      ],
+      names: { "biz-fr2-gen-001": "Second Shop", "biz-fr2-member": "A Shop" },
+    });
+    check(list.length === 3 && list[0].businessId === "user-fr2-uid" && list[0].own === true &&
+          list[1].businessId === "biz-fr2-gen-001" && list[1].own === true &&
+          list[2].businessId === "biz-fr2-member" && list[2].own === false,
+      "FR2 multi: the switcher lists the uid-shaped own business first, then other owned businesses, then member businesses — the owner's live business stays business #1 in the list");
+    check(tenancy.pickActiveBusiness(list, ["biz-fr2-member", "biz-fr2-gen-001"])?.businessId === "biz-fr2-member" &&
+          tenancy.pickActiveBusiness(list, ["biz-fr2-gone"]) === null,
+      "FR2 multi: active picking honours the first candidate present in the list; an absent candidate falls back to list[0] — the caller's decision, never a guess");
+    const mig = tenancy.planMigration({
+      ownerUid: "user-fr2-uid", ownerEmail: "o@x.com", shopName: "First Shop",
+      phone: "0300-1", staffEmails: [], registryExists: false, bills: [], sales: [],
+      nowISO: FR2_NOW,
+    });
+    const migReg = mig.find((w) => w.path === "businesses/user-fr2-uid");
+    check(migReg && migReg.data.plan.planId === "founding" &&
+          mig.some((w) => w.path === "businessCounters/user-fr2-uid"),
+      "FR2 multi: the legacy migration path is unchanged — a pre-G business still births at businesses/{uid} on the founding comp plan, so the owner's live business (aVmi6MiyvgTgw9QwnqCcaiCaqBq2) keeps working untouched as business #1 with no data move and no re-keying");
+  }
+
+  /* ---- FR2 rules v11: additive delta, strip-proof back to v10 ---- */
+  {
+    const rulesFR2 = fs.readFileSync("/home/hatch/workspace/ai-dukaan-ai/firebase/firestore.rules", "utf8");
+    const stripped = stripFR2Blocks(rulesFR2);
+    check(backup.sha256Hex(stripped) === "f10b2ee07ceb0c5a583f3762fa021222fb1a9a90832bf566956ae157372220ba",
+      "FR2 rules: stripping the FR2 spans returns the v10 FINAL text byte-for-byte (SHA f10b2ee0…) — the v11 delta is purely additive, nothing else in the file moved");
+    check(backup.sha256Hex(stripBizCreateFixBlocks(rulesFR2)) === "0f19f56e5da1d36840767468da71550105be65786a0939566115b19be4b40e70" &&
+          stripBizCreateFixBlocks(rulesFR2).split("\n").length === 1670,
+      "FR2 rules: v11 is 1,670 lines (JS split count), SHA 0f19f56e… (BizCreateFix same-check amendment: the v11 pin now runs over the v12-stripped file — v12 minus its two spans IS v11, proven in the BizCreateFix suite) — the deploy re-paste is REQUIRED (unlike FR1, where rules were unchanged)");
+    check(rulesFR2.includes("isRegistryOwner(uid)") && rulesFR2.includes("isBusinessOwner(uid)") &&
+          rulesFR2.includes("isClearWindow(uid)") && rulesFR2.includes("match /businessTrash/") &&
+          rulesFR2.includes("businessBirthOk(businessId)") &&
+          rulesFR2.includes("ownerUid == request.auth.uid") &&
+          rulesFR2.includes("isPlatformAdmin()"),
+      "FR2 rules: the new helpers exist — registry-owner, business-owner (uid match OR registry leg), and the clear window — and the trash block is owner-only");
+    const trashBlock = rulesFR2.slice(rulesFR2.indexOf("match /businessTrash/"));
+    const trashEnd = trashBlock.indexOf("match /{document=**}");
+    check(trashBlock.slice(0, trashEnd).includes("isBusinessOwner(businessId)") &&
+          !trashBlock.slice(0, trashEnd).includes("isPlatformAdmin"),
+      "FR2 rules: the /platform console gains NO leg into trash — the super-admin rule (no leg into any tenant namespace) holds for the trash area too");
+    const tenantRegion = rulesFR2.slice(
+      rulesFR2.indexOf("match /users/{uid}"),
+      rulesFR2.indexOf("// ---- Phase G · G1: platform collections (START)"));
+    const countOcc = (text, line) => text.split(line).length - 1;
+    check(countOcc(tenantRegion, "allow update, delete: if isBusinessOwner(uid);") === 4 &&
+          countOcc(tenantRegion, "allow delete: if isBusinessOwner(uid);") === 5 &&
+          countOcc(tenantRegion, "allow create, update, delete: if isBusinessOwner(uid);") === 1 &&
+          tenantRegion.includes("match /taxSlabs/{slabId} {\n        allow read: if canAccess(uid);\n        allow write: if isBusinessOwner(uid);") &&
+          tenantRegion.includes("match /periods/{periodId} {\n        allow read: if canAccess(uid);\n        allow write: if isBusinessOwner(uid);") &&
+          countOcc(tenantRegion, "allow delete: if isOwner(uid);") === 0 &&
+          countOcc(tenantRegion, "allow update, delete: if isOwner(uid);") === 0,
+      "FR2 rules: the 12 bare-isOwner legs in the tenant region are widened to isBusinessOwner — returns/dayCloses/notes/purchaseReturns (update+delete), cheques/warehouses/stockLevels/payrollRuns/loans (delete), branding (create/update/delete), taxSlabs + periods (write) — and NO bare-isOwner delete/update leg remains there: a generated business's owner deletes exactly as a legacy owner does, which clear-to-trash on a generated business depends on (staff gain nothing: isBusinessOwner is uid match OR registry leg)");
+  }
+
+  /* ---- FR2 i18n: 59 new keys, four-locale parity ---- */
+  {
+    const prefixCount = (dict, p) => Object.keys(dict).filter((k) => k.startsWith(p)).length;
+    check(prefixCount(i18n.en, "demo.") === 20 && prefixCount(i18n.en, "trash.") === 26 &&
+          ["biz.newBusiness", "biz.createTitle", "biz.createBody", "biz.nameLabel", "biz.namePlaceholder",
+           "biz.phoneLabel", "biz.addressLabel", "biz.createButton", "biz.created", "biz.createFailed",
+           "biz.setupIncomplete", "biz.retrySetup", "biz.activeBusiness"].every((k) => k in i18n.en),
+      "FR2 i18n: 20 demo + 26 trash + 13 business keys — the FR2 growth is exactly the three new surfaces, nothing else");
+    check(["ur", "ps", "fa"].every((l) =>
+          prefixCount(i18n[l], "demo.") === 20 && prefixCount(i18n[l], "trash.") === 26 &&
+          ["biz.newBusiness", "biz.createTitle", "biz.createBody", "biz.nameLabel", "biz.namePlaceholder",
+           "biz.phoneLabel", "biz.addressLabel", "biz.createButton", "biz.created", "biz.createFailed",
+           "biz.setupIncomplete", "biz.retrySetup", "biz.activeBusiness"].every((k) => k in i18n[l])),
+      "FR2 i18n: the same 59 keys exist in UR, PS and FA — PS/FA are machine drafts, 0 reviewed, exactly as the FR1/Phase H rule requires");
+  }
+
+  /* ---- FR2 client wiring: source checks (the harness cannot run
+   * React, so it pins the wiring textually — the same FR1 pattern:
+   * the new code paths must be present, and the old silent paths
+   * must be gone) ---- */
+  {
+    const readFR2 = (p) => fs.readFileSync("/home/hatch/workspace/ai-dukaan-ai/" + p, "utf8");
+    const storeFR2 = readFR2("web/components/StoreProvider.tsx");
+    const authFR2 = readFR2("web/components/AuthProvider.tsx");
+    const switcherFR2 = readFR2("web/components/BusinessSwitcher.tsx");
+    const dashFR2 = readFR2("web/components/Dashboard.tsx");
+    const settingsFR2 = readFR2("web/components/SettingsView.tsx");
+    const backupFR2 = readFR2("web/components/BackupPanel.tsx");
+    const platDataFR2 = readFR2("web/components/PlatformData.tsx");
+    const platLibFR2 = readFR2("web/lib/platform.ts");
+    const platConsoleFR2 = readFR2("web/components/PlatformConsole.tsx");
+    const platDetailFR2 = readFR2("web/components/PlatformDetail.tsx");
+    const platPayFR2 = readFR2("web/components/PlatformPayments.tsx");
+    const demoModalFR2 = readFR2("web/components/DemoDataModal.tsx");
+
+    /* Item 1 — auto-seeding is gone; the new branch creates EMPTY. */
+    check(!storeFR2.includes("seedNamespace(db, uid") &&
+          storeFR2.includes("createEmptyNamespace") &&
+          storeFR2.includes("seedDemoCollections") &&
+          storeFR2.includes("demoState: \"seeded\""),
+      "FR2 wiring (item 1): StoreProvider no longer calls seedNamespace on the brand-new-owner path — it creates an EMPTY namespace (skeleton only) and seeds demo data only through the explicit seedDemoCollections action, which marks demoState seeded");
+    check(storeFR2.includes("demoClass") && storeFR2.includes("addDemoData") &&
+          storeFR2.includes("resetDemoData") && storeFR2.includes("classFromIds") &&
+          storeFR2.includes("summaryFromWrites"),
+      "FR2 wiring (item 1): the store exposes demoClass + addDemoData + resetDemoData, re-classifies from fresh reads before writing, and returns the summary confirmed from the writes committed");
+    check(dashFR2.includes("DemoDataModal") && dashFR2.includes("demo.addButton") &&
+          dashFR2.includes("demo.reAddButton") && dashFR2.includes("demoClass") &&
+          dashFR2.includes("mode === \"demo\"") &&
+          settingsFR2.includes("DemoDataModal") && settingsFR2.includes("demo.addButton"),
+      "FR2 wiring (item 1): Dashboard and Settings both offer the demo actions through the shared DemoDataModal, gated on demoClass (empty → add, demo-only → re-add, real → hidden); the Dashboard's demo-mode branch keeps its legacy showroom reset, but the production footer button is state-aware, not the old unconditional reset");
+    check(demoModalFR2.includes("requirePin") && demoModalFR2.includes("demo.addButton") &&
+          demoModalFR2.includes("demo.reAddButton") && demoModalFR2.includes("demoSummary()") &&
+          demoModalFR2.includes("demo.addedBody"),
+      "FR2 wiring (item 1): the demo modal PIN-challenges with the action's own label key, shows the pre-list from the pure demoSummary() generator, and the post-seed summary from the action's result — never from live counts");
+
+    /* Item 2 — clear-to-trash + trash panel wiring. */
+    check(storeFR2.includes("clearBusinessData") && storeFR2.includes("listTrash") &&
+          storeFR2.includes("restoreFromTrash") && storeFR2.includes("deleteTrashPermanently") &&
+          storeFR2.includes("businessTrash") && storeFR2.includes("clearing: now") &&
+          storeFR2.includes("clearing: deleteField()"),
+      "FR2 wiring (item 2): the store exposes clearBusinessData + listTrash + restoreFromTrash + deleteTrashPermanently, snapshots under businessTrash, and opens/closes the rules clear window (clearing flag set before the wipe, cleared in a finally so a half-failed wipe never strands it open)");
+    check(settingsFR2.includes("trash.clearButton") && settingsFR2.includes("trash.typeLabel") &&
+          settingsFR2.includes("trash.replaceWarning") && settingsFR2.includes("CLEAR") &&
+          settingsFR2.includes("trash.storefrontNote") && settingsFR2.includes("trash.sweepNote") &&
+          settingsFR2.includes("requirePin(\"trash.clearButton\")"),
+      "FR2 wiring (item 2): Settings carries the production danger zone — type-CLEAR confirm, PIN challenge on the Clear button, replace warning, and the storefront/sweep notes");
+    check(backupFR2.includes("trash.title") && backupFR2.includes("listTrash") &&
+          backupFR2.includes("restoreFromTrash") && backupFR2.includes("deleteTrashPermanently") &&
+          backupFR2.includes("trash.restoreRefused") && backupFR2.includes("trash.restoreExpired") &&
+          backupFR2.includes("trashPanelState"),
+      "FR2 wiring (item 2): BackupPanel carries the trash panel — list (which sweeps expired lazily), restore with the guard-refusal and expired messages, delete-permanently, and read-time state derivation");
+
+    /* Item 3 — multi-business creation + switcher + platform fix. */
+    check(authFR2.includes("createBusiness") && authFR2.includes("planNewBusinessPhase1") &&
+          authFR2.includes("planNewBusinessPhase2") && authFR2.includes("newBusinessInputOk") &&
+          authFR2.includes("serverActive") && authFR2.includes("activeBusinessId") &&
+          authFR2.includes("{ activeBusinessId: businessId }"),
+      "FR2 wiring (item 3): AuthProvider exposes createBusiness (phase-1 registry + phase-2 counters/index, skeleton last with a setup-failed retry path) and persists the active business server-side in userMemberships as well as device-locally");
+    check(switcherFR2.includes("biz.newBusiness") && switcherFR2.includes("biz.createTitle") &&
+          switcherFR2.includes("biz.retrySetup") && switcherFR2.includes("retryBusinessSetup") &&
+          switcherFR2.includes("businesses.some((b) => b.own)"),
+      "FR2 wiring (item 3): the header switcher (NOT the sidebar) lists owned/member businesses, offers New business to owners, and a retry row when a generated business's skeleton never landed");
+    check(platDataFR2.includes("businessId: docId") && platDataFR2.includes("normRegistry(d.id,") &&
+          platLibFR2.includes("consoleBusinessId") &&
+          platLibFR2.includes("businessId: consoleBusinessId(registry)") &&
+          platLibFR2.includes("countersById[consoleBusinessId(b)]") &&
+          platConsoleFR2.includes("consoleBusinessId(b)") &&
+          platDetailFR2.includes("const bid = consoleBusinessId(business)") &&
+          platPayFR2.includes("consoleBusinessId(b) === p.businessId"),
+      "FR2 wiring (item 3): the /platform console keys businesses by registry doc id (consoleBusinessId, ownerUid fallback for legacy fixtures) — directory, aggregates, payment guard, selection, detail acts and payment matching — so two businesses of one owner list and act independently instead of collapsing onto the creator uid");
+    check(platLibFR2.includes("CONSOLE_READ_COLLECTIONS") &&
+          !platLibFR2.includes("businessTrash"),
+      "FR2 wiring (item 3): the platform console's closed read list is untouched by trash — no leg into any tenant namespace, trash included");
+  }
+}
+
+suite("BizCreateFix", null); // Business-creation fix — the FR2 birth path's Timestamp seam + the skeleton accounts leg (rules v12)
+{
+  const rulesV12 = fs.readFileSync("/home/hatch/workspace/ai-dukaan-ai/firebase/firestore.rules", "utf8");
+  check(backup.sha256Hex(stripBizCreateFixBlocks(rulesV12)) === "0f19f56e5da1d36840767468da71550105be65786a0939566115b19be4b40e70" &&
+        stripBizCreateFixBlocks(rulesV12).split("\n").length === 1670,
+    "BizCreateFix rules: stripping the two v12 spans returns the v11 FINAL text byte-for-byte (SHA 0f19f56e…, 1,670 lines) — the v12 delta is purely additive, nothing else in the file moved");
+  check(backup.sha256Hex(rulesV12) === "8b58c1d2357905cc91fbc9979de3ca6f6324a24aa3241c521439e9bba33336c0" &&
+        rulesV12.split("\n").length === 1688,
+    "BizCreateFix rules: v12 is 1,688 lines (JS split count), SHA 8b58c1d2… — the deploy re-paste + PUBLISH is REQUIRED (rules changed)");
+  check(rulesV12.includes("// ---- BizCreateFix · v12 header note (START) ----") &&
+        rulesV12.includes("match /accounts/{accountId} {\n        allow read: if canAccess(uid);\n        allow create, update: if isOwner(uid);\n        // ---- BizCreateFix · v12 amendment (accounts) (START) ----\n        allow create, update: if isRegistryOwner(uid);\n        // ---- BizCreateFix · v12 amendment (accounts) (END) ----"),
+    "BizCreateFix rules: the v12 header note and the accounts isRegistryOwner leg exist in the accounts block alongside (not instead of) the isOwner leg");
+  const readBiz = (p) => fs.readFileSync("/home/hatch/workspace/ai-dukaan-ai/" + p, "utf8");
+  const authBiz = readBiz("web/components/AuthProvider.tsx");
+  check(authBiz.includes("platformRegistryWriteData") &&
+        authBiz.includes("Timestamp.fromDate(new Date(plan.trialEndsAt))") &&
+        authBiz.includes("platformRegistryWriteData(w.path, w.data)") &&
+        authBiz.includes("path.startsWith(\"businesses/\")"),
+    "BizCreateFix wiring (textual pin — the harness cannot run React, so the wiring is pinned textually, the FR2 precedent): applyPlatformWrites converts plan.trialEndsAt string → Timestamp on businesses/ set ops only");
+}
+
+(async () => {
+  const nodeSubtle = crypto.webcrypto.subtle;
+  const hexOf = (u8) => [...u8].map((b) => b.toString(16).padStart(2, "0")).join("");
+  const fakeStorage = () => {
+    const map = new Map();
+    const touched = [];
+    return {
+      map,
+      touched,
+      getItem: (k) => { touched.push(k); return map.has(k) ? map.get(k) : null; },
+      setItem: (k, v) => { touched.push(k); map.set(k, String(v)); },
+      removeItem: (k) => { touched.push(k); map.delete(k); },
+    };
+  };
+
+  suite("E4", null); // Phase E · E4 — PIN lock: PBKDF2 core, device-local storage, friction + idle state machines (design §4)
+
+  /* ---- PBKDF2 known-answer vectors, through the app's own code ---- */
+  const katSalt = new TextEncoder().encode("salt");
+  check(hexOf(await pinlock.derivePinBits("password", katSalt, 1, nodeSubtle)) ===
+      "120fb6cffcf8b32c43e7225256c4f837a86548c92ccc35480805987cb70be17b",
+    "KAT: PBKDF2-HMAC-SHA256 (RFC 7914 §11) c=1 matches through lib/pinlock.derivePinBits — the production code path, not a re-implementation");
+  check(hexOf(await pinlock.derivePinBits("password", katSalt, 2, nodeSubtle)) ===
+      "ae4d0c95af6b46d32d0adff928f06dd02a303f8ef3c251dfd6e2d85a95474c43",
+    "KAT: PBKDF2-HMAC-SHA256 c=2 matches");
+  check(hexOf(await pinlock.derivePinBits("password", katSalt, 4096, nodeSubtle)) ===
+      "c5e478d59288c841aa530db6845c4c8d962893a001ce4e11a4963873aa98134a",
+    "KAT: PBKDF2-HMAC-SHA256 c=4096 matches");
+
+  /* ---- create / record shape (§4.2) ---- */
+  const rngA = (n) => new Uint8Array(Array.from({ length: n }, (_, i) => i + 1));
+  const rngB = (n) => new Uint8Array(Array.from({ length: n }, (_, i) => 200 - i));
+  const fixedNow = () => new Date("2026-10-22T00:00:00.000Z");
+  const rec = await pinlock.createPinRecord("97531", { subtle: nodeSubtle, randomBytes: rngA, now: fixedNow });
+  check(rec.v === 1 && rec.iterations === 150000 && rec.digits === 5 && rec.setAt === "2026-10-22T00:00:00.000Z",
+    "shape: a created record is exactly §4.2 — v 1, 150,000 iterations, the chosen digit length, the set instant");
+  check(pinlock.base64ToBytes(rec.salt).length === 16 && pinlock.base64ToBytes(rec.hash).length === 32,
+    "shape: the salt decodes to 16 bytes and the hash to 32 bytes");
+
+  /* ---- verify: accepts the set PIN, rejects neighbours ---- */
+  check((await pinlock.verifyPin(rec, "97531", nodeSubtle)) === true,
+    "verify: the set PIN is accepted");
+  check((await pinlock.verifyPin(rec, "97532", nodeSubtle)) === false,
+    "verify: a wrong digit is rejected");
+  check((await pinlock.verifyPin(rec, "9753", nodeSubtle)) === false,
+    "verify: a wrong (short) length is rejected");
+  check((await pinlock.verifyPin(rec, "975310", nodeSubtle)) === false,
+    "verify: an over-length entry is rejected");
+  check((await pinlock.verifyPin(rec, "", nodeSubtle)) === false,
+    "verify: an empty entry is rejected");
+
+  /* ---- salt uniqueness ---- */
+  const recB = await pinlock.createPinRecord("97531", { subtle: nodeSubtle, randomBytes: rngB, now: fixedNow });
+  check(recB.salt !== rec.salt && recB.hash !== rec.hash,
+    "salt: the same PIN under a different salt yields a different record AND a different hash");
+  check((await pinlock.verifyPin(recB, "97531", nodeSubtle)) === true,
+    "salt: the second record verifies its own PIN");
+
+  /* ---- tampered records never verify ---- */
+  const flip = (s) => (s[0] === "A" ? "B" : "A") + s.slice(1);
+  check((await pinlock.verifyPin({ ...rec, hash: flip(rec.hash) }, "97531", nodeSubtle)) === false,
+    "tamper: a flipped hash character is rejected");
+  check((await pinlock.verifyPin({ ...rec, salt: flip(rec.salt) }, "97531", nodeSubtle)) === false,
+    "tamper: a flipped salt character is rejected");
+  check((await pinlock.verifyPin({ ...rec, iterations: 149999 }, "97531", nodeSubtle)) === false,
+    "tamper: a changed iteration count derives a different key and is rejected");
+  check(pinlock.timingSafeEqualBytes(new Uint8Array([1, 2, 3]), new Uint8Array([1, 2, 3])) === true &&
+        pinlock.timingSafeEqualBytes(new Uint8Array([1, 2, 3]), new Uint8Array([1, 2, 4])) === false &&
+        pinlock.timingSafeEqualBytes(new Uint8Array([1, 2]), new Uint8Array([1, 2, 3])) === false,
+    "compare: the constant-time byte compare accepts equals, rejects a differing byte and a differing length");
+
+  /* ---- storage: device-local round-trips + the no-PIN-in-storage proof ---- */
+  const st = fakeStorage();
+  pinlock.savePinRecord(st, rec);
+  check(JSON.stringify(pinlock.loadPinRecord(st)) === JSON.stringify(rec),
+    "storage: the record round-trips through the injected storage seam");
+  const rawStored = st.map.get(pinlock.PIN_RECORD_KEY);
+  check(!rawStored.includes("97531") && !/"pin"\s*:/.test(rawStored),
+    "storage: the stored record contains NO substring of the PIN and no pin field — salt + slow hash only (§4.3)");
+  pinlock.clearPinRecord(st);
+  check(pinlock.loadPinRecord(st) === null,
+    "storage: clearing removes the record (the recovery/delete path)");
+  check(pinlock.loadPinRecord({ getItem: () => "{not json", setItem: () => {}, removeItem: () => {} }) === null &&
+        pinlock.loadPinRecord({ getItem: () => '{"v":2}', setItem: () => {}, removeItem: () => {} }) === null,
+    "storage: malformed or foreign-version records parse to NO record — never a crash, never a phantom PIN");
+  const emptySt = fakeStorage();
+  check(pinlock.loadPinPrefs(emptySt).idleMinutes === 5 && pinlock.loadPinPrefs(emptySt).gateSensitive === false,
+    "prefs: the defaults are idle 5 minutes and the E5 gate OFF (§4.2/§4.6)");
+  pinlock.savePinPrefs(st, { idleMinutes: 15, gateSensitive: true });
+  check(pinlock.loadPinPrefs(st).idleMinutes === 15 && pinlock.loadPinPrefs(st).gateSensitive === true,
+    "prefs: a saved prefs pair round-trips");
+  check(pinlock.loadPinPrefs({ getItem: () => '{"idleMinutes":7,"gateSensitive":true}', setItem: () => {}, removeItem: () => {} }).idleMinutes === 5,
+    "prefs: an out-of-set idle value falls back to the default — a tampered prefs blob cannot invent a schedule");
+  pinlock.savePinGuard(st, { failures: 3, pausedUntil: 12345 });
+  const guardBack = pinlock.loadPinGuard(st);
+  check(guardBack.failures === 3 && guardBack.pausedUntil === 12345,
+    "guard: the friction counters round-trip (a reload cannot reset a pause)");
+  check(st.touched.every((k) => k.startsWith("dukaan-ai-pinlock")),
+    "zero-Firestore seam: across a full set/save/load/clear cycle the PIN module touched ONLY its own dukaan-ai-pinlock* storage keys — device-local by construction (§4.2)");
+
+  /* ---- friction schedule (§4.4 — pure function, schedule points) ---- */
+  check(pinlock.frictionPauseMs(0) === 0 && pinlock.frictionPauseMs(4) === 0 &&
+        pinlock.frictionPauseMs(5) === 30000 && pinlock.frictionPauseMs(9) === 30000 &&
+        pinlock.frictionPauseMs(10) === 120000 && pinlock.frictionPauseMs(14) === 120000 &&
+        pinlock.frictionPauseMs(15) === 300000 && pinlock.frictionPauseMs(100) === 300000,
+    "friction: free below 5 failures; 30s at 5; 2 minutes per further 5; 5-minute cap — friction, honestly labelled, never strength (§4.1/§4.4)");
+  let g = { failures: 0, pausedUntil: 0 };
+  for (let i = 0; i < 4; i++) g = pinlock.applyPinFailure(g, 1000);
+  check(g.failures === 4 && g.pausedUntil === 0,
+    "friction: four failures accrue with no pause yet");
+  g = pinlock.applyPinFailure(g, 1000);
+  check(g.failures === 5 && g.pausedUntil === 31000 && pinlock.pinPauseRemainingMs(g, 11000) === 20000,
+    "friction: the fifth failure starts the 30-second pause from the failure instant");
+  const gReset = pinlock.applyPinSuccess();
+  check(gReset.failures === 0 && gReset.pausedUntil === 0,
+    "friction: a success clears the failure count and any pause");
+
+  /* ---- idle / lock state machine (§4.4 — pure reducer) ---- */
+  const R = pinlock.pinLockReducer;
+  check(R(pinlock.initialPinLockState, { type: "launch", hasRecord: true, now: 0 }).locked === true,
+    "lock: launch WITH a record opens locked");
+  check(R(pinlock.initialPinLockState, { type: "launch", hasRecord: false, now: 0 }).locked === false,
+    "lock: launch with NO record opens unlocked — no record, no lock UI");
+  let ls = { locked: false, lastActivityAt: 0 };
+  check(R(ls, { type: "check", now: 299999, idleMinutes: 5 }).locked === false &&
+        R(ls, { type: "check", now: 300000, idleMinutes: 5 }).locked === true,
+    "idle: the check locks exactly at the idle deadline, not before");
+  ls = R(ls, { type: "activity", now: 200000 });
+  check(ls.lastActivityAt === 200000 &&
+        R(ls, { type: "check", now: 499999, idleMinutes: 5 }).locked === false &&
+        R(ls, { type: "check", now: 500000, idleMinutes: 5 }).locked === true,
+    "idle: activity resets the epoch — the deadline moves with the last activity");
+  check(R({ locked: false, lastActivityAt: 0 }, { type: "check", now: 99999999, idleMinutes: 0 }).locked === false,
+    "idle: idleMinutes 0 is launch-only — a check never locks");
+  check(R({ locked: false, lastActivityAt: 0 }, { type: "check", now: 600000, idleMinutes: 5 }).locked === true,
+    "idle: a deadline that passed while the tab was hidden locks on the return check — hidden time counts toward idle (§4.4)");
+  const lockedState = { locked: true, lastActivityAt: 42 };
+  check(R(lockedState, { type: "activity", now: 999999 }).locked === true &&
+        R(lockedState, { type: "activity", now: 999999 }).lastActivityAt === 42,
+    "idle: activity while LOCKED changes nothing — the lock screen cannot extend its own deadline");
+  check(R({ locked: false, lastActivityAt: 0 }, { type: "lockNow" }).locked === true,
+    "lock: the manual lock engages immediately (the header button)");
+  const unlocked = R(lockedState, { type: "unlock", now: 700000 });
+  check(unlocked.locked === false &&
+        R(unlocked, { type: "check", now: 700000 + 299999, idleMinutes: 5 }).locked === false,
+    "lock: unlock opens AND starts a fresh idle epoch");
+
+  /* ---- source invariants ---- */
+  {
+    const pinSrc = fs.readFileSync("/home/hatch/workspace/ai-dukaan-ai/web/lib/pinlock.ts", "utf8");
+    check(!/makeEntry|guardPostings|postEntry|writeBatch|setDoc|addDoc|updateDoc/.test(pinSrc),
+      "source: lib/pinlock touches no posting path and no Firestore write — it is storage + crypto + pure state machines only");
+    const gateSrc = fs.readFileSync("/home/hatch/workspace/ai-dukaan-ai/web/components/PinGate.tsx", "utf8");
+    check(!/firebase\/firestore|setDoc|addDoc|updateDoc|deleteDoc|writeBatch/.test(gateSrc) &&
+          gateSrc.includes("reauthenticateWithCredential"),
+      "source: PinGate performs ZERO Firestore writes — its only Firebase call is Auth reauthentication, the §4.5 recovery key");
+    check((gateSrc.match(/resetDemo/g) || []).length === 3,
+      "source: PinGate references resetDemo exactly three times (destructure, the demo erase call, its dep array) — the ONLY store write the PIN system ever reaches, and it is demo-local storage, not Firestore");
+    const shellSrc = fs.readFileSync("/home/hatch/workspace/ai-dukaan-ai/web/components/AppShell.tsx", "utf8");
+    check(shellSrc.includes("PinGateProvider") && shellSrc.includes("PinLockButton"),
+      "source: AppShell mounts PinGateProvider around the non-auth branch and the header lock button beside logout (§4.4)");
+    const settingsSrc = fs.readFileSync("/home/hatch/workspace/ai-dukaan-ai/web/components/SettingsView.tsx", "utf8");
+    check(settingsSrc.includes("<DeviceLockCard />"),
+      "source: Settings mounts the Device lock card");
+    const cardSrc = fs.readFileSync("/home/hatch/workspace/ai-dukaan-ai/web/components/DeviceLockCard.tsx", "utf8");
+    check(!/useStore|firebase|setDoc|updateDoc/.test(cardSrc),
+      "source: the Device lock card holds no store or backend seam at all — it speaks only to the PinGate context (device-local state, §5)");
+    const pinKeys = Object.keys(i18n.en).filter((k) => k.startsWith("pin."));
+    check(pinKeys.length === 49 && pinKeys.every((k) => k in i18n.ur),
+      "i18n: 49 pin.* keys landed with full EN ≡ UR parity");
+    check(i18n.en["pin.honesty"].includes("not a replacement for your account password") &&
+          i18n.ur["pin.honesty"].includes("متبادل نہیں"),
+      "i18n: the §4.7 honesty copy is really in the product, both languages — the PIN is never sold as account security");
+  }
+
+  /* ---- zero journal effect ---- */
+  check((fs.readFileSync("/home/hatch/workspace/ai-dukaan-ai/web/components/StoreProvider.tsx", "utf8")
+        .match(/makeEntry\(/g) || []).length === 24,
+    "source: still exactly 24 makeEntry calls in the store — E4 composed no entry, template or refType");
+  check(crypto.createHash("sha256")
+        .update(stripG1Blocks(stripG2Blocks(fs.readFileSync("/home/hatch/workspace/ai-dukaan-ai/firebase/firestore.rules", "utf8"))), "utf8")
+        .digest("hex") === "04807268c2c1891c070e1cc34443fe4c3892ea35dde739718499e392c661f859",
+    "rules: byte-identical to the pre-E4 file (SHA pinned) — the PIN needs no rules and no Firestore presence at all (§5) (G1 same-check amendment: the four G1 spans are stripped first — v9's only other deltas, strip-proven in the G1 suite)");
+  {
+    const journalE4 = seed.getSeedJournal(products, sales, purchases, payments, expenses, credits);
+    const normalizedE4 = journalE4.map((e) => { const { ts, ...rest } = e; return rest; });
+    const shaE4 = crypto.createHash("sha256").update(JSON.stringify(normalizedE4), "utf8").digest("hex");
+    const allRangeE4 = reports.resolveReportRange("custom", null, { from: "2000-01-01", to: "2100-12-31" });
+    const tbE4 = reports.trialBalance(journalE4, allRangeE4);
+    check(journalE4.length === 21 && shaE4 === "e17e5bda19e87de698b0c0a37e923f9b396bc387e2092b2ffbbd7d60d4971168" &&
+          eq(ledger.accountBalance(journalE4, "inventory"), 272805) &&
+          eq(ledger.cashBalance(journalE4), 50000) &&
+          eq(ledger.payablesTotal(journalE4), 27900) &&
+          eq(ledger.receivablesTotal(journalE4), 5500) &&
+          eq(tbE4.totalDebits, tbE4.totalCredits),
+      "seed regression: the frozen identities stand — 21 entries, the seed-journal SHA, inventory 272,805 / cash 50,000 / payables 27,900 / receivables 5,500, trial balance zero. A PIN is device state, never an entry");
+  }
+
+  /* =============================== E5 (Phase E · E5 — sensitive-action gating) =============================== */
+  suite("E5", null); // Phase E · E5 — sensitive-action PIN gating: the gate matrix + the four call sites (design §4.6)
+
+  /* ---- the precondition truth table (one seam, all four actions) ---- */
+  check(pinlock.pinGateRequired({ idleMinutes: 5, gateSensitive: true }, false) === false,
+    "gate: NO record on this device ⇒ never required, whatever the pref says");
+  check(pinlock.pinGateRequired({ idleMinutes: 5, gateSensitive: false }, true) === false,
+    "gate: record + pref OFF (the default) ⇒ not required — every gated action behaves exactly as before E5");
+  check(pinlock.pinGateRequired({ idleMinutes: 0, gateSensitive: true }, true) === true,
+    "gate: record + pref ON ⇒ required");
+  check(["pin.gate.actVoid", "pin.gate.actDayClose", "pin.gate.actPeriod", "pin.gate.actFiscal"]
+        .every((k) => k in i18n.en && k in i18n.ur),
+    "gate: the v1 gate list is exactly void bill · day-close submit · period close/reopen · FY close/reopen, each with its challenge label in both languages (§4.6)");
+
+  /* ---- the composition matrix: writes composed exactly in the allow cases ---- */
+  const composedWrites = (required, outcome) => (pinlock.gateAllows(required, outcome) ? 1 : 0);
+  const matrix = [
+    [false, "pass", 1], [false, "fail", 1], [false, "cancel", 1], [false, "not-run", 1],
+    [true, "pass", 1], [true, "fail", 0], [true, "cancel", 0], [true, "not-run", 0],
+  ];
+  check(matrix.every(([req, outcome, want]) => composedWrites(req, outcome) === want),
+    "gate matrix: {not required} × any outcome composes (today's behaviour); {required} composes ONLY on pass — a failed or cancelled challenge composes ZERO writes, for every gated action (they share this one seam)");
+
+  /* ---- the gate helpers never touch the lock state (§4.6: a satisfied
+   * challenge IS activity — the standard activity path, nothing else) ---- */
+  {
+    const probe = { locked: false, lastActivityAt: 777 };
+    const before = JSON.stringify(probe);
+    pinlock.pinGateRequired({ idleMinutes: 5, gateSensitive: true }, true);
+    pinlock.gateAllows(true, "pass");
+    check(JSON.stringify(probe) === before,
+      "gate: the E5 decision helpers are pure — they read prefs + record presence only and cannot move the idle epoch");
+    const afterChallengeActivity = pinlock.pinLockReducer(probe, { type: "activity", now: 5000 });
+    check(afterChallengeActivity.lastActivityAt === 5000 &&
+          pinlock.pinLockReducer(afterChallengeActivity, { type: "check", now: 5000 + 299999, idleMinutes: 5 }).locked === false,
+      "gate: challenge interaction rides the ordinary activity event (the pad's own pointer/key events) — it neither bypasses nor resets the idle machine beyond being activity");
+  }
+
+  /* ---- the four call sites: challenge awaited BEFORE composition ---- */
+  {
+    const bdSrc = fs.readFileSync("/home/hatch/workspace/ai-dukaan-ai/web/components/BillingDesk.tsx", "utf8");
+    check(bdSrc.includes('if (!(await requirePin("pin.gate.actVoid")))') &&
+          bdSrc.indexOf('requirePin("pin.gate.actVoid")') < bdSrc.indexOf("voidBill(bill.id)"),
+      "call site: BillingDesk awaits the void-bill challenge BEFORE voidBill composes — cancel/fail returns without touching the store");
+    const dcSrc = fs.readFileSync("/home/hatch/workspace/ai-dukaan-ai/web/components/DayCloseView.tsx", "utf8");
+    check(dcSrc.includes('if (!(await requirePin("pin.gate.actDayClose"))) return;') &&
+          dcSrc.indexOf('requirePin("pin.gate.actDayClose")') < dcSrc.indexOf("saveDayClose({"),
+      "call site: DayClose awaits the day-close challenge BEFORE saveDayClose composes");
+    const perSrc = fs.readFileSync("/home/hatch/workspace/ai-dukaan-ai/web/components/PeriodsPanel.tsx", "utf8");
+    const perReq1 = perSrc.indexOf('requirePin("pin.gate.actPeriod")');
+    const perReq2 = perSrc.indexOf('requirePin("pin.gate.actPeriod")', perReq1 + 1);
+    check(perReq1 >= 0 && perReq2 > perReq1 &&
+          perReq1 < perSrc.indexOf("closePeriod(closeDate") &&
+          perReq2 < perSrc.indexOf("reopenPeriod(reopenFully"),
+      "call site: PeriodsPanel awaits the period challenge before BOTH closePeriod and reopenPeriod");
+    const fySrc = fs.readFileSync("/home/hatch/workspace/ai-dukaan-ai/web/components/FiscalClosePanel.tsx", "utf8");
+    const fyReq1 = fySrc.indexOf('requirePin("pin.gate.actFiscal")');
+    const fyReq2 = fySrc.indexOf('requirePin("pin.gate.actFiscal")', fyReq1 + 1);
+    check(fyReq1 >= 0 && fyReq2 > fyReq1 &&
+          fyReq1 < fySrc.indexOf("closeFiscalYear(range.startDate") &&
+          fyReq2 < fySrc.indexOf("reopenFiscalYear(range.startDate"),
+      "call site: FiscalClosePanel awaits the fiscal challenge before BOTH closeFiscalYear and reopenFiscalYear");
+    const gateSrc = fs.readFileSync("/home/hatch/workspace/ai-dukaan-ai/web/components/PinGate.tsx", "utf8");
+    check(gateSrc.includes("if (!required) return Promise.resolve(true);") &&
+          !/requirePin/.test(fs.readFileSync("/home/hatch/workspace/ai-dukaan-ai/web/components/StaffView.tsx", "utf8")) &&
+          !/requirePin/.test(fs.readFileSync("/home/hatch/workspace/ai-dukaan-ai/web/components/LoansView.tsx", "utf8")),
+      "seam: requirePin resolves true immediately when not required (ungated flows are byte-for-byte the pre-E5 flows), and neither the payroll desk nor the loans desk is gated — those money actions are deliberately excluded (§4.6)");
+    check(!/requirePin/.test(fs.readFileSync("/home/hatch/workspace/ai-dukaan-ai/web/components/StoreProvider.tsx", "utf8")),
+      "seam: the store knows nothing of the gate — no store action signature changed (view-layer precondition only, §4.6)");
+  }
+
+  /* ---- close: zero journal effect, rules untouched ---- */
+  check((fs.readFileSync("/home/hatch/workspace/ai-dukaan-ai/web/components/StoreProvider.tsx", "utf8")
+        .match(/makeEntry\(/g) || []).length === 24,
+    "source: still exactly 24 makeEntry calls in the store — E5 composed no entry and changed no posting");
+  check(crypto.createHash("sha256")
+        .update(stripG1Blocks(stripG2Blocks(fs.readFileSync("/home/hatch/workspace/ai-dukaan-ai/firebase/firestore.rules", "utf8"))), "utf8")
+        .digest("hex") === "04807268c2c1891c070e1cc34443fe4c3892ea35dde739718499e392c661f859",
+    "rules: byte-identical to the pre-E5 file (SHA pinned) — gating is a device-local view-layer precondition, invisible to the backend (§5/§6) (G1 same-check amendment: the four G1 spans are stripped first — v9's only other deltas, strip-proven in the G1 suite)");
+  {
+    const journalE5 = seed.getSeedJournal(products, sales, purchases, payments, expenses, credits);
+    const normalizedE5 = journalE5.map((e) => { const { ts, ...rest } = e; return rest; });
+    const shaE5 = crypto.createHash("sha256").update(JSON.stringify(normalizedE5), "utf8").digest("hex");
+    const allRangeE5 = reports.resolveReportRange("custom", null, { from: "2000-01-01", to: "2100-12-31" });
+    const tbE5 = reports.trialBalance(journalE5, allRangeE5);
+    check(journalE5.length === 21 && shaE5 === "e17e5bda19e87de698b0c0a37e923f9b396bc387e2092b2ffbbd7d60d4971168" &&
+          eq(ledger.accountBalance(journalE5, "inventory"), 272805) &&
+          eq(ledger.cashBalance(journalE5), 50000) &&
+          eq(ledger.payablesTotal(journalE5), 27900) &&
+          eq(ledger.receivablesTotal(journalE5), 5500) &&
+          eq(tbE5.totalDebits, tbE5.totalCredits),
+      "seed regression: the frozen identities stand — a gate on a screen is not an accounting event");
+  }
+
+  runAll();
+})().catch((err) => {
+  console.error("E4/E5 suite crashed:", err);
+  process.exit(1);
+});
+
 /* -------------------------------- runner -------------------------------- */
+/* The runner is a hoisted function since E4: the E4/E5 suites are
+ * async (PBKDF2 through Node's WebCrypto), so they run inside the
+ * IIFE above and call runAll() when their checks are registered.
+ * Every earlier suite is synchronous and has already run by then. */
+function runAll() {
 let totalPass = 0, totalFail = 0, countProblems = 0;
 for (const s of suites) {
   totalPass += s.pass; totalFail += s.fail;
@@ -5693,3 +12153,4 @@ for (const s of suites) {
 console.log(`TOTAL: ${totalPass} passed, ${totalFail} failed, ${totalPass + totalFail} checks`);
 if (totalFail > 0 || countProblems > 0) process.exit(1);
 console.log("ALL SUITES GREEN");
+}

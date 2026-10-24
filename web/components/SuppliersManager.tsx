@@ -16,6 +16,7 @@ import {
   IconTrash,
   IconTruck, SearchClear } from "./ui";
 import { fmtDate, fmtNum, fmtPKR, fmtUnit } from "@/lib/format";
+import { brandingDataUrls } from "@/lib/branding";
 import { computePurchaseTaxes, resolveTaxSlab } from "@/lib/tax";
 import { normQuery, supplierMatches } from "@/lib/search";
 import {
@@ -81,6 +82,7 @@ export default function SuppliersManager() {
     journal,
     taxSlabs,
     settings,
+    branding,
     addSupplier,
     updateSupplier,
     deleteSupplier,
@@ -1491,6 +1493,7 @@ export default function SuppliersManager() {
               }
             )}
             settings={settings}
+            assets={brandingDataUrls(branding)}
           />
         )}
       </div>

@@ -22,6 +22,7 @@ import { IconClose, IconPlus, IconTrash } from "./ui";
 import { ProductionPrintSheet } from "./DocPrintSheet";
 import { fmtDate, fmtNum, fmtPKR, fmtUnit } from "@/lib/format";
 import { can } from "@/lib/permissions";
+import { brandingDataUrls } from "@/lib/branding";
 import { activeWarehouses, defaultWarehouseId, qtyAtWarehouse } from "@/lib/stock";
 import { defaultAccountForMethod } from "@/lib/ledger";
 import {
@@ -478,6 +479,7 @@ export default function ProductionSection() {
         <ProductionPrintSheet
           order={printDoc}
           settings={settings}
+          assets={brandingDataUrls(store.branding)}
           warehouseName={whName(printDoc.warehouseId)}
         />
       )}

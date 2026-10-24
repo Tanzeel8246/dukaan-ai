@@ -127,9 +127,22 @@ export interface BillPayment {
    * to `cheques_in_hand` (ref: chequeId) instead of a money
    * account. `cheque` carries the capture draft on INPUT only.
    */
-  instrument?: "cheque";
+  instrument?: "cheque" | "points";
   chequeId?: string | null;
   cheque?: ChequeDraft | null;
+  /**
+   * Phase H · H1 (design §1.2/§1.3): on a `points` instrument part,
+   * the number of points the customer tenders. The part's `amount`
+   * is the RUPEE value those points carry — the FIFO value over the
+   * customer's unspent vintages at their snapshot rates, computed by
+   * lib/loyalty's quote and re-validated by the store at posting
+   * (the amount is never typed freehand past the derivation). The
+   * part's journal line posts Dr `loyalty_payable` (ref: customerId)
+   * in place of a money line, exactly as a cheque part posts to
+   * `cheques_in_hand`; the part's `method` rides as the desk's
+   * carrier ("cash") and settles nothing.
+   */
+  loyaltyPoints?: number | null;
 }
 
 export type BillStatus = "paid" | "held" | "voided" | "partially_returned" | "returned";
@@ -179,6 +192,15 @@ export interface SaleReturn {
   refundAmount: number;
   /** Portion of the refund settled by reducing the bill's udhaar part. */
   creditReduction?: number;
+  /** Phase H · H1 (design §1.4): the portion of the refund settled
+   * by re-crediting loyalty points (rupees + the point count) —
+   * points come back as points, never as cash. Absent/0 on returns
+   * of bills that carried no points tender. Operational stamps:
+   * the journal entry is the truth; these keep the return's total
+   * settlement (refund + udhaar reduction + points) readable and
+   * the clawback's cumulative basis exact. */
+  loyaltyRecreditRs?: number;
+  loyaltyRecreditPoints?: number;
   method: "cash" | "jazzcash" | "easypaisa" | "bank";
   /** A2: money account the cash/wallet refund part left from. */
   accountId?: string | null;
@@ -289,6 +311,23 @@ export interface Customer {
   address: string;
   note: string;
   ts: string;
+  /** Phase H · WhatsApp (design §3.2): marketing consent —
+   *  absent/false means NO marketing, ever. Transactional
+   *  messages (bill shares, order updates) are not marketing
+   *  and are untouched by this flag. Granted only by a capture
+   *  the customer agreed to (counter / storefront conversion);
+   *  an import can NEVER set it — lib/whatsapp's sanitizer
+   *  strips any consent claim from imported rows, so a bought
+   *  list cannot launder consent through a spreadsheet. */
+  waOptIn?: boolean;
+  /** When the current consent state was stamped (ISO). */
+  waOptInAt?: string;
+  /** Where the consent was captured. "import" is deliberately
+   *  NOT a member: no code path may stamp it (design §3.2's
+   *  capture list names an import column, but the §6 checkpoint
+   *  rules that import never sets opt-in — the checkpoint
+   *  governs). */
+  waOptInSource?: "counter" | "storefront";
 }
 
 export interface CreditEntry {
@@ -463,7 +502,14 @@ export type AccountCode =
    * that account's subledger is the `credits` collection, and a
    * journal-only loan line there would break the journal ≡
    * subledger identity the audits assert (the F-5 drift shape). */
-  | "loans_receivable"; // loans receivable (used Phase D)
+  | "loans_receivable" // loans receivable (used Phase D)
+  /* Phase H · H1 (design §1.2): the loyalty pair — exactly two
+   * codes, additive, metadata in lib/coa.ts. Points are a
+   * LIABILITY the shop owes its customers: grants recognise their
+   * cost at earn (Dr expense_loyalty), redemptions settle the
+   * liability inside the bill entry itself. */
+  | "loyalty_payable" // customer loyalty points owed (used Phase H)
+  | "expense_loyalty"; // loyalty programme cost (used Phase H)
 
 export interface JournalLine {
   account: AccountCode;
@@ -528,7 +574,24 @@ export type JournalRefType =
   | "loan_drawdown"
   | "loan_charge"
   | "loan_repayment"
-  | "fy_close";
+  | "fy_close"
+  /* Phase H · H1 (design §1.2) — the earn family and the expiry
+   * release. Earn posts at bill finalize (Dr expense_loyalty /
+   * Cr loyalty_payable, ref = customerId); clawbacks ride
+   * `loyalty_earn` with a NEGATIVE points payload (the sign carries
+   * direction, the CreditEntry negative-credit precedent). Expiry
+   * releases post from the loyalty desk (Dr loyalty_payable /
+   * Cr expense_loyalty) — a cost release, never revenue.
+   * Redemption adds NO refType: it is lines inside a `bill` entry. */
+  | "loyalty_earn"
+  | "loyalty_expire"
+  /* Fix Round 1 · F5 — the one-time opening-stock recognition
+   * (Dr inventory[/inventory_raw] / Cr capital), posted from the
+   * fiscal panel when a shop's shelf predates its books. Unlisted
+   * in the tier map (lib/plans + the rules mirror): Core — an
+   * owner correcting their own opening position is not a paid
+   * feature, and no rules amendment was needed. */
+  | "opening_stock";
 
 export interface JournalEntry {
   id: string;
@@ -546,14 +609,412 @@ export interface JournalEntry {
    * history by the period-lock machinery (increment A5).
    */
   dateISO?: string;
+  /* ---- Phase H · H1 loyalty payloads (design §1.3) ----
+   * The journal carries RUPEES; points are a DERIVED view folded
+   * from these payloads by lib/loyalty — no points figure is ever
+   * stored on the customer doc. Every field is optional; entries
+   * with no loyalty content carry none of them. */
+  /** On `loyalty_earn` entries: the points this entry grants
+   *  (positive) or claws back (negative — sign carries direction).
+   *  On `loyalty_expire` entries: the points this release expires
+   *  (positive count). */
+  points?: number;
+  /** On `loyalty_earn` entries with points > 0: the point's rupee
+   *  VALUE snapshotted at earn time (the settings' pointValueRs
+   *  then in force) — a later rate change never revalues an
+   *  existing promise. The entry's rupee amount is exactly
+   *  points × rsPerPoint. */
+  rsPerPoint?: number;
+  /** On earn entries: the programme's expiry horizon (months)
+   *  snapshotted at earn time — later settings changes apply to
+   *  future earns only. With `dateISO` (or `ts`) it dates the
+   *  vintage's expiry for the derived due-list. */
+  loyaltyExpiryMonths?: number;
+  /** On earn entries: the tier multiplier that WAS applied
+   *  (1 / 1.25 / 1.5) — history never re-tiers. */
+  loyaltyTierMult?: number;
+  /** On `bill` entries carrying a points tender: the points the
+   *  bill's Dr `loyalty_payable` leg settled. */
+  loyaltyPointsUsed?: number;
+  /** On `return` / `bill_void` entries against a points-paid bill:
+   *  the points this reversal re-credits to the customer (the
+   *  fold nets them against the bill's `loyaltyPointsUsed`). */
+  loyaltyPointsReturned?: number;
+  /** On clawback and void earn-reversal entries (negative-points
+   *  `loyalty_earn`): the bill whose earn this entry takes back —
+   *  the fold shrinks exactly that bill's vintage. */
+  loyaltySourceBillId?: string | null;
 }
 
 /* ---------------- Shop settings (lives on the users/{uid} doc) -------- */
+
+/* ==========================================================================
+ * ERP PHASE E — print design (design: ERP-PHASE-E-DESIGN.md §1).
+ * Templates are SETTINGS, never postings: every field is optional
+ * and absent reproduces today's rendering field for field. The
+ * single interpretation seam is `resolvePrintDesign` in
+ * lib/print.ts — no sheet reads these raw fields for a print
+ * decision. The brand-asset toggles (logo/letterhead/stamp) are
+ * declared here in E1; the assets themselves land in E2, the
+ * Raast fields are consumed by E3.
+ * ======================================================================== */
+
+/** Paper/layout for the receipt family (bills + document sheets).
+ *  Reports are always A4 and ignore this (§1.5). */
+export type PrintPaper = "a4" | "a4-compact" | "a5" | "thermal80";
+
+/** Bill stamp mode (§2.4): the stamp asserts settlement, so the
+ *  default prints it only on a fully-paid bill. */
+export type StampMode = "paid" | "always" | "never";
+
+export interface PrintDesign {
+  /** Paper/layout for the RECEIPT family. Default "a4". The desk's
+   *  per-print thermal choice still overrides per print. */
+  paper?: PrintPaper;
+  /** Receipt base type scale: "standard" (today) | "large"
+   *  (≈ +12.5% legibility). Structural only — never a colour or
+   *  typeface change (§1.6). Default "standard". */
+  fontScale?: "standard" | "large";
+
+  /* --- header --- */
+  showLogo?: boolean; // default false (no logo exists until E2)
+  logoSize?: "s" | "m" | "l"; // default "m"
+  showShopName?: boolean; // settings.shopName — default true
+  showShopNameAlt?: boolean; // settings.shopNameAlt — default true when set
+  showAddress?: boolean; // default true
+  showPhone?: boolean; // default true
+
+  /* --- item table columns (receipt family, §1.4) --- */
+  colSku?: boolean; // default false
+  colUrduName?: boolean; // default false
+  colTax?: boolean; // default false (bill tax summary lines stay)
+  colDiscount?: boolean; // default false (bill discount row stays)
+
+  /* --- footer --- */
+  footerNote?: string; // owner's words; "" = none
+  termsText?: string; // owner's words; "" = none
+  showThanks?: boolean; // default true (dictionary line / custom text)
+  thanksText?: string; // owner's words; "" = dictionary line
+  /** Authorised-signature slot on bills — default false (vouchers
+   *  and salary slips keep their slots; §2.4). */
+  showSignature?: boolean;
+
+  /* --- brand slots (assets land in E2; toggles declared here) --- */
+  headerMode?: "text" | "letterhead" | "logo-text"; // default "text"
+  showLetterheadFooter?: boolean; // default false
+  stampMode?: StampMode; // bills — default "paid"
+  stampDocs?: { notes?: boolean; vouchers?: boolean; quotations?: boolean };
+  // defaults: all false (§2.4); "quotations" covers orders too (one sheet family)
+  signDocs?: { vouchers?: boolean; salarySlips?: boolean; bills?: boolean };
+  // defaults preserve today's paper: vouchers + salary slips carry
+  // the shop's ruled signature line; bills have none (§2.4)
+
+  /* --- Raast (E3; declared here so the designer is one object) --- */
+  showRaastQr?: boolean; // default false
+  raastQrSize?: "s" | "m" | "l"; // default "m"
+  raastDynamic?: boolean; // amount+bill-no per bill — default true (§3.4)
+}
+
+/* ==========================================================================
+ * ERP PHASE E · E2 — brand assets (design: ERP-PHASE-E-DESIGN.md §2).
+ * One document per asset kind in the `branding` collection (decision
+ * B of §2.1: Firestore data-URLs — the only store that works
+ * identically in cloud, demo and offline, and keeps the hot owner
+ * doc lean). The payload is a COMPRESSED data-URL produced by the
+ * pipeline in lib/branding.ts under hard per-kind caps; assets are
+ * documents, never settings, and assert no money fact — a removed
+ * stamp simply stops printing. The doc id IS the kind (the A2
+ * fixed-id discipline). `raastQrImage` is the bank-issued QR image
+ * slot (design §3.1 Path 1) — stored by the E2 machinery, consumed
+ * by the Raast print slot in E3.
+ * ======================================================================== */
+
+export type BrandingAssetKind =
+  | "logo"
+  | "letterheadHeader"
+  | "letterheadFooter"
+  | "stamp"
+  | "signature"
+  | "raastQrImage";
+
+export interface BrandingAsset {
+  /** == kind (fixed ids — at most one asset per slot, ever). */
+  id: string;
+  kind: BrandingAssetKind;
+  /** The compressed image, encoded per lib/branding's plan. */
+  dataUrl: string;
+  mime: "image/png" | "image/jpeg" | "image/webp";
+  /** Encoded pixel size (display sizing + print aspect). */
+  width: number;
+  height: number;
+  /** Encoded size in bytes — the figure Settings shows (§2.5). */
+  bytes: number;
+  /** ISO instant of the last replace. */
+  updatedAt: string;
+}
+
+/* ==========================================================================
+ * ERP PHASE H · H1 — loyalty programme settings (design §1.7).
+ * The programme's commercial terms live on the owner doc's settings
+ * like every other programme term (the E-era settings-object
+ * pattern): owner-writable, read through lib/loyalty's resolver —
+ * composers never see a hard-coded figure. Absent ⇒ the design's
+ * proposed defaults (Q1): earn 1 point per Rs 100 of net payable,
+ * 1 point = Rs 1, redemption capped at 50% of a bill, 12-month
+ * expiry, tiers Silver ≥500 / Gold ≥2,000 trailing-12-month earned
+ * points at 1.25×/1.5× earn speed. Disabling stops future earns;
+ * existing balances remain redeemable and expirable for as long as
+ * the liability is non-zero (a shop may leave the programme; it may
+ * not strand its customers' earned value).
+ * ======================================================================== */
+export interface LoyaltySettings {
+  enabled?: boolean;
+  /** Rupees of net payable that earn ONE point (before the tier
+   *  multiplier). Default 100. */
+  earnRsPerPointBase?: number;
+  /** What one point is worth at redemption, in rupees. Default 1.
+   *  Snapshotted onto every earn entry (`rsPerPoint`) — changing
+   *  it revalues only future earns. */
+  pointValueRs?: number;
+  /** Max share of a bill's net payable that points may cover, in
+   *  percent (0–100). Default 50 — a bill is never 100% points. */
+  redeemCapPct?: number;
+  /** Months after earning at which a vintage expires. Default 12.
+   *  Snapshotted onto every earn entry. */
+  expiryMonths?: number;
+  /** Tier thresholds: points EARNED in the trailing 12 months. */
+  silverAt?: number; // default 500
+  goldAt?: number; // default 2000
+  /** Tier earn multipliers (earn speed only — a point is worth
+   *  the same rupee for every tier, always). */
+  silverMult?: number; // default 1.25
+  goldMult?: number; // default 1.5
+}
+
+/* ==========================================================================
+ * ERP PHASE H · H3 — the online storefront (design §2). The shop's
+ * first public data surface, shaped as a PUBLISHED SNAPSHOT + a
+ * CREATE-ONLY order inbox — never a public leg into the tenant
+ * namespace. The snapshot doc lives at top-level `storefronts/{slug}`
+ * (doc id = slug: uniqueness is structural, the slug immutable and
+ * never recycled); orders land at top-level `storeOrders` (auto-id)
+ * and become real only when a member converts one into a Phase B
+ * sale order (the conversion in lib/storefront). Pure logic for
+ * both lives in lib/storefront.ts.
+ * ======================================================================== */
+
+/** Stock as the world may see it: a BAND, never a count (§2.2).
+ *  `hidden` = the owner excludes the product from the public store
+ *  (it stays in the snapshot so a re-publish keeps the choice). */
+export type StoreStockState = "in" | "low" | "out" | "hidden";
+
+export interface StorefrontProduct {
+  productId: string;
+  name: string;
+  /** The product's second-script name (Product.urduName) when set. */
+  nameUr?: string;
+  /** The ADVERTISED price (live sale price at publish time).
+   *  Conversion re-prices from live data and shows drift (§2.5). */
+  price: number;
+  unit: string;
+  category?: string;
+  stockState: StoreStockState;
+  sort: number;
+}
+
+/** The published snapshot — `storefronts/{slug}`. A publishing
+ *  artefact assembled by the owner's client from live data; the
+ *  public page renders from this doc ALONE. */
+export interface StorefrontDoc {
+  businessId: string;
+  /** == the doc id. Immutable after claim; never recycled. */
+  slug: string;
+  shopName: string;
+  tagline?: string;
+  /** The shop's public / WhatsApp number (settings.phone). */
+  phone: string;
+  city?: string;
+  /** The published logo image (the E2 logo asset's data URL,
+   *  copied in at publish — the public page may read nothing
+   *  else, so the snapshot carries what it shows). */
+  logoRef?: string;
+  enabled: boolean;
+  publishedAt: string;
+  updatedAt: string;
+  currency: "PKR";
+  products: StorefrontProduct[];
+  notice?: string;
+}
+
+export interface StoreOrderLine {
+  productId: string;
+  qty: number; // 1..999 (rules-validated shape, §2.4)
+}
+
+export type StoreOrderState = "new" | "converted" | "dismissed";
+
+/** One public order — `storeOrders/{autoId}`. Create-only for the
+ *  public; the shop side reads it, converts it (exactly once) or
+ *  dismisses it. It is PAPER: it posts nothing, reserves nothing,
+ *  and creates no customer until conversion resolves one (§2.5). */
+export interface StoreOrder {
+  id: string;
+  businessId: string;
+  slug: string;
+  customerName: string;
+  phone: string;
+  lines: StoreOrderLine[];
+  note?: string;
+  fulfilment: "pickup" | "delivery";
+  /** ISO instant (written as a server timestamp by the page). */
+  createdAt: string;
+  /** H6: the customer's OWN WhatsApp consent tick, taken on the
+   *  public checkout form. Present only when ticked, and then
+   *  exactly true; absent ≡ no consent. Conversion stamps the
+   *  consent (source "storefront") from this flag alone. */
+  waOptIn?: boolean;
+  state: StoreOrderState;
+  /** Conversion stamps (the exactly-once claim, §2.5). */
+  convertedSoId?: string;
+  convertedBy?: string;
+  convertedAt?: string;
+  /** Dismissal stamps (actor + timestamp — spam is dismissed,
+   *  never silently dropped). */
+  dismissedBy?: string;
+  dismissedAt?: string;
+}
+
+/** The storefront block on the owner doc's settings (H3): only
+ *  what must survive a re-publish lives here — the publish form's
+ *  own preferences. The snapshot doc is the public record; the
+ *  slug cache below is a LABEL for print/link seams (the doc id
+ *  remains the slug's home). */
+export interface StorefrontSettings {
+  /** Re-assemble + re-publish automatically when products change
+   *  while the store is live (§2.2's client setting). */
+  autoRepublish?: boolean;
+}
+
+/* ==========================================================================
+ * ERP PHASE H — WhatsApp marketing (design: ERP-PHASE-H-DESIGN.md §3).
+ *
+ * The shop's number, the shop's customers, the shop's hand: every
+ * marketing message is sent from the shop's own WhatsApp, to its
+ * own opted-in customers, by the shopkeeper's own action (§3.1).
+ * The platform operates no sending infrastructure and sees none
+ * of this — templates, campaigns and the send log are tenant
+ * collections like any other, and NONE of it posts to the journal:
+ * marketing moves no money, so `makeEntry(` gains no site here.
+ * ========================================================================== */
+
+/** A template's kind: an offer the shop wants to broadcast, or a
+ *  service reminder the data suggested (§3.5). The kind drives
+ *  which placeholders make sense; it gates nothing. */
+export type WaTemplateKind = "promo" | "reminder";
+
+export interface WaTemplate {
+  id: string;
+  name: string;
+  kind: WaTemplateKind;
+  /** The shop's own words, with placeholders {name}, {shop},
+   *  {points}, {amount} (design §3.3). Starter templates ship as
+   *  dictionary strings the owner copies and edits — never
+   *  locked copy. */
+  body: string;
+  createdBy: string;
+  ts: string;
+}
+
+/** The segment DEFINITION a campaign sends to — never a frozen
+ *  list (design §3.3): the audience is re-derived live at launch
+ *  and re-checked per recipient at send time. */
+export type WaAudience =
+  | { kind: "all_opted_in" }
+  | { kind: "tier"; tier: "silver" | "gold" }
+  | { kind: "udhaar_outstanding"; minRs: number; minDays: number }
+  | { kind: "points_expiring"; withinDays: number }
+  | { kind: "inactive"; days: number }
+  | { kind: "storefront_customers" }
+  /* §3.5's service-due derivation: delivered jobs older than
+   * the settings interval. The interval is NOT a param — it is
+   * the shop's configured settings field, read at resolution. */
+  | { kind: "service_due" };
+
+export type WaCampaignState = "draft" | "sending" | "done";
+
+export interface WaCampaign {
+  id: string;
+  name: string;
+  templateId: string;
+  audience: WaAudience;
+  /** The audience size AT LAUNCH (the log's denominator). Null
+   *  while the campaign is a draft — a draft has resolved
+   *  nobody, and the desk shows the live count instead. */
+  resolvedCount: number | null;
+  createdBy: string;
+  ts: string;
+  state: WaCampaignState;
+}
+
+/** One row of the send log: a FACT, not a derivation (§3.3) —
+ *  who was queued for what, and what the shopkeeper did.
+ *  `sent` means exactly "the shopkeeper confirms he sent it"
+ *  (§3.4): v1's transport (wa.me, by hand) cannot know delivery
+ *  or read state, so no such state exists in this type. */
+export type WaSendState =
+  | "queued"
+  | "opened"
+  | "sent"
+  | "skipped_optout"
+  | "skipped_invalid";
+
+export interface WaSend {
+  id: string;
+  campaignId: string;
+  customerId: string;
+  /** The recipient number AS QUEUED (a snapshot — the log
+   *  records where the message was aimed, even if the customer
+   *  later edits their number). */
+  phone: string;
+  state: WaSendState;
+  ts: string;
+}
+
+/** The WhatsApp block on the owner doc's settings. */
+export interface WaSettings {
+  /** Service-due reminder interval in days (design §3.5): a
+   *  delivered job older than this suggests a service reminder.
+   *  Absent ⇒ lib/whatsapp's default (90). Owner-writable like
+   *  every settings write. */
+  serviceIntervalDays?: number;
+}
 
 export interface ShopSettings {
   shopName: string;
   address: string;
   phone: string;
+  /** Phase E · E1 (design §1.1): the shop's name in the other
+   *  script (an Urdu name for an English-named shop and vice
+   *  versa) — the owner's own data, never translated. The receipt
+   *  header prints it as a second, smaller line under `shopName`.
+   *  Absent/empty ⇒ no second line, exactly as before. */
+  shopNameAlt?: string;
+  /** Phase E · E1 (design §1.1): the ONE print template for the
+   *  receipt family. Absent ⇒ today's rendering, field for field;
+   *  read only through `resolvePrintDesign` (lib/print.ts). */
+  printDesign?: PrintDesign;
+  /** Phase E · E3 (design §3.2): the shop's own Raast beneficiary
+   *  IBAN, stored normalised (upper-case, no spaces). Validated
+   *  in full — structure AND the ISO 13616 mod-97 checksum — by
+   *  lib/raast before Settings will save it. Absent/"" ⇒ no
+   *  generated QR. A Raast ALIAS (mobile number) is never valid
+   *  here: the SBP P2P template carries an IBAN object and no
+   *  alias object exists to put a phone number in. */
+  raastIban?: string;
+  /** Phase E · E3 (design §3.2): the owner's bank name as the
+   *  bank prints it — payload object 03, optional, ≤ 25 chars,
+   *  ASCII (enforced by lib/raast's validateRaastFiName). */
+  raastFiName?: string;
   staffEmails: string[];
   /* ---- Phase A groundwork (all optional; written by the Phase A
    * migration in later increments, read by A2–A5 features). Absent on
@@ -581,6 +1042,25 @@ export interface ShopSettings {
    *  with the rest of the Phase D settings surface; the export
    *  that consumes it lands in D5. */
   tallyLedgerNames?: Partial<Record<AccountCode, string>>;
+  /** Phase H · H1 (design §1.7): the loyalty programme's terms.
+   *  Absent ⇒ the programme is OFF and every default in
+   *  lib/loyalty's resolver applies the day it is switched on.
+   *  Read only through `resolveLoyaltySettings` (lib/loyalty). */
+  loyalty?: LoyaltySettings;
+  /** Phase H · H3 (design §2.2): the storefront publish
+   *  preferences. Absent ⇒ manual publishing (the owner presses
+   *  Publish; nothing reaches the public doc on its own). */
+  storefront?: StorefrontSettings;
+  /** Phase H · WhatsApp (design §3.5): the service-reminder
+   *  interval. Absent ⇒ the lib default. */
+  whatsapp?: WaSettings;
+  /** Phase H · H3: the shop's claimed storefront slug, cached on
+   *  the owner doc at publish time so print/link seams can render
+   *  the store link without reading the platform layer. A label:
+   *  the `storefronts/{slug}` doc is the slug's home, and a slug
+   *  once claimed is never recycled (§2.6). Null/absent ⇒ no
+   *  store has been published. */
+  storefrontSlug?: string | null;
   /* Phase B (design §1.3): document-numbering prefix overrides, one
    * per series. Absent ⇒ the design defaults (QT-/SO- /DC-/PO-/CN-/
    * DN-/RV-/PV-). Owner-edited in Settings; a change affects future
@@ -678,6 +1158,19 @@ export interface Period {
   byEmail: string;
   ts: string;
   note: string;
+  /* ---- Phase D · D4 (fiscal_year docs only; design §4.3/§4.4) ---- */
+  /** The `lockedThrough` in force immediately before this event —
+   *  a reopen restores exactly this value. */
+  prevLockedThrough?: string;
+  /** The `fy_close` journal entry this event posted (the closing
+   *  entry for a close, its mirror for a reopen). Null when the
+   *  closed year carried no P&L movement and no entry was needed. */
+  entryId?: string | null;
+  /** Reopen docs only: the close doc this event unwinds. */
+  reopensPeriodId?: string;
+  /** Close docs only: the checklist's warnings were displayed and
+   *  explicitly ticked by the owner before closing (§4.2). */
+  warningsAcked?: boolean;
 }
 
 /* ---------------- Phase A migration flags ---------------- */
@@ -820,6 +1313,14 @@ export interface SaleOrder {
   estimatedTax: number; // display-only, as quotations
   total: number; // estimate, as quotations
   source: { type: "quotation"; id: string } | null;
+  /* Phase H · H3 (design §2.5): the storefront linkage — set on
+   * orders born by converting a public inbox order. The journal
+   * never sees it (the bill that eventually posts is an ordinary
+   * order bill); it exists so the desk can trace an order back to
+   * the public paper it came from. Absent/null on every other
+   * order. */
+  sourceType?: "storefront" | null;
+  sourceOrderId?: string | null;
   expectedDate: string | null; // YYYY-MM-DD promised delivery
   /* Phase C · C1 (design §1.6): the warehouse this order PREFERS
    * its goods to leave from — a preference, displayed and inherited

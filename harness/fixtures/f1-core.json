@@ -1,0 +1,1564 @@
+{
+ "version": 1,
+ "source": "web/lib via harness/out (makeEntry, tax, ledger) + StoreProvider template transcriptions",
+ "accounts": [
+  {
+   "id": "acct-till",
+   "name": "Main Till",
+   "kind": "cash",
+   "method": "cash",
+   "legacyFor": "cash",
+   "archived": false,
+   "sortOrder": 0,
+   "ts": "2026-01-01T00:00:00.000Z"
+  },
+  {
+   "id": "acct-wallet",
+   "name": "Wallet & Bank",
+   "kind": "wallet",
+   "method": null,
+   "legacyFor": "wallet",
+   "archived": false,
+   "sortOrder": 1,
+   "ts": "2026-01-01T00:00:00.000Z"
+  },
+  {
+   "id": "acct-jazz",
+   "name": "JazzCash",
+   "kind": "wallet",
+   "method": "jazzcash",
+   "legacyFor": null,
+   "archived": false,
+   "sortOrder": 2,
+   "ts": "2026-01-01T00:00:00.000Z"
+  }
+ ],
+ "products": [
+  {
+   "id": "p-tea",
+   "sku": "TEA-475",
+   "name": "Tapal Danedar Tea 475g",
+   "urduName": "چائے",
+   "category": "Grocery",
+   "unit": "pcs",
+   "costPrice": 800,
+   "salePrice": 1050,
+   "stockQty": 50,
+   "reorderLevel": 5,
+   "keywords": [],
+   "taxSlabId": null,
+   "taxExempt": false,
+   "stockClass": null
+  },
+  {
+   "id": "p-sugar",
+   "sku": "SUG-1KG",
+   "name": "Sugar 1kg",
+   "urduName": "چینی",
+   "category": "Grocery",
+   "unit": "kg",
+   "costPrice": 130,
+   "salePrice": 145,
+   "stockQty": 100,
+   "reorderLevel": 10,
+   "keywords": [],
+   "taxSlabId": null,
+   "taxExempt": false,
+   "stockClass": null
+  },
+  {
+   "id": "p-raw",
+   "sku": "RAW-LEAF",
+   "name": "Raw Tea Leaf 1kg",
+   "urduName": "کچی پتی",
+   "category": "Raw",
+   "unit": "kg",
+   "costPrice": 500,
+   "salePrice": 600,
+   "stockQty": 40,
+   "reorderLevel": 5,
+   "keywords": [],
+   "taxSlabId": null,
+   "taxExempt": false,
+   "stockClass": "raw"
+  },
+  {
+   "id": "p-oil",
+   "sku": "OIL-5L",
+   "name": "Cooking Oil 5L",
+   "urduName": "تیل",
+   "category": "Grocery",
+   "unit": "pcs",
+   "costPrice": 1000,
+   "salePrice": 1200,
+   "stockQty": 20,
+   "reorderLevel": 3,
+   "keywords": [],
+   "taxSlabId": "slab-gst-ex",
+   "taxExempt": false,
+   "stockClass": null
+  },
+  {
+   "id": "p-ghee",
+   "sku": "GHEE-1KG",
+   "name": "Desi Ghee 1kg",
+   "urduName": "گھی",
+   "category": "Grocery",
+   "unit": "kg",
+   "costPrice": 900,
+   "salePrice": 1170,
+   "stockQty": 15,
+   "reorderLevel": 3,
+   "keywords": [],
+   "taxSlabId": "slab-gst-in",
+   "taxExempt": false,
+   "stockClass": null
+  }
+ ],
+ "slabs": [
+  {
+   "id": "slab-gst-ex",
+   "name": "GST 17%",
+   "kind": "percent",
+   "rate": 17,
+   "appliesTo": "both",
+   "inclusive": false,
+   "isDefault": false,
+   "active": true,
+   "ts": "2026-01-01T00:00:00.000Z"
+  },
+  {
+   "id": "slab-gst-in",
+   "name": "GST 17% incl",
+   "kind": "percent",
+   "rate": 17,
+   "appliesTo": "both",
+   "inclusive": true,
+   "isDefault": false,
+   "active": true,
+   "ts": "2026-01-01T00:00:00.000Z"
+  }
+ ],
+ "settings": {
+  "defaultSalesTaxSlabId": null,
+  "defaultPurchaseTaxSlabId": null
+ },
+ "customer": {
+  "id": "cust-1",
+  "name": "Ahmed Traders",
+  "phone": "03001234567"
+ },
+ "supplier": {
+  "id": "sup-1",
+  "name": "Lahore Tea Co"
+ },
+ "scenarios": [
+  {
+   "id": "bill-cash",
+   "title": "Bill paid fully in cash, no tax, no discount",
+   "docs": {
+    "bill": {
+     "id": "bill-1",
+     "billNo": 1,
+     "customerId": null,
+     "customerName": "",
+     "customerPhone": "",
+     "items": [
+      {
+       "productId": "p-tea",
+       "name": "Tapal Danedar Tea 475g",
+       "qty": 2,
+       "unitPrice": 1050,
+       "unitCost": 800,
+       "total": 2100,
+       "taxAmount": 0,
+       "taxSlabId": null,
+       "taxSlabName": null,
+       "taxRate": 0,
+       "taxKind": "percent",
+       "taxInclusive": false
+      }
+     ],
+     "subtotal": 2100,
+     "discountType": "flat",
+     "discountValue": 0,
+     "discountAmount": 0,
+     "taxAmount": 0,
+     "total": 2100,
+     "payments": [
+      {
+       "method": "cash",
+       "amount": 2100
+      }
+     ],
+     "status": "paid",
+     "returnedQty": {},
+     "dayOffset": 0,
+     "ts": "2026-10-22T10:00:00.000Z"
+    }
+   },
+   "entries": [
+    {
+     "memo": "Bill #1 — Walk-in customer",
+     "refType": "bill",
+     "refId": "bill-1",
+     "reversesId": null,
+     "lines": [
+      {
+       "account": "cash",
+       "debit": 2100,
+       "credit": 0,
+       "ref": "acct-till"
+      },
+      {
+       "account": "cogs",
+       "debit": 1600,
+       "credit": 0,
+       "ref": null
+      },
+      {
+       "account": "sales_revenue",
+       "debit": 0,
+       "credit": 2100,
+       "ref": null
+      },
+      {
+       "account": "inventory",
+       "debit": 0,
+       "credit": 1600,
+       "ref": null
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "bill-credit-split",
+   "title": "Bill with flat discount, part cash part udhaar",
+   "docs": {
+    "bill": {
+     "id": "bill-2",
+     "billNo": 2,
+     "customerId": "cust-1",
+     "customerName": "Ahmed Traders",
+     "customerPhone": "03001234567",
+     "items": [
+      {
+       "productId": "p-tea",
+       "name": "Tapal Danedar Tea 475g",
+       "qty": 1,
+       "unitPrice": 1050,
+       "unitCost": 800,
+       "total": 1050,
+       "taxAmount": 0,
+       "taxSlabId": null,
+       "taxSlabName": null,
+       "taxRate": 0,
+       "taxKind": "percent",
+       "taxInclusive": false
+      },
+      {
+       "productId": "p-sugar",
+       "name": "Sugar 1kg",
+       "qty": 2,
+       "unitPrice": 145,
+       "unitCost": 130,
+       "total": 290,
+       "taxAmount": 0,
+       "taxSlabId": null,
+       "taxSlabName": null,
+       "taxRate": 0,
+       "taxKind": "percent",
+       "taxInclusive": false
+      }
+     ],
+     "subtotal": 1340,
+     "discountType": "flat",
+     "discountValue": 40,
+     "discountAmount": 40,
+     "taxAmount": 0,
+     "total": 1300,
+     "payments": [
+      {
+       "method": "cash",
+       "amount": 500
+      },
+      {
+       "method": "credit",
+       "amount": 800
+      }
+     ],
+     "status": "paid",
+     "returnedQty": {},
+     "dayOffset": 0,
+     "ts": "2026-10-22T10:00:00.000Z"
+    },
+    "creditRow": {
+     "id": "cr-bill-2",
+     "customerId": "cust-1",
+     "customerName": "Ahmed Traders",
+     "customerPhone": "03001234567",
+     "kind": "credit",
+     "amount": 800,
+     "note": "Bill #2 — part payment on udhaar",
+     "billId": "bill-2",
+     "dayOffset": 0,
+     "ts": "2026-10-22T10:00:00.000Z"
+    }
+   },
+   "entries": [
+    {
+     "memo": "Bill #2 — Ahmed Traders",
+     "refType": "bill",
+     "refId": "bill-2",
+     "reversesId": null,
+     "lines": [
+      {
+       "account": "cash",
+       "debit": 500,
+       "credit": 0,
+       "ref": "acct-till"
+      },
+      {
+       "account": "receivables",
+       "debit": 800,
+       "credit": 0,
+       "ref": "cust-1"
+      },
+      {
+       "account": "sales_discount",
+       "debit": 40,
+       "credit": 0,
+       "ref": null
+      },
+      {
+       "account": "cogs",
+       "debit": 1060,
+       "credit": 0,
+       "ref": null
+      },
+      {
+       "account": "sales_revenue",
+       "debit": 0,
+       "credit": 1340,
+       "ref": null
+      },
+      {
+       "account": "inventory",
+       "debit": 0,
+       "credit": 1060,
+       "ref": null
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "return-partial-udhaar",
+   "title": "Partial return: refund first reduces outstanding udhaar",
+   "docs": {
+    "bill": {
+     "id": "bill-2",
+     "billNo": 2,
+     "customerId": "cust-1",
+     "customerName": "Ahmed Traders",
+     "customerPhone": "03001234567",
+     "items": [
+      {
+       "productId": "p-tea",
+       "name": "Tapal Danedar Tea 475g",
+       "qty": 1,
+       "unitPrice": 1050,
+       "unitCost": 800,
+       "total": 1050,
+       "taxAmount": 0,
+       "taxSlabId": null,
+       "taxSlabName": null,
+       "taxRate": 0,
+       "taxKind": "percent",
+       "taxInclusive": false
+      },
+      {
+       "productId": "p-sugar",
+       "name": "Sugar 1kg",
+       "qty": 2,
+       "unitPrice": 145,
+       "unitCost": 130,
+       "total": 290,
+       "taxAmount": 0,
+       "taxSlabId": null,
+       "taxSlabName": null,
+       "taxRate": 0,
+       "taxKind": "percent",
+       "taxInclusive": false
+      }
+     ],
+     "subtotal": 1340,
+     "discountType": "flat",
+     "discountValue": 40,
+     "discountAmount": 40,
+     "taxAmount": 0,
+     "total": 1300,
+     "payments": [
+      {
+       "method": "cash",
+       "amount": 500
+      },
+      {
+       "method": "credit",
+       "amount": 800
+      }
+     ],
+     "status": "paid",
+     "returnedQty": {},
+     "dayOffset": 0,
+     "ts": "2026-10-22T10:00:00.000Z"
+    },
+    "priorReturns": [],
+    "credits": [
+     {
+      "id": "cr-bill-2",
+      "customerId": "cust-1",
+      "customerName": "Ahmed Traders",
+      "customerPhone": "03001234567",
+      "kind": "credit",
+      "amount": 800,
+      "note": "Bill #2 — part payment on udhaar",
+      "billId": "bill-2",
+      "dayOffset": 0,
+      "ts": "2026-10-22T10:00:00.000Z"
+     }
+    ],
+    "returnLines": [
+     {
+      "productId": "p-sugar",
+      "qty": 1
+     }
+    ],
+    "saleReturn": {
+     "id": "ret-bill-2-1",
+     "billId": "bill-2",
+     "billNo": 2,
+     "items": [
+      {
+       "productId": "p-sugar",
+       "name": "Sugar 1kg",
+       "qty": 1,
+       "unitPrice": 145,
+       "unitCost": 130,
+       "total": 145,
+       "taxAmount": 0,
+       "taxSlabId": null,
+       "taxSlabName": null,
+       "taxRate": 0,
+       "taxKind": "percent",
+       "taxInclusive": false
+      }
+     ],
+     "refundAmount": 0,
+     "creditReduction": 141,
+     "method": "cash",
+     "accountId": "acct-till",
+     "dayOffset": 0,
+     "ts": "2026-10-22T11:00:00.000Z"
+    }
+   },
+   "entries": [
+    {
+     "memo": "Return against Bill #2",
+     "refType": "return",
+     "refId": "bill-2",
+     "reversesId": null,
+     "lines": [
+      {
+       "account": "sales_revenue",
+       "debit": 145,
+       "credit": 0,
+       "ref": null
+      },
+      {
+       "account": "inventory",
+       "debit": 130,
+       "credit": 0,
+       "ref": null
+      },
+      {
+       "account": "sales_discount",
+       "debit": 0,
+       "credit": 4,
+       "ref": null
+      },
+      {
+       "account": "receivables",
+       "debit": 0,
+       "credit": 141,
+       "ref": "cust-1"
+      },
+      {
+       "account": "cogs",
+       "debit": 0,
+       "credit": 130,
+       "ref": null
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "bill-underpay-tolerance",
+   "title": "Bill underpaid by Rs 1 — rounding booked to sales_discount (Dr)",
+   "docs": {
+    "bill": {
+     "id": "bill-3",
+     "billNo": 3,
+     "customerId": null,
+     "customerName": "",
+     "customerPhone": "",
+     "items": [
+      {
+       "productId": "p-sugar",
+       "name": "Sugar 1kg",
+       "qty": 1,
+       "unitPrice": 145,
+       "unitCost": 130,
+       "total": 145,
+       "taxAmount": 0,
+       "taxSlabId": null,
+       "taxSlabName": null,
+       "taxRate": 0,
+       "taxKind": "percent",
+       "taxInclusive": false
+      }
+     ],
+     "subtotal": 145,
+     "discountType": "flat",
+     "discountValue": 0,
+     "discountAmount": 0,
+     "taxAmount": 0,
+     "total": 145,
+     "payments": [
+      {
+       "method": "cash",
+       "amount": 144
+      }
+     ],
+     "status": "paid",
+     "returnedQty": {},
+     "dayOffset": 0,
+     "ts": "2026-10-22T10:00:00.000Z"
+    }
+   },
+   "entries": [
+    {
+     "memo": "Bill #3 — Walk-in customer",
+     "refType": "bill",
+     "refId": "bill-3",
+     "reversesId": null,
+     "lines": [
+      {
+       "account": "cash",
+       "debit": 144,
+       "credit": 0,
+       "ref": "acct-till"
+      },
+      {
+       "account": "sales_discount",
+       "debit": 1,
+       "credit": 0,
+       "ref": null
+      },
+      {
+       "account": "cogs",
+       "debit": 130,
+       "credit": 0,
+       "ref": null
+      },
+      {
+       "account": "sales_revenue",
+       "debit": 0,
+       "credit": 145,
+       "ref": null
+      },
+      {
+       "account": "inventory",
+       "debit": 0,
+       "credit": 130,
+       "ref": null
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "bill-overpay-tolerance",
+   "title": "Bill overpaid by Rs 1 — rounding booked to sales_discount (Cr)",
+   "docs": {
+    "bill": {
+     "id": "bill-4",
+     "billNo": 4,
+     "customerId": null,
+     "customerName": "",
+     "customerPhone": "",
+     "items": [
+      {
+       "productId": "p-sugar",
+       "name": "Sugar 1kg",
+       "qty": 1,
+       "unitPrice": 145,
+       "unitCost": 130,
+       "total": 145,
+       "taxAmount": 0,
+       "taxSlabId": null,
+       "taxSlabName": null,
+       "taxRate": 0,
+       "taxKind": "percent",
+       "taxInclusive": false
+      }
+     ],
+     "subtotal": 145,
+     "discountType": "flat",
+     "discountValue": 0,
+     "discountAmount": 0,
+     "taxAmount": 0,
+     "total": 145,
+     "payments": [
+      {
+       "method": "cash",
+       "amount": 146
+      }
+     ],
+     "status": "paid",
+     "returnedQty": {},
+     "dayOffset": 0,
+     "ts": "2026-10-22T10:00:00.000Z"
+    }
+   },
+   "entries": [
+    {
+     "memo": "Bill #4 — Walk-in customer",
+     "refType": "bill",
+     "refId": "bill-4",
+     "reversesId": null,
+     "lines": [
+      {
+       "account": "cash",
+       "debit": 146,
+       "credit": 0,
+       "ref": "acct-till"
+      },
+      {
+       "account": "sales_discount",
+       "debit": 0,
+       "credit": 1,
+       "ref": null
+      },
+      {
+       "account": "cogs",
+       "debit": 130,
+       "credit": 0,
+       "ref": null
+      },
+      {
+       "account": "sales_revenue",
+       "debit": 0,
+       "credit": 145,
+       "ref": null
+      },
+      {
+       "account": "inventory",
+       "debit": 0,
+       "credit": 130,
+       "ref": null
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "bill-tax-exclusive",
+   "title": "Exclusive GST 17%: tax added on top, credited to tax_payable",
+   "docs": {
+    "bill": {
+     "id": "bill-5",
+     "billNo": 5,
+     "customerId": null,
+     "customerName": "",
+     "customerPhone": "",
+     "items": [
+      {
+       "productId": "p-oil",
+       "name": "Cooking Oil 5L",
+       "qty": 2,
+       "unitPrice": 1200,
+       "unitCost": 1000,
+       "total": 2400,
+       "taxAmount": 408,
+       "taxSlabId": "slab-gst-ex",
+       "taxSlabName": "GST 17%",
+       "taxRate": 17,
+       "taxKind": "percent",
+       "taxInclusive": false
+      }
+     ],
+     "subtotal": 2400,
+     "discountType": "flat",
+     "discountValue": 0,
+     "discountAmount": 0,
+     "taxAmount": 408,
+     "total": 2808,
+     "payments": [
+      {
+       "method": "cash",
+       "amount": 2808
+      }
+     ],
+     "status": "paid",
+     "returnedQty": {},
+     "dayOffset": 0,
+     "ts": "2026-10-22T10:00:00.000Z"
+    }
+   },
+   "entries": [
+    {
+     "memo": "Bill #5 — Walk-in customer",
+     "refType": "bill",
+     "refId": "bill-5",
+     "reversesId": null,
+     "lines": [
+      {
+       "account": "cash",
+       "debit": 2808,
+       "credit": 0,
+       "ref": "acct-till"
+      },
+      {
+       "account": "cogs",
+       "debit": 2000,
+       "credit": 0,
+       "ref": null
+      },
+      {
+       "account": "sales_revenue",
+       "debit": 0,
+       "credit": 2400,
+       "ref": null
+      },
+      {
+       "account": "tax_payable",
+       "debit": 0,
+       "credit": 408,
+       "ref": null
+      },
+      {
+       "account": "inventory",
+       "debit": 0,
+       "credit": 2000,
+       "ref": null
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "return-taxed-item-by-item",
+   "title": "Taxed bill returned item-by-item: tax reverses to the paisa across two returns",
+   "docs": {
+    "bill": {
+     "id": "bill-5",
+     "billNo": 5,
+     "customerId": null,
+     "customerName": "",
+     "customerPhone": "",
+     "items": [
+      {
+       "productId": "p-oil",
+       "name": "Cooking Oil 5L",
+       "qty": 2,
+       "unitPrice": 1200,
+       "unitCost": 1000,
+       "total": 2400,
+       "taxAmount": 408,
+       "taxSlabId": "slab-gst-ex",
+       "taxSlabName": "GST 17%",
+       "taxRate": 17,
+       "taxKind": "percent",
+       "taxInclusive": false
+      }
+     ],
+     "subtotal": 2400,
+     "discountType": "flat",
+     "discountValue": 0,
+     "discountAmount": 0,
+     "taxAmount": 408,
+     "total": 2808,
+     "payments": [
+      {
+       "method": "cash",
+       "amount": 2808
+      }
+     ],
+     "status": "paid",
+     "returnedQty": {},
+     "dayOffset": 0,
+     "ts": "2026-10-22T10:00:00.000Z"
+    },
+    "steps": [
+     {
+      "bill": {
+       "id": "bill-5",
+       "billNo": 5,
+       "customerId": null,
+       "customerName": "",
+       "customerPhone": "",
+       "items": [
+        {
+         "productId": "p-oil",
+         "name": "Cooking Oil 5L",
+         "qty": 2,
+         "unitPrice": 1200,
+         "unitCost": 1000,
+         "total": 2400,
+         "taxAmount": 408,
+         "taxSlabId": "slab-gst-ex",
+         "taxSlabName": "GST 17%",
+         "taxRate": 17,
+         "taxKind": "percent",
+         "taxInclusive": false
+        }
+       ],
+       "subtotal": 2400,
+       "discountType": "flat",
+       "discountValue": 0,
+       "discountAmount": 0,
+       "taxAmount": 408,
+       "total": 2808,
+       "payments": [
+        {
+         "method": "cash",
+         "amount": 2808
+        }
+       ],
+       "status": "paid",
+       "returnedQty": {},
+       "dayOffset": 0,
+       "ts": "2026-10-22T10:00:00.000Z"
+      },
+      "priorReturns": [],
+      "returnLines": [
+       {
+        "productId": "p-oil",
+        "qty": 1
+       }
+      ]
+     },
+     {
+      "bill": {
+       "id": "bill-5",
+       "billNo": 5,
+       "customerId": null,
+       "customerName": "",
+       "customerPhone": "",
+       "items": [
+        {
+         "productId": "p-oil",
+         "name": "Cooking Oil 5L",
+         "qty": 2,
+         "unitPrice": 1200,
+         "unitCost": 1000,
+         "total": 2400,
+         "taxAmount": 408,
+         "taxSlabId": "slab-gst-ex",
+         "taxSlabName": "GST 17%",
+         "taxRate": 17,
+         "taxKind": "percent",
+         "taxInclusive": false
+        }
+       ],
+       "subtotal": 2400,
+       "discountType": "flat",
+       "discountValue": 0,
+       "discountAmount": 0,
+       "taxAmount": 408,
+       "total": 2808,
+       "payments": [
+        {
+         "method": "cash",
+         "amount": 2808
+        }
+       ],
+       "status": "paid",
+       "returnedQty": {
+        "p-oil": 1
+       },
+       "dayOffset": 0,
+       "ts": "2026-10-22T10:00:00.000Z"
+      },
+      "priorReturns": [
+       {
+        "id": "ret-bill-5-1",
+        "billId": "bill-5",
+        "billNo": 5,
+        "items": [
+         {
+          "productId": "p-oil",
+          "name": "Cooking Oil 5L",
+          "qty": 1,
+          "unitPrice": 1200,
+          "unitCost": 1000,
+          "total": 1200,
+          "taxAmount": 204,
+          "taxSlabId": "slab-gst-ex",
+          "taxSlabName": "GST 17%",
+          "taxRate": 17,
+          "taxKind": "percent",
+          "taxInclusive": false
+         }
+        ],
+        "refundAmount": 1404,
+        "creditReduction": 0,
+        "method": "cash",
+        "accountId": "acct-till",
+        "dayOffset": 0,
+        "ts": "2026-10-22T11:00:00.000Z"
+       }
+      ],
+      "returnLines": [
+       {
+        "productId": "p-oil",
+        "qty": 1
+       }
+      ]
+     }
+    ],
+    "saleReturns": [
+     {
+      "id": "ret-bill-5-1",
+      "billId": "bill-5",
+      "billNo": 5,
+      "items": [
+       {
+        "productId": "p-oil",
+        "name": "Cooking Oil 5L",
+        "qty": 1,
+        "unitPrice": 1200,
+        "unitCost": 1000,
+        "total": 1200,
+        "taxAmount": 204,
+        "taxSlabId": "slab-gst-ex",
+        "taxSlabName": "GST 17%",
+        "taxRate": 17,
+        "taxKind": "percent",
+        "taxInclusive": false
+       }
+      ],
+      "refundAmount": 1404,
+      "creditReduction": 0,
+      "method": "cash",
+      "accountId": "acct-till",
+      "dayOffset": 0,
+      "ts": "2026-10-22T11:00:00.000Z"
+     },
+     {
+      "id": "ret-bill-5-2",
+      "billId": "bill-5",
+      "billNo": 5,
+      "items": [
+       {
+        "productId": "p-oil",
+        "name": "Cooking Oil 5L",
+        "qty": 1,
+        "unitPrice": 1200,
+        "unitCost": 1000,
+        "total": 1200,
+        "taxAmount": 204,
+        "taxSlabId": "slab-gst-ex",
+        "taxSlabName": "GST 17%",
+        "taxRate": 17,
+        "taxKind": "percent",
+        "taxInclusive": false
+       }
+      ],
+      "refundAmount": 1404,
+      "creditReduction": 0,
+      "method": "cash",
+      "accountId": "acct-till",
+      "dayOffset": 0,
+      "ts": "2026-10-22T11:00:00.000Z"
+     }
+    ]
+   },
+   "entries": [
+    {
+     "memo": "Return against Bill #5",
+     "refType": "return",
+     "refId": "bill-5",
+     "reversesId": null,
+     "lines": [
+      {
+       "account": "sales_revenue",
+       "debit": 1200,
+       "credit": 0,
+       "ref": null
+      },
+      {
+       "account": "tax_payable",
+       "debit": 204,
+       "credit": 0,
+       "ref": null
+      },
+      {
+       "account": "inventory",
+       "debit": 1000,
+       "credit": 0,
+       "ref": null
+      },
+      {
+       "account": "cash",
+       "debit": 0,
+       "credit": 1404,
+       "ref": "acct-till"
+      },
+      {
+       "account": "cogs",
+       "debit": 0,
+       "credit": 1000,
+       "ref": null
+      }
+     ]
+    },
+    {
+     "memo": "Return against Bill #5",
+     "refType": "return",
+     "refId": "bill-5",
+     "reversesId": null,
+     "lines": [
+      {
+       "account": "sales_revenue",
+       "debit": 1200,
+       "credit": 0,
+       "ref": null
+      },
+      {
+       "account": "tax_payable",
+       "debit": 204,
+       "credit": 0,
+       "ref": null
+      },
+      {
+       "account": "inventory",
+       "debit": 1000,
+       "credit": 0,
+       "ref": null
+      },
+      {
+       "account": "cash",
+       "debit": 0,
+       "credit": 1404,
+       "ref": "acct-till"
+      },
+      {
+       "account": "cogs",
+       "debit": 0,
+       "credit": 1000,
+       "ref": null
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "bill-tax-inclusive",
+   "title": "Inclusive GST 17%: revenue credited net of embedded tax",
+   "docs": {
+    "bill": {
+     "id": "bill-6",
+     "billNo": 6,
+     "customerId": null,
+     "customerName": "",
+     "customerPhone": "",
+     "items": [
+      {
+       "productId": "p-ghee",
+       "name": "Desi Ghee 1kg",
+       "qty": 1,
+       "unitPrice": 1170,
+       "unitCost": 900,
+       "total": 1170,
+       "taxAmount": 170,
+       "taxSlabId": "slab-gst-in",
+       "taxSlabName": "GST 17% incl",
+       "taxRate": 17,
+       "taxKind": "percent",
+       "taxInclusive": true
+      }
+     ],
+     "subtotal": 1170,
+     "discountType": "flat",
+     "discountValue": 0,
+     "discountAmount": 0,
+     "taxAmount": 170,
+     "total": 1170,
+     "payments": [
+      {
+       "method": "jazzcash",
+       "amount": 1170
+      }
+     ],
+     "status": "paid",
+     "returnedQty": {},
+     "dayOffset": 0,
+     "ts": "2026-10-22T10:00:00.000Z"
+    }
+   },
+   "entries": [
+    {
+     "memo": "Bill #6 — Walk-in customer",
+     "refType": "bill",
+     "refId": "bill-6",
+     "reversesId": null,
+     "lines": [
+      {
+       "account": "wallet",
+       "debit": 1170,
+       "credit": 0,
+       "ref": "acct-jazz"
+      },
+      {
+       "account": "cogs",
+       "debit": 900,
+       "credit": 0,
+       "ref": null
+      },
+      {
+       "account": "sales_revenue",
+       "debit": 0,
+       "credit": 1000,
+       "ref": null
+      },
+      {
+       "account": "tax_payable",
+       "debit": 0,
+       "credit": 170,
+       "ref": null
+      },
+      {
+       "account": "inventory",
+       "debit": 0,
+       "credit": 900,
+       "ref": null
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "counter-sale",
+   "title": "Counter sale, cash, untaxed",
+   "docs": {
+    "sale": {
+     "id": "sale-1",
+     "productId": "p-sugar",
+     "qty": 3
+    }
+   },
+   "entries": [
+    {
+     "memo": "Counter sale — Sugar 1kg × 3",
+     "refType": "sale",
+     "refId": "sale-1",
+     "reversesId": null,
+     "lines": [
+      {
+       "account": "cash",
+       "debit": 435,
+       "credit": 0,
+       "ref": "acct-till"
+      },
+      {
+       "account": "cogs",
+       "debit": 390,
+       "credit": 0,
+       "ref": null
+      },
+      {
+       "account": "sales_revenue",
+       "debit": 0,
+       "credit": 435,
+       "ref": null
+      },
+      {
+       "account": "inventory",
+       "debit": 0,
+       "credit": 390,
+       "ref": null
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "counter-sale-raw",
+   "title": "Counter sale of raw-class product: inventory_raw leg",
+   "docs": {
+    "sale": {
+     "id": "sale-2",
+     "productId": "p-raw",
+     "qty": 2
+    }
+   },
+   "entries": [
+    {
+     "memo": "Counter sale — Raw Tea Leaf 1kg × 2",
+     "refType": "sale",
+     "refId": "sale-2",
+     "reversesId": null,
+     "lines": [
+      {
+       "account": "cash",
+       "debit": 1200,
+       "credit": 0,
+       "ref": "acct-till"
+      },
+      {
+       "account": "cogs",
+       "debit": 1000,
+       "credit": 0,
+       "ref": null
+      },
+      {
+       "account": "sales_revenue",
+       "debit": 0,
+       "credit": 1200,
+       "ref": null
+      },
+      {
+       "account": "inventory_raw",
+       "debit": 0,
+       "credit": 1000,
+       "ref": null
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "purchase-untaxed",
+   "title": "Purchase on supplier credit: purchases clearing nets zero",
+   "docs": {
+    "purchase": {
+     "id": "pur-1",
+     "supplierId": "sup-1",
+     "items": [
+      {
+       "productId": "p-tea",
+       "name": "Tapal Danedar Tea 475g",
+       "qty": 10,
+       "unitCost": 800,
+       "total": 8000,
+       "taxAmount": 0
+      }
+     ],
+     "total": 8000,
+     "netTotal": 8000,
+     "taxAmount": 0,
+     "note": "",
+     "dayOffset": 0,
+     "ts": "2026-10-22T09:00:00.000Z"
+    }
+   },
+   "entries": [
+    {
+     "memo": "Purchase — stock received",
+     "refType": "purchase",
+     "refId": "pur-1",
+     "reversesId": null,
+     "lines": [
+      {
+       "account": "purchases",
+       "debit": 8000,
+       "credit": 0,
+       "ref": null
+      },
+      {
+       "account": "inventory",
+       "debit": 8000,
+       "credit": 0,
+       "ref": null
+      },
+      {
+       "account": "purchases",
+       "debit": 0,
+       "credit": 8000,
+       "ref": null
+      },
+      {
+       "account": "payables",
+       "debit": 0,
+       "credit": 8000,
+       "ref": "sup-1"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "purchase-taxed-mixed",
+   "title": "Purchase: exclusive input tax to tax_input; raw share to inventory_raw",
+   "docs": {
+    "purchase": {
+     "id": "pur-2",
+     "supplierId": "sup-1",
+     "items": [
+      {
+       "productId": "p-oil",
+       "name": "Cooking Oil 5L",
+       "qty": 5,
+       "unitCost": 1000,
+       "total": 5000,
+       "taxAmount": 850
+      },
+      {
+       "productId": "p-raw",
+       "name": "Raw Tea Leaf 1kg",
+       "qty": 4,
+       "unitCost": 500,
+       "total": 2000,
+       "taxAmount": 0
+      }
+     ],
+     "total": 7850,
+     "netTotal": 7000,
+     "taxAmount": 850,
+     "note": "",
+     "dayOffset": 0,
+     "ts": "2026-10-22T09:00:00.000Z"
+    }
+   },
+   "entries": [
+    {
+     "memo": "Purchase — stock received",
+     "refType": "purchase",
+     "refId": "pur-2",
+     "reversesId": null,
+     "lines": [
+      {
+       "account": "purchases",
+       "debit": 7000,
+       "credit": 0,
+       "ref": null
+      },
+      {
+       "account": "tax_input",
+       "debit": 850,
+       "credit": 0,
+       "ref": null
+      },
+      {
+       "account": "inventory",
+       "debit": 5000,
+       "credit": 0,
+       "ref": null
+      },
+      {
+       "account": "inventory_raw",
+       "debit": 2000,
+       "credit": 0,
+       "ref": null
+      },
+      {
+       "account": "purchases",
+       "debit": 0,
+       "credit": 7000,
+       "ref": null
+      },
+      {
+       "account": "payables",
+       "debit": 0,
+       "credit": 7850,
+       "ref": "sup-1"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "repayment-cash",
+   "title": "Udhaar repayment received in cash",
+   "docs": {
+    "creditRow": {
+     "id": "cr-repay-1",
+     "customerId": "cust-1",
+     "customerName": "Ahmed Traders",
+     "customerPhone": "03001234567",
+     "kind": "repayment",
+     "amount": 300,
+     "method": "cash",
+     "accountId": "acct-till",
+     "billId": null,
+     "dayOffset": 0,
+     "ts": "2026-10-22T12:00:00.000Z"
+    }
+   },
+   "entries": [
+    {
+     "memo": "Udhaar repayment — Ahmed Traders",
+     "refType": "repayment",
+     "refId": "cr-repay-1",
+     "reversesId": null,
+     "lines": [
+      {
+       "account": "cash",
+       "debit": 300,
+       "credit": 0,
+       "ref": "acct-till"
+      },
+      {
+       "account": "receivables",
+       "debit": 0,
+       "credit": 300,
+       "ref": "cust-1"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "credit-given-standalone",
+   "title": "Standalone udhaar is a cash loan out of the till, never revenue",
+   "docs": {
+    "creditRow": {
+     "id": "cr-loan-1",
+     "customerId": "cust-1",
+     "customerName": "Ahmed Traders",
+     "customerPhone": "03001234567",
+     "kind": "credit",
+     "amount": 2000,
+     "billId": null,
+     "dayOffset": 0,
+     "ts": "2026-10-22T12:05:00.000Z"
+    }
+   },
+   "entries": [
+    {
+     "memo": "Udhaar (cash loan) — Ahmed Traders",
+     "refType": "credit",
+     "refId": "cr-loan-1",
+     "reversesId": null,
+     "lines": [
+      {
+       "account": "receivables",
+       "debit": 2000,
+       "credit": 0,
+       "ref": "cust-1"
+      },
+      {
+       "account": "cash",
+       "debit": 0,
+       "credit": 2000,
+       "ref": "acct-till"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "bill-mixed-class",
+   "title": "Bill with goods + raw lines: COGS credit splits by class",
+   "docs": {
+    "bill": {
+     "id": "bill-7",
+     "billNo": 7,
+     "customerId": null,
+     "customerName": "",
+     "customerPhone": "",
+     "items": [
+      {
+       "productId": "p-tea",
+       "name": "Tapal Danedar Tea 475g",
+       "qty": 1,
+       "unitPrice": 1050,
+       "unitCost": 800,
+       "total": 1050,
+       "taxAmount": 0,
+       "taxSlabId": null,
+       "taxSlabName": null,
+       "taxRate": 0,
+       "taxKind": "percent",
+       "taxInclusive": false
+      },
+      {
+       "productId": "p-raw",
+       "name": "Raw Tea Leaf 1kg",
+       "qty": 2,
+       "unitPrice": 600,
+       "unitCost": 500,
+       "total": 1200,
+       "taxAmount": 0,
+       "taxSlabId": null,
+       "taxSlabName": null,
+       "taxRate": 0,
+       "taxKind": "percent",
+       "taxInclusive": false
+      }
+     ],
+     "subtotal": 2250,
+     "discountType": "flat",
+     "discountValue": 0,
+     "discountAmount": 0,
+     "taxAmount": 0,
+     "total": 2250,
+     "payments": [
+      {
+       "method": "cash",
+       "amount": 2250
+      }
+     ],
+     "status": "paid",
+     "returnedQty": {},
+     "dayOffset": 0,
+     "ts": "2026-10-22T10:00:00.000Z"
+    }
+   },
+   "entries": [
+    {
+     "memo": "Bill #7 — Walk-in customer",
+     "refType": "bill",
+     "refId": "bill-7",
+     "reversesId": null,
+     "lines": [
+      {
+       "account": "cash",
+       "debit": 2250,
+       "credit": 0,
+       "ref": "acct-till"
+      },
+      {
+       "account": "cogs",
+       "debit": 1800,
+       "credit": 0,
+       "ref": null
+      },
+      {
+       "account": "sales_revenue",
+       "debit": 0,
+       "credit": 2250,
+       "ref": null
+      },
+      {
+       "account": "inventory",
+       "debit": 0,
+       "credit": 800,
+       "ref": null
+      },
+      {
+       "account": "inventory_raw",
+       "debit": 0,
+       "credit": 1000,
+       "ref": null
+      }
+     ]
+    }
+   ]
+  }
+ ]
+}

@@ -1,16 +1,21 @@
 /* ==========================================================================
    Dukaan AI — design system. Professional retail SaaS.
-   Calm themes (owner directive): both palettes are soothing and
-   low-strain — Light is soft warm ivory with warm off-white cards
-   (never glaring pure white); Dark is deep desaturated blue-grey /
-   charcoal (never pure black) with soft off-white text and muted
-   accent saturation. Body-text contrast stays ≥ WCAG AA in both.
-   Sidebar is deep emerald in BOTH themes.
-   Theme switches via [data-theme] on <html> (see layout pre-paint script).
+   FIVE calm themes (owner directive): every palette is soothing and
+   low-strain and minimalist — light themes use tinted off-white
+   cards (never glaring pure white); dark themes use desaturated
+   tinted charcoal (never pure black) with soft off-white text and
+   muted accent saturation. Body-text contrast stays ≥ WCAG AA in
+   all five. Themes: emerald (light, default — :root below),
+   midnight (dark), ocean (light), sand (light), dusk (dark).
+   Each theme carries its own coherent sidebar treatment via the
+   --sb-* tokens. Theme switches via [data-theme] on <html> (see
+   layout pre-paint script); legacy saved values map light→emerald,
+   dark→midnight.
    Language switches via [lang] / [dir] on <html> (lang-init script).
    ========================================================================== */
 
-:root {
+:root,
+[data-theme="emerald"] {
   --bg: #F7F5EF;
   --bg-2: #EFECE3;
   --card: #FDFCFA;
@@ -28,6 +33,11 @@
   --amber-text: #8F4209;
   --danger: #B23A34;
   --danger-soft: rgba(178, 58, 52, .08);
+  --info: #7A5BA6;
+  --info-soft: rgba(122, 91, 166, .12);
+  --info-text: #7A5BA6;
+  --on-accent: #FFFFFF;
+  --on-amber: #FFFFFF;
   --nav-bg: rgba(247, 245, 239, .86);
   --chip-bg: rgba(11, 61, 46, .055);
   --paper-tex: none;
@@ -43,10 +53,11 @@
   --font-display: "Baloo 2", system-ui, sans-serif;
   --font-body: "Inter", system-ui, sans-serif;
   --font-urdu: "Noto Nastaliq Urdu", "Jameel Noori Nastaleeq", serif;
+  --font-naskh: "Noto Naskh Arabic", "Scheherazade New", "Traditional Arabic", serif;
   color-scheme: light;
 }
 
-[data-theme="dark"] {
+[data-theme="midnight"] {
   --bg: #15181D;
   --bg-2: #1A1F26;
   --card: #1E242C;
@@ -64,10 +75,129 @@
   --amber-text: #EDC27C;
   --danger: #E08A84;
   --danger-soft: rgba(224, 138, 132, .10);
+  --info: #A78BFA;
+  --info-soft: rgba(167, 139, 250, .12);
+  --info-text: #A78BFA;
+  --on-accent: #06231A;
+  --on-amber: #2A1A05;
   --nav-bg: rgba(21, 24, 29, .86);
   --chip-bg: rgba(178, 198, 214, .07);
   --paper-tex: none;
   --card-shadow: 0 3px 14px rgba(0, 0, 0, .32);
+  color-scheme: dark;
+}
+
+[data-theme="ocean"] {
+  --bg: #EEF5F4;
+  --bg-2: #E0ECEB;
+  --card: #FBFDFC;
+  --card-2: #EAF2F1;
+  --line: rgba(10, 63, 71, .10);
+  --text: #1C3238;
+  --text-2: #3E5A61;
+  --muted: #5E7A80;
+  --muted-2: #87A0A5;
+  --accent: #0C6B6E;
+  --accent-soft: rgba(12, 107, 110, .09);
+  --accent-text: #084E55;
+  --amber: #B96E12;
+  --amber-soft: rgba(185, 110, 18, .11);
+  --amber-text: #8A4D0B;
+  --danger: #AF3A34;
+  --danger-soft: rgba(175, 58, 52, .08);
+  --info: #4A6FA5;
+  --info-soft: rgba(74, 111, 165, .11);
+  --info-text: #3D5E8C;
+  --on-accent: #FFFFFF;
+  --on-amber: #FFFFFF;
+  --nav-bg: rgba(238, 245, 244, .86);
+  --chip-bg: rgba(10, 63, 71, .055);
+  --paper-tex: none;
+  --card-shadow: 0 2px 10px rgba(10, 63, 71, .05);
+  --sb-bg: #0D3542;
+  --sb-bg-grad: linear-gradient(180deg, #11404F, #0A2D3A);
+  --sb-text: #D9EBEE;
+  --sb-muted: #8FB4BC;
+  --sb-active-bg: rgba(125, 211, 202, .14);
+  --sb-active-text: #A5E3D8;
+  --sb-line: rgba(255, 255, 255, .08);
+  color-scheme: light;
+}
+
+[data-theme="sand"] {
+  --bg: #F8F2E7;
+  --bg-2: #F0E7D3;
+  --card: #FEFCF7;
+  --card-2: #F4EDDC;
+  --line: rgba(74, 54, 28, .11);
+  --text: #322A20;
+  --text-2: #57493A;
+  --muted: #7A6A54;
+  --muted-2: #A08E74;
+  /* Emerald stays the functional accent so semantic colours
+     (success green / warning amber / danger red) stay recognisable
+     on the warm neutral surfaces. */
+  --accent: #0E7A4B;
+  --accent-soft: rgba(14, 122, 75, .09);
+  --accent-text: #0A5C37;
+  --amber: #BC6C10;
+  --amber-soft: rgba(188, 108, 16, .12);
+  --amber-text: #8A4A08;
+  --danger: #B23A34;
+  --danger-soft: rgba(178, 58, 52, .08);
+  --info: #5B6FA6;
+  --info-soft: rgba(91, 111, 166, .11);
+  --info-text: #4C5E8C;
+  --on-accent: #FFFFFF;
+  --on-amber: #FFFFFF;
+  --nav-bg: rgba(248, 242, 231, .86);
+  --chip-bg: rgba(74, 54, 28, .055);
+  --paper-tex: none;
+  --card-shadow: 0 2px 10px rgba(74, 54, 28, .05);
+  --sb-bg: #3A2F22;
+  --sb-bg-grad: linear-gradient(180deg, #43362A, #2E251B);
+  --sb-text: #EFE6D4;
+  --sb-muted: #BBA98C;
+  --sb-active-bg: rgba(240, 196, 140, .15);
+  --sb-active-text: #F0C48C;
+  --sb-line: rgba(255, 255, 255, .08);
+  color-scheme: light;
+}
+
+[data-theme="dusk"] {
+  --bg: #1A1921;
+  --bg-2: #201E29;
+  --card: #262430;
+  --card-2: #2E2C3A;
+  --line: rgba(198, 182, 235, .12);
+  --text: #ECE9F2;
+  --text-2: #CFC9DB;
+  --muted: #A29BB2;
+  --muted-2: #7B748C;
+  --accent: #9D8BD0;
+  --accent-soft: rgba(157, 139, 208, .14);
+  --accent-text: #C9B8EE;
+  --amber: #DDA95E;
+  --amber-soft: rgba(221, 169, 94, .12);
+  --amber-text: #EDC48C;
+  --danger: #DE8B94;
+  --danger-soft: rgba(222, 139, 148, .11);
+  --info: #93B8E8;
+  --info-soft: rgba(147, 184, 232, .12);
+  --info-text: #A9CBF2;
+  --on-accent: #1D1730;
+  --on-amber: #2A1E06;
+  --nav-bg: rgba(26, 25, 33, .86);
+  --chip-bg: rgba(198, 182, 235, .07);
+  --paper-tex: none;
+  --card-shadow: 0 3px 14px rgba(0, 0, 0, .34);
+  --sb-bg: #231C31;
+  --sb-bg-grad: linear-gradient(180deg, #2A2138, #1E1829);
+  --sb-text: #E4DFF2;
+  --sb-muted: #A99CC4;
+  --sb-active-bg: rgba(196, 181, 253, .14);
+  --sb-active-text: #D6C6F7;
+  --sb-line: rgba(255, 255, 255, .08);
   color-scheme: dark;
 }
 
@@ -96,9 +226,10 @@ body {
 main { flex: 1; min-width: 0; }
 a { color: inherit; text-decoration: none; }
 img { max-width: 100%; }
-::selection { background: rgba(14, 122, 75, .22); }
+::selection { background: color-mix(in srgb, var(--accent) 22%, transparent); }
 
 .ur { font-family: var(--font-urdu); line-height: 2; }
+.naskh { font-family: var(--font-naskh); line-height: 1.8; }
 [dir="rtl"] { text-align: right; }
 
 /* ---------- Urdu / RTL typography ---------- */
@@ -107,6 +238,22 @@ html[lang="ur"] h1, html[lang="ur"] h2, html[lang="ur"] h3, html[lang="ur"] .dis
 html[lang="ur"] .kpi-value, html[lang="ur"] .sb-brand-name { font-family: var(--font-urdu), var(--font-display); }
 html[lang="ur"] .eyebrow, html[lang="ur"] .kpi-label, html[lang="ur"] table.data th,
 html[lang="ur"] .sb-group-label, html[lang="ur"] .footer h4 {
+  letter-spacing: 0; text-transform: none;
+}
+
+/* ---------- Pashto / Farsi — Naskh-first (Phase H design §4.5) ----------
+   PS/FA are Naskh-script languages: Nastaliq is NEVER forced on them.
+   No downloadable webfont — the stack names system Naskh faces, exactly
+   as Urdu honestly relies on platform shaping. */
+html[lang="ps"] body, html[lang="fa"] body { font-family: var(--font-naskh), var(--font-body); line-height: 1.8; }
+html[lang="ps"] h1, html[lang="ps"] h2, html[lang="ps"] h3, html[lang="ps"] .display,
+html[lang="ps"] .kpi-value, html[lang="ps"] .sb-brand-name,
+html[lang="fa"] h1, html[lang="fa"] h2, html[lang="fa"] h3, html[lang="fa"] .display,
+html[lang="fa"] .kpi-value, html[lang="fa"] .sb-brand-name { font-family: var(--font-naskh), var(--font-display); }
+html[lang="ps"] .eyebrow, html[lang="ps"] .kpi-label, html[lang="ps"] table.data th,
+html[lang="ps"] .sb-group-label, html[lang="ps"] .footer h4,
+html[lang="fa"] .eyebrow, html[lang="fa"] .kpi-label, html[lang="fa"] table.data th,
+html[lang="fa"] .sb-group-label, html[lang="fa"] .footer h4 {
   letter-spacing: 0; text-transform: none;
 }
 
@@ -137,7 +284,7 @@ h1, h2, h3, .display { font-family: var(--font-display); line-height: 1.2; lette
   cursor: pointer; transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
   white-space: nowrap;
 }
-.btn:hover { border-color: rgba(14, 122, 75, .35); }
+.btn:hover { border-color: color-mix(in srgb, var(--accent) 35%, transparent); }
 .btn:disabled { opacity: 0.55; cursor: not-allowed; transform: none; }
 /* Icons inside buttons are ALWAYS capped — an unconstrained inline SVG
    falls back to the 300x150 replaced-element default and blows the
@@ -145,11 +292,9 @@ h1, h2, h3, .display { font-family: var(--font-display); line-height: 1.2; lette
 .btn svg { width: 20px; height: 20px; flex-shrink: 0; }
 .btn-sm svg { width: 16px; height: 16px; }
 .btn-lg svg { width: 22px; height: 22px; }
-.btn-primary { background: var(--accent); color: #fff; box-shadow: 0 3px 12px rgba(14,122,75,.20); }
-[data-theme="dark"] .btn-primary { color: #06231A; }
-.btn-primary:hover { box-shadow: 0 5px 18px rgba(14,122,75,.26); }
-.btn-amber { background: var(--amber); color: #fff; box-shadow: 0 3px 12px rgba(199,116,20,.22); }
-[data-theme="dark"] .btn-amber { color: #2a1a05; }
+.btn-primary { background: var(--accent); color: var(--on-accent); box-shadow: 0 3px 12px color-mix(in srgb, var(--accent) 22%, transparent); }
+.btn-primary:hover { box-shadow: 0 5px 18px color-mix(in srgb, var(--accent) 28%, transparent); }
+.btn-amber { background: var(--amber); color: var(--on-amber); box-shadow: 0 3px 12px color-mix(in srgb, var(--amber) 24%, transparent); }
 .btn-ghost { border-color: var(--line); color: var(--text); background: var(--chip-bg); }
 .btn-ghost:hover { border-color: var(--accent); }
 .btn-danger { background: var(--danger-soft); color: var(--danger); border-color: var(--line); }
@@ -162,16 +307,14 @@ h1, h2, h3, .display { font-family: var(--font-display); line-height: 1.2; lette
   width: 38px; height: 38px; border-radius: 12px; background: var(--accent);
   display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0;
 }
-.brand-logo .mark svg { width: 22px; height: 22px; stroke: #fff; }
-[data-theme="dark"] .brand-logo .mark svg { stroke: #06231A; }
+.brand-logo .mark svg { width: 22px; height: 22px; stroke: var(--on-accent); }
 /* Legacy alias — kept so any older markup using .nav-logo still styles. */
 .nav-logo { display: inline-flex; align-items: center; gap: 10px; font-family: var(--font-display); font-weight: 800; font-size: 1.4rem; }
 .nav-logo .mark {
   width: 38px; height: 38px; border-radius: 12px; background: var(--accent);
   display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0;
 }
-.nav-logo .mark svg { width: 22px; height: 22px; stroke: #fff; }
-[data-theme="dark"] .nav-logo .mark svg { stroke: #06231A; }
+.nav-logo .mark svg { width: 22px; height: 22px; stroke: var(--on-accent); }
 
 /* ---------- legacy top nav (classes retained for compatibility) ---------- */
 .nav {
@@ -214,6 +357,110 @@ h1, h2, h3, .display { font-family: var(--font-display); line-height: 1.2; lette
 .lang-toggle:hover { border-color: var(--accent); }
 .lang-toggle svg { width: 19px; height: 19px; }
 
+/* ---------- language picker (four locales, §4.2 draft badge) ---------- */
+.lang-picker { position: relative; flex-shrink: 0; }
+.lang-menu {
+  position: absolute; top: calc(100% + 8px); inset-inline-end: 0; z-index: 90;
+  width: 248px; padding: 8px; border-radius: 14px;
+  background: var(--card); border: 1px solid var(--line);
+  box-shadow: var(--card-shadow);
+  display: flex; flex-direction: column; gap: 2px;
+  animation: fadeIn 0.15s ease;
+}
+.lang-option {
+  display: flex; align-items: center; gap: 10px; width: 100%;
+  padding: 9px 10px; border-radius: 10px; border: 1px solid transparent;
+  background: transparent; color: var(--text); cursor: pointer;
+  font-family: inherit; font-size: 0.92rem; font-weight: 600; text-align: start;
+  transition: background 0.15s, border-color 0.15s;
+}
+.lang-option:hover { background: var(--chip-bg); }
+.lang-option:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
+.lang-option[aria-selected="true"] { background: var(--accent-soft); color: var(--accent-text); }
+.lang-option .lang-name { flex: 1; min-width: 0; }
+.lang-check { width: 17px; height: 17px; color: var(--accent-text); flex-shrink: 0; }
+.lang-draft-badge {
+  font-size: 0.7rem; font-weight: 700; line-height: 1.5; white-space: nowrap;
+  padding: 1px 8px; border-radius: 999px; flex-shrink: 0;
+  background: color-mix(in srgb, var(--amber, #B07D2B) 16%, transparent);
+  color: var(--amber, #B07D2B); border: 1px solid color-mix(in srgb, var(--amber, #B07D2B) 40%, transparent);
+}
+
+/* ---------- theme picker (five themes) ---------- */
+.theme-picker { position: relative; flex-shrink: 0; }
+.theme-menu {
+  position: absolute; top: calc(100% + 8px); inset-inline-end: 0; z-index: 90;
+  width: 236px; padding: 8px; border-radius: 14px;
+  background: var(--card); border: 1px solid var(--line);
+  box-shadow: var(--card-shadow);
+  display: flex; flex-direction: column; gap: 2px;
+  animation: fadeIn 0.15s ease;
+}
+.theme-menu-label {
+  font-size: 0.78rem; font-weight: 700; letter-spacing: 0.04em;
+  color: var(--muted); padding: 6px 10px 4px;
+}
+.theme-option {
+  display: flex; align-items: center; gap: 10px; width: 100%;
+  padding: 9px 10px; border-radius: 10px; border: 1px solid transparent;
+  background: transparent; color: var(--text); cursor: pointer;
+  font-family: inherit; font-size: 0.92rem; font-weight: 600; text-align: start;
+  transition: background 0.15s, border-color 0.15s;
+}
+.theme-option:hover { background: var(--chip-bg); }
+.theme-option:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
+.theme-option[aria-selected="true"] { background: var(--accent-soft); color: var(--accent-text); }
+.theme-swatches {
+  display: inline-flex; border-radius: 999px; overflow: hidden;
+  border: 1px solid var(--line); flex-shrink: 0;
+}
+.theme-swatches span { width: 13px; height: 15px; display: block; }
+.theme-option .theme-name { flex: 1; min-width: 0; }
+.theme-check { width: 17px; height: 17px; color: var(--accent-text); flex-shrink: 0; }
+
+/* ---------- business switcher (Phase G · G1) ---------- */
+.biz-switcher { position: relative; min-width: 0; }
+.biz-switcher-btn {
+  display: inline-flex; align-items: center; gap: 6px;
+  background: transparent; border: none; cursor: pointer;
+  font-family: inherit; color: inherit; padding: 0; max-width: 100%;
+}
+.biz-switcher-btn span:first-child {
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.biz-switcher-caret { font-size: 0.7em; color: var(--muted); flex-shrink: 0; }
+.biz-menu {
+  position: absolute; top: calc(100% + 8px); inset-inline-start: 0; z-index: 90;
+  width: 264px; max-width: 82vw; padding: 8px; border-radius: 14px;
+  background: var(--card); border: 1px solid var(--line);
+  box-shadow: var(--card-shadow);
+  display: flex; flex-direction: column; gap: 2px;
+  animation: fadeIn 0.15s ease;
+}
+.biz-menu-item {
+  display: flex; align-items: center; gap: 10px; width: 100%;
+  padding: 9px 10px; border-radius: 10px; border: 1px solid transparent;
+  background: transparent; color: var(--text); cursor: pointer;
+  font-family: inherit; font-size: 0.92rem; font-weight: 600; text-align: start;
+  transition: background 0.15s, border-color 0.15s;
+}
+.biz-menu-item:hover { background: var(--chip-bg); }
+.biz-menu-item:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
+.biz-menu-item.active { background: var(--accent-soft); color: var(--accent-text); }
+.biz-menu-name { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.biz-menu-tag {
+  font-size: 0.72rem; font-weight: 700; letter-spacing: 0.03em;
+  color: var(--muted); background: var(--chip-bg);
+  border-radius: 999px; padding: 2px 8px; flex-shrink: 0;
+}
+.biz-menu-item.active .biz-menu-tag { color: var(--accent-text); }
+.biz-member-chip {
+  font-size: 0.72rem; font-weight: 700; letter-spacing: 0.02em;
+  color: var(--muted); background: var(--chip-bg);
+  border: 1px solid var(--line); border-radius: 999px; padding: 2px 9px;
+}
+.biz-member-chip[data-status="joined"] { color: var(--accent-text); background: var(--accent-soft); }
+
 /* ---------- app shell / sidebar ---------- */
 .app-shell { min-height: 100vh; }
 .sidebar {
@@ -230,7 +477,7 @@ h1, h2, h3, .display { font-family: var(--font-display); line-height: 1.2; lette
 }
 .sb-brand-link { display: inline-flex; align-items: center; gap: 10px; min-width: 0; font-family: var(--font-display); font-weight: 800; font-size: 1.25rem; color: var(--sb-text); }
 .sb-brand-link .mark {
-  width: 38px; height: 38px; border-radius: 12px; background: rgba(110, 231, 183, .18);
+  width: 38px; height: 38px; border-radius: 12px; background: var(--sb-active-bg);
   display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0;
 }
 .sb-brand-link .mark svg { width: 22px; height: 22px; stroke: var(--sb-active-text); }
@@ -344,7 +591,7 @@ h1, h2, h3, .display { font-family: var(--font-display); line-height: 1.2; lette
 }
 /* Minimalist pass: cards no longer lift or deepen their shadow on
    hover — a quiet border shift is the only feedback. */
-.card:hover { border-color: rgba(14, 122, 75, .28); }
+.card:hover { border-color: color-mix(in srgb, var(--accent) 28%, transparent); }
 .kpi { display: flex; gap: 16px; align-items: flex-start; }
 .kpi-icon {
   width: 52px; height: 52px; border-radius: 16px; flex-shrink: 0;
@@ -499,17 +746,15 @@ table.table th.num, table.table td.num { text-align: end; }
   display: flex; align-items: center; justify-content: center;
 }
 .msg .avatar svg { width: 20px; height: 20px; }
-.msg.bot .avatar { background: var(--accent); } .msg.bot .avatar svg { stroke: #fff; }
-[data-theme="dark"] .msg.bot .avatar svg { stroke: #06231A; }
+.msg.bot .avatar { background: var(--accent); } .msg.bot .avatar svg { stroke: var(--on-accent); }
 .msg.user { align-self: flex-end; flex-direction: row-reverse; }
-.msg.user .avatar { background: var(--amber); } .msg.user .avatar svg { stroke: #fff; }
-[data-theme="dark"] .msg.user .avatar svg { stroke: #2a1a05; }
+.msg.user .avatar { background: var(--amber); } .msg.user .avatar svg { stroke: var(--on-amber); }
 .bubble {
   background: var(--card-2); border: 1px solid var(--line);
   border-radius: 4px 18px 18px 18px; padding: 14px 18px;
   font-size: 0.97rem; color: var(--text-2); white-space: pre-line;
 }
-.msg.user .bubble { background: var(--accent-soft); border-color: rgba(14,122,75,0.3); border-radius: 18px 4px 18px 18px; }
+.msg.user .bubble { background: var(--accent-soft); border-color: color-mix(in srgb, var(--accent) 30%, transparent); border-radius: 18px 4px 18px 18px; }
 .bubble[dir="rtl"] { border-radius: 18px 4px 18px 18px; }
 .chips { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 4px; }
 .chip {
@@ -519,6 +764,7 @@ table.table th.num, table.table td.num { text-align: end; }
 }
 .chip:hover { border-color: var(--accent); color: var(--accent-text); background: var(--accent-soft); }
 .chip.ur { font-family: var(--font-urdu); }
+.chip.naskh { font-family: var(--font-naskh); }
 .chat-input-row { display: flex; gap: 10px; }
 .chat-input-row .field { flex: 1; }
 .typing { display: inline-flex; gap: 5px; padding: 6px 2px; }
@@ -646,8 +892,7 @@ table.table th.num, table.table td.num { text-align: end; }
   transition: all 0.15s;
 }
 .rep-chip:hover { border-color: var(--accent); color: var(--accent-text); }
-.rep-chip.active { background: var(--accent); border-color: var(--accent); color: #fff; }
-[data-theme="dark"] .rep-chip.active { color: #06231A; }
+.rep-chip.active { background: var(--accent); border-color: var(--accent); color: var(--on-accent); }
 .rep-controls { display: flex; gap: 10px; flex-wrap: wrap; align-items: end; }
 .rep-controls .field { margin: 0; }
 .rep-controls .field label { font-size: 0.8rem; margin-bottom: 5px; }
@@ -689,13 +934,12 @@ button.att-cell:hover { border-color: var(--accent); color: var(--accent-text); 
 .att-cell.att-present { background: var(--accent-soft); color: var(--accent-text); }
 .att-cell.att-absent { background: var(--danger-soft); color: var(--danger); }
 .att-cell.att-half { background: var(--amber-soft); color: var(--amber-text); }
-.att-cell.att-leave { background: rgba(122, 91, 166, .12); color: #7A5BA6; }
+.att-cell.att-leave { background: var(--info-soft); color: var(--info-text); }
 .att-cell.att-off { background: var(--bg-2); color: var(--muted); }
-[data-theme="dark"] .att-cell.att-leave { color: #A78BFA; }
 
 /* ---------- footer ---------- */
 .footer { border-top: 1px solid var(--line); background: var(--bg-2); margin-top: auto; }
-.footer-grid { display: grid; grid-template-columns: 1.5fr 1fr 1fr; gap: 36px; padding: 56px 0 36px; }
+.footer-grid { display: grid; grid-template-columns: 1.6fr repeat(5, 1fr); gap: 40px 28px; padding: 56px 0 36px; }
 .footer-brand p { color: var(--muted); font-size: 0.94rem; margin: 12px 0 18px; max-width: 320px; }
 .footer h4 { font-size: 0.82rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted-2); margin-bottom: 16px; }
 .footer ul { list-style: none; display: grid; gap: 9px; }
@@ -747,6 +991,72 @@ button.att-cell:hover { border-color: var(--accent); color: var(--accent-text); 
 .receipt-80 { width: 80mm; max-width: 100%; margin-inline: auto; padding: 14px 12px; font-size: 0.8rem; }
 .receipt-80 h3 { font-size: 1.05rem; }
 .receipt th.num, .receipt td.num { text-align: end; }
+/* Phase E · E1 — paper layouts (lib/print.ts receiptClassName).
+   Print width/margins come from the per-sheet @page rule
+   (PrintPageStyle); these classes only shape the sheet box. */
+.receipt-compact { width: 560px; max-width: 100%; margin-inline: auto; font-size: 0.85rem; padding: 20px 22px; }
+.receipt-compact th, .receipt-compact td { padding: 4px 3px; }
+.receipt-a5 { width: 148mm; max-width: 100%; margin-inline: auto; font-size: 0.86rem; padding: 18px 20px; }
+.receipt-lg { font-size: 1.035rem; }
+.receipt-80.receipt-lg { font-size: 0.9rem; }
+.receipt-80 th, .receipt-80 td { border-bottom-color: #e0d5bf; }
+/* Print chrome (components/PrintChrome.tsx) — E1 slots; the
+   brand images themselves land in E2. Colours stay hard-coded:
+   print is theme-independent. */
+.receipt .r-alt-name { text-align: center; color: #5c4a38; font-size: 0.95rem; margin-top: 2px; }
+.receipt .r-logo { text-align: center; margin-bottom: 6px; }
+.receipt .r-logo img { height: auto; }
+.receipt .r-logo-s img { width: 14mm; }
+.receipt .r-logo-m img { width: 20mm; }
+.receipt .r-logo-l img { width: 28mm; }
+.receipt-80 .r-logo-s img { width: 10mm; }
+.receipt-80 .r-logo-m img { width: 14mm; }
+.receipt-80 .r-logo-l img { width: 18mm; }
+.receipt .r-letterhead { margin-bottom: 10px; }
+.receipt .r-letterhead img { width: 100%; height: auto; display: block; }
+.receipt .r-letterhead-foot { margin-top: 12px; margin-bottom: 0; }
+.receipt .r-note { text-align: center; color: #5c4a38; font-size: 0.82rem; margin-top: 12px; white-space: pre-line; }
+.receipt .r-terms { font-size: 0.78rem; color: #5c4a38; white-space: pre-line; margin-top: 10px; }
+.receipt .r-terms-label { font-weight: 700; }
+.receipt .r-urdu-name { font-size: 0.82em; color: #5c4a38; }
+.receipt .r-stamp { text-align: center; margin-top: 10px; }
+.receipt .r-stamp img { width: 26mm; height: auto; opacity: 0.7; }
+.receipt .r-sign-img { height: 10mm; width: auto; }
+/* Phase E · E3 — the Raast block (PrintChrome's footer slot).
+   The QR itself is black-on-white by construction
+   (components/QrCode.tsx — invariant 3's sharpest case); only
+   the caption/IBAN lines take the receipt's muted ink. The
+   block's size comes from lib/raast's size map, inline. */
+.receipt .r-raast { text-align: center; margin-top: 12px; }
+/* Phase H · H3: the store link block — visually distinct from
+   the payment block above (dashed rule, smaller code): this QR
+   ORDERS, it does not pay. */
+.receipt .r-store-link { text-align: center; margin-top: 12px; padding-top: 10px; border-top: 1px dashed #b8a88f; }
+.receipt .r-store-link-caption { color: #5c4a38; font-size: 0.8rem; margin-top: 4px; }
+.receipt .r-store-link-url { color: #1c1410; font-size: 0.8rem; margin-top: 2px; direction: ltr; unicode-bidi: isolate; }
+.receipt .r-raast-caption { color: #5c4a38; font-size: 0.8rem; margin-top: 4px; }
+.receipt .r-raast-iban { color: #1c1410; font-size: 0.84rem; margin-top: 2px; letter-spacing: 0.02em; }
+/* The counter poster (§3.4): a minimal sheet — shop name, the
+   static code large, caption, IBAN in text. */
+.receipt.raast-poster { text-align: center; padding-top: 30mm; }
+.receipt.raast-poster .r-poster-title { font-size: 1.3rem; font-weight: 700; margin: 10px 0 14px; }
+.receipt.raast-poster .r-raast { margin-top: 0; }
+.receipt.raast-poster .r-raast-caption { font-size: 1rem; margin-top: 10px; }
+.receipt.raast-poster .r-raast-iban { font-size: 1.05rem; margin-top: 6px; }
+.receipt.raast-poster .r-poster-sample { color: #5c4a38; font-size: 0.85rem; margin-top: 14px; }
+/* Settings print designer — screen-only preview frame. The real
+   sheets inside keep their hard-coded print colours; the frame
+   itself follows the calm theme tokens. */
+.print-preview-frame {
+  position: relative; border: 1px solid var(--line); border-radius: 14px;
+  background: var(--bg); padding: 22px 14px; overflow-x: auto;
+  display: flex; justify-content: center;
+}
+.print-sample-badge {
+  position: absolute; top: 10px; inset-inline-end: 12px; z-index: 2;
+  background: var(--accent-soft); color: var(--accent-text);
+  font-size: 0.78rem; font-weight: 700; padding: 4px 10px; border-radius: 999px;
+}
 /* Reports section: the A4 report sheet on the same print shell —
    full width, denser tables, section headings. */
 .report-doc { width: 100%; font-size: 0.88rem; }
@@ -800,7 +1110,8 @@ button.att-cell:hover { border-color: var(--accent); color: var(--accent-text); 
   .app-shell[data-sb="rail"] .sb-link { justify-content: flex-start; padding-inline: 12px; }
   .sb-close { display: inline-flex; }
   .app-main, .app-shell[data-sb="rail"] .app-main { margin-inline-start: 0; }
-  .footer-grid { grid-template-columns: 1fr 1fr; }
+  .footer-grid { grid-template-columns: repeat(3, 1fr); }
+  .footer-brand { grid-column: 1 / -1; }
 }
 @media (max-width: 960px) {
   .nav-links, .nav-cta .btn { display: none; }
@@ -815,7 +1126,7 @@ button.att-cell:hover { border-color: var(--accent); color: var(--accent-text); 
 @media (max-width: 640px) {
   .section { padding: 52px 0; }
   .grid-3 { grid-template-columns: 1fr; }
-  .footer-grid { grid-template-columns: 1fr; }
+  .footer-grid { grid-template-columns: 1fr 1fr; }
   .form-grid { grid-template-columns: 1fr; }
   .page-hero { padding: 56px 0 40px; }
   .chat-log { padding: 20px 14px; }
@@ -832,8 +1143,75 @@ button.att-cell:hover { border-color: var(--accent); color: var(--accent-text); 
   *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
 }
 
+/* ---------- PIN lock (Phase E · E4/E5) — a calm screen, themed
+   like the rest of the shell; never print (the print block below
+   also hides it). The overlay covers the app; the shop's data
+   subscriptions keep running beneath it — the lock is a screen,
+   not a data gate (design §4.1/§4.4). ---------- */
+.pin-overlay {
+  position: fixed; inset: 0; z-index: 200;
+  background: var(--bg);
+  display: flex; align-items: flex-start; justify-content: center;
+  overflow-y: auto; padding: 32px 18px;
+  animation: fadeIn 0.2s ease;
+}
+.pin-overlay.centered { align-items: center; }
+.pin-card {
+  background: var(--card); border: 1px solid var(--line); border-radius: 18px;
+  box-shadow: var(--card-shadow);
+  width: min(400px, 100%); padding: 30px 28px; text-align: center;
+}
+.pin-shop { font-family: var(--font-display); font-weight: 800; font-size: 1.3rem; margin-bottom: 4px; }
+.pin-prompt { color: var(--muted); font-size: 0.95rem; margin-bottom: 20px; }
+.pin-title { font-size: 1.15rem; font-weight: 800; margin-bottom: 4px; }
+.pin-action { color: var(--accent-text); font-weight: 700; font-size: 0.98rem; margin-bottom: 4px; }
+.pin-dots { display: flex; gap: 12px; justify-content: center; margin-bottom: 22px; min-height: 16px; }
+.pin-dot {
+  width: 15px; height: 15px; border-radius: 50%;
+  border: 2px solid var(--muted); background: transparent;
+  transition: background 0.12s ease, border-color 0.12s ease;
+}
+.pin-dot.filled { background: var(--accent); border-color: var(--accent); }
+.pin-dots.shake { animation: pinShake 0.4s ease; }
+@keyframes pinShake {
+  0%, 100% { transform: translateX(0); }
+  20% { transform: translateX(-9px); }
+  40% { transform: translateX(9px); }
+  60% { transform: translateX(-6px); }
+  80% { transform: translateX(6px); }
+}
+.pin-pad {
+  display: grid; grid-template-columns: repeat(3, 74px); gap: 12px;
+  justify-content: center; margin-bottom: 18px;
+}
+.pin-key {
+  height: 62px; border-radius: 14px; border: 1px solid var(--line);
+  background: var(--card-2); color: var(--text);
+  font-size: 1.35rem; font-weight: 700; font-family: inherit;
+  cursor: pointer; display: flex; align-items: center; justify-content: center;
+}
+.pin-key:hover:not(:disabled) { border-color: var(--accent); }
+.pin-key:disabled { opacity: 0.45; cursor: default; }
+.pin-key svg { width: 24px; height: 24px; }
+.pin-key.ghost { background: transparent; border-color: transparent; font-size: 0.9rem; font-weight: 600; color: var(--muted); }
+.pin-msg { min-height: 24px; font-size: 0.92rem; font-weight: 600; color: var(--danger); margin-bottom: 8px; }
+.pin-msg.info { color: var(--muted); }
+.pin-link {
+  background: none; border: none; padding: 6px; cursor: pointer;
+  color: var(--accent-text); font-weight: 700; font-size: 0.94rem; font-family: inherit;
+}
+.pin-recovery { text-align: start; margin-top: 10px; }
+.pin-recovery .field { margin-bottom: 14px; }
+.topbar .pin-lock-btn { width: 40px; height: 40px; border-radius: 10px; }
+.pin-lock-btn {
+  display: inline-flex; align-items: center; justify-content: center;
+  background: transparent; border: 1px solid transparent; color: var(--text-2); cursor: pointer;
+}
+.pin-lock-btn:hover { border-color: var(--line); color: var(--text); }
+.pin-lock-btn svg { width: 19px; height: 19px; }
+
 @media print {
-  .sidebar, .topbar, .footer, .sb-scrim, .auth-topbar, .pos-cartbar, .pos-sheet-scrim, .pos-cart { display: none !important; }
+  .sidebar, .topbar, .footer, .sb-scrim, .auth-topbar, .pos-cartbar, .pos-sheet-scrim, .pos-cart, .pin-overlay { display: none !important; }
   .app-main, .app-shell[data-sb="rail"] .app-main { margin: 0 !important; }
   body * { visibility: hidden; }
   .receipt-sheet, .receipt-sheet * { visibility: visible; }
@@ -843,6 +1221,96 @@ button.att-cell:hover { border-color: var(--accent); color: var(--accent-text); 
   }
   .receipt { border: none; border-radius: 0; box-shadow: none; width: 100%; }
   .receipt-80 { width: 80mm; }
+  .receipt-compact { width: 148mm; }
+  .receipt-a5 { width: 148mm; }
   .no-print { display: none !important; }
 }
-@page { margin: 10mm; }
+/* The @page rule is per-sheet since Phase E · E1: every print
+   sheet renders its own <style> via PrintPageStyle
+   (lib/print.ts paperPageRule) for its template paper. */
+
+/* ---------- Phase G · G2: plan surfaces ----------
+   The state banner (calm amber, like the demo badge), the
+   refusal banner (the mapped gate copy — a soft red tint mixed
+   from the card colour so every theme keeps it readable), the
+   locked-door route panel, the sidebar's locked rows, and the
+   dashboard counter chip. */
+.plan-banner {
+  margin: 14px 20px 0; padding: 10px 14px; border-radius: 12px;
+  background: var(--amber-soft); color: var(--amber-text);
+  border: 1px solid var(--line);
+  font-weight: 600; font-size: 0.92rem;
+  display: flex; align-items: center; gap: 10px;
+}
+.plan-banner.refusal {
+  background: color-mix(in srgb, #d64545 12%, var(--card));
+  color: var(--text);
+  border-color: color-mix(in srgb, #d64545 40%, var(--line));
+}
+.plan-banner.urgent {
+  background: color-mix(in srgb, #d64545 12%, var(--card));
+  color: var(--text);
+  border-color: color-mix(in srgb, #d64545 40%, var(--line));
+}
+.plan-banner-link {
+  margin-inline-start: auto; color: inherit; font-weight: 700;
+  text-decoration: underline; text-underline-offset: 3px; white-space: nowrap;
+}
+.plan-banner-close {
+  margin-inline-start: auto; background: none; border: none;
+  cursor: pointer; color: inherit; display: inline-flex; padding: 4px;
+}
+.plan-banner-close svg { width: 16px; height: 16px; }
+.plan-locked {
+  max-width: 560px; margin: 48px auto; text-align: center;
+  padding: 40px 28px; background: var(--card);
+  border: 1px solid var(--line); border-radius: 20px; color: var(--muted);
+}
+.plan-locked svg { width: 34px; height: 34px; margin-bottom: 10px; }
+.plan-locked h2 { color: var(--text); font-size: 1.3rem; margin-bottom: 8px; }
+.sb-link.locked { opacity: 0.55; cursor: not-allowed; }
+.sb-link.locked:hover { background: transparent; }
+.sb-link .sb-lock { width: 15px; height: 15px; margin-inline-start: auto; flex-shrink: 0; }
+.plan-chip {
+  display: inline-flex; margin-top: 8px; padding: 5px 11px;
+  border-radius: 999px; background: var(--amber-soft); color: var(--amber-text);
+  border: 1px solid var(--line); font-size: 0.82rem; font-weight: 700;
+}
+
+/* ---- Phase G · G3: platform console (its own shell; calm
+ * theme variables only, no shop layout classes) ---- */
+.platform-shell { min-height: 100vh; background: var(--bg); }
+.platform-shell .topbar-actions { display: flex; align-items: center; gap: 10px; margin-inline-start: auto; }
+.platform-shell .acct-email { color: var(--muted); font-size: 0.85rem; }
+.plat-wrap { max-width: 1180px; margin: 0 auto; padding: 22px 18px 48px; display: grid; gap: 18px; }
+.plat-head h1 { margin: 0; font-size: 1.55rem; }
+.plat-sub { margin: 4px 0 0; color: var(--muted); }
+.plat-denied { max-width: 560px; margin: 8vh auto 0; text-align: center; display: grid; gap: 12px; justify-items: center; }
+.agg-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px; }
+.agg-card { display: grid; gap: 4px; padding: 14px 16px; }
+.agg-label { color: var(--muted); font-size: 0.8rem; font-weight: 600; }
+.agg-value { font-size: 1.3rem; }
+.plat-soft { color: var(--muted); font-size: 0.78rem; }
+.plat-tabs { display: flex; gap: 8px; flex-wrap: wrap; }
+.plat-filters { display: flex; gap: 12px; flex-wrap: wrap; align-items: end; margin-bottom: 14px; }
+.plat-search { flex: 1 1 220px; }
+.plat-empty { color: var(--muted); padding: 10px 2px; }
+.plat-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 16px; }
+.plat-kv { display: flex; justify-content: space-between; gap: 14px; margin: 7px 0; font-size: 0.92rem; }
+.plat-kv span { color: var(--muted); }
+.plat-kv strong { text-align: end; font-weight: 600; overflow-wrap: anywhere; }
+.plat-subhead { margin-top: 20px; }
+.plat-detail-name { margin: 8px 0 4px; }
+.plat-check { display: flex; gap: 8px; align-items: center; margin: 10px 0; font-size: 0.9rem; }
+.plat-warn { color: var(--danger); background: var(--danger-soft); border-radius: 8px; padding: 8px 10px; font-size: 0.88rem; }
+.plat-actions { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+.plat-inline-field { min-width: 150px; }
+.plat-note { color: var(--muted); font-size: 0.8rem; margin-top: 3px; }
+.plat-timeline { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
+.plat-timeline li { display: flex; gap: 12px; flex-wrap: wrap; align-items: baseline; border-bottom: 1px solid var(--line); padding-bottom: 8px; }
+.plat-ev-at { color: var(--muted); font-size: 0.82rem; min-width: 86px; }
+.plat-ev-kind { font-weight: 700; font-size: 0.88rem; }
+.plat-ev-detail { color: var(--text-2); font-size: 0.85rem; overflow-wrap: anywhere; }
+.plat-grant { display: flex; gap: 12px; flex-wrap: wrap; align-items: end; }
+.plat-you { margin-inline-start: 8px; }
+.plat-uid { font-size: 0.8rem; color: var(--muted); overflow-wrap: anywhere; }

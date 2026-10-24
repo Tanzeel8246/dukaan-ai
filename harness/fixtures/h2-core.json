@@ -1,0 +1,2755 @@
+{
+  "about": "H2 core fixture — expected values computed by the compiled web lib/loyalty (+ ledger/fiscal/tally) over the H1 suite's lifecycle walk; consumed by flutter-app/test/h2_fixtures_test.dart. Regenerate: node fixtures-export-h2.js (after compiling harness/tsconfig).",
+  "customerId": "h1-cust",
+  "settings": {
+    "loyalty": {
+      "enabled": true
+    }
+  },
+  "resolverCases": [
+    {
+      "name": "absent",
+      "settings": {},
+      "resolved": {
+        "enabled": false,
+        "earnRsPerPointBase": 100,
+        "pointValueRs": 1,
+        "redeemCapPct": 50,
+        "expiryMonths": 12,
+        "silverAt": 500,
+        "goldAt": 2000,
+        "silverMult": 1.25,
+        "goldMult": 1.5
+      }
+    },
+    {
+      "name": "enabled-defaults",
+      "settings": {
+        "loyalty": {
+          "enabled": true
+        }
+      },
+      "resolved": {
+        "enabled": true,
+        "earnRsPerPointBase": 100,
+        "pointValueRs": 1,
+        "redeemCapPct": 50,
+        "expiryMonths": 12,
+        "silverAt": 500,
+        "goldAt": 2000,
+        "silverMult": 1.25,
+        "goldMult": 1.5
+      }
+    },
+    {
+      "name": "partial-invalid",
+      "settings": {
+        "loyalty": {
+          "enabled": true,
+          "pointValueRs": 2,
+          "earnRsPerPointBase": -5,
+          "silverMult": 0.5
+        }
+      },
+      "resolved": {
+        "enabled": true,
+        "earnRsPerPointBase": 100,
+        "pointValueRs": 2,
+        "redeemCapPct": 50,
+        "expiryMonths": 12,
+        "silverAt": 500,
+        "goldAt": 2000,
+        "silverMult": 1.25,
+        "goldMult": 1.5
+      }
+    },
+    {
+      "name": "rs2",
+      "settings": {
+        "loyalty": {
+          "enabled": true,
+          "pointValueRs": 2
+        }
+      },
+      "resolved": {
+        "enabled": true,
+        "earnRsPerPointBase": 100,
+        "pointValueRs": 2,
+        "redeemCapPct": 50,
+        "expiryMonths": 12,
+        "silverAt": 500,
+        "goldAt": 2000,
+        "silverMult": 1.25,
+        "goldMult": 1.5
+      }
+    },
+    {
+      "name": "cap-clamped",
+      "settings": {
+        "loyalty": {
+          "enabled": true,
+          "redeemCapPct": 140
+        }
+      },
+      "resolved": {
+        "enabled": true,
+        "earnRsPerPointBase": 100,
+        "pointValueRs": 1,
+        "redeemCapPct": 100,
+        "expiryMonths": 12,
+        "silverAt": 500,
+        "goldAt": 2000,
+        "silverMult": 1.25,
+        "goldMult": 1.5
+      }
+    },
+    {
+      "name": "no-settings",
+      "settings": null,
+      "resolved": {
+        "enabled": false,
+        "earnRsPerPointBase": 100,
+        "pointValueRs": 1,
+        "redeemCapPct": 50,
+        "expiryMonths": 12,
+        "silverAt": 500,
+        "goldAt": 2000,
+        "silverMult": 1.25,
+        "goldMult": 1.5
+      }
+    }
+  ],
+  "coaCase": {
+    "codes": [
+      "cash",
+      "wallet",
+      "sales_revenue",
+      "sales_discount",
+      "cogs",
+      "inventory",
+      "purchases",
+      "expense_rent",
+      "expense_electricity",
+      "expense_salary",
+      "expense_transport",
+      "expense_other",
+      "receivables",
+      "payables",
+      "capital",
+      "drawings",
+      "inventory_loss",
+      "tax_payable",
+      "tax_input",
+      "cheques_in_hand",
+      "cheques_issued",
+      "salary_payable",
+      "loans_payable",
+      "expense_finance",
+      "inventory_raw",
+      "wip",
+      "retained_earnings",
+      "loans_receivable",
+      "loyalty_payable",
+      "expense_loyalty"
+    ],
+    "loyalty_payable": {
+      "type": "liability",
+      "normalBalance": "credit",
+      "since": "H"
+    },
+    "expense_loyalty": {
+      "type": "expense",
+      "normalBalance": "debit",
+      "since": "H"
+    },
+    "tallyMap": {
+      "loyalty_payable": {
+        "name": "Customer Loyalty Payable",
+        "group": "Current Liabilities"
+      },
+      "expense_loyalty": {
+        "name": "Loyalty Programme Cost",
+        "group": "Indirect Expenses"
+      }
+    },
+    "voucherTypes": {
+      "loyalty_earn": "Journal",
+      "loyalty_expire": "Journal"
+    },
+    "plIncludesExpenseLoyalty": true,
+    "plIncludesLoyaltyPayable": false,
+    "bsIncludesLoyaltyPayable": true
+  },
+  "seedCase": {
+    "journal": [
+      {
+        "id": "j-seed-sale-13",
+        "memo": "Daily sales summary (seed history)",
+        "refType": "seed",
+        "refId": null,
+        "dayOffset": 13,
+        "ts": "2026-10-10T08:05:00.000Z",
+        "lines": [
+          {
+            "account": "cash",
+            "debit": 32220,
+            "credit": 0
+          },
+          {
+            "account": "cogs",
+            "debit": 29274,
+            "credit": 0
+          },
+          {
+            "account": "sales_revenue",
+            "debit": 0,
+            "credit": 32220
+          },
+          {
+            "account": "inventory",
+            "debit": 0,
+            "credit": 29274
+          }
+        ]
+      },
+      {
+        "id": "j-seed-sale-12",
+        "memo": "Daily sales summary (seed history)",
+        "refType": "seed",
+        "refId": null,
+        "dayOffset": 12,
+        "ts": "2026-10-11T08:05:00.000Z",
+        "lines": [
+          {
+            "account": "cash",
+            "debit": 29240,
+            "credit": 0
+          },
+          {
+            "account": "cogs",
+            "debit": 26567,
+            "credit": 0
+          },
+          {
+            "account": "sales_revenue",
+            "debit": 0,
+            "credit": 29240
+          },
+          {
+            "account": "inventory",
+            "debit": 0,
+            "credit": 26567
+          }
+        ]
+      },
+      {
+        "id": "j-seed-sale-11",
+        "memo": "Daily sales summary (seed history)",
+        "refType": "seed",
+        "refId": null,
+        "dayOffset": 11,
+        "ts": "2026-10-12T08:05:00.000Z",
+        "lines": [
+          {
+            "account": "cash",
+            "debit": 28055,
+            "credit": 0
+          },
+          {
+            "account": "cogs",
+            "debit": 25469,
+            "credit": 0
+          },
+          {
+            "account": "sales_revenue",
+            "debit": 0,
+            "credit": 28055
+          },
+          {
+            "account": "inventory",
+            "debit": 0,
+            "credit": 25469
+          }
+        ]
+      },
+      {
+        "id": "j-seed-sale-10",
+        "memo": "Daily sales summary (seed history)",
+        "refType": "seed",
+        "refId": null,
+        "dayOffset": 10,
+        "ts": "2026-10-13T08:05:00.000Z",
+        "lines": [
+          {
+            "account": "cash",
+            "debit": 38220,
+            "credit": 0
+          },
+          {
+            "account": "cogs",
+            "debit": 34740,
+            "credit": 0
+          },
+          {
+            "account": "sales_revenue",
+            "debit": 0,
+            "credit": 38220
+          },
+          {
+            "account": "inventory",
+            "debit": 0,
+            "credit": 34740
+          }
+        ]
+      },
+      {
+        "id": "j-seed-sale-9",
+        "memo": "Daily sales summary (seed history)",
+        "refType": "seed",
+        "refId": null,
+        "dayOffset": 9,
+        "ts": "2026-10-14T08:05:00.000Z",
+        "lines": [
+          {
+            "account": "cash",
+            "debit": 27675,
+            "credit": 0
+          },
+          {
+            "account": "cogs",
+            "debit": 25144,
+            "credit": 0
+          },
+          {
+            "account": "sales_revenue",
+            "debit": 0,
+            "credit": 27675
+          },
+          {
+            "account": "inventory",
+            "debit": 0,
+            "credit": 25144
+          }
+        ]
+      },
+      {
+        "id": "j-seed-sale-8",
+        "memo": "Daily sales summary (seed history)",
+        "refType": "seed",
+        "refId": null,
+        "dayOffset": 8,
+        "ts": "2026-10-15T08:05:00.000Z",
+        "lines": [
+          {
+            "account": "cash",
+            "debit": 27070,
+            "credit": 0
+          },
+          {
+            "account": "cogs",
+            "debit": 24577,
+            "credit": 0
+          },
+          {
+            "account": "sales_revenue",
+            "debit": 0,
+            "credit": 27070
+          },
+          {
+            "account": "inventory",
+            "debit": 0,
+            "credit": 24577
+          }
+        ]
+      },
+      {
+        "id": "j-seed-sale-7",
+        "memo": "Daily sales summary (seed history)",
+        "refType": "seed",
+        "refId": null,
+        "dayOffset": 7,
+        "ts": "2026-10-16T08:05:00.000Z",
+        "lines": [
+          {
+            "account": "cash",
+            "debit": 30175,
+            "credit": 0
+          },
+          {
+            "account": "cogs",
+            "debit": 27402,
+            "credit": 0
+          },
+          {
+            "account": "sales_revenue",
+            "debit": 0,
+            "credit": 30175
+          },
+          {
+            "account": "inventory",
+            "debit": 0,
+            "credit": 27402
+          }
+        ]
+      },
+      {
+        "id": "j-seed-sale-6",
+        "memo": "Daily sales summary (seed history)",
+        "refType": "seed",
+        "refId": null,
+        "dayOffset": 6,
+        "ts": "2026-10-17T08:05:00.000Z",
+        "lines": [
+          {
+            "account": "cash",
+            "debit": 29720,
+            "credit": 0
+          },
+          {
+            "account": "cogs",
+            "debit": 26996,
+            "credit": 0
+          },
+          {
+            "account": "sales_revenue",
+            "debit": 0,
+            "credit": 29720
+          },
+          {
+            "account": "inventory",
+            "debit": 0,
+            "credit": 26996
+          }
+        ]
+      },
+      {
+        "id": "j-seed-sale-5",
+        "memo": "Daily sales summary (seed history)",
+        "refType": "seed",
+        "refId": null,
+        "dayOffset": 5,
+        "ts": "2026-10-18T08:05:00.000Z",
+        "lines": [
+          {
+            "account": "cash",
+            "debit": 26755,
+            "credit": 0
+          },
+          {
+            "account": "cogs",
+            "debit": 24207,
+            "credit": 0
+          },
+          {
+            "account": "sales_revenue",
+            "debit": 0,
+            "credit": 26755
+          },
+          {
+            "account": "inventory",
+            "debit": 0,
+            "credit": 24207
+          }
+        ]
+      },
+      {
+        "id": "j-seed-sale-4",
+        "memo": "Daily sales summary (seed history)",
+        "refType": "seed",
+        "refId": null,
+        "dayOffset": 4,
+        "ts": "2026-10-19T08:05:00.000Z",
+        "lines": [
+          {
+            "account": "cash",
+            "debit": 29155,
+            "credit": 0
+          },
+          {
+            "account": "cogs",
+            "debit": 26404,
+            "credit": 0
+          },
+          {
+            "account": "sales_revenue",
+            "debit": 0,
+            "credit": 29155
+          },
+          {
+            "account": "inventory",
+            "debit": 0,
+            "credit": 26404
+          }
+        ]
+      },
+      {
+        "id": "j-seed-sale-3",
+        "memo": "Daily sales summary (seed history)",
+        "refType": "seed",
+        "refId": null,
+        "dayOffset": 3,
+        "ts": "2026-10-20T08:05:00.000Z",
+        "lines": [
+          {
+            "account": "cash",
+            "debit": 32220,
+            "credit": 0
+          },
+          {
+            "account": "cogs",
+            "debit": 29155,
+            "credit": 0
+          },
+          {
+            "account": "sales_revenue",
+            "debit": 0,
+            "credit": 32220
+          },
+          {
+            "account": "inventory",
+            "debit": 0,
+            "credit": 29155
+          }
+        ]
+      },
+      {
+        "id": "j-seed-sale-2",
+        "memo": "Daily sales summary (seed history)",
+        "refType": "seed",
+        "refId": null,
+        "dayOffset": 2,
+        "ts": "2026-10-21T08:05:00.000Z",
+        "lines": [
+          {
+            "account": "cash",
+            "debit": 30565,
+            "credit": 0
+          },
+          {
+            "account": "cogs",
+            "debit": 27701,
+            "credit": 0
+          },
+          {
+            "account": "sales_revenue",
+            "debit": 0,
+            "credit": 30565
+          },
+          {
+            "account": "inventory",
+            "debit": 0,
+            "credit": 27701
+          }
+        ]
+      },
+      {
+        "id": "j-seed-sale-1",
+        "memo": "Daily sales summary (seed history)",
+        "refType": "seed",
+        "refId": null,
+        "dayOffset": 1,
+        "ts": "2026-10-22T08:05:00.000Z",
+        "lines": [
+          {
+            "account": "cash",
+            "debit": 27535,
+            "credit": 0
+          },
+          {
+            "account": "cogs",
+            "debit": 24927,
+            "credit": 0
+          },
+          {
+            "account": "sales_revenue",
+            "debit": 0,
+            "credit": 27535
+          },
+          {
+            "account": "inventory",
+            "debit": 0,
+            "credit": 24927
+          }
+        ]
+      },
+      {
+        "id": "j-seed-sale-0",
+        "memo": "Daily sales summary (seed history)",
+        "refType": "seed",
+        "refId": null,
+        "dayOffset": 0,
+        "ts": "2026-10-23T08:05:00.000Z",
+        "lines": [
+          {
+            "account": "cash",
+            "debit": 13375,
+            "credit": 0
+          },
+          {
+            "account": "cogs",
+            "debit": 12206,
+            "credit": 0
+          },
+          {
+            "account": "sales_revenue",
+            "debit": 0,
+            "credit": 13375
+          },
+          {
+            "account": "inventory",
+            "debit": 0,
+            "credit": 12206
+          }
+        ]
+      },
+      {
+        "id": "j-seed-pur-pur-1",
+        "memo": "Purchase on credit (seed) — Weekly restock — oil, atta, sugar.",
+        "refType": "seed",
+        "refId": "pur-1",
+        "dayOffset": 3,
+        "ts": "2026-10-20T08:05:00.000Z",
+        "lines": [
+          {
+            "account": "purchases",
+            "debit": 47900,
+            "credit": 0
+          },
+          {
+            "account": "inventory",
+            "debit": 47900,
+            "credit": 0
+          },
+          {
+            "account": "purchases",
+            "debit": 0,
+            "credit": 47900
+          },
+          {
+            "account": "payables",
+            "debit": 0,
+            "credit": 47900,
+            "ref": "sup-1"
+          }
+        ]
+      },
+      {
+        "id": "j-seed-spay-spay-1",
+        "memo": "Supplier payment (seed)",
+        "refType": "seed",
+        "refId": "spay-1",
+        "dayOffset": 2,
+        "ts": "2026-10-21T08:05:00.000Z",
+        "lines": [
+          {
+            "account": "payables",
+            "debit": 20000,
+            "credit": 0,
+            "ref": "sup-1"
+          },
+          {
+            "account": "wallet",
+            "debit": 0,
+            "credit": 20000
+          }
+        ]
+      },
+      {
+        "id": "j-seed-exp-exp-1",
+        "memo": "Expense — electricity (seed)",
+        "refType": "seed",
+        "refId": "exp-1",
+        "dayOffset": 0,
+        "ts": "2026-10-23T08:05:00.000Z",
+        "lines": [
+          {
+            "account": "expense_electricity",
+            "debit": 8450,
+            "credit": 0
+          },
+          {
+            "account": "cash",
+            "debit": 0,
+            "credit": 8450
+          }
+        ]
+      },
+      {
+        "id": "j-seed-exp-exp-2",
+        "memo": "Expense — rent (seed)",
+        "refType": "seed",
+        "refId": "exp-2",
+        "dayOffset": 12,
+        "ts": "2026-10-11T08:05:00.000Z",
+        "lines": [
+          {
+            "account": "expense_rent",
+            "debit": 25000,
+            "credit": 0
+          },
+          {
+            "account": "wallet",
+            "debit": 0,
+            "credit": 25000
+          }
+        ]
+      },
+      {
+        "id": "j-seed-cr-cr-1",
+        "memo": "Udhaar given (cash loan) — Haji Muhammad Saleem (seed)",
+        "refType": "seed",
+        "refId": "cr-1",
+        "dayOffset": 5,
+        "ts": "2026-10-18T08:05:00.000Z",
+        "lines": [
+          {
+            "account": "receivables",
+            "debit": 8500,
+            "credit": 0,
+            "ref": "cu-1"
+          },
+          {
+            "account": "cash",
+            "debit": 0,
+            "credit": 8500
+          }
+        ]
+      },
+      {
+        "id": "j-seed-cr-cr-2",
+        "memo": "Udhaar repayment — Haji Muhammad Saleem (seed)",
+        "refType": "seed",
+        "refId": "cr-2",
+        "dayOffset": 1,
+        "ts": "2026-10-22T08:05:00.000Z",
+        "lines": [
+          {
+            "account": "cash",
+            "debit": 3000,
+            "credit": 0
+          },
+          {
+            "account": "receivables",
+            "debit": 0,
+            "credit": 3000,
+            "ref": "cu-1"
+          }
+        ]
+      },
+      {
+        "id": "j-seed-opening",
+        "memo": "Opening balance — inventory & till trued up to physical count (go-live)",
+        "refType": "seed",
+        "refId": null,
+        "dayOffset": 0,
+        "ts": "2026-10-23T08:05:00.000Z",
+        "lines": [
+          {
+            "account": "inventory",
+            "debit": 589674,
+            "credit": 0
+          },
+          {
+            "account": "cash",
+            "debit": 0,
+            "credit": 338030
+          },
+          {
+            "account": "capital",
+            "debit": 0,
+            "credit": 251644
+          }
+        ]
+      }
+    ],
+    "loyaltyPayableNormal": 0,
+    "expenseLoyaltyBalance": 0,
+    "customerIds": []
+  },
+  "steps": [
+    {
+      "name": "earn-first",
+      "nowISO": "2026-01-05T05:00:00.000Z",
+      "appended": [
+        {
+          "id": "h2-e1",
+          "memo": "Bill #1",
+          "refType": "bill",
+          "refId": "h1-b1",
+          "reversesId": null,
+          "lines": [
+            {
+              "account": "cash",
+              "debit": 10000,
+              "credit": 0
+            },
+            {
+              "account": "cogs",
+              "debit": 6000,
+              "credit": 0
+            },
+            {
+              "account": "sales_revenue",
+              "debit": 0,
+              "credit": 10000
+            },
+            {
+              "account": "inventory",
+              "debit": 0,
+              "credit": 6000
+            }
+          ],
+          "dayOffset": 0,
+          "ts": "2026-01-05T05:00:00.000Z"
+        },
+        {
+          "id": "h2-e2",
+          "memo": "Loyalty points earned — Bill #1",
+          "refType": "loyalty_earn",
+          "refId": "h1-b1",
+          "reversesId": null,
+          "lines": [
+            {
+              "account": "expense_loyalty",
+              "debit": 100,
+              "credit": 0
+            },
+            {
+              "account": "loyalty_payable",
+              "debit": 0,
+              "credit": 100,
+              "ref": "h1-cust"
+            }
+          ],
+          "dayOffset": 0,
+          "ts": "2026-01-05T05:00:00.000Z",
+          "points": 100,
+          "rsPerPoint": 1,
+          "loyaltyExpiryMonths": 12,
+          "loyaltyTierMult": 1
+        }
+      ],
+      "position": {
+        "customerId": "h1-cust",
+        "points": 100,
+        "rupees": 100,
+        "redeemablePoints": 100,
+        "tier": "standard",
+        "tierMult": 1,
+        "earned12m": 100,
+        "vintages": [
+          {
+            "earnEntryId": "h2-e2",
+            "billId": "h1-b1",
+            "earnedOnISO": "2026-01-05",
+            "expiresOnISO": "2027-01-05",
+            "rsPerPoint": 1,
+            "pointsGranted": 100,
+            "pointsRedeemed": 0,
+            "pointsClawed": 0,
+            "pointsExpired": 0,
+            "pointsUnspent": 100,
+            "rsUnspent": 100
+          }
+        ]
+      },
+      "glLoyaltyPayable": 100,
+      "sumByCustomer": 100,
+      "tbTotal": 0
+    },
+    {
+      "name": "earn-tier-crossings",
+      "nowISO": "2026-02-04T05:00:00.000Z",
+      "appended": [
+        {
+          "id": "h2-e3",
+          "memo": "Bill #2",
+          "refType": "bill",
+          "refId": "h1-b2",
+          "reversesId": null,
+          "lines": [
+            {
+              "account": "cash",
+              "debit": 150000,
+              "credit": 0
+            },
+            {
+              "account": "cogs",
+              "debit": 90000,
+              "credit": 0
+            },
+            {
+              "account": "sales_revenue",
+              "debit": 0,
+              "credit": 150000
+            },
+            {
+              "account": "inventory",
+              "debit": 0,
+              "credit": 90000
+            }
+          ],
+          "dayOffset": 0,
+          "ts": "2026-02-01T05:00:00.000Z"
+        },
+        {
+          "id": "h2-e4",
+          "memo": "Loyalty points earned — Bill #2",
+          "refType": "loyalty_earn",
+          "refId": "h1-b2",
+          "reversesId": null,
+          "lines": [
+            {
+              "account": "expense_loyalty",
+              "debit": 1500,
+              "credit": 0
+            },
+            {
+              "account": "loyalty_payable",
+              "debit": 0,
+              "credit": 1500,
+              "ref": "h1-cust"
+            }
+          ],
+          "dayOffset": 0,
+          "ts": "2026-02-01T05:00:00.000Z",
+          "points": 1500,
+          "rsPerPoint": 1,
+          "loyaltyExpiryMonths": 12,
+          "loyaltyTierMult": 1
+        },
+        {
+          "id": "h2-e5",
+          "memo": "Bill #3",
+          "refType": "bill",
+          "refId": "h1-b3",
+          "reversesId": null,
+          "lines": [
+            {
+              "account": "cash",
+              "debit": 10000,
+              "credit": 0
+            },
+            {
+              "account": "cogs",
+              "debit": 6000,
+              "credit": 0
+            },
+            {
+              "account": "sales_revenue",
+              "debit": 0,
+              "credit": 10000
+            },
+            {
+              "account": "inventory",
+              "debit": 0,
+              "credit": 6000
+            }
+          ],
+          "dayOffset": 0,
+          "ts": "2026-02-02T05:00:00.000Z"
+        },
+        {
+          "id": "h2-e6",
+          "memo": "Loyalty points earned — Bill #3",
+          "refType": "loyalty_earn",
+          "refId": "h1-b3",
+          "reversesId": null,
+          "lines": [
+            {
+              "account": "expense_loyalty",
+              "debit": 125,
+              "credit": 0
+            },
+            {
+              "account": "loyalty_payable",
+              "debit": 0,
+              "credit": 125,
+              "ref": "h1-cust"
+            }
+          ],
+          "dayOffset": 0,
+          "ts": "2026-02-02T05:00:00.000Z",
+          "points": 125,
+          "rsPerPoint": 1,
+          "loyaltyExpiryMonths": 12,
+          "loyaltyTierMult": 1.25
+        },
+        {
+          "id": "h2-e7",
+          "memo": "Bill #4",
+          "refType": "bill",
+          "refId": "h1-b4",
+          "reversesId": null,
+          "lines": [
+            {
+              "account": "cash",
+              "debit": 40000,
+              "credit": 0
+            },
+            {
+              "account": "cogs",
+              "debit": 24000,
+              "credit": 0
+            },
+            {
+              "account": "sales_revenue",
+              "debit": 0,
+              "credit": 40000
+            },
+            {
+              "account": "inventory",
+              "debit": 0,
+              "credit": 24000
+            }
+          ],
+          "dayOffset": 0,
+          "ts": "2026-02-03T05:00:00.000Z"
+        },
+        {
+          "id": "h2-e8",
+          "memo": "Loyalty points earned — Bill #4",
+          "refType": "loyalty_earn",
+          "refId": "h1-b4",
+          "reversesId": null,
+          "lines": [
+            {
+              "account": "expense_loyalty",
+              "debit": 500,
+              "credit": 0
+            },
+            {
+              "account": "loyalty_payable",
+              "debit": 0,
+              "credit": 500,
+              "ref": "h1-cust"
+            }
+          ],
+          "dayOffset": 0,
+          "ts": "2026-02-03T05:00:00.000Z",
+          "points": 500,
+          "rsPerPoint": 1,
+          "loyaltyExpiryMonths": 12,
+          "loyaltyTierMult": 1.25
+        },
+        {
+          "id": "h2-e9",
+          "memo": "Bill #5",
+          "refType": "bill",
+          "refId": "h1-b5",
+          "reversesId": null,
+          "lines": [
+            {
+              "account": "cash",
+              "debit": 10000,
+              "credit": 0
+            },
+            {
+              "account": "cogs",
+              "debit": 6000,
+              "credit": 0
+            },
+            {
+              "account": "sales_revenue",
+              "debit": 0,
+              "credit": 10000
+            },
+            {
+              "account": "inventory",
+              "debit": 0,
+              "credit": 6000
+            }
+          ],
+          "dayOffset": 0,
+          "ts": "2026-02-04T05:00:00.000Z"
+        },
+        {
+          "id": "h2-e10",
+          "memo": "Loyalty points earned — Bill #5",
+          "refType": "loyalty_earn",
+          "refId": "h1-b5",
+          "reversesId": null,
+          "lines": [
+            {
+              "account": "expense_loyalty",
+              "debit": 150,
+              "credit": 0
+            },
+            {
+              "account": "loyalty_payable",
+              "debit": 0,
+              "credit": 150,
+              "ref": "h1-cust"
+            }
+          ],
+          "dayOffset": 0,
+          "ts": "2026-02-04T05:00:00.000Z",
+          "points": 150,
+          "rsPerPoint": 1,
+          "loyaltyExpiryMonths": 12,
+          "loyaltyTierMult": 1.5
+        }
+      ],
+      "position": {
+        "customerId": "h1-cust",
+        "points": 2375,
+        "rupees": 2375,
+        "redeemablePoints": 2375,
+        "tier": "gold",
+        "tierMult": 1.5,
+        "earned12m": 2375,
+        "vintages": [
+          {
+            "earnEntryId": "h2-e2",
+            "billId": "h1-b1",
+            "earnedOnISO": "2026-01-05",
+            "expiresOnISO": "2027-01-05",
+            "rsPerPoint": 1,
+            "pointsGranted": 100,
+            "pointsRedeemed": 0,
+            "pointsClawed": 0,
+            "pointsExpired": 0,
+            "pointsUnspent": 100,
+            "rsUnspent": 100
+          },
+          {
+            "earnEntryId": "h2-e4",
+            "billId": "h1-b2",
+            "earnedOnISO": "2026-02-01",
+            "expiresOnISO": "2027-02-01",
+            "rsPerPoint": 1,
+            "pointsGranted": 1500,
+            "pointsRedeemed": 0,
+            "pointsClawed": 0,
+            "pointsExpired": 0,
+            "pointsUnspent": 1500,
+            "rsUnspent": 1500
+          },
+          {
+            "earnEntryId": "h2-e6",
+            "billId": "h1-b3",
+            "earnedOnISO": "2026-02-02",
+            "expiresOnISO": "2027-02-02",
+            "rsPerPoint": 1,
+            "pointsGranted": 125,
+            "pointsRedeemed": 0,
+            "pointsClawed": 0,
+            "pointsExpired": 0,
+            "pointsUnspent": 125,
+            "rsUnspent": 125
+          },
+          {
+            "earnEntryId": "h2-e8",
+            "billId": "h1-b4",
+            "earnedOnISO": "2026-02-03",
+            "expiresOnISO": "2027-02-03",
+            "rsPerPoint": 1,
+            "pointsGranted": 500,
+            "pointsRedeemed": 0,
+            "pointsClawed": 0,
+            "pointsExpired": 0,
+            "pointsUnspent": 500,
+            "rsUnspent": 500
+          },
+          {
+            "earnEntryId": "h2-e10",
+            "billId": "h1-b5",
+            "earnedOnISO": "2026-02-04",
+            "expiresOnISO": "2027-02-04",
+            "rsPerPoint": 1,
+            "pointsGranted": 150,
+            "pointsRedeemed": 0,
+            "pointsClawed": 0,
+            "pointsExpired": 0,
+            "pointsUnspent": 150,
+            "rsUnspent": 150
+          }
+        ]
+      },
+      "glLoyaltyPayable": 2375,
+      "sumByCustomer": 2375,
+      "tbTotal": 0
+    },
+    {
+      "name": "redeem-split-tender",
+      "nowISO": "2026-02-05T05:00:00.000Z",
+      "appended": [
+        {
+          "id": "h2-e11",
+          "memo": "Bill #6",
+          "refType": "bill",
+          "refId": "h1-b6",
+          "reversesId": null,
+          "lines": [
+            {
+              "account": "cash",
+              "debit": 1500,
+              "credit": 0
+            },
+            {
+              "account": "loyalty_payable",
+              "debit": 500,
+              "credit": 0,
+              "ref": "h1-cust"
+            },
+            {
+              "account": "cogs",
+              "debit": 1200,
+              "credit": 0
+            },
+            {
+              "account": "sales_revenue",
+              "debit": 0,
+              "credit": 2000
+            },
+            {
+              "account": "inventory",
+              "debit": 0,
+              "credit": 1200
+            }
+          ],
+          "dayOffset": 0,
+          "ts": "2026-02-05T05:00:00.000Z",
+          "loyaltyPointsUsed": 500
+        },
+        {
+          "id": "h2-e12",
+          "memo": "Loyalty points earned — Bill #6",
+          "refType": "loyalty_earn",
+          "refId": "h1-b6",
+          "reversesId": null,
+          "lines": [
+            {
+              "account": "expense_loyalty",
+              "debit": 30,
+              "credit": 0
+            },
+            {
+              "account": "loyalty_payable",
+              "debit": 0,
+              "credit": 30,
+              "ref": "h1-cust"
+            }
+          ],
+          "dayOffset": 0,
+          "ts": "2026-02-05T05:00:00.000Z",
+          "points": 30,
+          "rsPerPoint": 1,
+          "loyaltyExpiryMonths": 12,
+          "loyaltyTierMult": 1.5
+        }
+      ],
+      "position": {
+        "customerId": "h1-cust",
+        "points": 1905,
+        "rupees": 1905,
+        "redeemablePoints": 1905,
+        "tier": "gold",
+        "tierMult": 1.5,
+        "earned12m": 2405,
+        "vintages": [
+          {
+            "earnEntryId": "h2-e2",
+            "billId": "h1-b1",
+            "earnedOnISO": "2026-01-05",
+            "expiresOnISO": "2027-01-05",
+            "rsPerPoint": 1,
+            "pointsGranted": 100,
+            "pointsRedeemed": 100,
+            "pointsClawed": 0,
+            "pointsExpired": 0,
+            "pointsUnspent": 0,
+            "rsUnspent": 0
+          },
+          {
+            "earnEntryId": "h2-e4",
+            "billId": "h1-b2",
+            "earnedOnISO": "2026-02-01",
+            "expiresOnISO": "2027-02-01",
+            "rsPerPoint": 1,
+            "pointsGranted": 1500,
+            "pointsRedeemed": 400,
+            "pointsClawed": 0,
+            "pointsExpired": 0,
+            "pointsUnspent": 1100,
+            "rsUnspent": 1100
+          },
+          {
+            "earnEntryId": "h2-e6",
+            "billId": "h1-b3",
+            "earnedOnISO": "2026-02-02",
+            "expiresOnISO": "2027-02-02",
+            "rsPerPoint": 1,
+            "pointsGranted": 125,
+            "pointsRedeemed": 0,
+            "pointsClawed": 0,
+            "pointsExpired": 0,
+            "pointsUnspent": 125,
+            "rsUnspent": 125
+          },
+          {
+            "earnEntryId": "h2-e8",
+            "billId": "h1-b4",
+            "earnedOnISO": "2026-02-03",
+            "expiresOnISO": "2027-02-03",
+            "rsPerPoint": 1,
+            "pointsGranted": 500,
+            "pointsRedeemed": 0,
+            "pointsClawed": 0,
+            "pointsExpired": 0,
+            "pointsUnspent": 500,
+            "rsUnspent": 500
+          },
+          {
+            "earnEntryId": "h2-e10",
+            "billId": "h1-b5",
+            "earnedOnISO": "2026-02-04",
+            "expiresOnISO": "2027-02-04",
+            "rsPerPoint": 1,
+            "pointsGranted": 150,
+            "pointsRedeemed": 0,
+            "pointsClawed": 0,
+            "pointsExpired": 0,
+            "pointsUnspent": 150,
+            "rsUnspent": 150
+          },
+          {
+            "earnEntryId": "h2-e12",
+            "billId": "h1-b6",
+            "earnedOnISO": "2026-02-05",
+            "expiresOnISO": "2027-02-05",
+            "rsPerPoint": 1,
+            "pointsGranted": 30,
+            "pointsRedeemed": 0,
+            "pointsClawed": 0,
+            "pointsExpired": 0,
+            "pointsUnspent": 30,
+            "rsUnspent": 30
+          }
+        ]
+      },
+      "glLoyaltyPayable": 1905,
+      "sumByCustomer": 1905,
+      "tbTotal": 0,
+      "quoteBefore": {
+        "pointsWanted": 500,
+        "capRs": 1000,
+        "quote": {
+          "points": 500,
+          "rs": 500
+        }
+      }
+    },
+    {
+      "name": "return-partial",
+      "nowISO": "2026-02-06T05:00:00.000Z",
+      "appended": [
+        {
+          "id": "h2-e13",
+          "memo": "Return against Bill #6",
+          "refType": "return",
+          "refId": "h1-b6",
+          "reversesId": null,
+          "lines": [
+            {
+              "account": "sales_revenue",
+              "debit": 1000,
+              "credit": 0
+            },
+            {
+              "account": "inventory",
+              "debit": 600,
+              "credit": 0
+            },
+            {
+              "account": "loyalty_payable",
+              "debit": 0,
+              "credit": 250,
+              "ref": "h1-cust"
+            },
+            {
+              "account": "cash",
+              "debit": 0,
+              "credit": 750
+            },
+            {
+              "account": "cogs",
+              "debit": 0,
+              "credit": 600
+            }
+          ],
+          "dayOffset": 0,
+          "ts": "2026-02-06T05:00:00.000Z",
+          "loyaltyPointsReturned": 250
+        },
+        {
+          "id": "h2-e14",
+          "memo": "Loyalty points taken back — return on Bill #6",
+          "refType": "loyalty_earn",
+          "refId": "h1-cn-1",
+          "reversesId": null,
+          "lines": [
+            {
+              "account": "loyalty_payable",
+              "debit": 15,
+              "credit": 0,
+              "ref": "h1-cust"
+            },
+            {
+              "account": "expense_loyalty",
+              "debit": 0,
+              "credit": 15
+            }
+          ],
+          "dayOffset": 0,
+          "ts": "2026-02-06T05:00:00.000Z",
+          "points": -15,
+          "loyaltySourceBillId": "h1-b6"
+        }
+      ],
+      "position": {
+        "customerId": "h1-cust",
+        "points": 2140,
+        "rupees": 2140,
+        "redeemablePoints": 2140,
+        "tier": "gold",
+        "tierMult": 1.5,
+        "earned12m": 2405,
+        "vintages": [
+          {
+            "earnEntryId": "h2-e2",
+            "billId": "h1-b1",
+            "earnedOnISO": "2026-01-05",
+            "expiresOnISO": "2027-01-05",
+            "rsPerPoint": 1,
+            "pointsGranted": 100,
+            "pointsRedeemed": 100,
+            "pointsClawed": 0,
+            "pointsExpired": 0,
+            "pointsUnspent": 0,
+            "rsUnspent": 0
+          },
+          {
+            "earnEntryId": "h2-e4",
+            "billId": "h1-b2",
+            "earnedOnISO": "2026-02-01",
+            "expiresOnISO": "2027-02-01",
+            "rsPerPoint": 1,
+            "pointsGranted": 1500,
+            "pointsRedeemed": 150,
+            "pointsClawed": 0,
+            "pointsExpired": 0,
+            "pointsUnspent": 1350,
+            "rsUnspent": 1350
+          },
+          {
+            "earnEntryId": "h2-e6",
+            "billId": "h1-b3",
+            "earnedOnISO": "2026-02-02",
+            "expiresOnISO": "2027-02-02",
+            "rsPerPoint": 1,
+            "pointsGranted": 125,
+            "pointsRedeemed": 0,
+            "pointsClawed": 0,
+            "pointsExpired": 0,
+            "pointsUnspent": 125,
+            "rsUnspent": 125
+          },
+          {
+            "earnEntryId": "h2-e8",
+            "billId": "h1-b4",
+            "earnedOnISO": "2026-02-03",
+            "expiresOnISO": "2027-02-03",
+            "rsPerPoint": 1,
+            "pointsGranted": 500,
+            "pointsRedeemed": 0,
+            "pointsClawed": 0,
+            "pointsExpired": 0,
+            "pointsUnspent": 500,
+            "rsUnspent": 500
+          },
+          {
+            "earnEntryId": "h2-e10",
+            "billId": "h1-b5",
+            "earnedOnISO": "2026-02-04",
+            "expiresOnISO": "2027-02-04",
+            "rsPerPoint": 1,
+            "pointsGranted": 150,
+            "pointsRedeemed": 0,
+            "pointsClawed": 0,
+            "pointsExpired": 0,
+            "pointsUnspent": 150,
+            "rsUnspent": 150
+          },
+          {
+            "earnEntryId": "h2-e12",
+            "billId": "h1-b6",
+            "earnedOnISO": "2026-02-05",
+            "expiresOnISO": "2027-02-05",
+            "rsPerPoint": 1,
+            "pointsGranted": 30,
+            "pointsRedeemed": 0,
+            "pointsClawed": 15,
+            "pointsExpired": 0,
+            "pointsUnspent": 15,
+            "rsUnspent": 15
+          }
+        ]
+      },
+      "glLoyaltyPayable": 2140,
+      "sumByCustomer": 2140,
+      "tbTotal": 0,
+      "recreditBefore": {
+        "billId": "h1-b6",
+        "billTotal": 2000,
+        "refundTotalRs": 1000,
+        "completesBill": false,
+        "quote": {
+          "points": 250,
+          "rs": 250
+        }
+      },
+      "clawPoints": 15
+    },
+    {
+      "name": "return-completing",
+      "nowISO": "2026-02-07T05:00:00.000Z",
+      "appended": [
+        {
+          "id": "h2-e15",
+          "memo": "Return against Bill #6",
+          "refType": "return",
+          "refId": "h1-b6",
+          "reversesId": null,
+          "lines": [
+            {
+              "account": "sales_revenue",
+              "debit": 1000,
+              "credit": 0
+            },
+            {
+              "account": "inventory",
+              "debit": 600,
+              "credit": 0
+            },
+            {
+              "account": "loyalty_payable",
+              "debit": 0,
+              "credit": 250,
+              "ref": "h1-cust"
+            },
+            {
+              "account": "cash",
+              "debit": 0,
+              "credit": 750
+            },
+            {
+              "account": "cogs",
+              "debit": 0,
+              "credit": 600
+            }
+          ],
+          "dayOffset": 0,
+          "ts": "2026-02-07T05:00:00.000Z",
+          "loyaltyPointsReturned": 250
+        },
+        {
+          "id": "h2-e16",
+          "memo": "Loyalty points taken back — return on Bill #6",
+          "refType": "loyalty_earn",
+          "refId": "h1-cn-2",
+          "reversesId": null,
+          "lines": [
+            {
+              "account": "loyalty_payable",
+              "debit": 15,
+              "credit": 0,
+              "ref": "h1-cust"
+            },
+            {
+              "account": "expense_loyalty",
+              "debit": 0,
+              "credit": 15
+            }
+          ],
+          "dayOffset": 0,
+          "ts": "2026-02-07T05:00:00.000Z",
+          "points": -15,
+          "loyaltySourceBillId": "h1-b6"
+        }
+      ],
+      "position": {
+        "customerId": "h1-cust",
+        "points": 2375,
+        "rupees": 2375,
+        "redeemablePoints": 2375,
+        "tier": "gold",
+        "tierMult": 1.5,
+        "earned12m": 2405,
+        "vintages": [
+          {
+            "earnEntryId": "h2-e2",
+            "billId": "h1-b1",
+            "earnedOnISO": "2026-01-05",
+            "expiresOnISO": "2027-01-05",
+            "rsPerPoint": 1,
+            "pointsGranted": 100,
+            "pointsRedeemed": 0,
+            "pointsClawed": 0,
+            "pointsExpired": 0,
+            "pointsUnspent": 100,
+            "rsUnspent": 100
+          },
+          {
+            "earnEntryId": "h2-e4",
+            "billId": "h1-b2",
+            "earnedOnISO": "2026-02-01",
+            "expiresOnISO": "2027-02-01",
+            "rsPerPoint": 1,
+            "pointsGranted": 1500,
+            "pointsRedeemed": 0,
+            "pointsClawed": 0,
+            "pointsExpired": 0,
+            "pointsUnspent": 1500,
+            "rsUnspent": 1500
+          },
+          {
+            "earnEntryId": "h2-e6",
+            "billId": "h1-b3",
+            "earnedOnISO": "2026-02-02",
+            "expiresOnISO": "2027-02-02",
+            "rsPerPoint": 1,
+            "pointsGranted": 125,
+            "pointsRedeemed": 0,
+            "pointsClawed": 0,
+            "pointsExpired": 0,
+            "pointsUnspent": 125,
+            "rsUnspent": 125
+          },
+          {
+            "earnEntryId": "h2-e8",
+            "billId": "h1-b4",
+            "earnedOnISO": "2026-02-03",
+            "expiresOnISO": "2027-02-03",
+            "rsPerPoint": 1,
+            "pointsGranted": 500,
+            "pointsRedeemed": 0,
+            "pointsClawed": 0,
+            "pointsExpired": 0,
+            "pointsUnspent": 500,
+            "rsUnspent": 500
+          },
+          {
+            "earnEntryId": "h2-e10",
+            "billId": "h1-b5",
+            "earnedOnISO": "2026-02-04",
+            "expiresOnISO": "2027-02-04",
+            "rsPerPoint": 1,
+            "pointsGranted": 150,
+            "pointsRedeemed": 0,
+            "pointsClawed": 0,
+            "pointsExpired": 0,
+            "pointsUnspent": 150,
+            "rsUnspent": 150
+          },
+          {
+            "earnEntryId": "h2-e12",
+            "billId": "h1-b6",
+            "earnedOnISO": "2026-02-05",
+            "expiresOnISO": "2027-02-05",
+            "rsPerPoint": 1,
+            "pointsGranted": 30,
+            "pointsRedeemed": 0,
+            "pointsClawed": 30,
+            "pointsExpired": 0,
+            "pointsUnspent": 0,
+            "rsUnspent": 0
+          }
+        ]
+      },
+      "glLoyaltyPayable": 2375,
+      "sumByCustomer": 2375,
+      "tbTotal": 0,
+      "recreditBefore": {
+        "billId": "h1-b6",
+        "billTotal": 2000,
+        "refundTotalRs": 1000,
+        "completesBill": true,
+        "quote": {
+          "points": 250,
+          "rs": 250
+        }
+      },
+      "clawPoints": 15
+    },
+    {
+      "name": "void-mirror",
+      "nowISO": "2026-02-09T05:00:00.000Z",
+      "appended": [
+        {
+          "id": "h2-e17",
+          "memo": "Bill #7",
+          "refType": "bill",
+          "refId": "h1-b7",
+          "reversesId": null,
+          "lines": [
+            {
+              "account": "cash",
+              "debit": 2000,
+              "credit": 0
+            },
+            {
+              "account": "loyalty_payable",
+              "debit": 1000,
+              "credit": 0,
+              "ref": "h1-cust"
+            },
+            {
+              "account": "cogs",
+              "debit": 1800,
+              "credit": 0
+            },
+            {
+              "account": "sales_revenue",
+              "debit": 0,
+              "credit": 3000
+            },
+            {
+              "account": "inventory",
+              "debit": 0,
+              "credit": 1800
+            }
+          ],
+          "dayOffset": 0,
+          "ts": "2026-02-08T05:00:00.000Z",
+          "loyaltyPointsUsed": 1000
+        },
+        {
+          "id": "h2-e18",
+          "memo": "Loyalty points earned — Bill #7",
+          "refType": "loyalty_earn",
+          "refId": "h1-b7",
+          "reversesId": null,
+          "lines": [
+            {
+              "account": "expense_loyalty",
+              "debit": 45,
+              "credit": 0
+            },
+            {
+              "account": "loyalty_payable",
+              "debit": 0,
+              "credit": 45,
+              "ref": "h1-cust"
+            }
+          ],
+          "dayOffset": 0,
+          "ts": "2026-02-08T05:00:00.000Z",
+          "points": 45,
+          "rsPerPoint": 1,
+          "loyaltyExpiryMonths": 12,
+          "loyaltyTierMult": 1.5
+        },
+        {
+          "id": "h2-e19",
+          "memo": "Bill #7 voided",
+          "refType": "bill_void",
+          "refId": "h1-b7",
+          "reversesId": null,
+          "lines": [
+            {
+              "account": "sales_revenue",
+              "debit": 3000,
+              "credit": 0
+            },
+            {
+              "account": "inventory",
+              "debit": 1800,
+              "credit": 0
+            },
+            {
+              "account": "cash",
+              "debit": 0,
+              "credit": 2000
+            },
+            {
+              "account": "loyalty_payable",
+              "debit": 0,
+              "credit": 1000,
+              "ref": "h1-cust"
+            },
+            {
+              "account": "cogs",
+              "debit": 0,
+              "credit": 1800
+            }
+          ],
+          "dayOffset": 0,
+          "ts": "2026-02-09T05:00:00.000Z",
+          "loyaltyPointsReturned": 1000
+        },
+        {
+          "id": "h2-e20",
+          "memo": "Loyalty earn reversed — Bill #7 voided",
+          "refType": "loyalty_earn",
+          "refId": "h1-b7",
+          "reversesId": "h2-e18",
+          "lines": [
+            {
+              "account": "loyalty_payable",
+              "debit": 45,
+              "credit": 0,
+              "ref": "h1-cust"
+            },
+            {
+              "account": "expense_loyalty",
+              "debit": 0,
+              "credit": 45
+            }
+          ],
+          "dayOffset": 0,
+          "ts": "2026-02-09T05:00:00.000Z",
+          "points": -45,
+          "loyaltySourceBillId": "h1-b7"
+        }
+      ],
+      "position": {
+        "customerId": "h1-cust",
+        "points": 2375,
+        "rupees": 2375,
+        "redeemablePoints": 2375,
+        "tier": "gold",
+        "tierMult": 1.5,
+        "earned12m": 2450,
+        "vintages": [
+          {
+            "earnEntryId": "h2-e2",
+            "billId": "h1-b1",
+            "earnedOnISO": "2026-01-05",
+            "expiresOnISO": "2027-01-05",
+            "rsPerPoint": 1,
+            "pointsGranted": 100,
+            "pointsRedeemed": 0,
+            "pointsClawed": 0,
+            "pointsExpired": 0,
+            "pointsUnspent": 100,
+            "rsUnspent": 100
+          },
+          {
+            "earnEntryId": "h2-e4",
+            "billId": "h1-b2",
+            "earnedOnISO": "2026-02-01",
+            "expiresOnISO": "2027-02-01",
+            "rsPerPoint": 1,
+            "pointsGranted": 1500,
+            "pointsRedeemed": 0,
+            "pointsClawed": 0,
+            "pointsExpired": 0,
+            "pointsUnspent": 1500,
+            "rsUnspent": 1500
+          },
+          {
+            "earnEntryId": "h2-e6",
+            "billId": "h1-b3",
+            "earnedOnISO": "2026-02-02",
+            "expiresOnISO": "2027-02-02",
+            "rsPerPoint": 1,
+            "pointsGranted": 125,
+            "pointsRedeemed": 0,
+            "pointsClawed": 0,
+            "pointsExpired": 0,
+            "pointsUnspent": 125,
+            "rsUnspent": 125
+          },
+          {
+            "earnEntryId": "h2-e8",
+            "billId": "h1-b4",
+            "earnedOnISO": "2026-02-03",
+            "expiresOnISO": "2027-02-03",
+            "rsPerPoint": 1,
+            "pointsGranted": 500,
+            "pointsRedeemed": 0,
+            "pointsClawed": 0,
+            "pointsExpired": 0,
+            "pointsUnspent": 500,
+            "rsUnspent": 500
+          },
+          {
+            "earnEntryId": "h2-e10",
+            "billId": "h1-b5",
+            "earnedOnISO": "2026-02-04",
+            "expiresOnISO": "2027-02-04",
+            "rsPerPoint": 1,
+            "pointsGranted": 150,
+            "pointsRedeemed": 0,
+            "pointsClawed": 0,
+            "pointsExpired": 0,
+            "pointsUnspent": 150,
+            "rsUnspent": 150
+          },
+          {
+            "earnEntryId": "h2-e12",
+            "billId": "h1-b6",
+            "earnedOnISO": "2026-02-05",
+            "expiresOnISO": "2027-02-05",
+            "rsPerPoint": 1,
+            "pointsGranted": 30,
+            "pointsRedeemed": 0,
+            "pointsClawed": 30,
+            "pointsExpired": 0,
+            "pointsUnspent": 0,
+            "rsUnspent": 0
+          },
+          {
+            "earnEntryId": "h2-e18",
+            "billId": "h1-b7",
+            "earnedOnISO": "2026-02-08",
+            "expiresOnISO": "2027-02-08",
+            "rsPerPoint": 1,
+            "pointsGranted": 45,
+            "pointsRedeemed": 0,
+            "pointsClawed": 45,
+            "pointsExpired": 0,
+            "pointsUnspent": 0,
+            "rsUnspent": 0
+          }
+        ]
+      },
+      "glLoyaltyPayable": 2375,
+      "sumByCustomer": 2375,
+      "tbTotal": 0,
+      "quoteBefore": {
+        "pointsWanted": 1000,
+        "capRs": 1500,
+        "quote": {
+          "points": 1000,
+          "rs": 1000
+        }
+      },
+      "earnEntryAfterVoid": null
+    },
+    {
+      "name": "fy-close",
+      "nowISO": "2026-02-10T00:00:00.000Z",
+      "appended": [
+        {
+          "id": "h2-e21",
+          "memo": "Fiscal year close — FY 2025-26",
+          "refType": "fy_close",
+          "refId": "per-h1-1",
+          "reversesId": null,
+          "lines": [
+            {
+              "account": "sales_revenue",
+              "debit": 220000,
+              "credit": 0,
+              "ref": null
+            },
+            {
+              "account": "cogs",
+              "debit": 0,
+              "credit": 132000,
+              "ref": null
+            },
+            {
+              "account": "expense_loyalty",
+              "debit": 0,
+              "credit": 2375,
+              "ref": null
+            },
+            {
+              "account": "retained_earnings",
+              "debit": 0,
+              "credit": 85625,
+              "ref": null
+            }
+          ],
+          "dayOffset": 115,
+          "ts": "2026-06-30T18:59:59.999Z"
+        }
+      ],
+      "position": {
+        "customerId": "h1-cust",
+        "points": 2375,
+        "rupees": 2375,
+        "redeemablePoints": 2375,
+        "tier": "gold",
+        "tierMult": 1.5,
+        "earned12m": 2450,
+        "vintages": [
+          {
+            "earnEntryId": "h2-e2",
+            "billId": "h1-b1",
+            "earnedOnISO": "2026-01-05",
+            "expiresOnISO": "2027-01-05",
+            "rsPerPoint": 1,
+            "pointsGranted": 100,
+            "pointsRedeemed": 0,
+            "pointsClawed": 0,
+            "pointsExpired": 0,
+            "pointsUnspent": 100,
+            "rsUnspent": 100
+          },
+          {
+            "earnEntryId": "h2-e4",
+            "billId": "h1-b2",
+            "earnedOnISO": "2026-02-01",
+            "expiresOnISO": "2027-02-01",
+            "rsPerPoint": 1,
+            "pointsGranted": 1500,
+            "pointsRedeemed": 0,
+            "pointsClawed": 0,
+            "pointsExpired": 0,
+            "pointsUnspent": 1500,
+            "rsUnspent": 1500
+          },
+          {
+            "earnEntryId": "h2-e6",
+            "billId": "h1-b3",
+            "earnedOnISO": "2026-02-02",
+            "expiresOnISO": "2027-02-02",
+            "rsPerPoint": 1,
+            "pointsGranted": 125,
+            "pointsRedeemed": 0,
+            "pointsClawed": 0,
+            "pointsExpired": 0,
+            "pointsUnspent": 125,
+            "rsUnspent": 125
+          },
+          {
+            "earnEntryId": "h2-e8",
+            "billId": "h1-b4",
+            "earnedOnISO": "2026-02-03",
+            "expiresOnISO": "2027-02-03",
+            "rsPerPoint": 1,
+            "pointsGranted": 500,
+            "pointsRedeemed": 0,
+            "pointsClawed": 0,
+            "pointsExpired": 0,
+            "pointsUnspent": 500,
+            "rsUnspent": 500
+          },
+          {
+            "earnEntryId": "h2-e10",
+            "billId": "h1-b5",
+            "earnedOnISO": "2026-02-04",
+            "expiresOnISO": "2027-02-04",
+            "rsPerPoint": 1,
+            "pointsGranted": 150,
+            "pointsRedeemed": 0,
+            "pointsClawed": 0,
+            "pointsExpired": 0,
+            "pointsUnspent": 150,
+            "rsUnspent": 150
+          },
+          {
+            "earnEntryId": "h2-e12",
+            "billId": "h1-b6",
+            "earnedOnISO": "2026-02-05",
+            "expiresOnISO": "2027-02-05",
+            "rsPerPoint": 1,
+            "pointsGranted": 30,
+            "pointsRedeemed": 0,
+            "pointsClawed": 30,
+            "pointsExpired": 0,
+            "pointsUnspent": 0,
+            "rsUnspent": 0
+          },
+          {
+            "earnEntryId": "h2-e18",
+            "billId": "h1-b7",
+            "earnedOnISO": "2026-02-08",
+            "expiresOnISO": "2027-02-08",
+            "rsPerPoint": 1,
+            "pointsGranted": 45,
+            "pointsRedeemed": 0,
+            "pointsClawed": 45,
+            "pointsExpired": 0,
+            "pointsUnspent": 0,
+            "rsUnspent": 0
+          }
+        ]
+      },
+      "glLoyaltyPayable": 2375,
+      "sumByCustomer": 2375,
+      "tbTotal": 0,
+      "expenseLoyaltyBalance": 0
+    },
+    {
+      "name": "expiry-posted",
+      "nowISO": "2027-01-06T00:00:00.000Z",
+      "appended": [
+        {
+          "id": "h2-e22",
+          "memo": "Loyalty points expired — H1 Customer",
+          "refType": "loyalty_expire",
+          "refId": "h2-e2",
+          "reversesId": null,
+          "lines": [
+            {
+              "account": "loyalty_payable",
+              "debit": 100,
+              "credit": 0,
+              "ref": "h1-cust"
+            },
+            {
+              "account": "expense_loyalty",
+              "debit": 0,
+              "credit": 100
+            }
+          ],
+          "dayOffset": 0,
+          "ts": "2027-01-05T10:00:00.000Z",
+          "points": 100
+        }
+      ],
+      "position": {
+        "customerId": "h1-cust",
+        "points": 2275,
+        "rupees": 2275,
+        "redeemablePoints": 2275,
+        "tier": "gold",
+        "tierMult": 1.5,
+        "earned12m": 2350,
+        "vintages": [
+          {
+            "earnEntryId": "h2-e2",
+            "billId": "h1-b1",
+            "earnedOnISO": "2026-01-05",
+            "expiresOnISO": "2027-01-05",
+            "rsPerPoint": 1,
+            "pointsGranted": 100,
+            "pointsRedeemed": 0,
+            "pointsClawed": 0,
+            "pointsExpired": 100,
+            "pointsUnspent": 0,
+            "rsUnspent": 0
+          },
+          {
+            "earnEntryId": "h2-e4",
+            "billId": "h1-b2",
+            "earnedOnISO": "2026-02-01",
+            "expiresOnISO": "2027-02-01",
+            "rsPerPoint": 1,
+            "pointsGranted": 1500,
+            "pointsRedeemed": 0,
+            "pointsClawed": 0,
+            "pointsExpired": 0,
+            "pointsUnspent": 1500,
+            "rsUnspent": 1500
+          },
+          {
+            "earnEntryId": "h2-e6",
+            "billId": "h1-b3",
+            "earnedOnISO": "2026-02-02",
+            "expiresOnISO": "2027-02-02",
+            "rsPerPoint": 1,
+            "pointsGranted": 125,
+            "pointsRedeemed": 0,
+            "pointsClawed": 0,
+            "pointsExpired": 0,
+            "pointsUnspent": 125,
+            "rsUnspent": 125
+          },
+          {
+            "earnEntryId": "h2-e8",
+            "billId": "h1-b4",
+            "earnedOnISO": "2026-02-03",
+            "expiresOnISO": "2027-02-03",
+            "rsPerPoint": 1,
+            "pointsGranted": 500,
+            "pointsRedeemed": 0,
+            "pointsClawed": 0,
+            "pointsExpired": 0,
+            "pointsUnspent": 500,
+            "rsUnspent": 500
+          },
+          {
+            "earnEntryId": "h2-e10",
+            "billId": "h1-b5",
+            "earnedOnISO": "2026-02-04",
+            "expiresOnISO": "2027-02-04",
+            "rsPerPoint": 1,
+            "pointsGranted": 150,
+            "pointsRedeemed": 0,
+            "pointsClawed": 0,
+            "pointsExpired": 0,
+            "pointsUnspent": 150,
+            "rsUnspent": 150
+          },
+          {
+            "earnEntryId": "h2-e12",
+            "billId": "h1-b6",
+            "earnedOnISO": "2026-02-05",
+            "expiresOnISO": "2027-02-05",
+            "rsPerPoint": 1,
+            "pointsGranted": 30,
+            "pointsRedeemed": 0,
+            "pointsClawed": 30,
+            "pointsExpired": 0,
+            "pointsUnspent": 0,
+            "rsUnspent": 0
+          },
+          {
+            "earnEntryId": "h2-e18",
+            "billId": "h1-b7",
+            "earnedOnISO": "2026-02-08",
+            "expiresOnISO": "2027-02-08",
+            "rsPerPoint": 1,
+            "pointsGranted": 45,
+            "pointsRedeemed": 0,
+            "pointsClawed": 45,
+            "pointsExpired": 0,
+            "pointsUnspent": 0,
+            "rsUnspent": 0
+          }
+        ]
+      },
+      "glLoyaltyPayable": 2275,
+      "sumByCustomer": 2275,
+      "tbTotal": 0,
+      "expenseLoyaltyBalance": -100
+    }
+  ],
+  "guardrails": {
+    "overBalance": {
+      "points": 2275,
+      "rs": 2275
+    },
+    "overCap": {
+      "points": 50,
+      "rs": 50
+    },
+    "walkInEarn": null,
+    "subBaseEarnQuote": null,
+    "disabledEarnQuote": null,
+    "disabledEarn": null,
+    "disabledRedeemQuote": {
+      "points": 100,
+      "rs": 100
+    },
+    "positionNow": {
+      "customerId": "h1-cust",
+      "points": 2275,
+      "rupees": 2275,
+      "redeemablePoints": 2275,
+      "tier": "gold",
+      "tierMult": 1.5,
+      "earned12m": 2350,
+      "vintages": [
+        {
+          "earnEntryId": "h2-e2",
+          "billId": "h1-b1",
+          "earnedOnISO": "2026-01-05",
+          "expiresOnISO": "2027-01-05",
+          "rsPerPoint": 1,
+          "pointsGranted": 100,
+          "pointsRedeemed": 0,
+          "pointsClawed": 0,
+          "pointsExpired": 100,
+          "pointsUnspent": 0,
+          "rsUnspent": 0
+        },
+        {
+          "earnEntryId": "h2-e4",
+          "billId": "h1-b2",
+          "earnedOnISO": "2026-02-01",
+          "expiresOnISO": "2027-02-01",
+          "rsPerPoint": 1,
+          "pointsGranted": 1500,
+          "pointsRedeemed": 0,
+          "pointsClawed": 0,
+          "pointsExpired": 0,
+          "pointsUnspent": 1500,
+          "rsUnspent": 1500
+        },
+        {
+          "earnEntryId": "h2-e6",
+          "billId": "h1-b3",
+          "earnedOnISO": "2026-02-02",
+          "expiresOnISO": "2027-02-02",
+          "rsPerPoint": 1,
+          "pointsGranted": 125,
+          "pointsRedeemed": 0,
+          "pointsClawed": 0,
+          "pointsExpired": 0,
+          "pointsUnspent": 125,
+          "rsUnspent": 125
+        },
+        {
+          "earnEntryId": "h2-e8",
+          "billId": "h1-b4",
+          "earnedOnISO": "2026-02-03",
+          "expiresOnISO": "2027-02-03",
+          "rsPerPoint": 1,
+          "pointsGranted": 500,
+          "pointsRedeemed": 0,
+          "pointsClawed": 0,
+          "pointsExpired": 0,
+          "pointsUnspent": 500,
+          "rsUnspent": 500
+        },
+        {
+          "earnEntryId": "h2-e10",
+          "billId": "h1-b5",
+          "earnedOnISO": "2026-02-04",
+          "expiresOnISO": "2027-02-04",
+          "rsPerPoint": 1,
+          "pointsGranted": 150,
+          "pointsRedeemed": 0,
+          "pointsClawed": 0,
+          "pointsExpired": 0,
+          "pointsUnspent": 150,
+          "rsUnspent": 150
+        },
+        {
+          "earnEntryId": "h2-e12",
+          "billId": "h1-b6",
+          "earnedOnISO": "2026-02-05",
+          "expiresOnISO": "2027-02-05",
+          "rsPerPoint": 1,
+          "pointsGranted": 30,
+          "pointsRedeemed": 0,
+          "pointsClawed": 30,
+          "pointsExpired": 0,
+          "pointsUnspent": 0,
+          "rsUnspent": 0
+        },
+        {
+          "earnEntryId": "h2-e18",
+          "billId": "h1-b7",
+          "earnedOnISO": "2026-02-08",
+          "expiresOnISO": "2027-02-08",
+          "rsPerPoint": 1,
+          "pointsGranted": 45,
+          "pointsRedeemed": 0,
+          "pointsClawed": 45,
+          "pointsExpired": 0,
+          "pointsUnspent": 0,
+          "rsUnspent": 0
+        }
+      ]
+    }
+  },
+  "snapshotCase": {
+    "settings": {
+      "loyalty": {
+        "enabled": true,
+        "pointValueRs": 2
+      }
+    },
+    "journal": [
+      {
+        "id": "h2-e23",
+        "memo": "Bill #1",
+        "refType": "bill",
+        "refId": "h1x-b1",
+        "reversesId": null,
+        "lines": [
+          {
+            "account": "cash",
+            "debit": 10000,
+            "credit": 0
+          },
+          {
+            "account": "sales_revenue",
+            "debit": 0,
+            "credit": 10000
+          }
+        ],
+        "dayOffset": 0,
+        "ts": "2026-03-01T05:00:00.000Z"
+      },
+      {
+        "id": "h2-e24",
+        "memo": "Loyalty points earned — Bill #1",
+        "refType": "loyalty_earn",
+        "refId": "h1x-b1",
+        "reversesId": null,
+        "lines": [
+          {
+            "account": "expense_loyalty",
+            "debit": 200,
+            "credit": 0
+          },
+          {
+            "account": "loyalty_payable",
+            "debit": 0,
+            "credit": 200,
+            "ref": "h1-cust"
+          }
+        ],
+        "dayOffset": 0,
+        "ts": "2026-03-01T05:00:00.000Z",
+        "points": 100,
+        "rsPerPoint": 2,
+        "loyaltyExpiryMonths": 12,
+        "loyaltyTierMult": 1
+      }
+    ],
+    "quote": {
+      "points": 100,
+      "rs": 200
+    },
+    "position": {
+      "customerId": "h1-cust",
+      "points": 100,
+      "rupees": 200,
+      "redeemablePoints": 100,
+      "tier": "standard",
+      "tierMult": 1,
+      "earned12m": 100,
+      "vintages": [
+        {
+          "earnEntryId": "h2-e24",
+          "billId": "h1x-b1",
+          "earnedOnISO": "2026-03-01",
+          "expiresOnISO": "2027-03-01",
+          "rsPerPoint": 2,
+          "pointsGranted": 100,
+          "pointsRedeemed": 0,
+          "pointsClawed": 0,
+          "pointsExpired": 0,
+          "pointsUnspent": 100,
+          "rsUnspent": 200
+        }
+      ]
+    }
+  },
+  "clawbackFloorCase": {
+    "journal": [
+      {
+        "id": "h2-e25",
+        "memo": "Bill #1",
+        "refType": "bill",
+        "refId": "h1y-b1",
+        "reversesId": null,
+        "lines": [
+          {
+            "account": "cash",
+            "debit": 300,
+            "credit": 0
+          },
+          {
+            "account": "sales_revenue",
+            "debit": 0,
+            "credit": 300
+          }
+        ],
+        "dayOffset": 0,
+        "ts": "2026-03-01T05:00:00.000Z"
+      },
+      {
+        "id": "h2-e26",
+        "memo": "Loyalty points earned — Bill #1",
+        "refType": "loyalty_earn",
+        "refId": "h1y-b1",
+        "reversesId": null,
+        "lines": [
+          {
+            "account": "expense_loyalty",
+            "debit": 3,
+            "credit": 0
+          },
+          {
+            "account": "loyalty_payable",
+            "debit": 0,
+            "credit": 3,
+            "ref": "h1-cust"
+          }
+        ],
+        "dayOffset": 0,
+        "ts": "2026-03-01T05:00:00.000Z",
+        "points": 3,
+        "rsPerPoint": 1,
+        "loyaltyExpiryMonths": 12,
+        "loyaltyTierMult": 1
+      },
+      {
+        "id": "h2-e27",
+        "memo": "clawback",
+        "refType": "loyalty_earn",
+        "refId": "h1y-ret-1",
+        "reversesId": null,
+        "lines": [
+          {
+            "account": "loyalty_payable",
+            "debit": 1,
+            "credit": 0,
+            "ref": "h1-cust"
+          },
+          {
+            "account": "expense_loyalty",
+            "debit": 0,
+            "credit": 1
+          }
+        ],
+        "dayOffset": 0,
+        "ts": "2026-03-02T05:00:00.000Z",
+        "points": -1,
+        "loyaltySourceBillId": "h1y-b1"
+      },
+      {
+        "id": "h2-e28",
+        "memo": "clawback",
+        "refType": "loyalty_earn",
+        "refId": "h1y-ret-2",
+        "reversesId": null,
+        "lines": [
+          {
+            "account": "loyalty_payable",
+            "debit": 1,
+            "credit": 0,
+            "ref": "h1-cust"
+          },
+          {
+            "account": "expense_loyalty",
+            "debit": 0,
+            "credit": 1
+          }
+        ],
+        "dayOffset": 0,
+        "ts": "2026-03-02T05:00:00.000Z",
+        "points": -1,
+        "loyaltySourceBillId": "h1y-b1"
+      },
+      {
+        "id": "h2-e29",
+        "memo": "clawback",
+        "refType": "loyalty_earn",
+        "refId": "h1y-ret-3",
+        "reversesId": null,
+        "lines": [
+          {
+            "account": "loyalty_payable",
+            "debit": 1,
+            "credit": 0,
+            "ref": "h1-cust"
+          },
+          {
+            "account": "expense_loyalty",
+            "debit": 0,
+            "credit": 1
+          }
+        ],
+        "dayOffset": 0,
+        "ts": "2026-03-02T05:00:00.000Z",
+        "points": -1,
+        "loyaltySourceBillId": "h1y-b1"
+      }
+    ],
+    "clawSeq": [
+      1,
+      1,
+      1
+    ],
+    "finalPoints": 0
+  },
+  "expiryCase": {
+    "at": "2027-01-05T10:00:00.000Z",
+    "due": [
+      {
+        "customerId": "h1-cust",
+        "vintage": {
+          "earnEntryId": "h2-e2",
+          "billId": "h1-b1",
+          "earnedOnISO": "2026-01-05",
+          "expiresOnISO": "2027-01-05",
+          "rsPerPoint": 1,
+          "pointsGranted": 100,
+          "pointsRedeemed": 0,
+          "pointsClawed": 0,
+          "pointsExpired": 0,
+          "pointsUnspent": 100,
+          "rsUnspent": 100
+        }
+      }
+    ],
+    "totalsBefore": {
+      "liabilityRs": 2375,
+      "pointsOutstanding": 2375,
+      "customersWithBalance": 1,
+      "expiringSoonPoints": 2275,
+      "expiringSoonRs": 2275,
+      "expiredUnposted": [
+        {
+          "earnEntryId": "h2-e2",
+          "billId": "h1-b1",
+          "earnedOnISO": "2026-01-05",
+          "expiresOnISO": "2027-01-05",
+          "rsPerPoint": 1,
+          "pointsGranted": 100,
+          "pointsRedeemed": 0,
+          "pointsClawed": 0,
+          "pointsExpired": 0,
+          "pointsUnspent": 100,
+          "rsUnspent": 100
+        }
+      ],
+      "expiredUnpostedPoints": 100,
+      "expiredUnpostedRs": 100
+    },
+    "entry": {
+      "id": "h2-e22",
+      "memo": "Loyalty points expired — H1 Customer",
+      "refType": "loyalty_expire",
+      "refId": "h2-e2",
+      "reversesId": null,
+      "lines": [
+        {
+          "account": "loyalty_payable",
+          "debit": 100,
+          "credit": 0,
+          "ref": "h1-cust"
+        },
+        {
+          "account": "expense_loyalty",
+          "debit": 0,
+          "credit": 100
+        }
+      ],
+      "dayOffset": 0,
+      "ts": "2027-01-05T10:00:00.000Z",
+      "points": 100
+    },
+    "spentVintage": {
+      "earnEntryId": "h2-e12",
+      "billId": "h1-b6",
+      "earnedOnISO": "2026-02-05",
+      "expiresOnISO": "2027-02-05",
+      "rsPerPoint": 1,
+      "pointsGranted": 30,
+      "pointsRedeemed": 0,
+      "pointsClawed": 30,
+      "pointsExpired": 0,
+      "pointsUnspent": 0,
+      "rsUnspent": 0
+    },
+    "spentVintageComposesNull": true
+  },
+  "fyCloseCase": {
+    "range": {
+      "startDate": "2025-07-01",
+      "endDate": "2026-06-30",
+      "fromTs": "2025-06-30T19:00:00.000Z",
+      "toTs": "2026-06-30T19:00:00.000Z"
+    },
+    "entry": {
+      "id": "h2-e21",
+      "memo": "Fiscal year close — FY 2025-26",
+      "refType": "fy_close",
+      "refId": "per-h1-1",
+      "reversesId": null,
+      "lines": [
+        {
+          "account": "sales_revenue",
+          "debit": 220000,
+          "credit": 0,
+          "ref": null
+        },
+        {
+          "account": "cogs",
+          "debit": 0,
+          "credit": 132000,
+          "ref": null
+        },
+        {
+          "account": "expense_loyalty",
+          "debit": 0,
+          "credit": 2375,
+          "ref": null
+        },
+        {
+          "account": "retained_earnings",
+          "debit": 0,
+          "credit": 85625,
+          "ref": null
+        }
+      ],
+      "dayOffset": 0,
+      "ts": "2026-06-30T18:59:59.999Z"
+    }
+  },
+  "reportCase": {
+    "range": {
+      "fromTs": "2026-01-01T00:00:00.000Z",
+      "toTs": "2026-03-01T00:00:00.000Z"
+    },
+    "report": {
+      "earnedPoints": 2450,
+      "earnedRs": 2450,
+      "redeemedPoints": 1500,
+      "redeemedRs": 1500,
+      "recreditedPoints": 1500,
+      "recreditedRs": 1500,
+      "clawedPoints": 75,
+      "clawedRs": 75,
+      "expiredPoints": 0,
+      "expiredRs": 0,
+      "liabilityRs": 2375,
+      "liabilityPoints": 2375,
+      "rows": [
+        {
+          "customerId": "h1-cust",
+          "earnedPoints": 2450,
+          "redeemedPoints": 1500,
+          "recreditedPoints": 1500,
+          "clawedPoints": 75,
+          "expiredPoints": 0,
+          "points": 2375,
+          "rupees": 2375
+        }
+      ]
+    }
+  },
+  "tallyCase": {
+    "range": {
+      "fromTs": "2025-12-31T19:00:00.000Z",
+      "toTs": "2026-12-31T19:00:00.000Z"
+    },
+    "masters": [
+      {
+        "name": "Cash",
+        "group": "Cash-in-Hand",
+        "isParty": false,
+        "openingBalance": 0
+      },
+      {
+        "name": "Sales",
+        "group": "Sales Accounts",
+        "isParty": false,
+        "openingBalance": 0
+      },
+      {
+        "name": "Cost of Goods Sold",
+        "group": "Direct Expenses",
+        "isParty": false,
+        "openingBalance": 0
+      },
+      {
+        "name": "Stock — Goods",
+        "group": "Stock-in-Hand",
+        "isParty": false,
+        "openingBalance": 0
+      },
+      {
+        "name": "Retained Earnings",
+        "group": "Reserves & Surplus",
+        "isParty": false,
+        "openingBalance": 0
+      },
+      {
+        "name": "Loyalty Programme Cost",
+        "group": "Indirect Expenses",
+        "isParty": false,
+        "openingBalance": 0
+      },
+      {
+        "name": "H1 Customer",
+        "group": "Current Liabilities",
+        "isParty": true,
+        "openingBalance": 0
+      }
+    ]
+  }
+}

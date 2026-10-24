@@ -19,7 +19,7 @@ export const enSettings = {
   "settings.profileTitle": "Shop profile",
   "settings.profileSub": "Shown on bills and across the app.",
   "settings.shopName": "Shop name",
-  "settings.shopNamePlaceholder": "e.g. Al-Madina Kiryana Store",
+  "settings.shopNamePlaceholder": "e.g. Your Business Name",
   "settings.phonePlaceholder": "e.g. 0300-1234567",
   "settings.addressPlaceholder": "Shop address",
   "settings.staffOnlyNote": "Only the shop owner can change shop settings.",
@@ -38,6 +38,9 @@ export const enSettings = {
   "settings.languageSub": "App language — English or Urdu.",
   "settings.langEnglish": "English",
   "settings.langUrdu": "اردو",
+  "settings.langPashto": "پښتو",
+  "settings.langFarsi": "فارسی",
+  "settings.langDraftPreview": "Draft preview",
   "settings.accountTitle": "Account",
   "settings.accountSub": "Your sign-in details for this shop.",
   "settings.accountEmail": "Email",
@@ -136,6 +139,39 @@ export const enSettings = {
   "settings.per.through": "through {date}",
   "settings.per.open": "no lock",
   "settings.per.by": "by {email}",
+  "backup.title": "Backup & restore",
+  "backup.sub":
+    "Your whole business in one file — every bill, entry and record. The file is yours: export works in every plan state, always.",
+  "backup.exportTitle": "Export backup",
+  "backup.exportBody":
+    "Downloads one JSON file with the complete business: every collection, the full journal, and this business's own platform records (registry, memberships, counters, events, payments).",
+  "backup.exportButton": "Download backup",
+  "backup.exporting": "Preparing…",
+  "backup.exportDone": "Backup downloaded — {docs} documents, {journal} journal entries.",
+  "backup.exportFailed": "The backup could not be prepared. Nothing was changed.",
+  "backup.fingerprint": "Journal fingerprint",
+  "backup.restoreTitle": "Restore into this business",
+  "backup.restoreBody":
+    "Restore works ONLY into a new, empty business — the books here must be empty. A live business is never overwritten: restore the file into a fresh business and trade there.",
+  "backup.restorePick": "Choose backup file",
+  "backup.restoreReading": "Checking the file…",
+  "backup.restoreSource": "Backup of {business} · exported {date}",
+  "backup.restoreSummary":
+    "{docs} documents to write ({journal} journal entries) — fingerprint verified against the file's own manifest.",
+  "backup.restoreConfirm": "Restore into this business",
+  "backup.restoring": "Restoring…",
+  "backup.restoreDone": "Restore complete — {written} documents written. This business now holds the backup's books.",
+  "backup.restoreAlready": "This backup is already fully restored here — nothing to write.",
+  "backup.restoreFailed":
+    "The restore could not be completed. Anything already written matches the backup exactly — pick the same file again to resume.",
+  "backup.refused.notABackup": "That file is not a Dukaan AI business backup.",
+  "backup.refused.unknownFormat":
+    "That backup uses a format this version does not know — use a backup exported by this version.",
+  "backup.refused.manifestMismatch":
+    "The file does not match its own manifest (counts or the journal fingerprint differ) — it may be damaged or edited. Nothing was written.",
+  "backup.refused.targetNotEmpty":
+    "This business is not empty — restore is refused so a live book is never overwritten. Create a new business and restore there.",
+  "backup.ownerOnly": "Only the business owner can back up or restore.",
 } as const;
 
 export const urSettings: Record<keyof typeof enSettings, string> = {
@@ -158,7 +194,7 @@ export const urSettings: Record<keyof typeof enSettings, string> = {
   "settings.profileTitle": "دکان کی معلومات",
   "settings.profileSub": "بلوں پر اور پوری ایپ میں دکھائی جاتی ہے۔",
   "settings.shopName": "دکان کا نام",
-  "settings.shopNamePlaceholder": "مثلاً المدینہ کریانہ اسٹور",
+  "settings.shopNamePlaceholder": "مثلاً آپ کے کاروبار کا نام",
   "settings.phonePlaceholder": "مثلاً 0300-1234567",
   "settings.addressPlaceholder": "دکان کا پتا",
   "settings.staffOnlyNote": "دکان کی ترتیبات صرف دکان کا مالک بدل سکتا ہے۔",
@@ -177,6 +213,9 @@ export const urSettings: Record<keyof typeof enSettings, string> = {
   "settings.languageSub": "ایپ کی زبان — انگریزی یا اردو۔",
   "settings.langEnglish": "English",
   "settings.langUrdu": "اردو",
+  "settings.langPashto": "پښتو",
+  "settings.langFarsi": "فارسی",
+  "settings.langDraftPreview": "مسودہ",
   "settings.accountTitle": "اکاؤنٹ",
   "settings.accountSub": "اس دکان کے لیے آپ کی لاگ اِن تفصیلات۔",
   "settings.accountEmail": "ای میل",
@@ -275,4 +314,37 @@ export const urSettings: Record<keyof typeof enSettings, string> = {
   "settings.per.through": "{date} تک",
   "settings.per.open": "کوئی قفل نہیں",
   "settings.per.by": "از {email}",
+  "backup.title": "بیک اپ اور بحالی",
+  "backup.sub":
+    "آپ کا پورا کاروبار ایک فائل میں — ہر بل، ہر اندراج، ہر ریکارڈ۔ یہ فائل آپ کی ملکیت ہے: ایکسپورٹ ہر پلان حالت میں ہمیشہ ممکن ہے۔",
+  "backup.exportTitle": "بیک اپ ایکسپورٹ کریں",
+  "backup.exportBody":
+    "ایک JSON فائل ڈاؤن لوڈ ہوگی جس میں مکمل کاروبار ہوگا: تمام کلیکشنز، مکمل جرنل، اور اس کاروبار کے اپنے پلیٹ فارم ریکارڈ (رجسٹری، رکنیتیں، کاؤنٹرز، واقعات، ادائیگیاں)۔",
+  "backup.exportButton": "بیک اپ ڈاؤن لوڈ کریں",
+  "backup.exporting": "تیار ہو رہا ہے…",
+  "backup.exportDone": "بیک اپ ڈاؤن لوڈ ہو گیا — {docs} دستاویزات، {journal} جرنل اندراجات۔",
+  "backup.exportFailed": "بیک اپ تیار نہیں ہو سکا۔ کچھ تبدیل نہیں ہوا۔",
+  "backup.fingerprint": "جرنل فنگر پرنٹ",
+  "backup.restoreTitle": "اس کاروبار میں بحال کریں",
+  "backup.restoreBody":
+    "بحالی صرف نئے، خالی کاروبار میں ممکن ہے — یہاں کے کھاتے خالی ہونے چاہئیں۔ چلتا ہوا کاروبار کبھی اوور رائٹ نہیں ہوتا: فائل کو نئے کاروبار میں بحال کریں اور وہیں کاروبار کریں۔",
+  "backup.restorePick": "بیک اپ فائل منتخب کریں",
+  "backup.restoreReading": "فائل جانچی جا رہی ہے…",
+  "backup.restoreSource": "{business} کا بیک اپ · ایکسپورٹ {date}",
+  "backup.restoreSummary":
+    "{docs} دستاویزات لکھی جائیں گی ({journal} جرنل اندراجات) — فنگر پرنٹ فائل کے اپنے مینی فیسٹ سے تصدیق شدہ ہے۔",
+  "backup.restoreConfirm": "اس کاروبار میں بحال کریں",
+  "backup.restoring": "بحالی جاری ہے…",
+  "backup.restoreDone": "بحالی مکمل — {written} دستاویزات لکھی گئیں۔ اب اس کاروبار میں بیک اپ کے کھاتے ہیں۔",
+  "backup.restoreAlready": "یہ بیک اپ یہاں پہلے ہی مکمل بحال ہے — لکھنے کو کچھ نہیں۔",
+  "backup.restoreFailed":
+    "بحالی مکمل نہیں ہو سکی۔ جو کچھ لکھا جا چکا ہے وہ بیک اپ سے حرف بہ حرف ملتا ہے — دوبارہ یہی فائل منتخب کر کے بحالی آگے بڑھائیں۔",
+  "backup.refused.notABackup": "یہ فائل دکان AI کے کاروبار کا بیک اپ نہیں ہے۔",
+  "backup.refused.unknownFormat":
+    "یہ بیک اپ ایسے فارمیٹ میں ہے جسے یہ ورژن نہیں جانتا — اسی ورژن سے ایکسپورٹ شدہ بیک اپ استعمال کریں۔",
+  "backup.refused.manifestMismatch":
+    "فائل اپنے مینی فیسٹ سے نہیں ملتی (تعداد یا جرنل فنگر پرنٹ مختلف ہے) — ممکن ہے فائل خراب یا تبدیل شدہ ہو۔ کچھ نہیں لکھا گیا۔",
+  "backup.refused.targetNotEmpty":
+    "یہ کاروبار خالی نہیں ہے — بحالی سے انکار ہے تاکہ چلتا کھاتہ کبھی اوور رائٹ نہ ہو۔ نیا کاروبار بنائیں اور وہاں بحال کریں۔",
+  "backup.ownerOnly": "صرف کاروبار کا مالک بیک اپ یا بحالی کر سکتا ہے۔",
 };

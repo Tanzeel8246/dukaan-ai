@@ -21,11 +21,13 @@ import { useStore } from "./StoreProvider";
 import { useAuth } from "./AuthProvider";
 import { useLang } from "./LangProvider";
 import PermDenied from "./PermDenied";
+import { TallyExportButtons } from "./ExportsPanel";
 import ReportPrintSheet, {
   type ReportSheetData,
   type ReportSheetSection,
 } from "./ReportPrintSheet";
 import { can } from "@/lib/permissions";
+import { brandingDataUrls } from "@/lib/branding";
 import { creditKey } from "@/lib/ledger";
 import { fmtDate, fmtNum, fmtPKR, fmtUnit } from "@/lib/format";
 import { translate, type I18nKey, type Lang } from "@/lib/i18n";
@@ -53,12 +55,14 @@ import {
   unitIn,
   type RangePreset,
 } from "@/lib/reports";
+import { balanceSheetReport } from "@/lib/fiscal";
+import { loyaltyReport } from "@/lib/loyalty";
 import type { Cheque } from "@/lib/types";
 
 type ReportId =
   | "sales" | "purchase" | "stock" | "pl" | "cashbook" | "tax"
   | "customer" | "supplier" | "aging" | "expenses" | "cheques"
-  | "dayclose" | "notes" | "trialbalance";
+  | "dayclose" | "notes" | "trialbalance" | "balancesheet";
 
 const CATALOGUE: Array<{ id: ReportId; title: I18nKey; desc: I18nKey }> = [
   { id: "sales", title: "rep.sales.title", desc: "rep.sales.desc" },
@@ -75,6 +79,7 @@ const CATALOGUE: Array<{ id: ReportId; title: I18nKey; desc: I18nKey }> = [
   { id: "dayclose", title: "rep.dayclose.title", desc: "rep.dayclose.desc" },
   { id: "notes", title: "rep.notes.title", desc: "rep.notes.desc" },
   { id: "trialbalance", title: "rep.tb.title", desc: "rep.tb.desc" },
+  { id: "balancesheet", title: "rep.bs.title", desc: "rep.bs.desc" },
 ];
 
 const PRESETS: Array<{ id: RangePreset; key: I18nKey }> = [
@@ -166,6 +171,9 @@ export default function ReportsView() {
       stock: stockReport(products),
       pl: plReport(journal, range),
       trialbalance: trialBalance(journal, range),
+      // Fix Round 1 · F2: the Balance Sheet — point-in-time at
+      // the range end (lib/fiscal `balanceSheetReport`).
+      balancesheet: balanceSheetReport(journal, range),
       cashbook: accountStatement(
         journal,
         accounts,
@@ -185,6 +193,7 @@ export default function ReportsView() {
             range
           )
         : null,
+      loyalty: loyaltyReport(journal, range),
       aging: agingReport(credits, purchases, supplierPayments, purchaseReturns),
       expenses: expensesReport(expenses, range),
       cheques: chequesReport(cheques, range),
@@ -211,7 +220,8 @@ export default function ReportsView() {
   }
 
   const active = CATALOGUE.find((r) => r.id === reportId)!;
-  const isSnapshot = reportId === "stock" || reportId === "aging";
+  const isSnapshot =
+    reportId === "stock" || reportId === "aging" || reportId === "balancesheet";
 
   /* ---------- output-language helpers ---------- */
   const trL = (key: I18nKey, params?: Record<string, string | number>): string =>
@@ -539,6 +549,35 @@ export default function ReportsView() {
         );
         break;
       }
+      case "balancesheet": {
+        const m = models.balancesheet;
+        sec(trL("rep.bs.assets"),
+          [trL("rep.col.account"), trL("rep.col.balance")],
+          [
+            ...m.assets.map((r) => [acctL(r.account), money(r.balance)]),
+            ...(m.clearing !== 0
+              ? [[acctL("purchases"), money(m.clearing)]]
+              : []),
+          ],
+          [[trL("rep.bs.totalAssets"), money(m.totalAssets)]]);
+        sec(trL("rep.bs.liabilities"),
+          [trL("rep.col.account"), trL("rep.col.balance")],
+          m.liabilities.map((r) => [acctL(r.account), money(r.balance)]),
+          [[trL("rep.col.total"), money(m.liabilitiesTotal)]]);
+        sec(trL("rep.bs.equity"),
+          [trL("rep.col.account"), trL("rep.col.balance")],
+          [
+            ...m.equity.map((r) => [acctL(r.account), money(r.balance)]),
+            [trL("rep.bs.result"), money(m.resultToDate)],
+          ],
+          [[trL("rep.bs.totalLiabEquity"), money(m.totalLiabilitiesEquity)]]);
+        totals.push(
+          [trL("rep.bs.asAt", { date: m.asAtDate }), ""],
+          [trL("rep.tb.difference"), money(m.difference)],
+          [m.balanced ? trL("rep.tb.balanced") : trL("rep.tb.unbalanced"), ""]
+        );
+        break;
+      }
     }
 
     return {
@@ -640,6 +679,15 @@ export default function ReportsView() {
           [
             trL("rep.tb.difference"),
             `${money(models.trialbalance.difference)} · ${models.trialbalance.balanced ? trL("rep.tb.balanced") : trL("rep.tb.unbalanced")}`,
+          ],
+        ];
+      case "balancesheet":
+        return [
+          [trL("rep.bs.totalAssets"), money(models.balancesheet.totalAssets)],
+          [trL("rep.bs.totalLiabEquity"), money(models.balancesheet.totalLiabilitiesEquity)],
+          [
+            trL("rep.tb.difference"),
+            `${money(models.balancesheet.difference)} · ${models.balancesheet.balanced ? trL("rep.tb.balanced") : trL("rep.tb.unbalanced")}`,
           ],
         ];
     }
@@ -920,6 +968,24 @@ export default function ReportsView() {
                 <b key="b">{fmtPKR(r.balance)}</b>,
               ])
             ))}
+            {/* Phase H · H1: the customer's loyalty movements for
+                the same period, folded from the journal by
+                lib/loyalty (the customers report family, §1.7). */}
+            {(() => {
+              const lr = models.loyalty.rows.find((r) => r.customerId === effectiveCustomer);
+              const pts = (n: number) => n.toLocaleString();
+              return sectionCard(t("rep.loyalty.title"), dataTable(
+                [t("rep.col.description"), t("loyalty.col.points")],
+                [
+                  [t("rep.loyalty.earned"), pts(lr?.earnedPoints ?? 0)],
+                  [t("rep.loyalty.redeemed"), pts(lr?.redeemedPoints ?? 0)],
+                  [t("rep.loyalty.recredited"), pts(lr?.recreditedPoints ?? 0)],
+                  [t("rep.loyalty.clawed"), pts(lr?.clawedPoints ?? 0)],
+                  [t("rep.loyalty.expired"), pts(lr?.expiredPoints ?? 0)],
+                ],
+                [t("rep.loyalty.liability"), `${pts(lr?.points ?? 0)} · ${fmtPKR(lr?.rupees ?? 0)}`]
+              ));
+            })()}
           </>
         );
       }
@@ -1096,6 +1162,79 @@ export default function ReportsView() {
               ]),
               [t("rep.col.total"), fmtPKR(m.totalDebits), fmtPKR(m.totalCredits), ""]
             ))}
+            {/* Phase D · D5 (design §5.1 + §6.1 G-D4): the export
+                actions for this exact range ride the
+                trialBalanceExports row — the file's totals equal
+                the trial balance above by construction. */}
+            <div style={{ marginTop: 18 }}>
+              <TallyExportButtons range={range} />
+            </div>
+          </>
+        );
+      }
+      case "balancesheet": {
+        const m = models.balancesheet;
+        return (
+          <>
+            {totalsCards([
+              [t("rep.bs.totalAssets"), fmtPKR(m.totalAssets)],
+              [t("rep.bs.totalLiabEquity"), fmtPKR(m.totalLiabilitiesEquity)],
+              [t("rep.tb.difference"), fmtPKR(m.difference)],
+            ])}
+            <div
+              className="note-box"
+              style={{
+                marginBottom: 24,
+                borderStyle: "solid",
+                borderColor: m.balanced ? "var(--accent)" : "var(--danger)",
+                color: m.balanced ? undefined : "var(--danger)",
+                fontWeight: 600,
+              }}
+            >
+              {m.balanced ? t("rep.tb.balanced") : t("rep.tb.unbalanced")}
+              {" · "}
+              {t("rep.bs.asAt", { date: m.asAtDate })}
+            </div>
+            {sectionCard(t("rep.bs.assets"), dataTable(
+              [t("rep.col.account"), t("rep.col.balance")],
+              [
+                ...m.assets.map((r) => [
+                  acctT(r.account),
+                  <b key={r.account}>{fmtPKR(r.balance)}</b>,
+                ]),
+                ...(m.clearing !== 0
+                  ? [
+                      [
+                        acctT("purchases"),
+                        <b key="purchases">{fmtPKR(m.clearing)}</b>,
+                      ] as Array<React.ReactNode>,
+                    ]
+                  : []),
+              ],
+              [t("rep.bs.totalAssets"), fmtPKR(m.totalAssets)]
+            ))}
+            {sectionCard(t("rep.bs.liabilities"), dataTable(
+              [t("rep.col.account"), t("rep.col.balance")],
+              m.liabilities.map((r) => [
+                acctT(r.account),
+                <b key={r.account}>{fmtPKR(r.balance)}</b>,
+              ]),
+              [t("rep.col.total"), fmtPKR(m.liabilitiesTotal)]
+            ))}
+            {sectionCard(t("rep.bs.equity"), dataTable(
+              [t("rep.col.account"), t("rep.col.balance")],
+              [
+                ...m.equity.map((r) => [
+                  acctT(r.account),
+                  <b key={r.account}>{fmtPKR(r.balance)}</b>,
+                ]),
+                [
+                  t("rep.bs.result"),
+                  <b key="result">{fmtPKR(m.resultToDate)}</b>,
+                ] as Array<React.ReactNode>,
+              ],
+              [t("rep.bs.totalLiabEquity"), fmtPKR(m.totalLiabilitiesEquity)]
+            ))}
           </>
         );
       }
@@ -1228,7 +1367,7 @@ export default function ReportsView() {
         {renderBody()}
 
         {printData && (
-          <ReportPrintSheet data={printData} settings={settings} outLang={outLang} />
+          <ReportPrintSheet data={printData} settings={settings} outLang={outLang} assets={brandingDataUrls(store.branding)} />
         )}
       </div>
     </div>

@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import { useStore } from "./StoreProvider";
 import { useLang } from "./LangProvider";
+import { isNaskhLang, langDir } from "@/lib/i18n";
 import { IconChat, IconSend, IconSpark } from "./ui";
 import { detectIntent } from "@/lib/ai-engine/intents";
 import { generateReply, suggestionsFor, type AssistantReply } from "@/lib/ai-engine/responder";
@@ -61,6 +62,11 @@ export default function AssistantChat() {
   const store = useStore();
   const { ready, products, sales, suppliers } = store;
   const { t, lang: uiLang } = useLang();
+  // The reply ENGINE speaks English/Urdu only — its copy is hardcoded
+  // engine text, never dictionary copy (a pre-existing boundary, not
+  // part of the §4 packs). PS/FA interfaces therefore drive the engine
+  // in English; the surrounding UI is fully translated as usual.
+  const engineLang: "en" | "ur" = uiLang === "ur" ? "ur" : "en";
   // The UI language drives the reply pipeline: ctx.lang makes generateReply
   // answer (and offer suggestion chips) in the interface language, whatever
   // language the question itself was typed in.
@@ -74,7 +80,7 @@ export default function AssistantChat() {
     credits: store.credits,
     expenses: store.expenses,
     journal: store.journal,
-    lang: uiLang,
+    lang: engineLang,
   };
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState("");
@@ -120,7 +126,7 @@ export default function AssistantChat() {
           id: nextId(),
           from: "bot",
           text: replyText,
-          lang: uiLang,
+          lang: engineLang,
           suggestions,
         },
       ]);
@@ -165,7 +171,7 @@ export default function AssistantChat() {
     );
   }
 
-  const starters = suggestionsFor(uiLang);
+  const starters = suggestionsFor(engineLang);
 
   return (
     <div className="section-sm">
@@ -182,8 +188,8 @@ export default function AssistantChat() {
               <button
                 type="button"
                 key={s}
-                className={`chip${uiLang === "ur" ? " ur" : ""}`}
-                dir={uiLang === "ur" ? "rtl" : "ltr"}
+                className={`chip${uiLang === "ur" ? " ur" : isNaskhLang(uiLang) ? " naskh" : ""}`}
+                dir={langDir(uiLang)}
                 onClick={() => ask(s)}
               >
                 {s}

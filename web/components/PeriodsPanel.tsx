@@ -21,6 +21,7 @@ import { useEffect, useMemo, useState } from "react";
 import { useStore } from "./StoreProvider";
 import { useAuth } from "./AuthProvider";
 import { useLang } from "./LangProvider";
+import { usePinGate } from "./PinGate";
 import { can } from "@/lib/permissions";
 import { fmtDate } from "@/lib/format";
 import type { I18nKey } from "@/lib/i18n";
@@ -35,6 +36,7 @@ export default function PeriodsPanel() {
   const { settings, periods, updateSettings, closePeriod, reopenPeriod } =
     useStore();
   const { role } = useAuth();
+  const { requirePin } = usePinGate();
   const { t } = useLang();
 
   /** "1 July 2026" from a YYYY-MM-DD business date — composed from
@@ -93,7 +95,14 @@ export default function PeriodsPanel() {
     else setError(t("settings.per.errDate"));
   };
 
-  const doClose = () => {
+  const doClose = async () => {
+    /* E5 (design §4.6): period close is a gated action — the PIN
+     * challenge precedes the store call; cancel/fail composes
+     * nothing. */
+    if (!(await requirePin("pin.gate.actPeriod"))) {
+      setConfirmClose(false);
+      return;
+    }
     const res = closePeriod(closeDate, closeNote);
     if (!res.ok) return fail(res.reason);
     setConfirmClose(false);
@@ -102,8 +111,12 @@ export default function PeriodsPanel() {
     setNotice(t("settings.per.closed", { date: dateLabel(closeDate) }));
   };
 
-  const doReopen = (e: React.FormEvent) => {
+  const doReopen = async (e: React.FormEvent) => {
     e.preventDefault();
+    /* E5 (design §4.6): period reopen is gated with close — the
+     * same device PIN challenge first; cancel/fail composes
+     * nothing. */
+    if (!(await requirePin("pin.gate.actPeriod"))) return;
     const res = reopenPeriod(reopenFully ? null : reopenDate || null, reopenReason);
     if (!res.ok) return fail(res.reason);
     setError("");

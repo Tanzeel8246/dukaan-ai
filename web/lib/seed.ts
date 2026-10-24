@@ -8,6 +8,7 @@ import type {
   Expense,
   JournalEntry,
   JournalLine,
+  Loan,
   MoneyAccount,
   PayrollRun,
   Product,
@@ -26,10 +27,17 @@ import type {
   TaxSlab,
   Warehouse,
 } from "./types";
+import { buildLoyaltyEarnEntry, resolveLoyaltySettings } from "./loyalty";
 import { attendanceDocId, buildRunLines, payrollRunTotals } from "./payroll";
 import raw from "./seed-data.json";
 import { accountBalance, entryBalances, totalOutstandingCredit } from "./ledger";
 import { DEFAULT_WAREHOUSE_ID, makeLevel } from "./stock";
+import {
+  PKT_OFFSET_MS,
+  addDaysISO,
+  startOfDayPktInstant,
+  todayPktISO,
+} from "./periods";
 
 interface SeedFile {
   products: Product[];
@@ -66,9 +74,20 @@ const data = raw as unknown as SeedFile;
 function rebaseTs(ts: string, dayOffset: number): string {
   const src = new Date(ts);
   if (Number.isNaN(src.getTime())) return ts;
-  const d = new Date(Date.now() - dayOffset * 86400000);
-  d.setHours(src.getHours(), src.getMinutes(), src.getSeconds(), src.getMilliseconds());
-  return d.toISOString();
+  // The target is a PKT calendar day and the preserved time-of-day is
+  // the source's PKT wall time — computed with the periods.ts PKT
+  // primitives, never local-time getters. (The earlier local-time
+  // version named the wrong day whenever the runtime was not in PKT
+  // and the PKT date had rolled past the local one — e.g. the harness
+  // or CI on a UTC host between 00:00 and 05:00 PKT.)
+  const targetDay = addDaysISO(todayPktISO(), -dayOffset);
+  const dayStartMs = Date.parse(startOfDayPktInstant(targetDay));
+  const pkt = new Date(src.getTime() + PKT_OFFSET_MS);
+  const todMs =
+    ((pkt.getUTCHours() * 60 + pkt.getUTCMinutes()) * 60 + pkt.getUTCSeconds()) *
+      1000 +
+    pkt.getUTCMilliseconds();
+  return new Date(dayStartMs + todMs).toISOString();
 }
 
 export function getSeedProducts(): Product[] {
@@ -119,8 +138,10 @@ export function getSeedCredits(): CreditEntry[] {
 /* ------------------------------------------------------------------ */
 
 function docDayISO(dayOffsetFromToday: number): string {
-  const d = new Date(Date.now() + dayOffsetFromToday * 86400000);
-  return d.toISOString().slice(0, 10);
+  // The PKT business date `dayOffsetFromToday` days from today (the
+  // UTC date of a shifted instant lagged the PKT date in the small
+  // hours — same defect class as rebaseTs/dayTs).
+  return addDaysISO(todayPktISO(), dayOffsetFromToday);
 }
 
 export function getSeedQuotations(
@@ -636,6 +657,43 @@ export function getSeedPayrollRunDraft(
   };
 }
 
+/* ------------------------------------------------------------------ */
+/* Sample loan (Phase D · D3, design §10.3). DEMO-only: ONE         */
+/* charge-free loan in `active` state with NO events — a register  */
+/* discoverability aid. Its outstanding derives as the full        */
+/* principal (unpaid, nothing behind it), which the demo tolerates */
+/* because demo journals are illustrative; in cloud shops a loan  */
+/* is born WITH its drawdown event in one batch (§3.4), so a real  */
+/* loan can never exist journalless. The doc posts nothing and     */
+/* cites no journal entry — zero footprint, frozen identities      */
+/* untouched. The production seeder never pushes this collection.  */
+/* ------------------------------------------------------------------ */
+
+export function getSeedLoans(): Loan[] {
+  return [
+    {
+      id: "loan-demo-1",
+      number: "LN-1",
+      direction: "payable",
+      partyName: "Malik Traders",
+      partyId: "sup-1", // the seed supplier — a dealer's financing (§3.5 link)
+      principal: 150000,
+      chargeType: "none",
+      chargeRate: 0,
+      chargeAmount: 0,
+      startDateISO: "2026-09-01",
+      instalmentCount: 10,
+      instalmentEvery: "month",
+      firstDueISO: "2026-10-01",
+      events: [],
+      status: "active",
+      note: "",
+      dayOffset: 0,
+      ts: "2025-01-02T09:20:00.000Z",
+    },
+  ];
+}
+
 export const SEED_GENERATED_AT = data.generatedAt;
 
 /* ------------------------------------------------------------------ */
@@ -688,9 +746,12 @@ export function getSeedTaxSlabs(): TaxSlab[] {
 export const SEED_OPENING_TILL = 50000;
 
 function dayTs(dayOffset: number, hour = 13): string {
-  const d = new Date(Date.now() - dayOffset * 86400000);
-  d.setHours(hour, 5, 0, 0);
-  return d.toISOString();
+  // PKT calendar day `dayOffset` days before today, at PKT wall time
+  // hour:05 — same PKT discipline as rebaseTs (local-time arithmetic
+  // named the wrong day on any non-PKT runtime near the PKT rollover).
+  const targetDay = addDaysISO(todayPktISO(), -dayOffset);
+  const dayStartMs = Date.parse(startOfDayPktInstant(targetDay));
+  return new Date(dayStartMs + (hour * 60 + 5) * 60000).toISOString();
 }
 
 function entry(
@@ -813,6 +874,122 @@ export function getSeedJournal(
   for (const e of out) {
     if (!entryBalances(e)) {
       throw new Error(`Seed journal entry ${e.id} does not balance.`);
+    }
+  }
+  return out;
+}
+
+/* ------------------------------------------------------------------ */
+/* Phase H · H6 (audit fix 3) — the DEMO shop's loyalty programme.    */
+/* DEMO-ONLY, exactly like the B1 discoverability documents above:    */
+/* the cloud seeder never calls these getters, so a real shop's       */
+/* journal stays the frozen 21 and its programme stays OFF until      */
+/* its owner switches it on. The demo, being the showroom, runs       */
+/* the programme ON at the design's Q1 default terms so a visitor     */
+/* sees points, tiers and a redemption without touching a real        */
+/* shop's books. The entries are composed with the REAL earn          */
+/* composer (lib/loyalty.buildLoyaltyEarnEntry) over bill entries     */
+/* shaped exactly as the billing flow posts them — the identities     */
+/* the H1 suite proved (GL ≡ fold ≡ Σ customers) therefore hold       */
+/* in the showroom too, and the harness pins them.                    */
+/* ------------------------------------------------------------------ */
+
+/** The demo shop's settings: the frozen seed settings with the
+ *  loyalty programme switched ON (terms stay the resolver's
+ *  defaults). Production seeding uses getSeedSettings() — whose
+ *  absent loyalty block resolves to OFF. */
+export function getDemoSettings(): ShopSettings {
+  return { ...getSeedSettings(), loyalty: { enabled: true } };
+}
+
+/**
+ * A small loyalty story in eight entries, appended to the demo
+ * journal after the frozen 21: Haji Muhammad Saleem (cu-1) earns
+ * 120 + 80 points on two cash bills, Fatima Bibi (cu-2) earns 250
+ * on one, and Saleem then pays 150 of his 200 points as a tender
+ * leg on a third bill (Rs 150 of its Rs 2,000; the rest cash) and
+ * earns 20 more on it. End state: cu-1 holds 70 points (Rs 70),
+ * cu-2 holds 250 (Rs 250), and the programme liability — journal
+ * `loyalty_payable` balance and the H1 fold alike — is Rs 320.
+ */
+export function getDemoLoyaltyEntries(customers: Customer[]): JournalEntry[] {
+  const settings = resolveLoyaltySettings({ loyalty: { enabled: true } });
+  const c1 = customers.find((c) => c.id === "cu-1");
+  const c2 = customers.find((c) => c.id === "cu-2");
+  if (!c1 || !c2) return [];
+  const out: JournalEntry[] = [];
+
+  const billEntry = (
+    n: number,
+    customer: Customer,
+    total: number,
+    cost: number,
+    dayOffset: number,
+    cashPaid: number,
+    pointsUsed: number
+  ): JournalEntry => {
+    const lines: JournalLine[] = [];
+    if (cashPaid > 0) lines.push({ account: "cash", debit: cashPaid, credit: 0 });
+    if (pointsUsed > 0)
+      lines.push({
+        account: "loyalty_payable",
+        debit: pointsUsed * settings.pointValueRs,
+        credit: 0,
+        // The fold attributes a bill's redemption by this ref
+        // (the billing flow's tender leg carries it identically).
+        ref: customer.id,
+      });
+    lines.push({ account: "cogs", debit: cost, credit: 0 });
+    lines.push({ account: "sales_revenue", debit: 0, credit: total });
+    lines.push({ account: "inventory", debit: 0, credit: cost });
+    const e = entry(
+      `j-demo-loyalty-bill-${n}`,
+      `Bill #${900 + n} — ${customer.name}`,
+      "bill",
+      `bill-demo-loyalty-${n}`,
+      dayOffset,
+      lines
+    );
+    if (pointsUsed > 0) e.loyaltyPointsUsed = pointsUsed;
+    return e;
+  };
+
+  const script: Array<{
+    n: number;
+    customer: Customer;
+    total: number;
+    cost: number;
+    dayOffset: number;
+    cashPaid: number;
+    pointsUsed: number;
+  }> = [
+    { n: 1, customer: c1, total: 12000, cost: 7200, dayOffset: 6, cashPaid: 12000, pointsUsed: 0 },
+    { n: 2, customer: c1, total: 8000, cost: 4800, dayOffset: 3, cashPaid: 8000, pointsUsed: 0 },
+    { n: 4, customer: c2, total: 25000, cost: 15000, dayOffset: 2, cashPaid: 25000, pointsUsed: 0 },
+    { n: 3, customer: c1, total: 2000, cost: 1200, dayOffset: 0, cashPaid: 1850, pointsUsed: 150 },
+  ];
+  for (const b of script) {
+    out.push(billEntry(b.n, b.customer, b.total, b.cost, b.dayOffset, b.cashPaid, b.pointsUsed));
+    const earn = buildLoyaltyEarnEntry({
+      journal: out,
+      bill: {
+        id: `bill-demo-loyalty-${b.n}`,
+        billNo: 900 + b.n,
+        customerId: b.customer.id,
+        total: b.total,
+      },
+      settings,
+      ts: dayTs(b.dayOffset, 14),
+      dayOffset: b.dayOffset,
+    });
+    if (earn) {
+      earn.id = `j-demo-loyalty-earn-${b.n}`;
+      out.push(earn);
+    }
+  }
+  for (const e of out) {
+    if (!entryBalances(e)) {
+      throw new Error(`Demo loyalty entry ${e.id} does not balance.`);
     }
   }
   return out;

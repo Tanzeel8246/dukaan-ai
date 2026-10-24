@@ -7,9 +7,12 @@ import { useStore } from "./StoreProvider";
 import { useLang } from "./LangProvider";
 import { NAV_GROUPS, type NavLink } from "@/lib/nav";
 import { can, type PermModule } from "@/lib/permissions";
+import { moduleMinTier, tierIncludesModule } from "@/lib/plans";
+import type { I18nKey } from "@/lib/i18n";
 import {
   IconBasket,
   IconBox,
+  IconLock,
   IconCalendarCheck,
   IconCard,
   IconCash,
@@ -21,6 +24,8 @@ import {
   IconHome,
   IconReceipt,
   IconScale,
+  IconSend,
+  IconSpark,
   IconTruck,
   IconUsers,
   IconWallet,
@@ -39,10 +44,13 @@ const LINK_ICONS: Record<string, React.ComponentType<{ className?: string }>> = 
   "/forecast": IconChart,
   "/suppliers": IconTruck,
   "/customers": IconUsers,
+  "/loyalty": IconSpark,
+  "/whatsapp": IconSend,
   "/staff": IconUsers,
   "/credit": IconWallet,
   "/expenses": IconCash,
   "/finance": IconScale,
+  "/loans": IconCash,
   "/cheques": IconCard,
   "/day-close": IconCalendarCheck,
   "/assistant": IconChat,
@@ -59,7 +67,7 @@ interface SidebarProps {
  *  §3.2); read-only roles keep the link and the view itself renders
  *  without its write controls. Settings stays visible to every role
  *  (language + own account live there). */
-const HREF_MODULE: Record<string, PermModule> = {
+export const HREF_MODULE: Record<string, PermModule> = {
   "/": "dashboard",
   "/sales": "salesCounter",
   "/billing": "billing",
@@ -77,17 +85,33 @@ const HREF_MODULE: Record<string, PermModule> = {
   "/forecast": "forecast",
   "/suppliers": "suppliersManage",
   "/customers": "customersManage",
+  "/loyalty": "loyalty",
+  "/storefront": "storefront",
+  "/whatsapp": "whatsapp",
   "/credit": "creditRepayment",
   "/expenses": "expenses",
   "/finance": "finance",
+  "/loans": "loans",
   "/day-close": "dayCloseHistory",
   "/assistant": "assistant",
+};
+
+/** Phase G · G2: the module a destination belongs to for PLAN
+ *  gating (design §3.3) — HREF_MODULE plus the two refinements
+ *  the RBAC map deliberately leaves open: delivery challans
+ *  ride the saleOrders module, and Reports/Settings are never
+ *  plan-locked (reports read across modules; the exports gate
+ *  lives on the export itself; settings holds the plan panel). */
+export const planModuleForHref = (href: string): PermModule | null => {
+  if (href === "/settings" || href === "/reports") return null;
+  if (href === "/delivery-challans") return "saleOrders";
+  return HREF_MODULE[href] ?? null;
 };
 
 export default function Sidebar({ collapsed, onNavigate }: SidebarProps) {
   const pathname = usePathname();
   const { role } = useAuth();
-  const { settings } = useStore();
+  const { settings, planView } = useStore();
   const { t } = useLang();
   const shopName = settings.shopName?.trim() || t("shell.brandFallback");
 
@@ -105,6 +129,29 @@ export default function Sidebar({ collapsed, onNavigate }: SidebarProps) {
   const renderLink = (l: NavLink) => {
     const Icon = LINK_ICONS[l.href] ?? IconBox;
     const label = t(l.key);
+    // Phase G · G2 (design §3.5): a module above the business's
+    // snapshot tier renders as a LOCKED, labelled door — visible
+    // (the shopkeeper can see what an upgrade adds) but not a
+    // link. Renders from the snapshot whenever a plan view
+    // exists, in observation mode too; RBAC hiding above still
+    // wins per-person.
+    const module = planModuleForHref(l.href);
+    if (planView && module && !tierIncludesModule(planView.snapshot.modulesTier, module)) {
+      return (
+        <span
+          key={l.href}
+          className="sb-link locked"
+          aria-disabled="true"
+          title={t("plan.includedIn", {
+            tier: t(`plan.name.${moduleMinTier(module)}` as I18nKey),
+          })}
+        >
+          <Icon />
+          <span className="sb-link-label">{label}</span>
+          <IconLock className="sb-lock" />
+        </span>
+      );
+    }
     return (
       <Link
         key={l.href}

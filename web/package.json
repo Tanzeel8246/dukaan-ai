@@ -2,10 +2,11 @@
   "dependencies": {
     "firebase": "^11.10.0",
     "next": "16.4.2",
+    "qrcode-generator": "^1.4.4",
     "react": "19.3.0",
     "react-dom": "19.3.0"
   },
-  "description": "Dukaan AI \u2014 kiryana/retail shop intelligence (Next.js; server build for Vercel + static export demo).",
+  "description": "Dukaan AI — kiryana/retail shop intelligence (Next.js; server build for Vercel + static export demo).",
   "devDependencies": {
     "@types/node": "^20",
     "@types/react": "^19",

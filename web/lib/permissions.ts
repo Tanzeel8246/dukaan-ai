@@ -73,7 +73,11 @@ export type PermModule =
   | "payroll"
   | "loans"
   | "fiscalClose"
-  | "trialBalanceExports";
+  | "trialBalanceExports"
+  /* ---- Phase H (growth layer) ---- */
+  | "loyalty"
+  | "storefront"
+  | "whatsapp";
 
 type RoleAccess = Record<"owner" | "manager" | "cashier" | "accountant", AccessLevel>;
 
@@ -130,6 +134,32 @@ export const PERMISSION_MATRIX: Record<PermModule, RoleAccess> = {
   loans:             { owner: F, manager: R, cashier: N, accountant: F },
   fiscalClose:       { owner: F, manager: N, cashier: N, accountant: N },
   trialBalanceExports: { owner: F, manager: F, cashier: N, accountant: F },
+  /* Phase H · H1 (Phase H design §1.7): the loyalty DESK —
+   * programme totals, expiry posting, the per-customer ledger.
+   * Programme settings themselves ride `settingsProfile` (owner)
+   * like every programme term. A cashier APPLIES a redemption at
+   * the billing desk — that act rides the `billing` row (a tender
+   * is a tender); the desk's postings are manager acts, and the
+   * accountant reads the figures that feed finance. */
+  loyalty:           { owner: F, manager: F, cashier: N, accountant: R },
+  /* Phase H · H3 (Phase H design §2.2/§2.4): the storefront
+   * desk — publish preparation, the order inbox, conversion and
+   * dismissal. The PUBLISH write itself is owner-keyed in rules
+   * v10 (the public face of the shop is an owner act, like E2's
+   * brand assets); a manager prepares and runs the inbox. The
+   * cashier's world is the counter — a public order reaches them
+   * as an ordinary sale order through the `saleOrders` row. The
+   * accountant reads the inbox (orders are sales-side paper). */
+  storefront:        { owner: F, manager: F, cashier: N, accountant: R },
+  /* Phase H · WhatsApp (Phase H design §3.3): templates,
+   * campaigns and the send queue. Creation and launching are
+   * owner/manager acts — a cashier does not launch campaigns
+   * (the design is explicit), and the accountant reads the
+   * campaign history like any other shop record. The rules
+   * mirror this row with a NARROWED read (owner/manager/
+   * accountant), the payrollRuns precedent: the cashier is
+   * excluded server-side, not merely UI-hidden. */
+  whatsapp:          { owner: F, manager: F, cashier: N, accountant: R },
 };
 
 /** Rows whose surfaces exist in the app TODAY (Complete + Phase A

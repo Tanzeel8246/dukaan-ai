@@ -20,6 +20,7 @@ import { NotePrintSheet } from "./DocPrintSheet";
 import { useLang } from "./LangProvider";
 import type { I18nKey } from "@/lib/i18n";
 import { IconPlus, IconReceipt, IconSearch, SearchClear } from "./ui";
+import { brandingDataUrls } from "@/lib/branding";
 import { fmtDate, fmtPKR } from "@/lib/format";
 import { can } from "@/lib/permissions";
 import { matchesAny } from "@/lib/search";
@@ -71,6 +72,7 @@ export function NotesManager() {
     purchaseReturns,
     purchases,
     bills,
+    products,
     settings,
     returnItemsWithNote,
   } = store;
@@ -549,6 +551,8 @@ export function NotesManager() {
           <NotePrintSheet
             note={printNote}
             settings={settings}
+            products={products}
+            assets={brandingDataUrls(store.branding)}
             sourceReturn={sourceReturnFor(printNote)}
             purchaseTs={purchaseTsFor(printNote)}
           />

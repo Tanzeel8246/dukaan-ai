@@ -1,0 +1,1762 @@
+{
+ "aging": {
+  "credits": [
+   {
+    "id": "fr1-c1",
+    "customerId": "fr1-cust-1",
+    "customerName": "fr1-cust-1",
+    "customerPhone": "",
+    "kind": "credit",
+    "amount": 5500,
+    "method": "cash",
+    "accountId": null,
+    "voucherNo": null,
+    "note": "",
+    "billId": "fr1-bill-old",
+    "dayOffset": 70,
+    "ts": "2026-10-24T05:00:00.000Z"
+   },
+   {
+    "id": "fr1-c2",
+    "customerId": "fr1-cust-1",
+    "customerName": "fr1-cust-1",
+    "customerPhone": "",
+    "kind": "credit",
+    "amount": 300,
+    "method": "cash",
+    "accountId": null,
+    "voucherNo": null,
+    "note": "",
+    "billId": "fr1-bill-test",
+    "dayOffset": 0,
+    "ts": "2026-10-24T05:00:00.000Z"
+   },
+   {
+    "id": "fr1-c3",
+    "customerId": "fr1-cust-1",
+    "customerName": "fr1-cust-1",
+    "customerPhone": "",
+    "kind": "repayment",
+    "amount": 100,
+    "method": "cash",
+    "accountId": null,
+    "voucherNo": null,
+    "note": "",
+    "billId": null,
+    "dayOffset": 0,
+    "ts": "2026-10-24T05:00:00.000Z"
+   },
+   {
+    "id": "fr1-c4",
+    "customerId": "fr1-cust-1",
+    "customerName": "fr1-cust-1",
+    "customerPhone": "",
+    "kind": "credit",
+    "amount": -150,
+    "method": "cash",
+    "accountId": null,
+    "voucherNo": null,
+    "note": "",
+    "billId": "fr1-bill-test",
+    "dayOffset": 0,
+    "ts": "2026-10-24T05:00:00.000Z"
+   },
+   {
+    "id": "fr1-c5",
+    "customerId": "fr1-cust-2",
+    "customerName": "fr1-cust-2",
+    "customerPhone": "",
+    "kind": "credit",
+    "amount": 200,
+    "method": "cash",
+    "accountId": null,
+    "voucherNo": null,
+    "note": "",
+    "billId": "fr1-bill-a",
+    "dayOffset": 45,
+    "ts": "2026-10-24T05:00:00.000Z"
+   },
+   {
+    "id": "fr1-c6",
+    "customerId": "fr1-cust-2",
+    "customerName": "fr1-cust-2",
+    "customerPhone": "",
+    "kind": "credit",
+    "amount": 400,
+    "method": "cash",
+    "accountId": null,
+    "voucherNo": null,
+    "note": "",
+    "billId": "fr1-bill-b",
+    "dayOffset": 10,
+    "ts": "2026-10-24T05:00:00.000Z"
+   },
+   {
+    "id": "fr1-c7",
+    "customerId": "fr1-cust-2",
+    "customerName": "fr1-cust-2",
+    "customerPhone": "",
+    "kind": "credit",
+    "amount": -50,
+    "method": "cash",
+    "accountId": null,
+    "voucherNo": null,
+    "note": "",
+    "billId": "fr1-bill-b",
+    "dayOffset": 0,
+    "ts": "2026-10-24T05:00:00.000Z"
+   },
+   {
+    "id": "fr1-c8",
+    "customerId": "fr1-cust-2",
+    "customerName": "fr1-cust-2",
+    "customerPhone": "",
+    "kind": "repayment",
+    "amount": 150,
+    "method": "cash",
+    "accountId": null,
+    "voucherNo": null,
+    "note": "",
+    "billId": null,
+    "dayOffset": 0,
+    "ts": "2026-10-24T05:00:00.000Z"
+   }
+  ],
+  "purchases": [
+   {
+    "id": "fr1-p1",
+    "supplierId": "fr1-sup-1",
+    "total": 1000,
+    "dayOffset": 70,
+    "ts": "2026-08-14T05:00:00.000Z"
+   }
+  ],
+  "purchaseReturns": [
+   {
+    "id": "fr1-pr1",
+    "purchaseId": "fr1-p1",
+    "supplierId": "fr1-sup-1",
+    "items": [],
+    "payableOffset": 300,
+    "refundAmount": 0,
+    "method": null,
+    "accountId": null,
+    "dayOffset": 0,
+    "ts": "2026-10-24T05:00:00.000Z"
+   }
+  ],
+  "supplierPayments": [
+   {
+    "id": "fr1-sp1",
+    "supplierId": "fr1-sup-1",
+    "amount": 200,
+    "dayOffset": 0,
+    "ts": "2026-10-24T05:00:00.000Z",
+    "method": "cash"
+   }
+  ],
+  "expected": {
+   "receivables": {
+    "current": 500,
+    "mid": 50,
+    "old": 5400,
+    "total": 5950
+   },
+   "lotsCust1": [
+    {
+     "lotKey": "fr1-bill-old",
+     "dayOffset": 70,
+     "remaining": 5400
+    },
+    {
+     "lotKey": "fr1-bill-test",
+     "dayOffset": 0,
+     "remaining": 150
+    }
+   ],
+   "lotsCust2": [
+    {
+     "lotKey": "fr1-bill-a",
+     "dayOffset": 45,
+     "remaining": 50
+    },
+    {
+     "lotKey": "fr1-bill-b",
+     "dayOffset": 10,
+     "remaining": 350
+    }
+   ],
+   "udhaarCust1": {
+    "outstanding": 5550,
+    "oldestAgeDays": 70
+   },
+   "udhaarCust2": {
+    "outstanding": 400,
+    "oldestAgeDays": 45
+   },
+   "payables": {
+    "current": 0,
+    "mid": 0,
+    "old": 500,
+    "total": 500
+   },
+   "supplierBalance": 500
+  }
+ },
+ "dayOffsets": {
+  "cases": [
+   {
+    "ts": "2026-10-22T05:00:00.000Z",
+    "today": "2026-10-24",
+    "expected": 2
+   },
+   {
+    "ts": "2026-10-24T05:00:00.000Z",
+    "today": "2026-10-24",
+    "expected": 0
+   },
+   {
+    "ts": "2026-10-24T19:30:00.000Z",
+    "today": "2026-10-24",
+    "expected": 0
+   },
+   {
+    "ts": "2026-10-20T18:59:59.999Z",
+    "today": "2026-10-24",
+    "expected": 4
+   },
+   {
+    "ts": "not-a-date",
+    "today": "2026-10-24",
+    "fallback": 7,
+    "expected": 7
+   }
+  ]
+ },
+ "balanceSheet": {
+  "range": {
+   "fromDate": "2000-01-01",
+   "toDate": "2100-12-31",
+   "fromTs": "2000-01-01T00:00:00.000Z",
+   "toTs": "2100-01-01T00:00:00.000Z"
+  },
+  "seedEntries": [
+   {
+    "id": "e0",
+    "ts": "2026-10-11T08:05:00.000Z",
+    "memo": "Daily sales summary (seed history)",
+    "refType": "seed",
+    "refId": null,
+    "reversesId": null,
+    "lines": [
+     {
+      "account": "cash",
+      "debit": 32220,
+      "credit": 0,
+      "ref": null
+     },
+     {
+      "account": "cogs",
+      "debit": 29274,
+      "credit": 0,
+      "ref": null
+     },
+     {
+      "account": "sales_revenue",
+      "debit": 0,
+      "credit": 32220,
+      "ref": null
+     },
+     {
+      "account": "inventory",
+      "debit": 0,
+      "credit": 29274,
+      "ref": null
+     }
+    ]
+   },
+   {
+    "id": "e1",
+    "ts": "2026-10-12T08:05:00.000Z",
+    "memo": "Daily sales summary (seed history)",
+    "refType": "seed",
+    "refId": null,
+    "reversesId": null,
+    "lines": [
+     {
+      "account": "cash",
+      "debit": 29240,
+      "credit": 0,
+      "ref": null
+     },
+     {
+      "account": "cogs",
+      "debit": 26567,
+      "credit": 0,
+      "ref": null
+     },
+     {
+      "account": "sales_revenue",
+      "debit": 0,
+      "credit": 29240,
+      "ref": null
+     },
+     {
+      "account": "inventory",
+      "debit": 0,
+      "credit": 26567,
+      "ref": null
+     }
+    ]
+   },
+   {
+    "id": "e2",
+    "ts": "2026-10-13T08:05:00.000Z",
+    "memo": "Daily sales summary (seed history)",
+    "refType": "seed",
+    "refId": null,
+    "reversesId": null,
+    "lines": [
+     {
+      "account": "cash",
+      "debit": 28055,
+      "credit": 0,
+      "ref": null
+     },
+     {
+      "account": "cogs",
+      "debit": 25469,
+      "credit": 0,
+      "ref": null
+     },
+     {
+      "account": "sales_revenue",
+      "debit": 0,
+      "credit": 28055,
+      "ref": null
+     },
+     {
+      "account": "inventory",
+      "debit": 0,
+      "credit": 25469,
+      "ref": null
+     }
+    ]
+   },
+   {
+    "id": "e3",
+    "ts": "2026-10-14T08:05:00.000Z",
+    "memo": "Daily sales summary (seed history)",
+    "refType": "seed",
+    "refId": null,
+    "reversesId": null,
+    "lines": [
+     {
+      "account": "cash",
+      "debit": 38220,
+      "credit": 0,
+      "ref": null
+     },
+     {
+      "account": "cogs",
+      "debit": 34740,
+      "credit": 0,
+      "ref": null
+     },
+     {
+      "account": "sales_revenue",
+      "debit": 0,
+      "credit": 38220,
+      "ref": null
+     },
+     {
+      "account": "inventory",
+      "debit": 0,
+      "credit": 34740,
+      "ref": null
+     }
+    ]
+   },
+   {
+    "id": "e4",
+    "ts": "2026-10-15T08:05:00.000Z",
+    "memo": "Daily sales summary (seed history)",
+    "refType": "seed",
+    "refId": null,
+    "reversesId": null,
+    "lines": [
+     {
+      "account": "cash",
+      "debit": 27675,
+      "credit": 0,
+      "ref": null
+     },
+     {
+      "account": "cogs",
+      "debit": 25144,
+      "credit": 0,
+      "ref": null
+     },
+     {
+      "account": "sales_revenue",
+      "debit": 0,
+      "credit": 27675,
+      "ref": null
+     },
+     {
+      "account": "inventory",
+      "debit": 0,
+      "credit": 25144,
+      "ref": null
+     }
+    ]
+   },
+   {
+    "id": "e5",
+    "ts": "2026-10-16T08:05:00.000Z",
+    "memo": "Daily sales summary (seed history)",
+    "refType": "seed",
+    "refId": null,
+    "reversesId": null,
+    "lines": [
+     {
+      "account": "cash",
+      "debit": 27070,
+      "credit": 0,
+      "ref": null
+     },
+     {
+      "account": "cogs",
+      "debit": 24577,
+      "credit": 0,
+      "ref": null
+     },
+     {
+      "account": "sales_revenue",
+      "debit": 0,
+      "credit": 27070,
+      "ref": null
+     },
+     {
+      "account": "inventory",
+      "debit": 0,
+      "credit": 24577,
+      "ref": null
+     }
+    ]
+   },
+   {
+    "id": "e6",
+    "ts": "2026-10-17T08:05:00.000Z",
+    "memo": "Daily sales summary (seed history)",
+    "refType": "seed",
+    "refId": null,
+    "reversesId": null,
+    "lines": [
+     {
+      "account": "cash",
+      "debit": 30175,
+      "credit": 0,
+      "ref": null
+     },
+     {
+      "account": "cogs",
+      "debit": 27402,
+      "credit": 0,
+      "ref": null
+     },
+     {
+      "account": "sales_revenue",
+      "debit": 0,
+      "credit": 30175,
+      "ref": null
+     },
+     {
+      "account": "inventory",
+      "debit": 0,
+      "credit": 27402,
+      "ref": null
+     }
+    ]
+   },
+   {
+    "id": "e7",
+    "ts": "2026-10-18T08:05:00.000Z",
+    "memo": "Daily sales summary (seed history)",
+    "refType": "seed",
+    "refId": null,
+    "reversesId": null,
+    "lines": [
+     {
+      "account": "cash",
+      "debit": 29720,
+      "credit": 0,
+      "ref": null
+     },
+     {
+      "account": "cogs",
+      "debit": 26996,
+      "credit": 0,
+      "ref": null
+     },
+     {
+      "account": "sales_revenue",
+      "debit": 0,
+      "credit": 29720,
+      "ref": null
+     },
+     {
+      "account": "inventory",
+      "debit": 0,
+      "credit": 26996,
+      "ref": null
+     }
+    ]
+   },
+   {
+    "id": "e8",
+    "ts": "2026-10-19T08:05:00.000Z",
+    "memo": "Daily sales summary (seed history)",
+    "refType": "seed",
+    "refId": null,
+    "reversesId": null,
+    "lines": [
+     {
+      "account": "cash",
+      "debit": 26755,
+      "credit": 0,
+      "ref": null
+     },
+     {
+      "account": "cogs",
+      "debit": 24207,
+      "credit": 0,
+      "ref": null
+     },
+     {
+      "account": "sales_revenue",
+      "debit": 0,
+      "credit": 26755,
+      "ref": null
+     },
+     {
+      "account": "inventory",
+      "debit": 0,
+      "credit": 24207,
+      "ref": null
+     }
+    ]
+   },
+   {
+    "id": "e9",
+    "ts": "2026-10-20T08:05:00.000Z",
+    "memo": "Daily sales summary (seed history)",
+    "refType": "seed",
+    "refId": null,
+    "reversesId": null,
+    "lines": [
+     {
+      "account": "cash",
+      "debit": 29155,
+      "credit": 0,
+      "ref": null
+     },
+     {
+      "account": "cogs",
+      "debit": 26404,
+      "credit": 0,
+      "ref": null
+     },
+     {
+      "account": "sales_revenue",
+      "debit": 0,
+      "credit": 29155,
+      "ref": null
+     },
+     {
+      "account": "inventory",
+      "debit": 0,
+      "credit": 26404,
+      "ref": null
+     }
+    ]
+   },
+   {
+    "id": "e10",
+    "ts": "2026-10-21T08:05:00.000Z",
+    "memo": "Daily sales summary (seed history)",
+    "refType": "seed",
+    "refId": null,
+    "reversesId": null,
+    "lines": [
+     {
+      "account": "cash",
+      "debit": 32220,
+      "credit": 0,
+      "ref": null
+     },
+     {
+      "account": "cogs",
+      "debit": 29155,
+      "credit": 0,
+      "ref": null
+     },
+     {
+      "account": "sales_revenue",
+      "debit": 0,
+      "credit": 32220,
+      "ref": null
+     },
+     {
+      "account": "inventory",
+      "debit": 0,
+      "credit": 29155,
+      "ref": null
+     }
+    ]
+   },
+   {
+    "id": "e11",
+    "ts": "2026-10-22T08:05:00.000Z",
+    "memo": "Daily sales summary (seed history)",
+    "refType": "seed",
+    "refId": null,
+    "reversesId": null,
+    "lines": [
+     {
+      "account": "cash",
+      "debit": 30565,
+      "credit": 0,
+      "ref": null
+     },
+     {
+      "account": "cogs",
+      "debit": 27701,
+      "credit": 0,
+      "ref": null
+     },
+     {
+      "account": "sales_revenue",
+      "debit": 0,
+      "credit": 30565,
+      "ref": null
+     },
+     {
+      "account": "inventory",
+      "debit": 0,
+      "credit": 27701,
+      "ref": null
+     }
+    ]
+   },
+   {
+    "id": "e12",
+    "ts": "2026-10-23T08:05:00.000Z",
+    "memo": "Daily sales summary (seed history)",
+    "refType": "seed",
+    "refId": null,
+    "reversesId": null,
+    "lines": [
+     {
+      "account": "cash",
+      "debit": 27535,
+      "credit": 0,
+      "ref": null
+     },
+     {
+      "account": "cogs",
+      "debit": 24927,
+      "credit": 0,
+      "ref": null
+     },
+     {
+      "account": "sales_revenue",
+      "debit": 0,
+      "credit": 27535,
+      "ref": null
+     },
+     {
+      "account": "inventory",
+      "debit": 0,
+      "credit": 24927,
+      "ref": null
+     }
+    ]
+   },
+   {
+    "id": "e13",
+    "ts": "2026-10-24T08:05:00.000Z",
+    "memo": "Daily sales summary (seed history)",
+    "refType": "seed",
+    "refId": null,
+    "reversesId": null,
+    "lines": [
+     {
+      "account": "cash",
+      "debit": 13375,
+      "credit": 0,
+      "ref": null
+     },
+     {
+      "account": "cogs",
+      "debit": 12206,
+      "credit": 0,
+      "ref": null
+     },
+     {
+      "account": "sales_revenue",
+      "debit": 0,
+      "credit": 13375,
+      "ref": null
+     },
+     {
+      "account": "inventory",
+      "debit": 0,
+      "credit": 12206,
+      "ref": null
+     }
+    ]
+   },
+   {
+    "id": "e14",
+    "ts": "2026-10-21T08:05:00.000Z",
+    "memo": "Purchase on credit (seed) — Weekly restock — oil, atta, sugar.",
+    "refType": "seed",
+    "refId": "pur-1",
+    "reversesId": null,
+    "lines": [
+     {
+      "account": "purchases",
+      "debit": 47900,
+      "credit": 0,
+      "ref": null
+     },
+     {
+      "account": "inventory",
+      "debit": 47900,
+      "credit": 0,
+      "ref": null
+     },
+     {
+      "account": "purchases",
+      "debit": 0,
+      "credit": 47900,
+      "ref": null
+     },
+     {
+      "account": "payables",
+      "debit": 0,
+      "credit": 47900,
+      "ref": "sup-1"
+     }
+    ]
+   },
+   {
+    "id": "e15",
+    "ts": "2026-10-22T08:05:00.000Z",
+    "memo": "Supplier payment (seed)",
+    "refType": "seed",
+    "refId": "spay-1",
+    "reversesId": null,
+    "lines": [
+     {
+      "account": "payables",
+      "debit": 20000,
+      "credit": 0,
+      "ref": "sup-1"
+     },
+     {
+      "account": "wallet",
+      "debit": 0,
+      "credit": 20000,
+      "ref": null
+     }
+    ]
+   },
+   {
+    "id": "e16",
+    "ts": "2026-10-24T08:05:00.000Z",
+    "memo": "Expense — electricity (seed)",
+    "refType": "seed",
+    "refId": "exp-1",
+    "reversesId": null,
+    "lines": [
+     {
+      "account": "expense_electricity",
+      "debit": 8450,
+      "credit": 0,
+      "ref": null
+     },
+     {
+      "account": "cash",
+      "debit": 0,
+      "credit": 8450,
+      "ref": null
+     }
+    ]
+   },
+   {
+    "id": "e17",
+    "ts": "2026-10-12T08:05:00.000Z",
+    "memo": "Expense — rent (seed)",
+    "refType": "seed",
+    "refId": "exp-2",
+    "reversesId": null,
+    "lines": [
+     {
+      "account": "expense_rent",
+      "debit": 25000,
+      "credit": 0,
+      "ref": null
+     },
+     {
+      "account": "wallet",
+      "debit": 0,
+      "credit": 25000,
+      "ref": null
+     }
+    ]
+   },
+   {
+    "id": "e18",
+    "ts": "2026-10-19T08:05:00.000Z",
+    "memo": "Udhaar given (cash loan) — Haji Muhammad Saleem (seed)",
+    "refType": "seed",
+    "refId": "cr-1",
+    "reversesId": null,
+    "lines": [
+     {
+      "account": "receivables",
+      "debit": 8500,
+      "credit": 0,
+      "ref": "cu-1"
+     },
+     {
+      "account": "cash",
+      "debit": 0,
+      "credit": 8500,
+      "ref": null
+     }
+    ]
+   },
+   {
+    "id": "e19",
+    "ts": "2026-10-23T08:05:00.000Z",
+    "memo": "Udhaar repayment — Haji Muhammad Saleem (seed)",
+    "refType": "seed",
+    "refId": "cr-2",
+    "reversesId": null,
+    "lines": [
+     {
+      "account": "cash",
+      "debit": 3000,
+      "credit": 0,
+      "ref": null
+     },
+     {
+      "account": "receivables",
+      "debit": 0,
+      "credit": 3000,
+      "ref": "cu-1"
+     }
+    ]
+   },
+   {
+    "id": "e20",
+    "ts": "2026-10-24T08:05:00.000Z",
+    "memo": "Opening balance — inventory & till trued up to physical count (go-live)",
+    "refType": "seed",
+    "refId": null,
+    "reversesId": null,
+    "lines": [
+     {
+      "account": "inventory",
+      "debit": 589674,
+      "credit": 0,
+      "ref": null
+     },
+     {
+      "account": "cash",
+      "debit": 0,
+      "credit": 338030,
+      "ref": null
+     },
+     {
+      "account": "capital",
+      "debit": 0,
+      "credit": 251644,
+      "ref": null
+     }
+    ]
+   }
+  ],
+  "walkEntries": [
+   {
+    "id": "e0",
+    "ts": "2026-02-10T05:00:00.000Z",
+    "memo": "Capital in",
+    "refType": "cashbook",
+    "refId": null,
+    "reversesId": null,
+    "lines": [
+     {
+      "account": "cash",
+      "debit": 100000,
+      "credit": 0,
+      "ref": null
+     },
+     {
+      "account": "capital",
+      "debit": 0,
+      "credit": 100000,
+      "ref": null
+     }
+    ]
+   },
+   {
+    "id": "e1",
+    "ts": "2026-02-11T05:00:00.000Z",
+    "memo": "Stock bought on credit",
+    "refType": "purchase",
+    "refId": null,
+    "reversesId": null,
+    "lines": [
+     {
+      "account": "inventory",
+      "debit": 40000,
+      "credit": 0,
+      "ref": null
+     },
+     {
+      "account": "payables",
+      "debit": 0,
+      "credit": 40000,
+      "ref": null
+     }
+    ]
+   },
+   {
+    "id": "e2",
+    "ts": "2026-02-12T05:00:00.000Z",
+    "memo": "Sale",
+    "refType": "bill",
+    "refId": null,
+    "reversesId": null,
+    "lines": [
+     {
+      "account": "cash",
+      "debit": 25000,
+      "credit": 0,
+      "ref": null
+     },
+     {
+      "account": "sales_revenue",
+      "debit": 0,
+      "credit": 25000,
+      "ref": null
+     }
+    ]
+   },
+   {
+    "id": "e3",
+    "ts": "2026-02-12T05:01:00.000Z",
+    "memo": "COGS",
+    "refType": "bill",
+    "refId": null,
+    "reversesId": null,
+    "lines": [
+     {
+      "account": "cogs",
+      "debit": 15000,
+      "credit": 0,
+      "ref": null
+     },
+     {
+      "account": "inventory",
+      "debit": 0,
+      "credit": 15000,
+      "ref": null
+     }
+    ]
+   },
+   {
+    "id": "e4",
+    "ts": "2026-02-13T05:00:00.000Z",
+    "memo": "Rent",
+    "refType": "expense",
+    "refId": null,
+    "reversesId": null,
+    "lines": [
+     {
+      "account": "expense_rent",
+      "debit": 5000,
+      "credit": 0,
+      "ref": null
+     },
+     {
+      "account": "cash",
+      "debit": 0,
+      "credit": 5000,
+      "ref": null
+     }
+    ]
+   },
+   {
+    "id": "e5",
+    "ts": "2026-02-14T05:00:00.000Z",
+    "memo": "Drawings",
+    "refType": "cashbook",
+    "refId": null,
+    "reversesId": null,
+    "lines": [
+     {
+      "account": "drawings",
+      "debit": 2000,
+      "credit": 0,
+      "ref": null
+     },
+     {
+      "account": "cash",
+      "debit": 0,
+      "credit": 2000,
+      "ref": null
+     }
+    ]
+   },
+   {
+    "id": "e6",
+    "ts": "2026-02-15T05:00:00.000Z",
+    "memo": "Supplier paid",
+    "refType": "supplier_payment",
+    "refId": null,
+    "reversesId": null,
+    "lines": [
+     {
+      "account": "payables",
+      "debit": 10000,
+      "credit": 0,
+      "ref": null
+     },
+     {
+      "account": "cash",
+      "debit": 0,
+      "credit": 10000,
+      "ref": null
+     }
+    ]
+   }
+  ],
+  "walkClearingEntries": [
+   {
+    "id": "e0",
+    "ts": "2026-02-10T05:00:00.000Z",
+    "memo": "Capital in",
+    "refType": "cashbook",
+    "refId": null,
+    "reversesId": null,
+    "lines": [
+     {
+      "account": "cash",
+      "debit": 100000,
+      "credit": 0,
+      "ref": null
+     },
+     {
+      "account": "capital",
+      "debit": 0,
+      "credit": 100000,
+      "ref": null
+     }
+    ]
+   },
+   {
+    "id": "e1",
+    "ts": "2026-02-11T05:00:00.000Z",
+    "memo": "Stock bought on credit",
+    "refType": "purchase",
+    "refId": null,
+    "reversesId": null,
+    "lines": [
+     {
+      "account": "inventory",
+      "debit": 40000,
+      "credit": 0,
+      "ref": null
+     },
+     {
+      "account": "payables",
+      "debit": 0,
+      "credit": 40000,
+      "ref": null
+     }
+    ]
+   },
+   {
+    "id": "e2",
+    "ts": "2026-02-12T05:00:00.000Z",
+    "memo": "Sale",
+    "refType": "bill",
+    "refId": null,
+    "reversesId": null,
+    "lines": [
+     {
+      "account": "cash",
+      "debit": 25000,
+      "credit": 0,
+      "ref": null
+     },
+     {
+      "account": "sales_revenue",
+      "debit": 0,
+      "credit": 25000,
+      "ref": null
+     }
+    ]
+   },
+   {
+    "id": "e3",
+    "ts": "2026-02-12T05:01:00.000Z",
+    "memo": "COGS",
+    "refType": "bill",
+    "refId": null,
+    "reversesId": null,
+    "lines": [
+     {
+      "account": "cogs",
+      "debit": 15000,
+      "credit": 0,
+      "ref": null
+     },
+     {
+      "account": "inventory",
+      "debit": 0,
+      "credit": 15000,
+      "ref": null
+     }
+    ]
+   },
+   {
+    "id": "e4",
+    "ts": "2026-02-13T05:00:00.000Z",
+    "memo": "Rent",
+    "refType": "expense",
+    "refId": null,
+    "reversesId": null,
+    "lines": [
+     {
+      "account": "expense_rent",
+      "debit": 5000,
+      "credit": 0,
+      "ref": null
+     },
+     {
+      "account": "cash",
+      "debit": 0,
+      "credit": 5000,
+      "ref": null
+     }
+    ]
+   },
+   {
+    "id": "e5",
+    "ts": "2026-02-14T05:00:00.000Z",
+    "memo": "Drawings",
+    "refType": "cashbook",
+    "refId": null,
+    "reversesId": null,
+    "lines": [
+     {
+      "account": "drawings",
+      "debit": 2000,
+      "credit": 0,
+      "ref": null
+     },
+     {
+      "account": "cash",
+      "debit": 0,
+      "credit": 2000,
+      "ref": null
+     }
+    ]
+   },
+   {
+    "id": "e6",
+    "ts": "2026-02-15T05:00:00.000Z",
+    "memo": "Supplier paid",
+    "refType": "supplier_payment",
+    "refId": null,
+    "reversesId": null,
+    "lines": [
+     {
+      "account": "payables",
+      "debit": 10000,
+      "credit": 0,
+      "ref": null
+     },
+     {
+      "account": "cash",
+      "debit": 0,
+      "credit": 10000,
+      "ref": null
+     }
+    ]
+   },
+   {
+    "id": "e7",
+    "ts": "2026-02-16T05:00:00.000Z",
+    "memo": "Purchase mid-clearing",
+    "refType": "purchase",
+    "refId": null,
+    "reversesId": null,
+    "lines": [
+     {
+      "account": "purchases",
+      "debit": 8000,
+      "credit": 0,
+      "ref": null
+     },
+     {
+      "account": "payables",
+      "debit": 0,
+      "credit": 8000,
+      "ref": null
+     }
+    ]
+   }
+  ],
+  "walkClosedEntries": [
+   {
+    "id": "e0",
+    "ts": "2026-02-10T05:00:00.000Z",
+    "memo": "Capital in",
+    "refType": "cashbook",
+    "refId": null,
+    "reversesId": null,
+    "lines": [
+     {
+      "account": "cash",
+      "debit": 100000,
+      "credit": 0,
+      "ref": null
+     },
+     {
+      "account": "capital",
+      "debit": 0,
+      "credit": 100000,
+      "ref": null
+     }
+    ]
+   },
+   {
+    "id": "e1",
+    "ts": "2026-02-11T05:00:00.000Z",
+    "memo": "Stock bought on credit",
+    "refType": "purchase",
+    "refId": null,
+    "reversesId": null,
+    "lines": [
+     {
+      "account": "inventory",
+      "debit": 40000,
+      "credit": 0,
+      "ref": null
+     },
+     {
+      "account": "payables",
+      "debit": 0,
+      "credit": 40000,
+      "ref": null
+     }
+    ]
+   },
+   {
+    "id": "e2",
+    "ts": "2026-02-12T05:00:00.000Z",
+    "memo": "Sale",
+    "refType": "bill",
+    "refId": null,
+    "reversesId": null,
+    "lines": [
+     {
+      "account": "cash",
+      "debit": 25000,
+      "credit": 0,
+      "ref": null
+     },
+     {
+      "account": "sales_revenue",
+      "debit": 0,
+      "credit": 25000,
+      "ref": null
+     }
+    ]
+   },
+   {
+    "id": "e3",
+    "ts": "2026-02-12T05:01:00.000Z",
+    "memo": "COGS",
+    "refType": "bill",
+    "refId": null,
+    "reversesId": null,
+    "lines": [
+     {
+      "account": "cogs",
+      "debit": 15000,
+      "credit": 0,
+      "ref": null
+     },
+     {
+      "account": "inventory",
+      "debit": 0,
+      "credit": 15000,
+      "ref": null
+     }
+    ]
+   },
+   {
+    "id": "e4",
+    "ts": "2026-02-13T05:00:00.000Z",
+    "memo": "Rent",
+    "refType": "expense",
+    "refId": null,
+    "reversesId": null,
+    "lines": [
+     {
+      "account": "expense_rent",
+      "debit": 5000,
+      "credit": 0,
+      "ref": null
+     },
+     {
+      "account": "cash",
+      "debit": 0,
+      "credit": 5000,
+      "ref": null
+     }
+    ]
+   },
+   {
+    "id": "e5",
+    "ts": "2026-02-14T05:00:00.000Z",
+    "memo": "Drawings",
+    "refType": "cashbook",
+    "refId": null,
+    "reversesId": null,
+    "lines": [
+     {
+      "account": "drawings",
+      "debit": 2000,
+      "credit": 0,
+      "ref": null
+     },
+     {
+      "account": "cash",
+      "debit": 0,
+      "credit": 2000,
+      "ref": null
+     }
+    ]
+   },
+   {
+    "id": "e6",
+    "ts": "2026-02-15T05:00:00.000Z",
+    "memo": "Supplier paid",
+    "refType": "supplier_payment",
+    "refId": null,
+    "reversesId": null,
+    "lines": [
+     {
+      "account": "payables",
+      "debit": 10000,
+      "credit": 0,
+      "ref": null
+     },
+     {
+      "account": "cash",
+      "debit": 0,
+      "credit": 10000,
+      "ref": null
+     }
+    ]
+   },
+   {
+    "id": "e7",
+    "ts": "2026-06-30T18:59:59.999Z",
+    "memo": "Fiscal year close — FY 2025-26",
+    "refType": "fy_close",
+    "refId": "per-fr1-1",
+    "reversesId": null,
+    "lines": [
+     {
+      "account": "sales_revenue",
+      "debit": 25000,
+      "credit": 0,
+      "ref": null
+     },
+     {
+      "account": "cogs",
+      "debit": 0,
+      "credit": 15000,
+      "ref": null
+     },
+     {
+      "account": "expense_rent",
+      "debit": 0,
+      "credit": 5000,
+      "ref": null
+     },
+     {
+      "account": "retained_earnings",
+      "debit": 0,
+      "credit": 5000,
+      "ref": null
+     }
+    ]
+   }
+  ],
+  "expected": {
+   "seed": {
+    "asAtDate": "2100-12-31",
+    "assets": [
+     {
+      "account": "cash",
+      "balance": 50000
+     },
+     {
+      "account": "wallet",
+      "balance": -45000
+     },
+     {
+      "account": "inventory",
+      "balance": 272805
+     },
+     {
+      "account": "receivables",
+      "balance": 5500
+     }
+    ],
+    "assetsTotal": 283305,
+    "clearing": 0,
+    "liabilities": [
+     {
+      "account": "payables",
+      "balance": 27900
+     }
+    ],
+    "liabilitiesTotal": 27900,
+    "equity": [
+     {
+      "account": "capital",
+      "balance": 251644
+     }
+    ],
+    "equityTotal": 251644,
+    "resultToDate": 3761,
+    "totalAssets": 283305,
+    "totalLiabilitiesEquity": 283305,
+    "difference": 0,
+    "balanced": true
+   },
+   "walk": {
+    "asAtDate": "2100-12-31",
+    "assets": [
+     {
+      "account": "cash",
+      "balance": 108000
+     },
+     {
+      "account": "inventory",
+      "balance": 25000
+     }
+    ],
+    "assetsTotal": 133000,
+    "clearing": 0,
+    "liabilities": [
+     {
+      "account": "payables",
+      "balance": 30000
+     }
+    ],
+    "liabilitiesTotal": 30000,
+    "equity": [
+     {
+      "account": "capital",
+      "balance": 100000
+     },
+     {
+      "account": "drawings",
+      "balance": -2000
+     }
+    ],
+    "equityTotal": 98000,
+    "resultToDate": 5000,
+    "totalAssets": 133000,
+    "totalLiabilitiesEquity": 133000,
+    "difference": 0,
+    "balanced": true
+   },
+   "walkClearing": {
+    "asAtDate": "2100-12-31",
+    "assets": [
+     {
+      "account": "cash",
+      "balance": 108000
+     },
+     {
+      "account": "inventory",
+      "balance": 25000
+     }
+    ],
+    "assetsTotal": 133000,
+    "clearing": 8000,
+    "liabilities": [
+     {
+      "account": "payables",
+      "balance": 38000
+     }
+    ],
+    "liabilitiesTotal": 38000,
+    "equity": [
+     {
+      "account": "capital",
+      "balance": 100000
+     },
+     {
+      "account": "drawings",
+      "balance": -2000
+     }
+    ],
+    "equityTotal": 98000,
+    "resultToDate": 5000,
+    "totalAssets": 141000,
+    "totalLiabilitiesEquity": 141000,
+    "difference": 0,
+    "balanced": true
+   },
+   "walkClosed": {
+    "asAtDate": "2100-12-31",
+    "assets": [
+     {
+      "account": "cash",
+      "balance": 108000
+     },
+     {
+      "account": "inventory",
+      "balance": 25000
+     }
+    ],
+    "assetsTotal": 133000,
+    "clearing": 0,
+    "liabilities": [
+     {
+      "account": "payables",
+      "balance": 30000
+     }
+    ],
+    "liabilitiesTotal": 30000,
+    "equity": [
+     {
+      "account": "capital",
+      "balance": 100000
+     },
+     {
+      "account": "drawings",
+      "balance": -2000
+     },
+     {
+      "account": "retained_earnings",
+      "balance": 5000
+     }
+    ],
+    "equityTotal": 103000,
+    "resultToDate": 0,
+    "totalAssets": 133000,
+    "totalLiabilitiesEquity": 133000,
+    "difference": 0,
+    "balanced": true
+   }
+  }
+ },
+ "openingStock": {
+  "products": [
+   {
+    "id": "fr1-p1",
+    "name": "Goods",
+    "stockQty": 10,
+    "costPrice": 1000,
+    "salePrice": 1200,
+    "stockClass": null
+   },
+   {
+    "id": "fr1-p2",
+    "name": "Raw",
+    "stockQty": 5,
+    "costPrice": 2000,
+    "salePrice": 2600,
+    "stockClass": "raw"
+   }
+  ],
+  "journalA": [
+   {
+    "id": "e0",
+    "ts": "2026-10-20T05:00:00.000Z",
+    "memo": "Bought goods",
+    "refType": "purchase",
+    "refId": null,
+    "reversesId": null,
+    "lines": [
+     {
+      "account": "inventory",
+      "debit": 4000,
+      "credit": 0,
+      "ref": null
+     },
+     {
+      "account": "payables",
+      "debit": 0,
+      "credit": 4000,
+      "ref": null
+     }
+    ]
+   },
+   {
+    "id": "e1",
+    "ts": "2026-10-20T05:01:00.000Z",
+    "memo": "Bought raw",
+    "refType": "purchase",
+    "refId": null,
+    "reversesId": null,
+    "lines": [
+     {
+      "account": "inventory_raw",
+      "debit": 12000,
+      "credit": 0,
+      "ref": null
+     },
+     {
+      "account": "payables",
+      "debit": 0,
+      "credit": 12000,
+      "ref": null
+     }
+    ]
+   }
+  ],
+  "journalB": [
+   {
+    "id": "e0",
+    "ts": "2026-10-20T05:00:00.000Z",
+    "memo": "Bought goods",
+    "refType": "purchase",
+    "refId": null,
+    "reversesId": null,
+    "lines": [
+     {
+      "account": "inventory",
+      "debit": 4000,
+      "credit": 0,
+      "ref": null
+     },
+     {
+      "account": "payables",
+      "debit": 0,
+      "credit": 4000,
+      "ref": null
+     }
+    ]
+   },
+   {
+    "id": "e1",
+    "ts": "2026-10-20T05:01:00.000Z",
+    "memo": "Bought raw",
+    "refType": "purchase",
+    "refId": null,
+    "reversesId": null,
+    "lines": [
+     {
+      "account": "inventory_raw",
+      "debit": 6000,
+      "credit": 0,
+      "ref": null
+     },
+     {
+      "account": "payables",
+      "debit": 0,
+      "credit": 6000,
+      "ref": null
+     }
+    ]
+   }
+  ],
+  "expected": {
+   "gapA": {
+    "shelf": 20000,
+    "book": 16000,
+    "gap": 4000,
+    "rawGap": 0
+   },
+   "entryA": {
+    "id": "e0",
+    "ts": "2026-10-24T05:00:00.000Z",
+    "memo": "Opening stock — one-time recognition",
+    "refType": "opening_stock",
+    "refId": null,
+    "reversesId": null,
+    "lines": [
+     {
+      "account": "inventory",
+      "debit": 4000,
+      "credit": 0,
+      "ref": null
+     },
+     {
+      "account": "capital",
+      "debit": 0,
+      "credit": 4000,
+      "ref": null
+     }
+    ]
+   },
+   "gapAfterA": {
+    "shelf": 20000,
+    "book": 20000,
+    "gap": 0,
+    "rawGap": 0
+   },
+   "gapB": {
+    "shelf": 20000,
+    "book": 10000,
+    "gap": 10000,
+    "rawGap": 4000
+   },
+   "entryB": {
+    "id": "e0",
+    "ts": "2026-10-24T05:00:00.000Z",
+    "memo": "Opening stock — one-time recognition",
+    "refType": "opening_stock",
+    "refId": null,
+    "reversesId": null,
+    "lines": [
+     {
+      "account": "inventory",
+      "debit": 6000,
+      "credit": 0,
+      "ref": null
+     },
+     {
+      "account": "inventory_raw",
+      "debit": 4000,
+      "credit": 0,
+      "ref": null
+     },
+     {
+      "account": "capital",
+      "debit": 0,
+      "credit": 10000,
+      "ref": null
+     }
+    ]
+   }
+  }
+ }
+}

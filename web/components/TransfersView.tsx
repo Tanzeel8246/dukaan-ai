@@ -34,6 +34,7 @@ import {
 } from "./ui";
 import { fmtNum, fmtPKR, fmtUnit } from "@/lib/format";
 import { can } from "@/lib/permissions";
+import { brandingDataUrls } from "@/lib/branding";
 import { isPeriodLockedError } from "@/lib/periods";
 import { nextDocNumber } from "@/lib/documents";
 import { filterProducts } from "@/lib/search";
@@ -81,6 +82,7 @@ export default function TransfersView() {
     stockLevels,
     stockTransfers,
     settings,
+    branding,
     createStockTransfer,
     updateStockTransfer,
     deleteStockTransfer,
@@ -847,6 +849,7 @@ export default function TransfersView() {
           <TransferPrintSheet
             transfer={printDoc}
             settings={settings}
+            assets={brandingDataUrls(branding)}
             fromName={whName(printDoc.fromWarehouseId)}
             toName={whName(printDoc.toWarehouseId)}
           />

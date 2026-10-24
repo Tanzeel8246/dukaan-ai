@@ -1,0 +1,3414 @@
+{
+ "version": 1,
+ "source": "web/lib via harness/out (tenancy, plans, renewal, ledger, tax) — G5 shared truth tables",
+ "resolver": [
+  {
+   "id": "owner-uid",
+   "title": "uid == businessId ⇒ owner, before every other leg",
+   "input": {
+    "callerUid": "biz-a",
+    "callerEmail": "",
+    "businessId": "biz-a",
+    "staffEmails": [],
+    "membership": null,
+    "staffIndex": null
+   },
+   "expected": {
+    "access": true,
+    "role": "owner",
+    "via": "owner"
+   }
+  },
+  {
+   "id": "membership-role",
+   "title": "membership doc + mirror ⇒ its role",
+   "input": {
+    "callerUid": "u-1",
+    "callerEmail": "staff@x.com",
+    "businessId": "biz-a",
+    "staffEmails": [
+     "staff@x.com",
+     "gone@x.com"
+    ],
+    "membership": {
+     "role": "cashier"
+    },
+    "staffIndex": null
+   },
+   "expected": {
+    "access": true,
+    "role": "cashier",
+    "via": "membership"
+   }
+  },
+  {
+   "id": "membership-no-role",
+   "title": "membership without a role ⇒ manager (legacy default)",
+   "input": {
+    "callerUid": "u-1",
+    "callerEmail": "staff@x.com",
+    "businessId": "biz-a",
+    "staffEmails": [
+     "staff@x.com",
+     "gone@x.com"
+    ],
+    "membership": {},
+    "staffIndex": null
+   },
+   "expected": {
+    "access": true,
+    "role": "manager",
+    "via": "membership"
+   }
+  },
+  {
+   "id": "membership-mirror-cut",
+   "title": "membership but email REMOVED from the mirror ⇒ no access (removal cuts both legs)",
+   "input": {
+    "callerUid": "u-1",
+    "callerEmail": "other@x.com",
+    "businessId": "biz-a",
+    "staffEmails": [
+     "staff@x.com",
+     "gone@x.com"
+    ],
+    "membership": {
+     "role": "cashier"
+    },
+    "staffIndex": null
+   },
+   "expected": {
+    "access": false,
+    "role": "none",
+    "via": null
+   }
+  },
+  {
+   "id": "legacy-role",
+   "title": "no membership; staffIndex at this business + mirror ⇒ legacy role",
+   "input": {
+    "callerUid": "u-2",
+    "callerEmail": "staff@x.com",
+    "businessId": "biz-a",
+    "staffEmails": [
+     "staff@x.com",
+     "gone@x.com"
+    ],
+    "membership": null,
+    "staffIndex": {
+     "ownerUid": "biz-a",
+     "role": "accountant"
+    }
+   },
+   "expected": {
+    "access": true,
+    "role": "accountant",
+    "via": "legacy"
+   }
+  },
+  {
+   "id": "legacy-other-business",
+   "title": "staffIndex points at ANOTHER business ⇒ no access here (cross-business isolation)",
+   "input": {
+    "callerUid": "u-2",
+    "callerEmail": "staff@x.com",
+    "businessId": "biz-a",
+    "staffEmails": [
+     "staff@x.com",
+     "gone@x.com"
+    ],
+    "membership": null,
+    "staffIndex": {
+     "ownerUid": "biz-b",
+     "role": "accountant"
+    }
+   },
+   "expected": {
+    "access": false,
+    "role": "none",
+    "via": null
+   }
+  },
+  {
+   "id": "legacy-mirror-cut",
+   "title": "staffIndex at this business but email removed from mirror ⇒ no access",
+   "input": {
+    "callerUid": "u-3",
+    "callerEmail": "gone@x.com",
+    "businessId": "biz-a",
+    "staffEmails": [
+     "staff@x.com"
+    ],
+    "membership": null,
+    "staffIndex": {
+     "ownerUid": "biz-a",
+     "role": "cashier"
+    }
+   },
+   "expected": {
+    "access": false,
+    "role": "none",
+    "via": null
+   }
+  },
+  {
+   "id": "legacy-bad-role",
+   "title": "staffIndex role unrecognised ⇒ manager",
+   "input": {
+    "callerUid": "u-2",
+    "callerEmail": "staff@x.com",
+    "businessId": "biz-a",
+    "staffEmails": [
+     "staff@x.com",
+     "gone@x.com"
+    ],
+    "membership": null,
+    "staffIndex": {
+     "ownerUid": "biz-a",
+     "role": "boss"
+    }
+   },
+   "expected": {
+    "access": true,
+    "role": "manager",
+    "via": "legacy"
+   }
+  },
+  {
+   "id": "email-normalised",
+   "title": "caller email is trimmed + lowercased before the mirror test",
+   "input": {
+    "callerUid": "u-1",
+    "callerEmail": "  Staff@X.com ",
+    "businessId": "biz-a",
+    "staffEmails": [
+     "staff@x.com",
+     "gone@x.com"
+    ],
+    "membership": {
+     "role": "cashier"
+    },
+    "staffIndex": null
+   },
+   "expected": {
+    "access": true,
+    "role": "cashier",
+    "via": "membership"
+   }
+  },
+  {
+   "id": "membership-beats-legacy",
+   "title": "both legs present ⇒ membership wins over legacy",
+   "input": {
+    "callerUid": "u-1",
+    "callerEmail": "staff@x.com",
+    "businessId": "biz-a",
+    "staffEmails": [
+     "staff@x.com",
+     "gone@x.com"
+    ],
+    "membership": {
+     "role": "cashier"
+    },
+    "staffIndex": {
+     "ownerUid": "biz-a",
+     "role": "accountant"
+    }
+   },
+   "expected": {
+    "access": true,
+    "role": "cashier",
+    "via": "membership"
+   }
+  },
+  {
+   "id": "stranger",
+   "title": "no legs at all ⇒ none",
+   "input": {
+    "callerUid": "u-9",
+    "callerEmail": "nobody@x.com",
+    "businessId": "biz-a",
+    "staffEmails": [
+     "staff@x.com",
+     "gone@x.com"
+    ],
+    "membership": null,
+    "staffIndex": null
+   },
+   "expected": {
+    "access": false,
+    "role": "none",
+    "via": null
+   }
+  }
+ ],
+ "claims": [
+  {
+   "id": "claim-ok",
+   "title": "pending invite for the caller's verified email ⇒ membership + claim + index + event",
+   "input": {
+    "businessId": "biz-a",
+    "callerUid": "u-1",
+    "callerEmail": "staff@example.com",
+    "invite": {
+     "email": "Staff@Example.com",
+     "role": "cashier",
+     "status": "pending",
+     "invitedBy": "biz-a",
+     "createdAt": "2026-10-20T09:00:00.000Z"
+    },
+    "existingMembership": null,
+    "nowISO": "2026-10-23T10:00:00.000Z"
+   },
+   "expected": {
+    "ok": true,
+    "role": "cashier",
+    "writes": [
+     {
+      "kind": "set",
+      "path": "businessMembers/biz-a/members/u-1",
+      "data": {
+       "email": "staff@example.com",
+       "role": "cashier",
+       "addedBy": "biz-a",
+       "addedAt": "2026-10-23T10:00:00.000Z",
+       "source": "invite"
+      }
+     },
+     {
+      "kind": "update",
+      "path": "businessInvites/biz-a/invites/staff@example.com",
+      "data": {
+       "status": "claimed",
+       "claimedBy": "u-1",
+       "claimedAt": "2026-10-23T10:00:00.000Z"
+      }
+     },
+     {
+      "kind": "index",
+      "uid": "u-1",
+      "businessId": "biz-a",
+      "role": "cashier"
+     },
+     {
+      "kind": "add",
+      "collection": "businessEvents",
+      "data": {
+       "businessId": "biz-a",
+       "kind": "membership.claimed",
+       "actor": "u-1",
+       "at": "2026-10-23T10:00:00.000Z",
+       "detail": {
+        "email": "staff@example.com",
+        "role": "cashier",
+        "source": "invite"
+       }
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "claim-no-invite",
+   "title": "no invite ⇒ refused, no writes",
+   "input": {
+    "businessId": "biz-a",
+    "callerUid": "u-1",
+    "callerEmail": "staff@example.com",
+    "invite": null,
+    "existingMembership": null,
+    "nowISO": "2026-10-23T10:00:00.000Z"
+   },
+   "expected": {
+    "ok": false,
+    "reason": "no-invite",
+    "writes": []
+   }
+  },
+  {
+   "id": "claim-email-mismatch",
+   "title": "invite is for a different email ⇒ refused",
+   "input": {
+    "businessId": "biz-a",
+    "callerUid": "u-1",
+    "callerEmail": "other@example.com",
+    "invite": {
+     "email": "Staff@Example.com",
+     "role": "cashier",
+     "status": "pending",
+     "invitedBy": "biz-a",
+     "createdAt": "2026-10-20T09:00:00.000Z"
+    },
+    "existingMembership": null,
+    "nowISO": "2026-10-23T10:00:00.000Z"
+   },
+   "expected": {
+    "ok": false,
+    "reason": "email-mismatch",
+    "writes": []
+   }
+  },
+  {
+   "id": "claim-already-by-other",
+   "title": "invite claimed by someone else ⇒ refused",
+   "input": {
+    "businessId": "biz-a",
+    "callerUid": "u-1",
+    "callerEmail": "staff@example.com",
+    "invite": {
+     "email": "Staff@Example.com",
+     "role": "cashier",
+     "status": "claimed",
+     "invitedBy": "biz-a",
+     "createdAt": "2026-10-20T09:00:00.000Z",
+     "claimedBy": "u-9",
+     "claimedAt": "2026-10-21T09:00:00.000Z"
+    },
+    "existingMembership": null,
+    "nowISO": "2026-10-23T10:00:00.000Z"
+   },
+   "expected": {
+    "ok": false,
+    "reason": "already-claimed",
+    "writes": []
+   }
+  },
+  {
+   "id": "claim-idempotent-own",
+   "title": "own claim + membership present ⇒ ok, zero writes",
+   "input": {
+    "businessId": "biz-a",
+    "callerUid": "u-1",
+    "callerEmail": "staff@example.com",
+    "invite": {
+     "email": "Staff@Example.com",
+     "role": "cashier",
+     "status": "claimed",
+     "invitedBy": "biz-a",
+     "createdAt": "2026-10-20T09:00:00.000Z",
+     "claimedBy": "u-1",
+     "claimedAt": "2026-10-21T09:00:00.000Z"
+    },
+    "existingMembership": {
+     "email": "staff@example.com",
+     "role": "accountant",
+     "addedBy": "biz-a",
+     "addedAt": "2026-10-21T09:00:00.000Z",
+     "source": "invite"
+    },
+    "nowISO": "2026-10-23T10:00:00.000Z"
+   },
+   "expected": {
+    "ok": true,
+    "role": "accountant",
+    "writes": []
+   }
+  },
+  {
+   "id": "claim-own-no-membership",
+   "title": "own claim but membership gone ⇒ already-claimed (the claim is spent)",
+   "input": {
+    "businessId": "biz-a",
+    "callerUid": "u-1",
+    "callerEmail": "staff@example.com",
+    "invite": {
+     "email": "Staff@Example.com",
+     "role": "cashier",
+     "status": "claimed",
+     "invitedBy": "biz-a",
+     "createdAt": "2026-10-20T09:00:00.000Z",
+     "claimedBy": "u-1",
+     "claimedAt": "2026-10-21T09:00:00.000Z"
+    },
+    "existingMembership": null,
+    "nowISO": "2026-10-23T10:00:00.000Z"
+   },
+   "expected": {
+    "ok": false,
+    "reason": "already-claimed",
+    "writes": []
+   }
+  },
+  {
+   "id": "claim-not-pending",
+   "title": "invite in a non-pending, non-claimed state ⇒ refused",
+   "input": {
+    "businessId": "biz-a",
+    "callerUid": "u-1",
+    "callerEmail": "staff@example.com",
+    "invite": {
+     "email": "Staff@Example.com",
+     "role": "cashier",
+     "status": "revoked",
+     "invitedBy": "biz-a",
+     "createdAt": "2026-10-20T09:00:00.000Z"
+    },
+    "existingMembership": null,
+    "nowISO": "2026-10-23T10:00:00.000Z"
+   },
+   "expected": {
+    "ok": false,
+    "reason": "not-pending",
+    "writes": []
+   }
+  }
+ ],
+ "backfill": [
+  {
+   "id": "backfill-ok",
+   "title": "legacy staffer, no membership ⇒ mirror write plan (source staff)",
+   "input": {
+    "businessId": "biz-a",
+    "callerUid": "u-2",
+    "callerEmail": "staff@x.com",
+    "staffIndex": {
+     "ownerUid": "biz-a",
+     "role": "accountant"
+    },
+    "existingMembership": null,
+    "nowISO": "2026-10-23T10:00:00.000Z"
+   },
+   "expected": [
+    {
+     "kind": "set",
+     "path": "businessMembers/biz-a/members/u-2",
+     "data": {
+      "email": "staff@x.com",
+      "role": "accountant",
+      "addedBy": "biz-a",
+      "addedAt": "2026-10-23T10:00:00.000Z",
+      "source": "staff"
+     }
+    },
+    {
+     "kind": "index",
+     "uid": "u-2",
+     "businessId": "biz-a",
+     "role": "accountant"
+    },
+    {
+     "kind": "add",
+     "collection": "businessEvents",
+     "data": {
+      "businessId": "biz-a",
+      "kind": "membership.backfilled",
+      "actor": "u-2",
+      "at": "2026-10-23T10:00:00.000Z",
+      "detail": {
+       "email": "staff@x.com",
+       "role": "accountant",
+       "source": "staff"
+      }
+     }
+    }
+   ]
+  },
+  {
+   "id": "backfill-has-membership",
+   "title": "membership already exists ⇒ no-op",
+   "input": {
+    "businessId": "biz-a",
+    "callerUid": "u-2",
+    "callerEmail": "staff@x.com",
+    "staffIndex": {
+     "ownerUid": "biz-a",
+     "role": "accountant"
+    },
+    "existingMembership": {
+     "email": "staff@x.com",
+     "role": "accountant",
+     "addedBy": "biz-a",
+     "addedAt": "2026-10-01T00:00:00.000Z",
+     "source": "staff"
+    },
+    "nowISO": "2026-10-23T10:00:00.000Z"
+   },
+   "expected": []
+  },
+  {
+   "id": "backfill-other-business",
+   "title": "index points elsewhere ⇒ no-op",
+   "input": {
+    "businessId": "biz-a",
+    "callerUid": "u-2",
+    "callerEmail": "staff@x.com",
+    "staffIndex": {
+     "ownerUid": "biz-b",
+     "role": "accountant"
+    },
+    "existingMembership": null,
+    "nowISO": "2026-10-23T10:00:00.000Z"
+   },
+   "expected": []
+  },
+  {
+   "id": "backfill-no-index",
+   "title": "no index ⇒ no-op",
+   "input": {
+    "businessId": "biz-a",
+    "callerUid": "u-2",
+    "callerEmail": "staff@x.com",
+    "staffIndex": null,
+    "existingMembership": null,
+    "nowISO": "2026-10-23T10:00:00.000Z"
+   },
+   "expected": []
+  }
+ ],
+ "index": [
+  {
+   "id": "heal",
+   "title": "healIndex: dead entries drop, roles refresh from live docs, dupes collapse",
+   "entries": [
+    {
+     "businessId": "biz-a",
+     "role": "cashier"
+    },
+    {
+     "businessId": "biz-b",
+     "role": "manager"
+    },
+    {
+     "businessId": "biz-a",
+     "role": "accountant"
+    },
+    {
+     "businessId": "biz-c",
+     "role": "cashier"
+    }
+   ],
+   "live": {
+    "biz-a": {
+     "email": "s@x.com",
+     "role": "manager",
+     "addedBy": "biz-a",
+     "addedAt": "2026-10-23T10:00:00.000Z",
+     "source": "invite"
+    },
+    "biz-b": null,
+    "biz-c": {
+     "email": "s@x.com",
+     "role": "cashier",
+     "addedBy": "biz-c",
+     "addedAt": "2026-10-23T10:00:00.000Z",
+     "source": "staff"
+    }
+   },
+   "expected": {
+    "kept": [
+     {
+      "businessId": "biz-a",
+      "role": "manager"
+     },
+     {
+      "businessId": "biz-c",
+      "role": "cashier"
+     }
+    ],
+    "dropped": [
+     "biz-b"
+    ]
+   }
+  },
+  {
+   "id": "merge",
+   "title": "indexWith: an existing entry is replaced (role refreshed) and moves last",
+   "entries": [
+    {
+     "businessId": "biz-a",
+     "role": "cashier"
+    },
+    {
+     "businessId": "biz-b",
+     "role": "manager"
+    }
+   ],
+   "add": {
+    "businessId": "biz-a",
+    "role": "owner"
+   },
+   "expected": [
+    {
+     "businessId": "biz-b",
+     "role": "manager"
+    },
+    {
+     "businessId": "biz-a",
+     "role": "owner"
+    }
+   ]
+  },
+  {
+   "id": "switcher-list",
+   "title": "buildSwitcherList: own first, memberships in name order, own never duplicated",
+   "own": {
+    "businessId": "own-1",
+    "name": "Fallback Name"
+   },
+   "entries": [
+    {
+     "businessId": "biz-b",
+     "role": "manager"
+    },
+    {
+     "businessId": "biz-a",
+     "role": "cashier"
+    },
+    {
+     "businessId": "own-1",
+     "role": "cashier"
+    }
+   ],
+   "names": {
+    "own-1": "My Shop",
+    "biz-a": "Alpha Store",
+    "biz-b": "Beta Store"
+   },
+   "expected": [
+    {
+     "businessId": "own-1",
+     "name": "My Shop",
+     "role": "owner",
+     "own": true
+    },
+    {
+     "businessId": "biz-a",
+     "name": "Alpha Store",
+     "role": "cashier",
+     "own": false
+    },
+    {
+     "businessId": "biz-b",
+     "name": "Beta Store",
+     "role": "manager",
+     "own": false
+    }
+   ]
+  },
+  {
+   "id": "switcher-no-own",
+   "title": "buildSwitcherList without an own business",
+   "own": null,
+   "entries": [
+    {
+     "businessId": "biz-b",
+     "role": "manager"
+    },
+    {
+     "businessId": "biz-a",
+     "role": "cashier"
+    }
+   ],
+   "names": {
+    "own-1": "My Shop",
+    "biz-a": "Alpha Store",
+    "biz-b": "Beta Store"
+   },
+   "expected": [
+    {
+     "businessId": "biz-a",
+     "name": "Alpha Store",
+     "role": "cashier",
+     "own": false
+    },
+    {
+     "businessId": "biz-b",
+     "name": "Beta Store",
+     "role": "manager",
+     "own": false
+    }
+   ]
+  },
+  {
+   "id": "member-status",
+   "title": "membershipStatusFor: joined > pending > legacy",
+   "cases": [
+    {
+     "email": "joined@x.com",
+     "expected": "joined"
+    },
+    {
+     "email": "invited@x.com",
+     "expected": "pending"
+    },
+    {
+     "email": "other@x.com",
+     "expected": "legacy"
+    }
+   ],
+   "memberships": [
+    {
+     "email": "Joined@X.com"
+    },
+    {
+     "email": "gone@x.com"
+    }
+   ],
+   "invites": [
+    {
+     "email": "invited@x.com",
+     "status": "pending"
+    },
+    {
+     "email": "joined@x.com",
+     "status": "claimed"
+    }
+   ]
+  }
+ ],
+ "snapshots": [
+  {
+   "id": "trial-snapshot",
+   "title": "trialPlanSnapshot: 14 days, 2 users, 200 pool, Standard set",
+   "expected": {
+    "planId": "trial",
+    "tierRank": 0,
+    "usersLimit": 2,
+    "invoiceLimit": 200,
+    "modulesTier": "standard",
+    "periodFrom": "2026-10-23T10:00:00.000Z",
+    "periodTo": null,
+    "trialEndsAt": "2026-11-06T10:00:00.000Z",
+    "assignedBy": "signup",
+    "assignedAt": "2026-10-23T10:00:00.000Z"
+   }
+  },
+  {
+   "id": "founding-snapshot",
+   "title": "foundingPlanSnapshot: Advanced set + limits, no expiry",
+   "expected": {
+    "planId": "founding",
+    "tierRank": 3,
+    "usersLimit": 10,
+    "invoiceLimit": 10000,
+    "modulesTier": "advanced",
+    "periodFrom": "2026-10-23T10:00:00.000Z",
+    "periodTo": null,
+    "trialEndsAt": null,
+    "assignedBy": "migration",
+    "assignedAt": "2026-10-23T10:00:00.000Z"
+   }
+  },
+  {
+   "id": "snapshot-basic",
+   "title": "snapshotFor basic with an admin period end",
+   "expected": {
+    "planId": "basic",
+    "tierRank": 1,
+    "usersLimit": 3,
+    "invoiceLimit": 500,
+    "modulesTier": "core",
+    "periodFrom": "2026-10-23T10:00:00.000Z",
+    "periodTo": "2026-11-23T10:00:00.000Z",
+    "trialEndsAt": null,
+    "assignedBy": "admin",
+    "assignedAt": "2026-10-23T10:00:00.000Z"
+   }
+  },
+  {
+   "id": "snapshot-standard",
+   "title": "snapshotFor standard",
+   "expected": {
+    "planId": "standard",
+    "tierRank": 2,
+    "usersLimit": 5,
+    "invoiceLimit": 2000,
+    "modulesTier": "standard",
+    "periodFrom": "2026-10-23T10:00:00.000Z",
+    "periodTo": "2026-11-23T10:00:00.000Z",
+    "trialEndsAt": null,
+    "assignedBy": "admin",
+    "assignedAt": "2026-10-23T10:00:00.000Z"
+   }
+  },
+  {
+   "id": "snapshot-enterprise-default",
+   "title": "snapshotFor enterprise: catalogue nulls store as 0 (= unlimited)",
+   "expected": {
+    "planId": "enterprise",
+    "tierRank": 4,
+    "usersLimit": 0,
+    "invoiceLimit": 0,
+    "modulesTier": "advanced",
+    "periodFrom": "2026-10-23T10:00:00.000Z",
+    "periodTo": null,
+    "trialEndsAt": null,
+    "assignedBy": "admin",
+    "assignedAt": "2026-10-23T10:00:00.000Z"
+   }
+  },
+  {
+   "id": "snapshot-enterprise-pinned",
+   "title": "snapshotFor enterprise with pinned limits (null invoice limit ⇒ 0)",
+   "expected": {
+    "planId": "enterprise",
+    "tierRank": 4,
+    "usersLimit": 25,
+    "invoiceLimit": 0,
+    "modulesTier": "advanced",
+    "periodFrom": "2026-10-23T10:00:00.000Z",
+    "periodTo": null,
+    "trialEndsAt": null,
+    "assignedBy": "admin",
+    "assignedAt": "2026-10-23T10:00:00.000Z"
+   }
+  },
+  {
+   "id": "snapshot-trial",
+   "title": "snapshotFor trial re-derives the trial end and nulls the period",
+   "expected": {
+    "planId": "trial",
+    "tierRank": 0,
+    "usersLimit": 2,
+    "invoiceLimit": 200,
+    "modulesTier": "standard",
+    "periodFrom": "2026-10-23T10:00:00.000Z",
+    "periodTo": null,
+    "trialEndsAt": "2026-11-06T10:00:00.000Z",
+    "assignedBy": "signup",
+    "assignedAt": "2026-10-23T10:00:00.000Z"
+   }
+  }
+ ],
+ "monthKeys": [
+  {
+   "iso": "2026-10-31T18:59:59.000Z",
+   "expected": "2026-10"
+  },
+  {
+   "iso": "2026-10-31T19:00:00.000Z",
+   "expected": "2026-11"
+  },
+  {
+   "iso": "2026-01-01T00:00:00.000Z",
+   "expected": "2026-01"
+  },
+  {
+   "iso": "2026-12-31T19:30:00.000Z",
+   "expected": "2027-01"
+  }
+ ],
+ "planState": [
+  {
+   "id": "none",
+   "title": "no registry ⇒ none (pre-G shop; nothing gates)",
+   "registry": null,
+   "now": "2026-10-23T10:00:00.000Z",
+   "expected": {
+    "state": "none",
+    "allowsPosting": true,
+    "rulesPostable": true
+   }
+  },
+  {
+   "id": "trial-mid",
+   "title": "trial, mid-window",
+   "registry": {
+    "ownerUid": "biz-x",
+    "ownerEmail": "o@x.com",
+    "name": "X",
+    "phone": "",
+    "city": "",
+    "createdAt": "2026-10-01T00:00:00.000Z",
+    "status": "active",
+    "enforce": false,
+    "plan": {
+     "planId": "trial",
+     "tierRank": 0,
+     "usersLimit": 2,
+     "invoiceLimit": 200,
+     "modulesTier": "standard",
+     "periodFrom": "2026-10-01T00:00:00.000Z",
+     "periodTo": null,
+     "trialEndsAt": "2026-10-15T00:00:00.000Z",
+     "assignedBy": "signup",
+     "assignedAt": "2026-10-01T00:00:00.000Z"
+    }
+   },
+   "now": "2026-10-10T00:00:00.000Z",
+   "expected": {
+    "state": "trial",
+    "allowsPosting": true,
+    "rulesPostable": true
+   }
+  },
+  {
+   "id": "trial-end-minus-1ms",
+   "title": "trial: 1ms before the end instant is still trial",
+   "registry": {
+    "ownerUid": "biz-x",
+    "ownerEmail": "o@x.com",
+    "name": "X",
+    "phone": "",
+    "city": "",
+    "createdAt": "2026-10-01T00:00:00.000Z",
+    "status": "active",
+    "enforce": false,
+    "plan": {
+     "planId": "trial",
+     "tierRank": 0,
+     "usersLimit": 2,
+     "invoiceLimit": 200,
+     "modulesTier": "standard",
+     "periodFrom": "2026-10-01T00:00:00.000Z",
+     "periodTo": null,
+     "trialEndsAt": "2026-10-15T00:00:00.000Z",
+     "assignedBy": "signup",
+     "assignedAt": "2026-10-01T00:00:00.000Z"
+    }
+   },
+   "now": "2026-10-14T23:59:59.999Z",
+   "expected": {
+    "state": "trial",
+    "allowsPosting": true,
+    "rulesPostable": true
+   }
+  },
+  {
+   "id": "trial-end-exact",
+   "title": "trial: the end instant itself still belongs to the trial",
+   "registry": {
+    "ownerUid": "biz-x",
+    "ownerEmail": "o@x.com",
+    "name": "X",
+    "phone": "",
+    "city": "",
+    "createdAt": "2026-10-01T00:00:00.000Z",
+    "status": "active",
+    "enforce": false,
+    "plan": {
+     "planId": "trial",
+     "tierRank": 0,
+     "usersLimit": 2,
+     "invoiceLimit": 200,
+     "modulesTier": "standard",
+     "periodFrom": "2026-10-01T00:00:00.000Z",
+     "periodTo": null,
+     "trialEndsAt": "2026-10-15T00:00:00.000Z",
+     "assignedBy": "signup",
+     "assignedAt": "2026-10-01T00:00:00.000Z"
+    }
+   },
+   "now": "2026-10-15T00:00:00.000Z",
+   "expected": {
+    "state": "trial",
+    "allowsPosting": true,
+    "rulesPostable": true
+   }
+  },
+  {
+   "id": "trial-end-plus-1ms",
+   "title": "trial: 1ms past the end ⇒ grace",
+   "registry": {
+    "ownerUid": "biz-x",
+    "ownerEmail": "o@x.com",
+    "name": "X",
+    "phone": "",
+    "city": "",
+    "createdAt": "2026-10-01T00:00:00.000Z",
+    "status": "active",
+    "enforce": false,
+    "plan": {
+     "planId": "trial",
+     "tierRank": 0,
+     "usersLimit": 2,
+     "invoiceLimit": 200,
+     "modulesTier": "standard",
+     "periodFrom": "2026-10-01T00:00:00.000Z",
+     "periodTo": null,
+     "trialEndsAt": "2026-10-15T00:00:00.000Z",
+     "assignedBy": "signup",
+     "assignedAt": "2026-10-01T00:00:00.000Z"
+    }
+   },
+   "now": "2026-10-15T00:00:00.001Z",
+   "expected": {
+    "state": "grace",
+    "allowsPosting": false,
+    "rulesPostable": true
+   }
+  },
+  {
+   "id": "trial-grace-day30",
+   "title": "trial: end + 30 days exactly ⇒ still grace (inclusive)",
+   "registry": {
+    "ownerUid": "biz-x",
+    "ownerEmail": "o@x.com",
+    "name": "X",
+    "phone": "",
+    "city": "",
+    "createdAt": "2026-10-01T00:00:00.000Z",
+    "status": "active",
+    "enforce": false,
+    "plan": {
+     "planId": "trial",
+     "tierRank": 0,
+     "usersLimit": 2,
+     "invoiceLimit": 200,
+     "modulesTier": "standard",
+     "periodFrom": "2026-10-01T00:00:00.000Z",
+     "periodTo": null,
+     "trialEndsAt": "2026-10-15T00:00:00.000Z",
+     "assignedBy": "signup",
+     "assignedAt": "2026-10-01T00:00:00.000Z"
+    }
+   },
+   "now": "2026-11-14T00:00:00.000Z",
+   "expected": {
+    "state": "grace",
+    "allowsPosting": false,
+    "rulesPostable": true
+   }
+  },
+  {
+   "id": "trial-grace-day30-plus-1ms",
+   "title": "trial: end + 30 days + 1ms ⇒ readonly",
+   "registry": {
+    "ownerUid": "biz-x",
+    "ownerEmail": "o@x.com",
+    "name": "X",
+    "phone": "",
+    "city": "",
+    "createdAt": "2026-10-01T00:00:00.000Z",
+    "status": "active",
+    "enforce": false,
+    "plan": {
+     "planId": "trial",
+     "tierRank": 0,
+     "usersLimit": 2,
+     "invoiceLimit": 200,
+     "modulesTier": "standard",
+     "periodFrom": "2026-10-01T00:00:00.000Z",
+     "periodTo": null,
+     "trialEndsAt": "2026-10-15T00:00:00.000Z",
+     "assignedBy": "signup",
+     "assignedAt": "2026-10-01T00:00:00.000Z"
+    }
+   },
+   "now": "2026-11-14T00:00:00.001Z",
+   "expected": {
+    "state": "readonly",
+    "allowsPosting": false,
+    "rulesPostable": true
+   }
+  },
+  {
+   "id": "active-mid",
+   "title": "paid: mid-period ⇒ active",
+   "registry": {
+    "ownerUid": "biz-x",
+    "ownerEmail": "o@x.com",
+    "name": "X",
+    "phone": "",
+    "city": "",
+    "createdAt": "2026-10-01T00:00:00.000Z",
+    "status": "active",
+    "enforce": false,
+    "plan": {
+     "planId": "basic",
+     "tierRank": 1,
+     "usersLimit": 3,
+     "invoiceLimit": 500,
+     "modulesTier": "core",
+     "periodFrom": "2026-10-01T00:00:00.000Z",
+     "periodTo": "2026-11-01T00:00:00.000Z",
+     "trialEndsAt": null,
+     "assignedBy": "admin",
+     "assignedAt": "2026-10-01T00:00:00.000Z"
+    }
+   },
+   "now": "2026-10-20T00:00:00.000Z",
+   "expected": {
+    "state": "active",
+    "allowsPosting": true,
+    "rulesPostable": true
+   }
+  },
+  {
+   "id": "active-end-exact",
+   "title": "paid: the end instant itself is still active",
+   "registry": {
+    "ownerUid": "biz-x",
+    "ownerEmail": "o@x.com",
+    "name": "X",
+    "phone": "",
+    "city": "",
+    "createdAt": "2026-10-01T00:00:00.000Z",
+    "status": "active",
+    "enforce": false,
+    "plan": {
+     "planId": "basic",
+     "tierRank": 1,
+     "usersLimit": 3,
+     "invoiceLimit": 500,
+     "modulesTier": "core",
+     "periodFrom": "2026-10-01T00:00:00.000Z",
+     "periodTo": "2026-11-01T00:00:00.000Z",
+     "trialEndsAt": null,
+     "assignedBy": "admin",
+     "assignedAt": "2026-10-01T00:00:00.000Z"
+    }
+   },
+   "now": "2026-11-01T00:00:00.000Z",
+   "expected": {
+    "state": "active",
+    "allowsPosting": true,
+    "rulesPostable": true
+   }
+  },
+  {
+   "id": "active-end-plus-1ms",
+   "title": "paid: 1ms past ⇒ grace",
+   "registry": {
+    "ownerUid": "biz-x",
+    "ownerEmail": "o@x.com",
+    "name": "X",
+    "phone": "",
+    "city": "",
+    "createdAt": "2026-10-01T00:00:00.000Z",
+    "status": "active",
+    "enforce": false,
+    "plan": {
+     "planId": "basic",
+     "tierRank": 1,
+     "usersLimit": 3,
+     "invoiceLimit": 500,
+     "modulesTier": "core",
+     "periodFrom": "2026-10-01T00:00:00.000Z",
+     "periodTo": "2026-11-01T00:00:00.000Z",
+     "trialEndsAt": null,
+     "assignedBy": "admin",
+     "assignedAt": "2026-10-01T00:00:00.000Z"
+    }
+   },
+   "now": "2026-11-01T00:00:00.001Z",
+   "expected": {
+    "state": "grace",
+    "allowsPosting": false,
+    "rulesPostable": true
+   }
+  },
+  {
+   "id": "grace-day30",
+   "title": "paid: end + 30 days ⇒ grace",
+   "registry": {
+    "ownerUid": "biz-x",
+    "ownerEmail": "o@x.com",
+    "name": "X",
+    "phone": "",
+    "city": "",
+    "createdAt": "2026-10-01T00:00:00.000Z",
+    "status": "active",
+    "enforce": false,
+    "plan": {
+     "planId": "basic",
+     "tierRank": 1,
+     "usersLimit": 3,
+     "invoiceLimit": 500,
+     "modulesTier": "core",
+     "periodFrom": "2026-10-01T00:00:00.000Z",
+     "periodTo": "2026-11-01T00:00:00.000Z",
+     "trialEndsAt": null,
+     "assignedBy": "admin",
+     "assignedAt": "2026-10-01T00:00:00.000Z"
+    }
+   },
+   "now": "2026-12-01T00:00:00.000Z",
+   "expected": {
+    "state": "grace",
+    "allowsPosting": false,
+    "rulesPostable": true
+   }
+  },
+  {
+   "id": "readonly-day30-plus-1ms",
+   "title": "paid: end + 30 days + 1ms ⇒ readonly",
+   "registry": {
+    "ownerUid": "biz-x",
+    "ownerEmail": "o@x.com",
+    "name": "X",
+    "phone": "",
+    "city": "",
+    "createdAt": "2026-10-01T00:00:00.000Z",
+    "status": "active",
+    "enforce": false,
+    "plan": {
+     "planId": "basic",
+     "tierRank": 1,
+     "usersLimit": 3,
+     "invoiceLimit": 500,
+     "modulesTier": "core",
+     "periodFrom": "2026-10-01T00:00:00.000Z",
+     "periodTo": "2026-11-01T00:00:00.000Z",
+     "trialEndsAt": null,
+     "assignedBy": "admin",
+     "assignedAt": "2026-10-01T00:00:00.000Z"
+    }
+   },
+   "now": "2026-12-01T00:00:00.001Z",
+   "expected": {
+    "state": "readonly",
+    "allowsPosting": false,
+    "rulesPostable": true
+   }
+  },
+  {
+   "id": "founding-eternal",
+   "title": "founding at any instant ⇒ founding",
+   "registry": {
+    "ownerUid": "biz-x",
+    "ownerEmail": "o@x.com",
+    "name": "X",
+    "phone": "",
+    "city": "",
+    "createdAt": "2026-10-01T00:00:00.000Z",
+    "status": "active",
+    "enforce": false,
+    "plan": {
+     "planId": "founding",
+     "tierRank": 3,
+     "usersLimit": 10,
+     "invoiceLimit": 10000,
+     "modulesTier": "advanced",
+     "periodFrom": "2026-10-01T00:00:00.000Z",
+     "periodTo": null,
+     "trialEndsAt": null,
+     "assignedBy": "migration",
+     "assignedAt": "2026-10-01T00:00:00.000Z"
+    }
+   },
+   "now": "2031-05-05T00:00:00.000Z",
+   "expected": {
+    "state": "founding",
+    "allowsPosting": true,
+    "rulesPostable": true
+   }
+  },
+  {
+   "id": "suspended-over-active",
+   "title": "suspension overlays an active period",
+   "registry": {
+    "ownerUid": "biz-x",
+    "ownerEmail": "o@x.com",
+    "name": "X",
+    "phone": "",
+    "city": "",
+    "createdAt": "2026-10-01T00:00:00.000Z",
+    "status": "suspended",
+    "enforce": false,
+    "plan": {
+     "planId": "basic",
+     "tierRank": 1,
+     "usersLimit": 3,
+     "invoiceLimit": 500,
+     "modulesTier": "core",
+     "periodFrom": "2026-10-01T00:00:00.000Z",
+     "periodTo": "2026-11-01T00:00:00.000Z",
+     "trialEndsAt": null,
+     "assignedBy": "admin",
+     "assignedAt": "2026-10-01T00:00:00.000Z"
+    }
+   },
+   "now": "2026-10-20T00:00:00.000Z",
+   "expected": {
+    "state": "suspended",
+    "allowsPosting": false,
+    "rulesPostable": true
+   }
+  },
+  {
+   "id": "suspended-over-founding",
+   "title": "suspension overlays even founding",
+   "registry": {
+    "ownerUid": "biz-x",
+    "ownerEmail": "o@x.com",
+    "name": "X",
+    "phone": "",
+    "city": "",
+    "createdAt": "2026-10-01T00:00:00.000Z",
+    "status": "suspended",
+    "enforce": false,
+    "plan": {
+     "planId": "founding",
+     "tierRank": 3,
+     "usersLimit": 10,
+     "invoiceLimit": 10000,
+     "modulesTier": "advanced",
+     "periodFrom": "2026-10-01T00:00:00.000Z",
+     "periodTo": null,
+     "trialEndsAt": null,
+     "assignedBy": "migration",
+     "assignedAt": "2026-10-01T00:00:00.000Z"
+    }
+   },
+   "now": "2026-10-23T10:00:00.000Z",
+   "expected": {
+    "state": "suspended",
+    "allowsPosting": false,
+    "rulesPostable": true
+   }
+  },
+  {
+   "id": "dateless-paid",
+   "title": "a paid-shaped snapshot without dates reads active (never bricks a shop)",
+   "registry": {
+    "ownerUid": "biz-x",
+    "ownerEmail": "o@x.com",
+    "name": "X",
+    "phone": "",
+    "city": "",
+    "createdAt": "2026-10-01T00:00:00.000Z",
+    "status": "active",
+    "enforce": false,
+    "plan": {
+     "planId": "basic",
+     "tierRank": 1,
+     "usersLimit": 3,
+     "invoiceLimit": 500,
+     "modulesTier": "core",
+     "periodFrom": "2026-10-01T00:00:00.000Z",
+     "periodTo": null,
+     "trialEndsAt": null,
+     "assignedBy": "admin",
+     "assignedAt": "2026-10-01T00:00:00.000Z"
+    }
+   },
+   "now": "2027-01-01T00:00:00.000Z",
+   "expected": {
+    "state": "active",
+    "allowsPosting": true,
+    "rulesPostable": true
+   }
+  }
+ ],
+ "gates": [
+  {
+   "id": "gate-none",
+   "title": "no registry: state none, nothing refused, counters read 0",
+   "registry": null,
+   "counters": null,
+   "now": "2026-10-23T10:00:00.000Z",
+   "expected": {
+    "state": "none",
+    "postable": true,
+    "refusal": null,
+    "invoiceCountAfter": 0,
+    "invoiceLimit": 0,
+    "membersTotal": 1,
+    "usersLimit": 0
+   }
+  },
+  {
+   "id": "gate-observe-grace",
+   "title": "grace but enforce OFF ⇒ postable (observation)",
+   "registry": {
+    "ownerUid": "biz-x",
+    "ownerEmail": "o@x.com",
+    "name": "X",
+    "phone": "",
+    "city": "",
+    "createdAt": "2026-10-01T00:00:00.000Z",
+    "status": "active",
+    "enforce": false,
+    "plan": {
+     "planId": "basic",
+     "tierRank": 1,
+     "usersLimit": 3,
+     "invoiceLimit": 500,
+     "modulesTier": "core",
+     "periodFrom": "2026-10-01T00:00:00.000Z",
+     "periodTo": "2026-11-01T00:00:00.000Z",
+     "trialEndsAt": null,
+     "assignedBy": "admin",
+     "assignedAt": "2026-10-01T00:00:00.000Z"
+    }
+   },
+   "counters": {
+    "invoiceMonth": "2026-10",
+    "invoiceCount": 41,
+    "memberCount": 2
+   },
+   "now": "2026-11-06T00:00:00.000Z",
+   "expected": {
+    "state": "grace",
+    "postable": true,
+    "refusal": null,
+    "invoiceCountAfter": 1,
+    "invoiceLimit": 500,
+    "membersTotal": 3,
+    "usersLimit": 3
+   }
+  },
+  {
+   "id": "gate-enforced-grace",
+   "title": "grace + enforce ⇒ refusal: state",
+   "registry": {
+    "ownerUid": "biz-x",
+    "ownerEmail": "o@x.com",
+    "name": "X",
+    "phone": "",
+    "city": "",
+    "createdAt": "2026-10-01T00:00:00.000Z",
+    "status": "active",
+    "enforce": true,
+    "plan": {
+     "planId": "basic",
+     "tierRank": 1,
+     "usersLimit": 3,
+     "invoiceLimit": 500,
+     "modulesTier": "core",
+     "periodFrom": "2026-10-01T00:00:00.000Z",
+     "periodTo": "2026-11-01T00:00:00.000Z",
+     "trialEndsAt": null,
+     "assignedBy": "admin",
+     "assignedAt": "2026-10-01T00:00:00.000Z"
+    }
+   },
+   "counters": {
+    "invoiceMonth": "2026-10",
+    "invoiceCount": 41,
+    "memberCount": 2
+   },
+   "now": "2026-11-06T00:00:00.000Z",
+   "expected": {
+    "state": "grace",
+    "postable": false,
+    "refusal": "state",
+    "invoiceCountAfter": 1,
+    "invoiceLimit": 500,
+    "membersTotal": 3,
+    "usersLimit": 3
+   }
+  },
+  {
+   "id": "gate-enforced-cap",
+   "title": "active + enforce, counter AT the limit ⇒ the next event refuses: invoice-cap",
+   "registry": {
+    "ownerUid": "biz-x",
+    "ownerEmail": "o@x.com",
+    "name": "X",
+    "phone": "",
+    "city": "",
+    "createdAt": "2026-10-01T00:00:00.000Z",
+    "status": "active",
+    "enforce": true,
+    "plan": {
+     "planId": "basic",
+     "tierRank": 1,
+     "usersLimit": 3,
+     "invoiceLimit": 500,
+     "modulesTier": "core",
+     "periodFrom": "2026-10-01T00:00:00.000Z",
+     "periodTo": "2026-11-01T00:00:00.000Z",
+     "trialEndsAt": null,
+     "assignedBy": "admin",
+     "assignedAt": "2026-10-01T00:00:00.000Z"
+    }
+   },
+   "counters": {
+    "invoiceMonth": "2026-10",
+    "invoiceCount": 500,
+    "memberCount": 2
+   },
+   "now": "2026-10-20T00:00:00.000Z",
+   "expected": {
+    "state": "active",
+    "postable": false,
+    "refusal": "invoice-cap",
+    "invoiceCountAfter": 501,
+    "invoiceLimit": 500,
+    "membersTotal": 3,
+    "usersLimit": 3
+   }
+  },
+  {
+   "id": "gate-enforced-under-cap",
+   "title": "active + enforce, one below the limit ⇒ postable, projected count = limit",
+   "registry": {
+    "ownerUid": "biz-x",
+    "ownerEmail": "o@x.com",
+    "name": "X",
+    "phone": "",
+    "city": "",
+    "createdAt": "2026-10-01T00:00:00.000Z",
+    "status": "active",
+    "enforce": true,
+    "plan": {
+     "planId": "basic",
+     "tierRank": 1,
+     "usersLimit": 3,
+     "invoiceLimit": 500,
+     "modulesTier": "core",
+     "periodFrom": "2026-10-01T00:00:00.000Z",
+     "periodTo": "2026-11-01T00:00:00.000Z",
+     "trialEndsAt": null,
+     "assignedBy": "admin",
+     "assignedAt": "2026-10-01T00:00:00.000Z"
+    }
+   },
+   "counters": {
+    "invoiceMonth": "2026-10",
+    "invoiceCount": 499,
+    "memberCount": 2
+   },
+   "now": "2026-10-20T00:00:00.000Z",
+   "expected": {
+    "state": "active",
+    "postable": true,
+    "refusal": null,
+    "invoiceCountAfter": 500,
+    "invoiceLimit": 500,
+    "membersTotal": 3,
+    "usersLimit": 3
+   }
+  },
+  {
+   "id": "gate-trial-pool-cap",
+   "title": "trial + enforce, pool exhausted ⇒ invoice-cap (the pool is the limit)",
+   "registry": {
+    "ownerUid": "biz-x",
+    "ownerEmail": "o@x.com",
+    "name": "X",
+    "phone": "",
+    "city": "",
+    "createdAt": "2026-10-01T00:00:00.000Z",
+    "status": "active",
+    "enforce": true,
+    "plan": {
+     "planId": "trial",
+     "tierRank": 0,
+     "usersLimit": 2,
+     "invoiceLimit": 200,
+     "modulesTier": "standard",
+     "periodFrom": "2026-10-01T00:00:00.000Z",
+     "periodTo": null,
+     "trialEndsAt": "2026-10-15T00:00:00.000Z",
+     "assignedBy": "signup",
+     "assignedAt": "2026-10-01T00:00:00.000Z"
+    }
+   },
+   "counters": {
+    "invoiceMonth": "2026-10",
+    "invoiceCount": 200,
+    "memberCount": 1
+   },
+   "now": "2026-10-10T00:00:00.000Z",
+   "expected": {
+    "state": "trial",
+    "postable": false,
+    "refusal": "invoice-cap",
+    "invoiceCountAfter": 201,
+    "invoiceLimit": 200,
+    "membersTotal": 2,
+    "usersLimit": 2
+   }
+  },
+  {
+   "id": "gate-trial-no-roll",
+   "title": "trial + enforce: the projected count accumulates across the month edge (no roll)",
+   "registry": {
+    "ownerUid": "biz-x",
+    "ownerEmail": "o@x.com",
+    "name": "X",
+    "phone": "",
+    "city": "",
+    "createdAt": "2026-10-01T00:00:00.000Z",
+    "status": "active",
+    "enforce": true,
+    "plan": {
+     "planId": "trial",
+     "tierRank": 0,
+     "usersLimit": 2,
+     "invoiceLimit": 200,
+     "modulesTier": "standard",
+     "periodFrom": "2026-10-01T00:00:00.000Z",
+     "periodTo": null,
+     "trialEndsAt": "2026-10-15T00:00:00.000Z",
+     "assignedBy": "signup",
+     "assignedAt": "2026-10-01T00:00:00.000Z"
+    }
+   },
+   "counters": {
+    "invoiceMonth": "2026-10",
+    "invoiceCount": 7,
+    "memberCount": 1
+   },
+   "now": "2026-11-01T00:00:00.000Z",
+   "expected": {
+    "state": "grace",
+    "postable": false,
+    "refusal": "state",
+    "invoiceCountAfter": 8,
+    "invoiceLimit": 200,
+    "membersTotal": 2,
+    "usersLimit": 2
+   }
+  }
+ ],
+ "counters": [
+  {
+   "id": "next-same-month",
+   "title": "invoice +1 within the PKT month",
+   "expected": {
+    "invoiceMonth": "2026-10",
+    "invoiceCount": 42,
+    "memberCount": 2
+   }
+  },
+  {
+   "id": "next-roll",
+   "title": "a new PKT month (Oct 31 19:00Z = Nov 1 PKT) rolls to 1",
+   "expected": {
+    "invoiceMonth": "2026-11",
+    "invoiceCount": 1,
+    "memberCount": 2
+   }
+  },
+  {
+   "id": "next-trial-noroll",
+   "title": "trial NEVER rolls — the pool accumulates across the edge",
+   "expected": {
+    "invoiceMonth": "2026-10",
+    "invoiceCount": 200,
+    "memberCount": 1
+   }
+  },
+  {
+   "id": "member-plus",
+   "title": "seat +1 at invite",
+   "expected": {
+    "invoiceMonth": "2026-10",
+    "invoiceCount": 41,
+    "memberCount": 3
+   }
+  },
+  {
+   "id": "member-minus",
+   "title": "seat −1 at removal",
+   "expected": {
+    "invoiceMonth": "2026-10",
+    "invoiceCount": 41,
+    "memberCount": 1
+   }
+  },
+  {
+   "id": "member-floor",
+   "title": "seat −1 floors at 0",
+   "expected": {
+    "invoiceMonth": "2026-10",
+    "invoiceCount": 41,
+    "memberCount": 0
+   }
+  }
+ ],
+ "transitions": [
+  {
+   "id": "ok-plus1",
+   "before": {
+    "invoiceMonth": "2026-10",
+    "invoiceCount": 41,
+    "memberCount": 2
+   },
+   "after": {
+    "invoiceMonth": "2026-10",
+    "invoiceCount": 42,
+    "memberCount": 2
+   },
+   "kind": "invoice",
+   "expected": true,
+   "computed": true
+  },
+  {
+   "id": "ok-roll",
+   "before": {
+    "invoiceMonth": "2026-10",
+    "invoiceCount": 41,
+    "memberCount": 2
+   },
+   "after": {
+    "invoiceMonth": "2026-11",
+    "invoiceCount": 1,
+    "memberCount": 2
+   },
+   "kind": "invoice",
+   "expected": true,
+   "computed": true
+  },
+  {
+   "id": "bad-plus2",
+   "before": {
+    "invoiceMonth": "2026-10",
+    "invoiceCount": 41,
+    "memberCount": 2
+   },
+   "after": {
+    "invoiceMonth": "2026-10",
+    "invoiceCount": 43,
+    "memberCount": 2
+   },
+   "kind": "invoice",
+   "expected": false,
+   "computed": false
+  },
+  {
+   "id": "bad-month-back",
+   "before": {
+    "invoiceMonth": "2026-10",
+    "invoiceCount": 41,
+    "memberCount": 2
+   },
+   "after": {
+    "invoiceMonth": "2026-09",
+    "invoiceCount": 1,
+    "memberCount": 2
+   },
+   "kind": "invoice",
+   "expected": false,
+   "computed": false
+  },
+  {
+   "id": "bad-member-moved",
+   "before": {
+    "invoiceMonth": "2026-10",
+    "invoiceCount": 41,
+    "memberCount": 2
+   },
+   "after": {
+    "invoiceMonth": "2026-10",
+    "invoiceCount": 42,
+    "memberCount": 3
+   },
+   "kind": "invoice",
+   "expected": false,
+   "computed": false
+  },
+  {
+   "id": "bad-baseline-moved",
+   "before": {
+    "invoiceMonth": "2026-10",
+    "invoiceCount": 41,
+    "memberCount": 2,
+    "baseline": "migration"
+   },
+   "after": {
+    "invoiceMonth": "2026-10",
+    "invoiceCount": 42,
+    "memberCount": 2
+   },
+   "kind": "invoice",
+   "expected": false,
+   "computed": false
+  },
+  {
+   "id": "ok-member-plus",
+   "before": {
+    "invoiceMonth": "2026-10",
+    "invoiceCount": 41,
+    "memberCount": 2
+   },
+   "after": {
+    "invoiceMonth": "2026-10",
+    "invoiceCount": 41,
+    "memberCount": 3
+   },
+   "kind": "member-plus",
+   "expected": true,
+   "computed": true
+  },
+  {
+   "id": "ok-member-minus",
+   "before": {
+    "invoiceMonth": "2026-10",
+    "invoiceCount": 41,
+    "memberCount": 2
+   },
+   "after": {
+    "invoiceMonth": "2026-10",
+    "invoiceCount": 41,
+    "memberCount": 1
+   },
+   "kind": "member-minus",
+   "expected": true,
+   "computed": true
+  },
+  {
+   "id": "bad-member-minus-below0",
+   "before": {
+    "invoiceMonth": "2026-10",
+    "invoiceCount": 41,
+    "memberCount": 0
+   },
+   "after": {
+    "invoiceMonth": "2026-10",
+    "invoiceCount": 41,
+    "memberCount": -1
+   },
+   "kind": "member-minus",
+   "expected": false,
+   "computed": false
+  },
+  {
+   "id": "bad-invoice-moved-on-member",
+   "before": {
+    "invoiceMonth": "2026-10",
+    "invoiceCount": 41,
+    "memberCount": 2
+   },
+   "after": {
+    "invoiceMonth": "2026-10",
+    "invoiceCount": 42,
+    "memberCount": 3
+   },
+   "kind": "member-plus",
+   "expected": false,
+   "computed": false
+  }
+ ],
+ "caps": [
+  {
+   "id": "event-at-limit",
+   "expected": true
+  },
+  {
+   "id": "event-over-limit",
+   "expected": false
+  },
+  {
+   "id": "event-unlimited",
+   "expected": true
+  },
+  {
+   "id": "event-illegal-transition",
+   "expected": false
+  },
+  {
+   "id": "member-at-cap",
+   "expected": true
+  },
+  {
+   "id": "member-over-cap",
+   "expected": false
+  },
+  {
+   "id": "member-unlimited",
+   "expected": true
+  }
+ ],
+ "actuals": [
+  {
+   "id": "actual-monthly",
+   "title": "monthly reading: held bills, bill rows, returns and other PKT months excluded",
+   "bills": [
+    {
+     "ts": "2026-10-05T10:00:00.000Z",
+     "status": "paid"
+    },
+    {
+     "ts": "2026-10-06T10:00:00.000Z",
+     "status": "held"
+    },
+    {
+     "ts": "2026-10-31T19:30:00.000Z",
+     "status": "paid"
+    },
+    {
+     "ts": "2026-09-30T18:00:00.000Z",
+     "status": "paid"
+    }
+   ],
+   "sales": [
+    {
+     "ts": "2026-10-07T10:00:00.000Z",
+     "billId": null,
+     "kind": "sale"
+    },
+    {
+     "ts": "2026-10-08T10:00:00.000Z",
+     "billId": "bill-1",
+     "kind": "sale"
+    },
+    {
+     "ts": "2026-10-09T10:00:00.000Z",
+     "billId": null,
+     "kind": "return"
+    },
+    {
+     "ts": "2026-10-10T10:00:00.000Z"
+    }
+   ],
+   "staffEmails": [
+    "a@x.com",
+    "b@x.com"
+   ],
+   "plan": {
+    "planId": "basic",
+    "tierRank": 1,
+    "usersLimit": 3,
+    "invoiceLimit": 500,
+    "modulesTier": "core",
+    "periodFrom": "2026-10-01T00:00:00.000Z",
+    "periodTo": "2026-11-01T00:00:00.000Z",
+    "trialEndsAt": null,
+    "assignedBy": "admin",
+    "assignedAt": "2026-10-01T00:00:00.000Z"
+   },
+   "now": "2026-10-23T10:00:00.000Z",
+   "expected": {
+    "invoiceCount": 3,
+    "memberCount": 2
+   }
+  },
+  {
+   "id": "actual-trial-pool",
+   "title": "trial reading: the pool consumed since periodFrom (month edges ignored)",
+   "bills": [
+    {
+     "ts": "2026-10-05T10:00:00.000Z",
+     "status": "paid"
+    },
+    {
+     "ts": "2026-10-06T10:00:00.000Z",
+     "status": "held"
+    },
+    {
+     "ts": "2026-10-31T19:30:00.000Z",
+     "status": "paid"
+    },
+    {
+     "ts": "2026-09-30T18:00:00.000Z",
+     "status": "paid"
+    }
+   ],
+   "sales": [
+    {
+     "ts": "2026-10-07T10:00:00.000Z",
+     "billId": null,
+     "kind": "sale"
+    },
+    {
+     "ts": "2026-10-08T10:00:00.000Z",
+     "billId": "bill-1",
+     "kind": "sale"
+    },
+    {
+     "ts": "2026-10-09T10:00:00.000Z",
+     "billId": null,
+     "kind": "return"
+    },
+    {
+     "ts": "2026-10-10T10:00:00.000Z"
+    }
+   ],
+   "staffEmails": [
+    "a@x.com"
+   ],
+   "plan": {
+    "planId": "trial",
+    "tierRank": 0,
+    "usersLimit": 2,
+    "invoiceLimit": 200,
+    "modulesTier": "standard",
+    "periodFrom": "2026-10-06T00:00:00.000Z",
+    "periodTo": null,
+    "trialEndsAt": "2026-10-15T00:00:00.000Z",
+    "assignedBy": "signup",
+    "assignedAt": "2026-10-01T00:00:00.000Z"
+   },
+   "now": "2026-10-23T10:00:00.000Z",
+   "expected": {
+    "invoiceCount": 3,
+    "memberCount": 1
+   }
+  }
+ ],
+ "monthAdds": [
+  {
+   "iso": "2026-01-31T00:00:00.000Z",
+   "months": 1,
+   "expected": "2026-02-28T00:00:00.000Z"
+  },
+  {
+   "iso": "2024-01-31T00:00:00.000Z",
+   "months": 1,
+   "expected": "2024-02-29T00:00:00.000Z"
+  },
+  {
+   "iso": "2026-12-15T00:00:00.000Z",
+   "months": 1,
+   "expected": "2027-01-15T00:00:00.000Z"
+  },
+  {
+   "iso": "2026-10-23T10:30:00.000Z",
+   "months": 12,
+   "expected": "2027-10-23T10:30:00.000Z"
+  },
+  {
+   "iso": "2026-03-31T00:00:00.000Z",
+   "months": 1,
+   "expected": "2026-04-30T00:00:00.000Z"
+  },
+  {
+   "iso": "2026-10-31T00:00:00.000Z",
+   "months": 1,
+   "expected": "2026-11-30T00:00:00.000Z"
+  }
+ ],
+ "quotes": [
+  {
+   "id": "basic-monthly-early",
+   "title": "renew early: the new period starts at the CURRENT period's end (nothing bought is lost)",
+   "registry": {
+    "ownerUid": "biz-x",
+    "ownerEmail": "o@x.com",
+    "name": "X",
+    "phone": "",
+    "city": "",
+    "createdAt": "2026-10-01T00:00:00.000Z",
+    "status": "active",
+    "enforce": false,
+    "plan": {
+     "planId": "basic",
+     "tierRank": 1,
+     "usersLimit": 3,
+     "invoiceLimit": 500,
+     "modulesTier": "core",
+     "periodFrom": "2026-10-01T00:00:00.000Z",
+     "periodTo": "2026-11-01T00:00:00.000Z",
+     "trialEndsAt": null,
+     "assignedBy": "admin",
+     "assignedAt": "2026-10-01T00:00:00.000Z"
+    }
+   },
+   "planId": "basic",
+   "billing": "monthly",
+   "now": "2026-10-20T00:00:00.000Z",
+   "expected": {
+    "ok": true,
+    "quote": {
+     "planId": "basic",
+     "billing": "monthly",
+     "months": 1,
+     "amount": 1500,
+     "periodFrom": "2026-11-01T00:00:00.000Z",
+     "periodTo": "2026-12-01T00:00:00.000Z"
+    }
+   }
+  },
+  {
+   "id": "basic-annual",
+   "title": "annual = 10 × monthly over 12 months",
+   "registry": {
+    "ownerUid": "biz-x",
+    "ownerEmail": "o@x.com",
+    "name": "X",
+    "phone": "",
+    "city": "",
+    "createdAt": "2026-10-01T00:00:00.000Z",
+    "status": "active",
+    "enforce": false,
+    "plan": {
+     "planId": "basic",
+     "tierRank": 1,
+     "usersLimit": 3,
+     "invoiceLimit": 500,
+     "modulesTier": "core",
+     "periodFrom": "2026-10-01T00:00:00.000Z",
+     "periodTo": "2026-11-01T00:00:00.000Z",
+     "trialEndsAt": null,
+     "assignedBy": "admin",
+     "assignedAt": "2026-10-01T00:00:00.000Z"
+    }
+   },
+   "planId": "basic",
+   "billing": "annual",
+   "now": "2026-10-20T00:00:00.000Z",
+   "expected": {
+    "ok": true,
+    "quote": {
+     "planId": "basic",
+     "billing": "annual",
+     "months": 12,
+     "amount": 15000,
+     "periodFrom": "2026-11-01T00:00:00.000Z",
+     "periodTo": "2027-11-01T00:00:00.000Z"
+    }
+   }
+  },
+  {
+   "id": "standard-from-grace",
+   "title": "renew from grace: the period starts NOW",
+   "registry": {
+    "ownerUid": "biz-x",
+    "ownerEmail": "o@x.com",
+    "name": "X",
+    "phone": "",
+    "city": "",
+    "createdAt": "2026-10-01T00:00:00.000Z",
+    "status": "active",
+    "enforce": false,
+    "plan": {
+     "planId": "basic",
+     "tierRank": 1,
+     "usersLimit": 3,
+     "invoiceLimit": 500,
+     "modulesTier": "core",
+     "periodFrom": "2026-10-01T00:00:00.000Z",
+     "periodTo": "2026-11-01T00:00:00.000Z",
+     "trialEndsAt": null,
+     "assignedBy": "admin",
+     "assignedAt": "2026-10-01T00:00:00.000Z"
+    }
+   },
+   "planId": "standard",
+   "billing": "monthly",
+   "now": "2026-11-06T00:00:00.000Z",
+   "expected": {
+    "ok": true,
+    "quote": {
+     "planId": "standard",
+     "billing": "monthly",
+     "months": 1,
+     "amount": 2500,
+     "periodFrom": "2026-11-06T00:00:00.000Z",
+     "periodTo": "2026-12-06T00:00:00.000Z"
+    }
+   }
+  },
+  {
+   "id": "advanced-annual-trial",
+   "title": "from trial: the period starts at the trial's end",
+   "registry": {
+    "ownerUid": "biz-x",
+    "ownerEmail": "o@x.com",
+    "name": "X",
+    "phone": "",
+    "city": "",
+    "createdAt": "2026-10-01T00:00:00.000Z",
+    "status": "active",
+    "enforce": false,
+    "plan": {
+     "planId": "trial",
+     "tierRank": 0,
+     "usersLimit": 2,
+     "invoiceLimit": 200,
+     "modulesTier": "standard",
+     "periodFrom": "2026-10-01T00:00:00.000Z",
+     "periodTo": null,
+     "trialEndsAt": "2026-10-15T00:00:00.000Z",
+     "assignedBy": "signup",
+     "assignedAt": "2026-10-01T00:00:00.000Z"
+    }
+   },
+   "planId": "advanced",
+   "billing": "annual",
+   "now": "2026-10-10T00:00:00.000Z",
+   "expected": {
+    "ok": true,
+    "quote": {
+     "planId": "advanced",
+     "billing": "annual",
+     "months": 12,
+     "amount": 40000,
+     "periodFrom": "2026-10-15T00:00:00.000Z",
+     "periodTo": "2027-10-15T00:00:00.000Z"
+    }
+   }
+  },
+  {
+   "id": "founding-refused",
+   "title": "founding has nothing to renew",
+   "registry": {
+    "ownerUid": "biz-x",
+    "ownerEmail": "o@x.com",
+    "name": "X",
+    "phone": "",
+    "city": "",
+    "createdAt": "2026-10-01T00:00:00.000Z",
+    "status": "active",
+    "enforce": false,
+    "plan": {
+     "planId": "founding",
+     "tierRank": 3,
+     "usersLimit": 10,
+     "invoiceLimit": 10000,
+     "modulesTier": "advanced",
+     "periodFrom": "2026-10-01T00:00:00.000Z",
+     "periodTo": null,
+     "trialEndsAt": null,
+     "assignedBy": "migration",
+     "assignedAt": "2026-10-01T00:00:00.000Z"
+    }
+   },
+   "planId": "basic",
+   "billing": "monthly",
+   "now": "2026-10-23T10:00:00.000Z",
+   "expected": {
+    "ok": false,
+    "reason": "not-applicable"
+   }
+  },
+  {
+   "id": "enterprise-current",
+   "title": "an enterprise business renews by console conversation",
+   "registry": {
+    "ownerUid": "biz-x",
+    "ownerEmail": "o@x.com",
+    "name": "X",
+    "phone": "",
+    "city": "",
+    "createdAt": "2026-10-01T00:00:00.000Z",
+    "status": "active",
+    "enforce": false,
+    "plan": {
+     "planId": "enterprise",
+     "tierRank": 4,
+     "usersLimit": 0,
+     "invoiceLimit": 0,
+     "modulesTier": "advanced",
+     "periodFrom": "2026-10-23T10:00:00.000Z",
+     "periodTo": null,
+     "trialEndsAt": null,
+     "assignedBy": "admin",
+     "assignedAt": "2026-10-23T10:00:00.000Z"
+    }
+   },
+   "planId": "basic",
+   "billing": "monthly",
+   "now": "2026-10-23T10:00:00.000Z",
+   "expected": {
+    "ok": false,
+    "reason": "custom-plan"
+   }
+  },
+  {
+   "id": "enterprise-target",
+   "title": "enterprise is not purchasable from the surface",
+   "registry": {
+    "ownerUid": "biz-x",
+    "ownerEmail": "o@x.com",
+    "name": "X",
+    "phone": "",
+    "city": "",
+    "createdAt": "2026-10-01T00:00:00.000Z",
+    "status": "active",
+    "enforce": false,
+    "plan": {
+     "planId": "basic",
+     "tierRank": 1,
+     "usersLimit": 3,
+     "invoiceLimit": 500,
+     "modulesTier": "core",
+     "periodFrom": "2026-10-01T00:00:00.000Z",
+     "periodTo": "2026-11-01T00:00:00.000Z",
+     "trialEndsAt": null,
+     "assignedBy": "admin",
+     "assignedAt": "2026-10-01T00:00:00.000Z"
+    }
+   },
+   "planId": "enterprise",
+   "billing": "monthly",
+   "now": "2026-10-23T10:00:00.000Z",
+   "expected": {
+    "ok": false,
+    "reason": "custom-plan"
+   }
+  },
+  {
+   "id": "trial-target",
+   "title": "trial is a birth state, not purchasable",
+   "registry": {
+    "ownerUid": "biz-x",
+    "ownerEmail": "o@x.com",
+    "name": "X",
+    "phone": "",
+    "city": "",
+    "createdAt": "2026-10-01T00:00:00.000Z",
+    "status": "active",
+    "enforce": false,
+    "plan": {
+     "planId": "basic",
+     "tierRank": 1,
+     "usersLimit": 3,
+     "invoiceLimit": 500,
+     "modulesTier": "core",
+     "periodFrom": "2026-10-01T00:00:00.000Z",
+     "periodTo": "2026-11-01T00:00:00.000Z",
+     "trialEndsAt": null,
+     "assignedBy": "admin",
+     "assignedAt": "2026-10-01T00:00:00.000Z"
+    }
+   },
+   "planId": "trial",
+   "billing": "monthly",
+   "now": "2026-10-23T10:00:00.000Z",
+   "expected": {
+    "ok": false,
+    "reason": "not-purchasable"
+   }
+  },
+  {
+   "id": "no-registry",
+   "title": "no registry ⇒ no quote",
+   "registry": null,
+   "planId": "basic",
+   "billing": "monthly",
+   "now": "2026-10-23T10:00:00.000Z",
+   "expected": {
+    "ok": false,
+    "reason": "no-registry"
+   }
+  },
+  {
+   "id": "dateless-registry",
+   "title": "a dateless paid snapshot renews from now",
+   "registry": {
+    "ownerUid": "biz-x",
+    "ownerEmail": "o@x.com",
+    "name": "X",
+    "phone": "",
+    "city": "",
+    "createdAt": "2026-10-01T00:00:00.000Z",
+    "status": "active",
+    "enforce": false,
+    "plan": {
+     "planId": "basic",
+     "tierRank": 1,
+     "usersLimit": 3,
+     "invoiceLimit": 500,
+     "modulesTier": "core",
+     "periodFrom": "2026-10-01T00:00:00.000Z",
+     "periodTo": null,
+     "trialEndsAt": null,
+     "assignedBy": "admin",
+     "assignedAt": "2026-10-01T00:00:00.000Z"
+    }
+   },
+   "planId": "standard",
+   "billing": "monthly",
+   "now": "2026-10-20T00:00:00.000Z",
+   "expected": {
+    "ok": true,
+    "quote": {
+     "planId": "standard",
+     "billing": "monthly",
+     "months": 1,
+     "amount": 2500,
+     "periodFrom": "2026-10-20T00:00:00.000Z",
+     "periodTo": "2026-11-20T00:00:00.000Z"
+    }
+   }
+  }
+ ],
+ "submissions": [
+  {
+   "id": "submit-ok",
+   "title": "the record is born submitted, in the owner's name, amount from the catalogue",
+   "input": {
+    "registry": {
+     "ownerUid": "biz-x",
+     "ownerEmail": "o@x.com",
+     "name": "X",
+     "phone": "",
+     "city": "",
+     "createdAt": "2026-10-01T00:00:00.000Z",
+     "status": "active",
+     "enforce": false,
+     "plan": {
+      "planId": "basic",
+      "tierRank": 1,
+      "usersLimit": 3,
+      "invoiceLimit": 500,
+      "modulesTier": "core",
+      "periodFrom": "2026-10-01T00:00:00.000Z",
+      "periodTo": "2026-11-01T00:00:00.000Z",
+      "trialEndsAt": null,
+      "assignedBy": "admin",
+      "assignedAt": "2026-10-01T00:00:00.000Z"
+     }
+    },
+    "businessId": "biz-x",
+    "planId": "standard",
+    "billing": "monthly",
+    "method": "raast",
+    "reference": "FT-98213",
+    "actor": "biz-x",
+    "now": "2026-10-20T00:00:00.000Z"
+   },
+   "expected": {
+    "ok": true,
+    "writes": [
+     {
+      "kind": "add",
+      "collection": "platformPayments",
+      "data": {
+       "businessId": "biz-x",
+       "amount": 2500,
+       "method": "raast",
+       "reference": "FT-98213",
+       "periodFrom": "2026-11-01T00:00:00.000Z",
+       "periodTo": "2026-12-01T00:00:00.000Z",
+       "planId": "standard",
+       "billingPeriod": "monthly",
+       "state": "submitted",
+       "submittedBy": "biz-x",
+       "confirmedBy": null,
+       "submittedAt": "2026-10-20T00:00:00.000Z",
+       "confirmedAt": null
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "submit-ok-note",
+   "title": "a non-blank owner note rides; the amount follows an annual quote",
+   "input": {
+    "registry": {
+     "ownerUid": "biz-x",
+     "ownerEmail": "o@x.com",
+     "name": "X",
+     "phone": "",
+     "city": "",
+     "createdAt": "2026-10-01T00:00:00.000Z",
+     "status": "active",
+     "enforce": false,
+     "plan": {
+      "planId": "basic",
+      "tierRank": 1,
+      "usersLimit": 3,
+      "invoiceLimit": 500,
+      "modulesTier": "core",
+      "periodFrom": "2026-10-01T00:00:00.000Z",
+      "periodTo": "2026-11-01T00:00:00.000Z",
+      "trialEndsAt": null,
+      "assignedBy": "admin",
+      "assignedAt": "2026-10-01T00:00:00.000Z"
+     }
+    },
+    "businessId": "biz-x",
+    "planId": "standard",
+    "billing": "annual",
+    "method": "raast",
+    "reference": "FT-98213",
+    "actor": "biz-x",
+    "now": "2026-10-20T00:00:00.000Z",
+    "ownerNote": "  paid via branch  "
+   },
+   "expected": {
+    "ok": true,
+    "writes": [
+     {
+      "kind": "add",
+      "collection": "platformPayments",
+      "data": {
+       "businessId": "biz-x",
+       "amount": 25000,
+       "method": "raast",
+       "reference": "FT-98213",
+       "periodFrom": "2026-11-01T00:00:00.000Z",
+       "periodTo": "2027-11-01T00:00:00.000Z",
+       "planId": "standard",
+       "billingPeriod": "annual",
+       "state": "submitted",
+       "submittedBy": "biz-x",
+       "confirmedBy": null,
+       "submittedAt": "2026-10-20T00:00:00.000Z",
+       "confirmedAt": null,
+       "ownerNote": "paid via branch"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "submit-suspended-ok",
+   "title": "submission stays open while SUSPENDED (the remedy must reach it)",
+   "input": {
+    "registry": {
+     "ownerUid": "biz-x",
+     "ownerEmail": "o@x.com",
+     "name": "X",
+     "phone": "",
+     "city": "",
+     "createdAt": "2026-10-01T00:00:00.000Z",
+     "status": "suspended",
+     "enforce": false,
+     "plan": {
+      "planId": "basic",
+      "tierRank": 1,
+      "usersLimit": 3,
+      "invoiceLimit": 500,
+      "modulesTier": "core",
+      "periodFrom": "2026-10-01T00:00:00.000Z",
+      "periodTo": "2026-11-01T00:00:00.000Z",
+      "trialEndsAt": null,
+      "assignedBy": "admin",
+      "assignedAt": "2026-10-01T00:00:00.000Z"
+     }
+    },
+    "businessId": "biz-x",
+    "planId": "standard",
+    "billing": "monthly",
+    "method": "raast",
+    "reference": "FT-98213",
+    "actor": "biz-x",
+    "now": "2026-10-20T00:00:00.000Z"
+   },
+   "expected": {
+    "ok": true,
+    "writes": [
+     {
+      "kind": "add",
+      "collection": "platformPayments",
+      "data": {
+       "businessId": "biz-x",
+       "amount": 2500,
+       "method": "raast",
+       "reference": "FT-98213",
+       "periodFrom": "2026-11-01T00:00:00.000Z",
+       "periodTo": "2026-12-01T00:00:00.000Z",
+       "planId": "standard",
+       "billingPeriod": "monthly",
+       "state": "submitted",
+       "submittedBy": "biz-x",
+       "confirmedBy": null,
+       "submittedAt": "2026-10-20T00:00:00.000Z",
+       "confirmedAt": null
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "submit-not-owner",
+   "title": "actor ≠ business ⇒ refused (a member cannot submit the owner's renewal)",
+   "input": {
+    "registry": {
+     "ownerUid": "biz-x",
+     "ownerEmail": "o@x.com",
+     "name": "X",
+     "phone": "",
+     "city": "",
+     "createdAt": "2026-10-01T00:00:00.000Z",
+     "status": "active",
+     "enforce": false,
+     "plan": {
+      "planId": "basic",
+      "tierRank": 1,
+      "usersLimit": 3,
+      "invoiceLimit": 500,
+      "modulesTier": "core",
+      "periodFrom": "2026-10-01T00:00:00.000Z",
+      "periodTo": "2026-11-01T00:00:00.000Z",
+      "trialEndsAt": null,
+      "assignedBy": "admin",
+      "assignedAt": "2026-10-01T00:00:00.000Z"
+     }
+    },
+    "businessId": "biz-x",
+    "planId": "standard",
+    "billing": "monthly",
+    "method": "raast",
+    "reference": "FT-98213",
+    "actor": "u-7",
+    "now": "2026-10-20T00:00:00.000Z"
+   },
+   "expected": {
+    "ok": false,
+    "reason": "not-owner",
+    "writes": []
+   }
+  },
+  {
+   "id": "submit-bad-method",
+   "title": "an unknown method refuses",
+   "input": {
+    "registry": {
+     "ownerUid": "biz-x",
+     "ownerEmail": "o@x.com",
+     "name": "X",
+     "phone": "",
+     "city": "",
+     "createdAt": "2026-10-01T00:00:00.000Z",
+     "status": "active",
+     "enforce": false,
+     "plan": {
+      "planId": "basic",
+      "tierRank": 1,
+      "usersLimit": 3,
+      "invoiceLimit": 500,
+      "modulesTier": "core",
+      "periodFrom": "2026-10-01T00:00:00.000Z",
+      "periodTo": "2026-11-01T00:00:00.000Z",
+      "trialEndsAt": null,
+      "assignedBy": "admin",
+      "assignedAt": "2026-10-01T00:00:00.000Z"
+     }
+    },
+    "businessId": "biz-x",
+    "planId": "standard",
+    "billing": "monthly",
+    "method": "card",
+    "reference": "FT-98213",
+    "actor": "biz-x",
+    "now": "2026-10-20T00:00:00.000Z"
+   },
+   "expected": {
+    "ok": false,
+    "reason": "bad-method",
+    "writes": []
+   }
+  },
+  {
+   "id": "submit-blank-reference",
+   "title": "a blank reference refuses (nothing to check against the bank)",
+   "input": {
+    "registry": {
+     "ownerUid": "biz-x",
+     "ownerEmail": "o@x.com",
+     "name": "X",
+     "phone": "",
+     "city": "",
+     "createdAt": "2026-10-01T00:00:00.000Z",
+     "status": "active",
+     "enforce": false,
+     "plan": {
+      "planId": "basic",
+      "tierRank": 1,
+      "usersLimit": 3,
+      "invoiceLimit": 500,
+      "modulesTier": "core",
+      "periodFrom": "2026-10-01T00:00:00.000Z",
+      "periodTo": "2026-11-01T00:00:00.000Z",
+      "trialEndsAt": null,
+      "assignedBy": "admin",
+      "assignedAt": "2026-10-01T00:00:00.000Z"
+     }
+    },
+    "businessId": "biz-x",
+    "planId": "standard",
+    "billing": "monthly",
+    "method": "raast",
+    "reference": "   ",
+    "actor": "biz-x",
+    "now": "2026-10-20T00:00:00.000Z"
+   },
+   "expected": {
+    "ok": false,
+    "reason": "reference-required",
+    "writes": []
+   }
+  },
+  {
+   "id": "submit-no-registry",
+   "title": "no registry ⇒ refused",
+   "input": {
+    "registry": null,
+    "businessId": "biz-x",
+    "planId": "standard",
+    "billing": "monthly",
+    "method": "raast",
+    "reference": "FT-98213",
+    "actor": "biz-x",
+    "now": "2026-10-20T00:00:00.000Z"
+   },
+   "expected": {
+    "ok": false,
+    "reason": "no-registry",
+    "writes": []
+   }
+  },
+  {
+   "id": "submit-founding",
+   "title": "founding refuses through the quote",
+   "input": {
+    "registry": {
+     "ownerUid": "biz-x",
+     "ownerEmail": "o@x.com",
+     "name": "X",
+     "phone": "",
+     "city": "",
+     "createdAt": "2026-10-01T00:00:00.000Z",
+     "status": "active",
+     "enforce": false,
+     "plan": {
+      "planId": "founding",
+      "tierRank": 3,
+      "usersLimit": 10,
+      "invoiceLimit": 10000,
+      "modulesTier": "advanced",
+      "periodFrom": "2026-10-01T00:00:00.000Z",
+      "periodTo": null,
+      "trialEndsAt": null,
+      "assignedBy": "migration",
+      "assignedAt": "2026-10-01T00:00:00.000Z"
+     }
+    },
+    "businessId": "biz-x",
+    "planId": "standard",
+    "billing": "monthly",
+    "method": "raast",
+    "reference": "FT-98213",
+    "actor": "biz-x",
+    "now": "2026-10-20T00:00:00.000Z"
+   },
+   "expected": {
+    "ok": false,
+    "reason": "not-applicable",
+    "writes": []
+   }
+  }
+ ],
+ "lifecycle": [
+  {
+   "id": "lc-trial-far",
+   "title": "trial with > 7 days left: plain countdown + pool figures",
+   "registry": {
+    "ownerUid": "biz-x",
+    "ownerEmail": "o@x.com",
+    "name": "X",
+    "phone": "",
+    "city": "",
+    "createdAt": "2026-10-01T00:00:00.000Z",
+    "status": "active",
+    "enforce": false,
+    "plan": {
+     "planId": "trial",
+     "tierRank": 0,
+     "usersLimit": 2,
+     "invoiceLimit": 200,
+     "modulesTier": "standard",
+     "periodFrom": "2026-10-20T09:00:00.000Z",
+     "periodTo": null,
+     "trialEndsAt": "2026-11-03T09:00:00.000Z",
+     "assignedBy": "signup",
+     "assignedAt": "2026-10-20T09:00:00.000Z"
+    }
+   },
+   "counters": {
+    "invoiceMonth": "2026-10",
+    "invoiceCount": 12,
+    "memberCount": 1
+   },
+   "now": "2026-10-23T09:00:00.000Z",
+   "expected": {
+    "kind": "trial",
+    "daysLeft": 11
+   }
+  },
+  {
+   "id": "lc-trial-approaching",
+   "title": "7 days left ⇒ approaching",
+   "registry": {
+    "ownerUid": "biz-x",
+    "ownerEmail": "o@x.com",
+    "name": "X",
+    "phone": "",
+    "city": "",
+    "createdAt": "2026-10-01T00:00:00.000Z",
+    "status": "active",
+    "enforce": false,
+    "plan": {
+     "planId": "trial",
+     "tierRank": 0,
+     "usersLimit": 2,
+     "invoiceLimit": 200,
+     "modulesTier": "standard",
+     "periodFrom": "2026-10-20T09:00:00.000Z",
+     "periodTo": null,
+     "trialEndsAt": "2026-11-03T09:00:00.000Z",
+     "assignedBy": "signup",
+     "assignedAt": "2026-10-20T09:00:00.000Z"
+    }
+   },
+   "counters": null,
+   "now": "2026-10-27T09:00:00.000Z",
+   "expected": {
+    "kind": "trial-approaching",
+    "daysLeft": 7
+   }
+  },
+  {
+   "id": "lc-trial-urgent",
+   "title": "1 day left ⇒ urgent",
+   "registry": {
+    "ownerUid": "biz-x",
+    "ownerEmail": "o@x.com",
+    "name": "X",
+    "phone": "",
+    "city": "",
+    "createdAt": "2026-10-01T00:00:00.000Z",
+    "status": "active",
+    "enforce": false,
+    "plan": {
+     "planId": "trial",
+     "tierRank": 0,
+     "usersLimit": 2,
+     "invoiceLimit": 200,
+     "modulesTier": "standard",
+     "periodFrom": "2026-10-20T09:00:00.000Z",
+     "periodTo": null,
+     "trialEndsAt": "2026-11-03T09:00:00.000Z",
+     "assignedBy": "signup",
+     "assignedAt": "2026-10-20T09:00:00.000Z"
+    }
+   },
+   "counters": null,
+   "now": "2026-11-02T09:00:00.000Z",
+   "expected": {
+    "kind": "trial-urgent",
+    "daysLeft": 1
+   }
+  },
+  {
+   "id": "lc-trial-urgent-halfday",
+   "title": "12 hours left: ceil ⇒ 1 day, urgent",
+   "registry": {
+    "ownerUid": "biz-x",
+    "ownerEmail": "o@x.com",
+    "name": "X",
+    "phone": "",
+    "city": "",
+    "createdAt": "2026-10-01T00:00:00.000Z",
+    "status": "active",
+    "enforce": false,
+    "plan": {
+     "planId": "trial",
+     "tierRank": 0,
+     "usersLimit": 2,
+     "invoiceLimit": 200,
+     "modulesTier": "standard",
+     "periodFrom": "2026-10-20T09:00:00.000Z",
+     "periodTo": null,
+     "trialEndsAt": "2026-11-03T09:00:00.000Z",
+     "assignedBy": "signup",
+     "assignedAt": "2026-10-20T09:00:00.000Z"
+    }
+   },
+   "counters": null,
+   "now": "2026-11-02T21:00:00.000Z",
+   "expected": {
+    "kind": "trial-urgent",
+    "daysLeft": 1
+   }
+  },
+  {
+   "id": "lc-grace",
+   "title": "5 days into grace: elapsed + left",
+   "registry": {
+    "ownerUid": "biz-x",
+    "ownerEmail": "o@x.com",
+    "name": "X",
+    "phone": "",
+    "city": "",
+    "createdAt": "2026-10-01T00:00:00.000Z",
+    "status": "active",
+    "enforce": false,
+    "plan": {
+     "planId": "basic",
+     "tierRank": 1,
+     "usersLimit": 3,
+     "invoiceLimit": 500,
+     "modulesTier": "core",
+     "periodFrom": "2026-10-01T00:00:00.000Z",
+     "periodTo": "2026-11-01T00:00:00.000Z",
+     "trialEndsAt": null,
+     "assignedBy": "admin",
+     "assignedAt": "2026-10-01T00:00:00.000Z"
+    }
+   },
+   "counters": null,
+   "now": "2026-11-06T00:00:00.000Z",
+   "expected": {
+    "kind": "grace",
+    "daysElapsed": 5,
+    "graceLeft": 25
+   }
+  },
+  {
+   "id": "lc-grace-last-hour",
+   "title": "the last hour of grace: elapsed floors, left ceils to 1",
+   "registry": {
+    "ownerUid": "biz-x",
+    "ownerEmail": "o@x.com",
+    "name": "X",
+    "phone": "",
+    "city": "",
+    "createdAt": "2026-10-01T00:00:00.000Z",
+    "status": "active",
+    "enforce": false,
+    "plan": {
+     "planId": "basic",
+     "tierRank": 1,
+     "usersLimit": 3,
+     "invoiceLimit": 500,
+     "modulesTier": "core",
+     "periodFrom": "2026-10-01T00:00:00.000Z",
+     "periodTo": "2026-11-01T00:00:00.000Z",
+     "trialEndsAt": null,
+     "assignedBy": "admin",
+     "assignedAt": "2026-10-01T00:00:00.000Z"
+    }
+   },
+   "counters": null,
+   "now": "2026-11-30T23:00:00.000Z",
+   "expected": {
+    "kind": "grace",
+    "daysElapsed": 29,
+    "graceLeft": 1
+   }
+  },
+  {
+   "id": "lc-readonly",
+   "title": "past grace ⇒ readonly",
+   "registry": {
+    "ownerUid": "biz-x",
+    "ownerEmail": "o@x.com",
+    "name": "X",
+    "phone": "",
+    "city": "",
+    "createdAt": "2026-10-01T00:00:00.000Z",
+    "status": "active",
+    "enforce": false,
+    "plan": {
+     "planId": "basic",
+     "tierRank": 1,
+     "usersLimit": 3,
+     "invoiceLimit": 500,
+     "modulesTier": "core",
+     "periodFrom": "2026-10-01T00:00:00.000Z",
+     "periodTo": "2026-11-01T00:00:00.000Z",
+     "trialEndsAt": null,
+     "assignedBy": "admin",
+     "assignedAt": "2026-10-01T00:00:00.000Z"
+    }
+   },
+   "counters": null,
+   "now": "2026-12-02T00:00:00.000Z",
+   "expected": {
+    "kind": "readonly"
+   }
+  },
+  {
+   "id": "lc-suspended",
+   "title": "suspended",
+   "registry": {
+    "ownerUid": "biz-x",
+    "ownerEmail": "o@x.com",
+    "name": "X",
+    "phone": "",
+    "city": "",
+    "createdAt": "2026-10-01T00:00:00.000Z",
+    "status": "suspended",
+    "enforce": false,
+    "plan": {
+     "planId": "basic",
+     "tierRank": 1,
+     "usersLimit": 3,
+     "invoiceLimit": 500,
+     "modulesTier": "core",
+     "periodFrom": "2026-10-01T00:00:00.000Z",
+     "periodTo": "2026-11-01T00:00:00.000Z",
+     "trialEndsAt": null,
+     "assignedBy": "admin",
+     "assignedAt": "2026-10-01T00:00:00.000Z"
+    }
+   },
+   "counters": null,
+   "now": "2026-10-23T10:00:00.000Z",
+   "expected": {
+    "kind": "suspended"
+   }
+  },
+  {
+   "id": "lc-active-calm",
+   "title": "active ⇒ no banner",
+   "registry": {
+    "ownerUid": "biz-x",
+    "ownerEmail": "o@x.com",
+    "name": "X",
+    "phone": "",
+    "city": "",
+    "createdAt": "2026-10-01T00:00:00.000Z",
+    "status": "active",
+    "enforce": false,
+    "plan": {
+     "planId": "basic",
+     "tierRank": 1,
+     "usersLimit": 3,
+     "invoiceLimit": 500,
+     "modulesTier": "core",
+     "periodFrom": "2026-10-01T00:00:00.000Z",
+     "periodTo": "2026-11-01T00:00:00.000Z",
+     "trialEndsAt": null,
+     "assignedBy": "admin",
+     "assignedAt": "2026-10-01T00:00:00.000Z"
+    }
+   },
+   "counters": null,
+   "now": "2026-10-20T00:00:00.000Z",
+   "expected": null
+  },
+  {
+   "id": "lc-founding-calm",
+   "title": "founding ⇒ no banner, ever",
+   "registry": {
+    "ownerUid": "biz-x",
+    "ownerEmail": "o@x.com",
+    "name": "X",
+    "phone": "",
+    "city": "",
+    "createdAt": "2026-10-01T00:00:00.000Z",
+    "status": "active",
+    "enforce": false,
+    "plan": {
+     "planId": "founding",
+     "tierRank": 3,
+     "usersLimit": 10,
+     "invoiceLimit": 10000,
+     "modulesTier": "advanced",
+     "periodFrom": "2026-10-01T00:00:00.000Z",
+     "periodTo": null,
+     "trialEndsAt": null,
+     "assignedBy": "migration",
+     "assignedAt": "2026-10-01T00:00:00.000Z"
+    }
+   },
+   "counters": null,
+   "now": "2031-01-01T00:00:00.000Z",
+   "expected": null
+  }
+ ],
+ "reasons": [
+  {
+   "id": "reason-latest",
+   "events": [
+    {
+     "businessId": "biz-x",
+     "kind": "business.suspended",
+     "actor": "admin-1",
+     "at": "2026-10-01T00:00:00.000Z",
+     "detail": {
+      "reason": "Non-payment"
+     }
+    }
+   ],
+   "expected": "Non-payment"
+  },
+  {
+   "id": "reason-cleared-by-activation",
+   "events": [
+    {
+     "businessId": "biz-x",
+     "kind": "business.suspended",
+     "actor": "admin-1",
+     "at": "2026-10-01T00:00:00.000Z",
+     "detail": {
+      "reason": "Non-payment"
+     }
+    },
+    {
+     "businessId": "biz-x",
+     "kind": "business.activated",
+     "actor": "admin-1",
+     "at": "2026-10-05T00:00:00.000Z",
+     "detail": {}
+    }
+   ],
+   "expected": null
+  },
+  {
+   "id": "reason-second-suspension",
+   "events": [
+    {
+     "businessId": "biz-x",
+     "kind": "business.suspended",
+     "actor": "admin-1",
+     "at": "2026-09-01T00:00:00.000Z",
+     "detail": {
+      "reason": "First"
+     }
+    },
+    {
+     "businessId": "biz-x",
+     "kind": "business.activated",
+     "actor": "admin-1",
+     "at": "2026-09-05T00:00:00.000Z",
+     "detail": {}
+    },
+    {
+     "businessId": "biz-x",
+     "kind": "business.suspended",
+     "actor": "admin-1",
+     "at": "2026-10-01T00:00:00.000Z",
+     "detail": {
+      "reason": "Second"
+     }
+    }
+   ],
+   "expected": "Second"
+  },
+  {
+   "id": "reason-none-recorded",
+   "events": [
+    {
+     "businessId": "biz-x",
+     "kind": "business.suspended",
+     "actor": "admin-1",
+     "at": "2026-10-01T00:00:00.000Z",
+     "detail": {}
+    }
+   ],
+   "expected": null
+  },
+  {
+   "id": "reason-no-events",
+   "events": [],
+   "expected": null
+  }
+ ],
+ "crossClient": {
+  "now": "2026-10-23T10:00:00.000Z",
+  "stafferEmail": "shared@staff.com",
+  "accounts": [
+   {
+    "id": "acct-till",
+    "name": "Main Till",
+    "kind": "cash",
+    "method": "cash",
+    "legacyFor": "cash",
+    "archived": false,
+    "sortOrder": 0,
+    "ts": "2026-01-01T00:00:00.000Z"
+   },
+   {
+    "id": "acct-wallet",
+    "name": "Wallet & Bank",
+    "kind": "wallet",
+    "method": null,
+    "legacyFor": "wallet",
+    "archived": false,
+    "sortOrder": 1,
+    "ts": "2026-01-01T00:00:00.000Z"
+   }
+  ],
+  "products": [
+   {
+    "id": "p-tea",
+    "sku": "TEA-475",
+    "name": "Tapal Danedar Tea 475g",
+    "costPrice": 800,
+    "salePrice": 1050,
+    "stockClass": null,
+    "taxSlabId": null,
+    "taxExempt": false
+   },
+   {
+    "id": "p-sugar",
+    "sku": "SUG-1KG",
+    "name": "Sugar 1kg",
+    "costPrice": 130,
+    "salePrice": 145,
+    "stockClass": null,
+    "taxSlabId": null,
+    "taxExempt": false
+   }
+  ],
+  "businesses": [
+   {
+    "businessId": "biz-a",
+    "registry": {
+     "ownerUid": "biz-a",
+     "ownerEmail": "o@x.com",
+     "name": "X",
+     "phone": "",
+     "city": "",
+     "createdAt": "2026-10-01T00:00:00.000Z",
+     "status": "active",
+     "enforce": false,
+     "plan": {
+      "planId": "trial",
+      "tierRank": 0,
+      "usersLimit": 2,
+      "invoiceLimit": 200,
+      "modulesTier": "standard",
+      "periodFrom": "2026-10-20T09:00:00.000Z",
+      "periodTo": null,
+      "trialEndsAt": "2026-11-03T09:00:00.000Z",
+      "assignedBy": "signup",
+      "assignedAt": "2026-10-20T09:00:00.000Z"
+     }
+    },
+    "counters": {
+     "invoiceMonth": "2026-10",
+     "invoiceCount": 3,
+     "memberCount": 1
+    },
+    "staffEmails": [
+     "shared@staff.com"
+    ],
+    "membership": {
+     "role": "cashier"
+    },
+    "expected": {
+     "resolution": {
+      "access": true,
+      "role": "cashier",
+      "via": "membership"
+     },
+     "state": "trial",
+     "counterAfter": {
+      "invoiceMonth": "2026-10",
+      "invoiceCount": 4,
+      "memberCount": 1
+     }
+    }
+   },
+   {
+    "businessId": "biz-b",
+    "registry": {
+     "ownerUid": "biz-b",
+     "ownerEmail": "o@x.com",
+     "name": "X",
+     "phone": "",
+     "city": "",
+     "createdAt": "2026-10-01T00:00:00.000Z",
+     "status": "active",
+     "enforce": false,
+     "plan": {
+      "planId": "basic",
+      "tierRank": 1,
+      "usersLimit": 3,
+      "invoiceLimit": 500,
+      "modulesTier": "core",
+      "periodFrom": "2026-10-01T09:00:00.000Z",
+      "periodTo": "2026-11-01T09:00:00.000Z",
+      "trialEndsAt": null,
+      "assignedBy": "admin",
+      "assignedAt": "2026-10-01T09:00:00.000Z"
+     }
+    },
+    "counters": {
+     "invoiceMonth": "2026-10",
+     "invoiceCount": 41,
+     "memberCount": 2
+    },
+    "staffEmails": [
+     "shared@staff.com",
+     "second@staff.com"
+    ],
+    "membership": {
+     "role": "manager"
+    },
+    "expected": {
+     "resolution": {
+      "access": true,
+      "role": "manager",
+      "via": "membership"
+     },
+     "state": "active",
+     "counterAfter": {
+      "invoiceMonth": "2026-10",
+      "invoiceCount": 42,
+      "memberCount": 2
+     }
+    }
+   }
+  ],
+  "trades": [
+   {
+    "businessId": "biz-a",
+    "kind": "bill",
+    "input": {
+     "id": "bill-a1",
+     "billNo": 1,
+     "lines": [
+      {
+       "productId": "p-tea",
+       "qty": 2
+      }
+     ],
+     "payments": [
+      {
+       "method": "cash",
+       "amount": 2100
+      }
+     ]
+    },
+    "entry": {
+     "memo": "Bill #1 — Walk-in customer",
+     "refType": "bill",
+     "refId": "bill-a1",
+     "reversesId": null,
+     "lines": [
+      {
+       "account": "cash",
+       "debit": 2100,
+       "credit": 0,
+       "ref": "acct-till"
+      },
+      {
+       "account": "cogs",
+       "debit": 1600,
+       "credit": 0,
+       "ref": null
+      },
+      {
+       "account": "sales_revenue",
+       "debit": 0,
+       "credit": 2100,
+       "ref": null
+      },
+      {
+       "account": "inventory",
+       "debit": 0,
+       "credit": 1600,
+       "ref": null
+      }
+     ]
+    }
+   },
+   {
+    "businessId": "biz-b",
+    "kind": "counter",
+    "input": {
+     "id": "sale-b1",
+     "productId": "p-sugar",
+     "qty": 3
+    },
+    "entry": {
+     "memo": "Counter sale — Sugar 1kg × 3",
+     "refType": "sale",
+     "refId": "sale-b1",
+     "reversesId": null,
+     "lines": [
+      {
+       "account": "cash",
+       "debit": 435,
+       "credit": 0,
+       "ref": "acct-till"
+      },
+      {
+       "account": "cogs",
+       "debit": 390,
+       "credit": 0,
+       "ref": null
+      },
+      {
+       "account": "sales_revenue",
+       "debit": 0,
+       "credit": 435,
+       "ref": null
+      },
+      {
+       "account": "inventory",
+       "debit": 0,
+       "credit": 390,
+       "ref": null
+      }
+     ]
+    }
+   }
+  ]
+ }
+}

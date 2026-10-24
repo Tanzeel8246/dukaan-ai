@@ -94,6 +94,37 @@ export function addDaysISO(dateISO: string, days: number): string {
   return `${dt.getUTCFullYear()}-${pad2(dt.getUTCMonth() + 1)}-${pad2(dt.getUTCDate())}`;
 }
 
+/**
+ * The age, in whole PKT business days, of a row stamped at `tsISO`
+ * relative to the business day `todayISO` — the DERIVED dayOffset
+ * (Fix Round 1 · F3).
+ *
+ * A row's stored `dayOffset` is written ONCE, at creation, as 0
+ * ("today"), and nothing in a running shop ever recomputes it —
+ * so every `dayOffset === 0` consumer (the day-close "today"
+ * scope, aging ages, the dashboard's today figures) silently
+ * widens with each passing day: on 2026-10-24 the owner's live
+ * shop still counted its 22-Oct rows as "today" (the live test's
+ * F3). The row's `ts` is the truth — it never moves — so the
+ * effective offset is derived from it at load: the store re-bases
+ * every loaded row through this function, and downstream code
+ * keeps reading `dayOffset` unchanged. Floor 0: a future-stamped
+ * row is "today", never negative. An unparseable `ts` keeps
+ * whatever stamp the caller passes as `fallback`.
+ */
+export function dayOffsetForTs(
+  tsISO: string,
+  todayISO: string,
+  fallback = 0
+): number {
+  const date = businessDateISO(tsISO);
+  if (!date || !isValidDateISO(todayISO)) return fallback;
+  const ms =
+    Date.parse(`${todayISO}T00:00:00.000Z`) - Date.parse(`${date}T00:00:00.000Z`);
+  if (!Number.isFinite(ms)) return fallback;
+  return Math.max(0, Math.round(ms / DAY_MS));
+}
+
 /** The instant a PKT business date begins: 00:00:00.000 PKT. */
 export function startOfDayPktInstant(dateISO: string): string {
   const [y, m, d] = dateISO.split("-").map(Number);

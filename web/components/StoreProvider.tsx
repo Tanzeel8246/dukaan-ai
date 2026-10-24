@@ -35,13 +35,19 @@ import {
   arrayUnion,
   collection,
   deleteDoc,
+  deleteField,
   doc,
   getDoc,
   getDocs,
   increment,
+  limit,
   onSnapshot,
+  orderBy,
+  query,
   setDoc,
+  Timestamp,
   updateDoc,
+  where,
   writeBatch,
   type Firestore,
   type WriteBatch,
@@ -53,6 +59,8 @@ import type {
   Bill,
   BillPayment,
   Bom,
+  BrandingAsset,
+  BrandingAssetKind,
   CashEntry,
   Cheque,
   ChequeDraft,
@@ -68,6 +76,8 @@ import type {
   Job,
   JournalEntry,
   Loan,
+  LoanDirection,
+  LoanEvent,
   MoneyAccount,
   PayMethod,
   PayrollPaymentEvent,
@@ -90,10 +100,17 @@ import type {
   StockAdjustment,
   StockLevel,
   StockTransfer,
+  StoreOrder,
+  StorefrontDoc,
   Supplier,
   SupplierPayment,
   TaxSlab,
   Warehouse,
+  WaAudience,
+  WaCampaign,
+  WaSend,
+  WaTemplate,
+  WaTemplateKind,
 } from "@/lib/types";
 import {
   getSeedAccounts,
@@ -102,11 +119,14 @@ import {
   getSeedCredits,
   getSeedCustomers,
   getSeedDeliveryChallans,
+  getDemoLoyaltyEntries,
+  getDemoSettings,
   getSeedEmployees,
   getSeedPayrollRunDraft,
   getSeedExpenses,
   getSeedJobs,
   getSeedJournal,
+  getSeedLoans,
   getSeedProducts,
   getSeedProductionOrders,
   getSeedPurchases,
@@ -216,6 +236,81 @@ import {
   payrollRunTotals,
   salaryPayableComposition,
 } from "@/lib/payroll";
+import {
+  newBusinessSkeleton,
+  planMigration,
+  planTrialBirth,
+  type BusinessCountersDoc,
+  type BusinessEventDoc,
+  type BusinessRegistryDoc,
+  type InviteDoc,
+  type MembershipDoc,
+  type PlatformWrite,
+} from "@/lib/tenancy";
+import {
+  nextInvoiceCounter,
+  nextMemberCounter,
+  planInvoiceRefusal,
+  planMemberRefusal,
+  planViewOf,
+  type PlanId,
+  type PlanRefusal,
+  type PlanView,
+} from "@/lib/plans";
+import {
+  PLATFORM_CONFIG_DOC_ID,
+  type PlatformConfigDoc,
+  type PlatformPaymentDoc,
+  type PlatformPaymentMethod,
+} from "@/lib/platform";
+import {
+  latestSuspensionReason,
+  planRenewalSubmission,
+  type RenewalSubmissionForm,
+} from "@/lib/renewal";
+import {
+  assembleBackup,
+  planRestore,
+  TENANT_COLLECTIONS,
+  verifyBackup,
+  type BusinessBackup,
+  type JsonDoc,
+  type RestorePlan,
+  type RestoreTargetState,
+} from "@/lib/backup";
+import {
+  classifyBusinessContent,
+  DEMO_CONTENT_COLLECTIONS,
+  demoSetIds,
+  demoSummary,
+  planDemoSeed,
+  summarizeSeedWrites,
+  type BusinessContentClass,
+  type DemoSeedWrite,
+  type DemoSummary,
+} from "@/lib/demo";
+import {
+  canRestoreFromTrash,
+  clearReplacesTrash,
+  reassembleChunks,
+  trashManifestFor,
+  trashPanelState,
+  type TrashManifest,
+} from "@/lib/trash";
+import {
+  accruedChargeCount,
+  buildLoanChargeEntry,
+  buildLoanDrawdownEntry,
+  buildLoanRepaymentEntry,
+  defaultRepaymentSplit,
+  isISODate,
+  loanChargeAmount,
+  loanPosition,
+  loanSchedule,
+  loanStatusFor,
+  loanTermsError,
+  repaymentSplitError,
+} from "@/lib/loans";
 import { getFirestoreDb } from "@/lib/firebase";
 import {
   computeBillTaxes,
@@ -227,13 +322,58 @@ import {
   taxPosition,
 } from "@/lib/tax";
 import { backfillStaff, can, resolveStaffRole, type ShopRole } from "@/lib/permissions";
+import { parseStaff, settingsFromOwnerDoc } from "@/lib/settings";
 import {
   canCloseThroughDate,
   correctionDating,
+  dayOffsetForTs,
   endOfDayPktInstant,
+  fiscalYearRange,
+  isPeriodLockedError,
   isValidDateISO,
   preparePosting,
+  startOfDayPktInstant,
+  todayPktISO,
 } from "@/lib/periods";
+import {
+  buildFiscalClosingEntry,
+  buildOpeningStockEntry,
+  buildFiscalReopenEntry,
+  fiscalCloseState,
+  fiscalReopenBlocker,
+  fiscalYearCloseChecklist,
+} from "@/lib/fiscal";
+import {
+  billLoyaltyClawedPoints,
+  billLoyaltyEarnEntry,
+  buildLoyaltyClawbackEntry,
+  buildLoyaltyEarnEntry,
+  buildLoyaltyExpiryEntry,
+  loyaltyClawbackPoints,
+  loyaltyExpiryDue,
+  loyaltyRecreditForReturn,
+  loyaltyRedeemCapRs,
+  loyaltyRedemptionQuote,
+  resolveLoyaltySettings,
+} from "@/lib/loyalty";
+import {
+  assembleStorefrontSnapshot,
+  buildStoreSaleOrder,
+  planStoreConversion,
+  slugProblem,
+  storefrontContentEqual,
+} from "@/lib/storefront";
+import {
+  planWaLaunch,
+  resolveWaSettings,
+  waCampaignProgress,
+  waConsentPatch,
+  waModuleAllowed,
+  waQueueStep,
+  waSendingAllowed,
+  waSendTransition,
+  type WaConsentSource,
+} from "@/lib/whatsapp";
 import { useAuth } from "./AuthProvider";
 
 // v3: Phase A · A2 added the `accounts` collection to the demo shape.
@@ -257,7 +397,10 @@ import { useAuth } from "./AuthProvider";
 // v16: Phase D · D1 added `employees` + `attendance` (the HR
 // directory + register) and the declared-but-empty `payrollRuns`
 // + `loans` shapes — key "dukaan-ai-store-v16".
-const STORAGE_KEY = "dukaan-ai-store-v16";
+// v17: Phase E · E2 added the `branding` slice (brand assets —
+// one compressed data-URL doc per slot) — key
+// "dukaan-ai-store-v17".
+const STORAGE_KEY = "dukaan-ai-store-v17";
 
 export interface NewProduct {
   sku: string;
@@ -568,6 +711,14 @@ interface Collections {
   attendance: AttendanceMonth[];
   payrollRuns: PayrollRun[];
   loans: Loan[];
+  branding: BrandingAsset[];
+  /** Phase H · WhatsApp (design §3.3): the marketing module's
+   *  three tenant collections — templates, campaigns, and the
+   *  send log. Facts, not derivations: the log especially is
+   *  written row by row as the queue advances. */
+  waTemplates: WaTemplate[];
+  waCampaigns: WaCampaign[];
+  waSends: WaSend[];
   settings: ShopSettings;
 }
 
@@ -604,6 +755,10 @@ const COLLECTION_NAMES = [
   "attendance",
   "payrollRuns",
   "loans",
+  "branding",
+  "waTemplates",
+  "waCampaigns",
+  "waSends",
 ] as const;
 
 type CollectionName = (typeof COLLECTION_NAMES)[number];
@@ -619,6 +774,215 @@ interface StoreValue extends Collections {
   role: ShopRole;
   /** True when the signed-in user works inside someone else's shop. */
   isStaff: boolean;
+  /** Phase G · G1 (design §1.3): the ACTIVE business's membership
+   *  docs, subscribed in the owner's context (the settings staff
+   *  list's membership chips read these). Empty outside the
+   *  owner's own business and in demo mode. */
+  memberships: Array<MembershipDoc & { memberUid: string }>;
+  /** Phase G · G1: the ACTIVE business's invite docs (pending /
+   *  claimed), subscribed alongside `memberships`. */
+  invites: InviteDoc[];
+  /** Phase G · G2 (design §3/§4): the ACTIVE business's plan
+   *  view — the assignment snapshot, the enforcement flag, the
+   *  DERIVED plan state, and the live counters — driving the
+   *  banner, the locked doors, the client-side gates and the
+   *  settings observation panel. Null in demo mode and for a
+   *  business with no registry doc (pre-G): every plan surface
+   *  stays dark and every gate passes. */
+  planView: PlanView | null;
+  /** Phase G · G2: the most recent client-side plan refusal
+   *  (invoice limit / member limit / paused state), rendered by
+   *  the shell as mapped copy — a rules denial must never
+   *  surface as a raw error (§4.2). Cleared on the next
+   *  successful gated write or by dismissal. */
+  planRefusal: PlanRefusal | null;
+  clearPlanRefusal: () => void;
+  /** Phase G · G4: the business's own renewal payment records
+   *  (design §3.5), subscribed in the OWNER's context only —
+   *  the platformPayments rules read a record for its own
+   *  business's owner alone. Empty for staff and in demo. */
+  ownPayments: PlatformPaymentDoc[];
+  /** Phase G · G4: the platform's payment instructions +
+   *  support contact (platformConfig), as the renewal surface
+   *  shows them. Null until the platform publishes them. */
+  platformConfig: PlatformConfigDoc | null;
+  /** Phase G · G4: the recorded reason of the live suspension,
+   *  read back from the business's own event log (§2.4) — the
+   *  shell banner names it. Null when not suspended. */
+  suspensionReason: string | null;
+  /** Phase G · G4: submit a renewal payment record (§3.5) —
+   *  a platform write only; it composes no journal entry and
+   *  touches no shop path. Resolves the planner's refusal
+   *  reason when it refuses. */
+  submitRenewalPayment: (
+    form: RenewalSubmissionForm
+  ) => Promise<{ ok: boolean; reason?: string }>;
+  /** Phase G · G6: assemble the full-business backup (design §9) —
+   *  owner-only, reads only, assembled from the owner's own reads;
+   *  available in every plan state because reads are never gated.
+   *  Null when unavailable (staff, demo, read failure). */
+  exportBusinessBackup: () => Promise<BusinessBackup | null>;
+  /** Phase G · G6: verify a backup file and plan its restore into
+   *  THIS business — probes the namespace and runs the pure
+   *  planner; writes nothing. Null when unavailable. */
+  planBusinessRestore: (file: unknown) => Promise<RestorePlan | null>;
+  /** Phase G · G6: execute a restore plan returned by
+   *  planBusinessRestore — batched document writes in plan order
+   *  (the restore.performed event last). Composes no journal
+   *  entry: the journal is transplanted as documents. */
+  executeBusinessRestore: (
+    plan: RestorePlan
+  ) => Promise<{ ok: boolean; reason?: string }>;
+  /** Fix Round 2 · FR2: the business's demo-data class from
+   *  loaded state — "empty" (seedable), "demo-only"
+   *  (re-addable), "real" (demo actions refused). The actions
+   *  re-classify from fresh reads before writing. */
+  demoClass: BusinessContentClass;
+  /** FR2 item 1 — "Add demo data" (owner, cloud-only, empty
+   *  businesses only). The summary is confirmed from the writes
+   *  committed. Reasons: "unavailable" | "real" | "already" |
+   *  "write-failed". */
+  addDemoData: () => Promise<{
+    ok: boolean;
+    reason?: string;
+    summary?: DemoSummary;
+  }>;
+  /** FR2 item 1 — "Re-add demo data" (owner, cloud-only,
+   *  demo-only businesses only). Reasons: "unavailable" |
+   *  "empty" | "real" | "write-failed". */
+  resetDemoData: () => Promise<{
+    ok: boolean;
+    reason?: string;
+    summary?: DemoSummary;
+  }>;
+  /** FR2 item 2 — list trash snapshots (expired ones swept
+   *  lazily on load). */
+  listTrash: () => Promise<TrashManifest[]>;
+  /** FR2 item 2 — "Clear data" (owner, cloud-only, danger zone).
+   *  Snapshots to trash, then wipes. Reason "replace" carries
+   *  the active snapshot the clear would replace; recall with
+   *  replaceConfirmed to confirm. */
+  clearBusinessData: (opts?: {
+    replaceConfirmed?: boolean;
+  }) => Promise<{
+    ok: boolean;
+    reason?: string;
+    manifest?: TrashManifest;
+    replaced?: TrashManifest | null;
+  }>;
+  /** FR2 item 2 — restore a trash snapshot via the existing
+   *  pipeline (empty-business guard included). Consumes the
+   *  snapshot on success. */
+  restoreFromTrash: (trashId: string) => Promise<{ ok: boolean; reason?: string }>;
+  /** FR2 item 2 — delete a trash snapshot permanently. */
+  deleteTrashPermanently: (trashId: string) => Promise<{ ok: boolean; reason?: string }>;
+  /** FR2 item 3 — the active business's skeleton never landed;
+   *  the switcher offers the retry while this is true. */
+  setupIncomplete: boolean;
+  /** FR2 item 3 — retry the failed business setup. */
+  retryBusinessSetup: () => Promise<boolean>;
+  /** Phase H · H3 (design §2): the business's published
+   *  storefront snapshot (null = never published), subscribed
+   *  from the top-level `storefronts` collection by businessId —
+   *  the desk's record of its public face. Null in demo mode:
+   *  demo publishes nothing (§5.3). */
+  storefront: StorefrontDoc | null;
+  /** Phase H · H3: the business's store-order inbox, newest
+   *  first — paper until a member converts a row (§2.4/§2.5).
+   *  Empty in demo mode (the preview takes no orders). */
+  storeOrders: StoreOrder[];
+  /** Phase H · H3: publish (or re-publish) the storefront
+   *  snapshot — OWNER-only (the public face is an owner act,
+   *  rules v10 enforce it), cloud-only. The slug is claimed on
+   *  the first publish and can never change afterwards. */
+  publishStorefront: (input: {
+    slug?: string;
+    tagline?: string | null;
+    notice?: string | null;
+    excludedProductIds: string[];
+    includeProductIds: string[];
+  }) => Promise<{ ok: boolean; reason?: string }>;
+  /** Phase H · H3: switch the store off — the doc and slug are
+   *  kept; the public page and the order intake close together
+   *  (the create leg requires `enabled`). Owner-only. */
+  unpublishStorefront: () => Promise<{ ok: boolean; reason?: string }>;
+  /** Phase H · H3: the auto-republish preference (owner). */
+  setStorefrontAutoRepublish: (on: boolean) => void;
+  /** Phase H · H3: convert one inbox order into a sale order —
+   *  re-priced against live data at the moment of the act, the
+   *  customer resolved (phone-matched, else created), the SO
+   *  born `open`, and the inbox doc flipped to `converted` in
+   *  the SAME batch: the state is the exactly-once claim.
+   *  Phase H · H6 (audit fix 2): WhatsApp consent rides the
+   *  ORDER's own flag — the customer's tick on the public
+   *  checkout form (design §3.2), stamped (source "storefront")
+   *  onto the resolved/created customer in the same batch. The
+   *  desk asserts nothing: an order without the flag converts
+   *  with no consent stamp, ever. */
+  convertStoreOrder: (
+    orderId: string
+  ) => Promise<{ ok: boolean; reason?: string; soNumber?: string }>;
+  /** Phase H · H3: dismiss one inbox order (actor + timestamp
+   *  stamped; dismissed paper is kept, never deleted). */
+  dismissStoreOrder: (orderId: string) => Promise<{ ok: boolean; reason?: string }>;
+  /** Phase H · WhatsApp (design §3.3): create or update a
+   *  message template (owner/manager — the `whatsapp` matrix
+   *  row). Returns the template id ("" when refused). */
+  saveWaTemplate: (input: {
+    id?: string;
+    name: string;
+    kind: WaTemplateKind;
+    body: string;
+  }) => string;
+  /** Phase H · WhatsApp: delete a template. Campaigns already
+   *  sent keep their log; a draft campaign citing it simply
+   *  cannot launch until it names a live template. */
+  deleteWaTemplate: (id: string) => void;
+  /** Phase H · WhatsApp (design §3.3): create a campaign in
+   *  `draft` — a template + an audience DEFINITION; nobody is
+   *  resolved until launch. Returns the id ("" when refused). */
+  createWaCampaign: (input: {
+    name: string;
+    templateId: string;
+    audience: WaAudience;
+  }) => string;
+  /** Phase H · WhatsApp (design §3.4): launch a draft campaign
+   *  — resolve its audience LIVE (consent filter applied),
+   *  materialise one `queued` send row per recipient, stamp
+   *  resolvedCount, flip the campaign to `sending`. Refused
+   *  (with reason) when the plan snapshot lacks the module or
+   *  the plan state is not postable — sending degrades with
+   *  plan expiry (invariant 5); reads never do. */
+  launchWaCampaign: (
+    campaignId: string
+  ) => { ok: boolean; reason?: string; count?: number };
+  /** Phase H · WhatsApp (design §3.4): one queue act on a
+   *  campaign's head row. The lib re-check runs FIRST: if the
+   *  recipient has opted out (or the number is invalid) since
+   *  launch, the row lands in its skipped_* state whatever the
+   *  act — `outcome` reports what actually happened. When the
+   *  last row turns terminal the campaign closes to `done`. */
+  advanceWaSend: (
+    campaignId: string,
+    act: "opened" | "sent",
+    afterId?: string | null
+  ) => { ok: boolean; reason?: string; outcome?: WaSend["state"] };
+  /** Phase H · WhatsApp: close a campaign now — rows still
+   *  queued stay queued in the log (they were never sent, and
+   *  the log does not pretend otherwise). */
+  finishWaCampaign: (campaignId: string) => void;
+  /** Phase H · WhatsApp (design §3.2): record a customer's
+   *  marketing consent (grant or revoke), stamped with its
+   *  source. Rides the `customersManage` guard — consent is
+   *  captured where customers are managed. */
+  setCustomerWaConsent: (
+    customerId: string,
+    agreed: boolean,
+    source: WaConsentSource
+  ) => void;
+  /** Phase H · WhatsApp (design §3.5): the service-reminder
+   *  interval, in days — an owner-doc settings write. */
+  setWaServiceIntervalDays: (days: number) => void;
   // products / sales (original API)
   addProduct: (p: NewProduct) => void;
   updateProduct: (id: string, patch: Partial<Product>) => void;
@@ -632,6 +996,12 @@ interface StoreValue extends Collections {
   finalizeBill: (billId: string, payments: BillPayment[]) => boolean;
   discardHeldBill: (id: string) => void;
   voidBill: (billId: string) => boolean;
+  /** Phase H · H1: post expiry releases for every vintage the
+   *  derived due-list names (owner/manager — the `loyalty` matrix
+   *  row). Returns how many release entries posted (0 = nothing
+   *  due / refused). The list is derived, never stored; posting is
+   *  always this deliberate act — no scheduler exists. */
+  postLoyaltyExpiries: () => number;
   returnItems: (
     billId: string,
     lines: BillLineInput[],
@@ -775,6 +1145,17 @@ interface StoreValue extends Collections {
   // carries a machine reason the Settings UI maps to dictionary copy
   closePeriod: (throughDate: string, note: string) => PeriodActionResult;
   reopenPeriod: (throughDate: string | null, reason: string) => PeriodActionResult;
+  // fiscal-year close (Phase D · D4) — owner-only (matrix row
+  // `fiscalClose`); one closing entry + periods doc + lock advance
+  // per close, reopening by mirror reversal (design §4.3/§4.4)
+  closeFiscalYear: (
+    fyStartDate: string,
+    opts: { note: string; ackWarnings: boolean }
+  ) => FiscalCloseResult;
+  reopenFiscalYear: (fyStartDate: string, reason: string) => FiscalCloseResult;
+  // Fix Round 1 · F5 — the one-time opening-stock recognition
+  // entry (Dr inventory / Cr capital), owner-gated like the close
+  postOpeningStock: (amount: number, rawShare: number) => FiscalCloseResult;
   // document chain (Phase B · B1) — NON-POSTING documents: none of
   // these actions writes a journal entry, moves stock or touches a
   // money/subledger collection (design §2.2, the cardinal rule)
@@ -1103,6 +1484,59 @@ interface StoreValue extends Collections {
     method: PayMethod;
     accountId?: string | null;
   }) => string | null;
+  // Phase D · D3: loans register (design §3). Every money action
+  // gates on the `loans` matrix row (owner/accountant write;
+  // manager read) and posts through the A5 choke point in the
+  // SAME batch as its loan doc. Charges accrue only as discrete
+  // desk-confirmed events; receivable loans are charge-free.
+  /** Create a loan AND post its drawdown in one batch (a cloud
+   *  loan is born drawn, §3.4/§10.3): the LN- number is minted
+   *  at creation, the fee (if any) is netted from the proceeds,
+   *  and the drawdown + fee events open the diary. Returns the
+   *  loan id, or null when the terms are refused at composition
+   *  (charged receivable lending included). */
+  createLoan: (input: {
+    direction: LoanDirection;
+    partyName: string;
+    partyId?: string | null;
+    principal: number;
+    chargeType: Loan["chargeType"];
+    chargeRate: number;
+    feeAmount: number;
+    startDateISO: string;
+    instalmentCount: number;
+    instalmentEvery: Loan["instalmentEvery"];
+    firstDueISO: string;
+    method: PayMethod;
+    accountId?: string | null;
+    note?: string;
+  }) => string | null;
+  /** Accrue ONE instalment's charge (the next un-accrued one —
+   *  the schedule proposes, the desk confirms, §3.4). Payable
+   *  flat/reducing loans only; one entry + one diary event. */
+  accrueLoanCharge: (loanId: string, instalmentN: number) => boolean;
+  /** Repay a loan (either direction): one entry + one diary
+   *  event carrying the principal/charge split (charges-first by
+   *  default, desk-overridable). Overpayment beyond the derived
+   *  outstanding is refused pre-composition. */
+  repayLoan: (
+    loanId: string,
+    input: {
+      amount: number;
+      method: PayMethod;
+      accountId?: string | null;
+      principalPart?: number;
+      chargePart?: number;
+    }
+  ) => boolean;
+  /** Reverse ONE loan event (its mirror entry + negated diary
+   *  events, §3.4). A drawdown reverses only when no repayment
+   *  or charge stands against it, and cancels the loan. */
+  reverseLoanEvent: (loanId: string, entryId: string) => boolean;
+  /** Delete a never-used loan (owner only, mirroring the rules —
+   *  a loan with any diary event is a posted record and is
+   *  never deleted). */
+  deleteLoan: (id: string) => boolean;
   // stock adjustments
   recordAdjustment: (
     productId: string,
@@ -1117,6 +1551,14 @@ interface StoreValue extends Collections {
   saveDayClose: (d: Omit<DayClose, "id" | "ts" | "dayOffset">) => void;
   // settings & staff (owner-only in production; roles per A3 matrix)
   updateSettings: (patch: Partial<ShopSettings>) => void;
+  // brand assets (Phase E · E2) — one doc per slot in the
+  // `branding` collection; every role READS them (each desk
+  // prints branded paper), the OWNER alone writes. The asset
+  // arrives fully formed from the lib/branding pipeline (its
+  // cap already enforced); removal simply stops the slot
+  // printing — assets assert no history.
+  setBrandingAsset: (asset: BrandingAsset) => void;
+  removeBrandingAsset: (kind: BrandingAssetKind) => void;
   addStaff: (email: string, role: StaffRole) => void;
   setStaffRole: (email: string, role: StaffRole) => void;
   removeStaff: (email: string) => void;
@@ -1131,6 +1573,31 @@ export type PeriodActionResult =
   | {
       ok: false;
       reason: "permission" | "invalid" | "rail" | "backwards" | "nothing" | "reason";
+    };
+
+/** Result of a fiscal-year close/reopen (Phase D · D4): on failure
+ *  the `reason` names the rule that refused, for dictionary
+ *  mapping — a hard gate on the derived checklist (`gate`),
+ *  unacknowledged warnings (`warnings`), an already-closed year
+ *  (`closed`), a not-yet-past year (`notpast`), the period-lock
+ *  guard refusing the closing entry's own date (`locked`), a
+ *  reopen with no live close (`notclosed`) or a later closed year
+ *  still standing (`stack`). */
+export type FiscalCloseResult =
+  | { ok: true }
+  | {
+      ok: false;
+      reason:
+        | "permission"
+        | "invalid"
+        | "notpast"
+        | "closed"
+        | "gate"
+        | "warnings"
+        | "locked"
+        | "notclosed"
+        | "stack"
+        | "reason";
     };
 
 const StoreContext = createContext<StoreValue | null>(null);
@@ -1169,6 +1636,10 @@ function emptyCollections(): Collections {
     attendance: [],
     payrollRuns: [],
     loans: [],
+    branding: [],
+    waTemplates: [],
+    waCampaigns: [],
+    waSends: [],
     settings: { shopName: "", address: "", phone: "", staffEmails: [], staff: [] },
   };
 }
@@ -1192,7 +1663,14 @@ function seedCollections(): Collections {
     adjustments: [],
     dayCloses: [],
     cashEntries: [],
-    journal: getSeedJournal(products, sales, purchases, supplierPayments, expenses, credits),
+    // Phase H · H6 (audit fix 3): the DEMO journal appends its
+    // small loyalty story (demo-only getter; the frozen 21 the
+    // cloud seeder pushes are untouched — the harness pins both
+    // the frozen SHA and the demo end-state identities).
+    journal: [
+      ...getSeedJournal(products, sales, purchases, supplierPayments, expenses, credits),
+      ...getDemoLoyaltyEntries(getSeedCustomers()),
+    ],
     accounts: getSeedAccounts(),
     taxSlabs: getSeedTaxSlabs(),
     periods: [],
@@ -1267,9 +1745,35 @@ function seedCollections(): Collections {
     // nothing (no number, no accrual entry), so the frozen
     // journal above is untouched; loans' demo doc arrives in D3.
     payrollRuns: [getSeedPayrollRunDraft(getSeedEmployees(), getSeedAttendance(getSeedEmployees()))],
-    loans: [],
+    // Phase D · D3 (design §10.3): ONE demo loan — charge-free,
+    // active, NO events (a register discoverability aid whose
+    // outstanding derives as principal-unpaid with no journal
+    // behind it; cloud loans are born with their drawdown in
+    // one batch, §3.4). The doc posts nothing, so the seed
+    // journal above is untouched; the production seeder never
+    // pushes this collection.
+    loans: getSeedLoans(),
+    // Phase E · E2 (design §2.6/§10.3): brand assets start EMPTY
+    // everywhere — the demo seed ships NO assets, so the public
+    // demo prints the clean text-header look until the owner
+    // uploads their own. The collection asserts no money fact;
+    // the production seeder never pushes it either.
+    branding: [],
+    // Phase H · WhatsApp (design §5.3): the marketing
+    // collections start EMPTY in demo too — the showroom
+    // composes and queues campaigns against the demo customers
+    // locally (the send step opens wa.me exactly as production
+    // does; it is the shopkeeper's own WhatsApp either way, so
+    // nothing demo-specific can leak), and the frozen journal
+    // is untouched: marketing posts nothing, ever.
+    waTemplates: [],
+    waCampaigns: [],
+    waSends: [],
     settings: {
-      ...getSeedSettings(),
+      // H6: the demo shop runs its loyalty programme ON
+      // (getDemoSettings — demo only; the cloud seed's settings
+      // carry no loyalty block, so a real shop starts OFF).
+      ...getDemoSettings(),
       staff: parseStaff(getSeedSettings().staff),
       phaseC: { stockV1: true },
       phaseD: { hrV1: true },
@@ -1289,15 +1793,56 @@ function demoSeedProducts(): Product[] {
   );
 }
 
+/**
+ * Fix Round 1 · F3: re-base every loaded row's `dayOffset` from its
+ * `ts` (lib/periods `dayOffsetForTs`). A stored dayOffset is a
+ * creation-day stamp — written 0 and never recomputed — so without
+ * this, every "today"-scoped derivation (the day close, aging,
+ * the dashboard) silently widens day after day: the owner's live
+ * shop still counted its 22-Oct rows as "today" on 24-Oct. The
+ * row's `ts` never moves, so the effective offset is derived at
+ * the load choke points (here for local state, the cloud `sub`
+ * mapper for snapshots) and every consumer keeps reading
+ * `dayOffset` unchanged. Rows without a parseable `ts` keep their
+ * stored stamp; the seed's stamps already agree with its `ts`
+ * values (lib/seed's rebaseTs), so demo data is untouched.
+ */
+function rebaseAges<T>(list: T[]): T[] {
+  const today = todayPktISO();
+  let changed = false;
+  const out = list.map((row) => {
+    const r = row as { ts?: unknown; dayOffset?: unknown } | null;
+    if (
+      r &&
+      typeof r === "object" &&
+      typeof r.ts === "string" &&
+      typeof r.dayOffset === "number"
+    ) {
+      const eff = dayOffsetForTs(r.ts, today, r.dayOffset);
+      if (eff !== r.dayOffset) {
+        changed = true;
+        return { ...(row as object), dayOffset: eff } as T;
+      }
+    }
+    return row;
+  });
+  return changed ? out : list;
+}
+
 function loadInitial(): { products: Product[]; sales: Sale[] } & Collections {
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
     if (raw) {
       const parsed = JSON.parse(raw) as { products: Product[]; sales: Sale[] } & Collections;
       if (Array.isArray(parsed.products) && Array.isArray(parsed.sales)) {
+        const rebased = { ...parsed } as Record<string, unknown>;
+        for (const key of Object.keys(rebased)) {
+          const v = rebased[key];
+          if (Array.isArray(v)) rebased[key] = rebaseAges(v);
+        }
         return {
           ...seedCollections(),
-          ...parsed,
+          ...(rebased as unknown as typeof parsed),
           settings: {
             ...getSeedSettings(),
             ...(parsed.settings ?? {}),
@@ -1395,24 +1940,6 @@ function buildAdjustment(
 /** Validate a raw owner-doc `staff[]` value (Phase A · A3). Entries
  *  with a missing/unrecognised role resolve to "manager" — the same
  *  legacy default the client and the rules apply everywhere. */
-function parseStaff(raw: unknown): StaffMember[] {
-  if (!Array.isArray(raw)) return [];
-  const out: StaffMember[] = [];
-  const seen = new Set<string>();
-  for (const item of raw) {
-    const m = item as Partial<StaffMember> | null;
-    const email = typeof m?.email === "string" ? m.email.trim().toLowerCase() : "";
-    if (!email || seen.has(email)) continue;
-    seen.add(email);
-    out.push({
-      email,
-      role: resolveStaffRole(m?.role),
-      addedAt: typeof m?.addedAt === "string" ? m.addedAt : "",
-    });
-  }
-  return out;
-}
-
 export function StoreProvider({ children }: { children: React.ReactNode }) {
   const { mode, user, role, dataUid } = useAuth();
   const cloud = mode === "production";
@@ -1420,9 +1947,58 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
   const isStaff = role !== "owner";
 
   const [ready, setReady] = useState(false);
+  /** Fix Round 2 · FR2: the active business's skeleton never
+   *  landed (its creation's phase-2 write failed) — the switcher
+   *  offers the retry until this clears. False for every business
+   *  whose owner doc exists. */
+  const [setupIncomplete, setSetupIncomplete] = useState(false);
   const [products, setProducts] = useState<Product[]>([]);
   const [sales, setSales] = useState<Sale[]>([]);
   const [cols, setCols] = useState<Collections>(emptyCollections());
+  // Phase G · G1: the ACTIVE business's memberships + invites,
+  // subscribed in the owner's context only (the settings staff
+  // list's membership chips + the staff actions' conditional
+  // platform writes read them). Demo mode never populates these.
+  const [memberships, setMemberships] = useState<
+    Array<MembershipDoc & { memberUid: string }>
+  >([]);
+  const [invites, setInvites] = useState<InviteDoc[]>([]);
+  const membershipsRef = useRef<Array<MembershipDoc & { memberUid: string }>>([]);
+  membershipsRef.current = memberships;
+  const invitesRef = useRef<InviteDoc[]>([]);
+  invitesRef.current = invites;
+  // Phase G · G2: the ACTIVE business's registry + counter docs
+  // (design §2.2/§2.3), subscribed for EVERY role — a cashier's
+  // posting batch composes its counter write from the live doc,
+  // so a cashier's client must hold it (the counter rule's read
+  // widened to canAccess in v9 part 2 for exactly this). The
+  // refusal state carries the last mapped gate refusal.
+  const [planRegistry, setPlanRegistry] = useState<BusinessRegistryDoc | null>(null);
+  const [planCounters, setPlanCounters] = useState<BusinessCountersDoc | null>(null);
+  const [planRefusal, setPlanRefusal] = useState<PlanRefusal | null>(null);
+  const planRegistryRef = useRef<BusinessRegistryDoc | null>(null);
+  planRegistryRef.current = planRegistry;
+  const planCountersRef = useRef<BusinessCountersDoc | null>(null);
+  planCountersRef.current = planCounters;
+  // Phase G · G4: the renewal surface's data — the business's
+  // own payment records + the platform's payment instructions
+  // (owner context; see the subscription below), and the
+  // business's own platform event log (owner + members — the
+  // suspension banner's reason is read back from it, §2.4).
+  const [ownPayments, setOwnPayments] = useState<PlatformPaymentDoc[]>([]);
+  const [platformConfig, setPlatformConfig] =
+    useState<PlatformConfigDoc | null>(null);
+  const [ownEvents, setOwnEvents] = useState<BusinessEventDoc[]>([]);
+  // Phase H · H3: the storefront snapshot + order inbox
+  // (top-level collections, subscribed by businessId below —
+  //  NOT tenant collections: the backup carries them in its
+  //  platform slice, and demo mode holds neither).
+  const [storefront, setStorefront] = useState<StorefrontDoc | null>(null);
+  const [storeOrders, setStoreOrders] = useState<StoreOrder[]>([]);
+  const storefrontRef = useRef<StorefrontDoc | null>(null);
+  storefrontRef.current = storefront;
+  const storeOrdersRef = useRef<StoreOrder[]>([]);
+  storeOrdersRef.current = storeOrders;
   // Phase B · B1: a conversion's billing-desk draft (memory only).
   const [billDraft, setBillDraft] = useState<BillDraftPrefill | null>(null);
   const clearBillDraft = useCallback(() => setBillDraft(null), []);
@@ -1612,6 +2188,10 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
       attendance: initial.attendance ?? [],
       payrollRuns: initial.payrollRuns ?? [],
       loans: initial.loans ?? [],
+      branding: initial.branding ?? [],
+      waTemplates: initial.waTemplates ?? [],
+      waCampaigns: initial.waCampaigns ?? [],
+      waSends: initial.waSends ?? [],
       settings: initial.settings,
     });
     setReady(true);
@@ -1649,8 +2229,12 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
             collection(db, "users", uid, name),
             (qs) => {
               const list = qs.docs.map((d) => ({ ...(d.data() as object), id: d.id }) as T);
-              if (sortFn) list.sort(sortFn);
-              apply(list);
+              // Fix Round 1 · F3: derive each row's effective
+              // dayOffset from its ts before any consumer reads
+              // it (see `rebaseAges` at the local load path).
+              const aged = rebaseAges(list);
+              if (sortFn) aged.sort(sortFn);
+              apply(aged);
             },
             () => undefined
           )
@@ -1700,54 +2284,31 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
       sub<AttendanceMonth>("attendance", (l) => setCol("attendance", l), byTs);
       sub<PayrollRun>("payrollRuns", (l) => setCol("payrollRuns", l), byTs);
       sub<Loan>("loans", (l) => setCol("loans", l), byTs);
+      // Phase E · E2: brand assets — every role reads them (each
+      // desk prints branded paper; rules: read canAccess, write
+      // owner-only), so staff subscriptions attach like any other.
+      sub<BrandingAsset>("branding", (l) => setCol("branding", l), (a, b) => a.id.localeCompare(b.id));
+      // Phase H · WhatsApp: the marketing collections. Reads are
+      // narrowed at the RULES level (owner/manager/accountant —
+      // the cashier does not launch campaigns, §3.3); a cashier's
+      // subscription is simply denied and the surface never
+      // renders for them, the D1 pattern.
+      sub<WaTemplate>("waTemplates", (l) => setCol("waTemplates", l), (a, b) => a.name.localeCompare(b.name));
+      sub<WaCampaign>("waCampaigns", (l) => setCol("waCampaigns", l), byTs);
+      sub<WaSend>("waSends", (l) => setCol("waSends", l), byTs);
       // Settings live on the owner doc itself.
       unsubs.push(
         onSnapshot(
           doc(db, "users", uid),
           (snap) => {
-            const d = snap.data() ?? {};
-            setCol("settings", {
-              shopName: String(d.shopName ?? ""),
-              address: String(d.address ?? ""),
-              phone: String(d.phone ?? ""),
-              staffEmails: Array.isArray(d.staffEmails) ? (d.staffEmails as string[]) : [],
-              staff: parseStaff(d.staff),
-              defaultSalesTaxSlabId: (d.defaultSalesTaxSlabId as string | null) ?? null,
-              defaultPurchaseTaxSlabId: (d.defaultPurchaseTaxSlabId as string | null) ?? null,
-              // A5: the fiscal-year start + the period-lock
-              // enforcement value live on this doc too.
-              fiscalYearStartMonth:
-                typeof d.fiscalYearStartMonth === "number" ? d.fiscalYearStartMonth : undefined,
-              fiscalYearStartDay:
-                typeof d.fiscalYearStartDay === "number" ? d.fiscalYearStartDay : undefined,
-              lockedThrough: typeof d.lockedThrough === "string" ? d.lockedThrough : "",
-              phaseA: (d.phaseA as ShopSettings["phaseA"]) ?? undefined,
-              // Phase C · C1: the stockV1 migration flag.
-              phaseC: (d.phaseC as ShopSettings["phaseC"]) ?? undefined,
-              // Phase D · D1: the hrV1 migration flag + the D5
-              // Tally ledger-name overrides (declared in D1).
-              phaseD: (d.phaseD as ShopSettings["phaseD"]) ?? undefined,
-              tallyLedgerNames:
-                (d.tallyLedgerNames as ShopSettings["tallyLedgerNames"]) ?? undefined,
-              // Phase B · B1: document-numbering prefix overrides.
-              docSeries: (d.docSeries as ShopSettings["docSeries"]) ?? undefined,
-              // Phase C · C4: the production desk's settlement
-              // preference (§4.4 + Q3).
-              productionSettlement:
-                d.productionSettlement === "accrue" ? "accrue" : undefined,
-              productionAccountId:
-                typeof d.productionAccountId === "string"
-                  ? (d.productionAccountId as string)
-                  : undefined,
-              // Phase C · C5: the workshop's job stage names
-              // (§5.2) — shop data on this doc, like the series
-              // prefixes.
-              jobStages: Array.isArray(d.jobStages)
-                ? (d.jobStages as unknown[]).filter(
-                    (s): s is string => typeof s === "string"
-                  )
-                : undefined,
-            });
+            // Fix Round 1 · F1: the settings rebuild is
+            // lib/settings' `settingsFromOwnerDoc` — the single
+            // source of truth for which owner-doc fields are
+            // settings. The hand-maintained inline list that used
+            // to live here silently dropped every Phase H family
+            // (loyalty above all), so a cloud shop's saved
+            // programme read back as OFF forever.
+            setCol("settings", settingsFromOwnerDoc(snap.data() ?? {}));
           },
           () => undefined
         )
@@ -1759,9 +2320,43 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
         const userRef = doc(db, "users", uid);
         const userDoc = await getDoc(userRef);
         if (!cancelled && !userDoc.exists() && !isStaff) {
-          // Brand-new owner account: seed the whole shop.
-          await seedNamespace(db, uid, user?.email ?? null);
+          if (uid === user?.uid) {
+            // Fix Round 2 · FR2: a brand-new owner's FIRST business
+            // starts EMPTY — the skeleton only (accounts + default
+            // warehouse, no content, no journal). Demo data is an
+            // explicit owner act afterwards, never at signup.
+            const settings = getSeedSettings();
+            await createEmptyNamespace(
+              db, uid, user?.email ?? null,
+              settings.shopName, settings.phone, settings.address
+            );
+            // Phase G · G1 (design §4.3): the registry birth — the
+            // trial plan snapshot + zeroed counters, platform
+            // collections only.
+            await createTrialRegistry(db, uid, user?.email ?? null);
+          } else {
+            // Fix Round 2 · FR2: a GENERATED business whose skeleton
+            // never landed (its phase-2 write failed): complete it
+            // idempotently from the registry's own name/phone, so
+            // the business is usable instead of failing the load.
+            // A failure here is NOT fatal — the switcher offers
+            // the retry (retryBusinessSetup) and the flag below
+            // records it.
+            try {
+              const regSnap = await getDoc(doc(db, "businesses", uid));
+              const reg = regSnap.exists() ? (regSnap.data() as { name?: string; phone?: string; city?: string }) : null;
+              if (!reg) throw new Error("registry-missing");
+              await createEmptyNamespace(
+                db, uid, user?.email ?? null,
+                reg.name ?? "Shop", reg.phone ?? "", reg.city ?? ""
+              );
+              setSetupIncomplete(false);
+            } catch {
+              setSetupIncomplete(true);
+            }
+          }
         } else if (!cancelled && userDoc.exists() && !isStaff) {
+          setSetupIncomplete(false);
           if (userDoc.data().seedV2 !== true) {
             // Pre-Complete-edition account: top up the NEW collections only
             // (products/sales are the owner's live data — never touched).
@@ -1814,6 +2409,19 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
           if (phaseD?.hrV1 !== true) {
             await ensurePhaseD(db, uid);
           }
+          // Phase G · G1 migration (design §7.2): the tenancy
+          // registry for a pre-G shop — the `founding` comp
+          // assignment, membership mirrors, baseline counters.
+          // Platform collections ONLY: this writes nothing inside
+          // the users/{uid} tree and no journal entry, and the
+          // registry doc's existence is its own marker, so a
+          // second sign-in writes nothing new.
+          await ensureBusinessRegistry(
+            db,
+            uid,
+            user?.email ?? null,
+            userDoc.data()
+          );
         }
       } catch {
         /* best effort — snapshots below still attach */
@@ -1828,12 +2436,865 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [cloud, uid, isStaff]);
 
+  /* Phase G · G1 — the owner-context platform subscriptions: the
+   * active business's memberships + invites (design §1.3). Only
+   * the OWNER's client subscribes (a staffer's rules could not
+   * read the whole set, and the settings surface that consumes
+   * these is owner-only anyway). Switching businesses re-keys
+   * `uid`, so a switch tears these down with everything else. */
+  useEffect(() => {
+    if (!cloud || !uid || role !== "owner") {
+      setMemberships([]);
+      setInvites([]);
+      return;
+    }
+    const db = getFirestoreDb();
+    if (!db) return;
+    const un1 = onSnapshot(
+      collection(db, "businessMembers", uid, "members"),
+      (qs) =>
+        setMemberships(
+          qs.docs.map((d) => ({
+            ...(d.data() as MembershipDoc),
+            memberUid: d.id,
+          }))
+        ),
+      () => undefined
+    );
+    const un2 = onSnapshot(
+      collection(db, "businessInvites", uid, "invites"),
+      (qs) => setInvites(qs.docs.map((d) => d.data() as InviteDoc)),
+      () => undefined
+    );
+    return () => {
+      un1();
+      un2();
+    };
+  }, [cloud, uid, role]);
+
+  /* Phase G · G2 — the plan + counter subscriptions (design
+   * §2.2/§2.3): the ACTIVE business's registry and counter docs,
+   * for every role (see the state comment). A missing doc reads
+   * as null — a pre-G namespace mid-migration, or a staffer
+   * whose counter read is still denied by the pre-part-2 rules
+   * (the error callback swallows it; the gates then pass, the
+   * observation posture) — never as an error surface. */
+  useEffect(() => {
+    if (!cloud || !uid) {
+      setPlanRegistry(null);
+      setPlanCounters(null);
+      return;
+    }
+    const db = getFirestoreDb();
+    if (!db) return;
+    const un1 = onSnapshot(
+      doc(db, "businesses", uid),
+      (ds) =>
+        setPlanRegistry(
+          ds.exists()
+            ? normPlanRegistryDoc(ds.data() as Record<string, unknown>)
+            : null
+        ),
+      () => undefined
+    );
+    const un2 = onSnapshot(
+      doc(db, "businessCounters", uid),
+      (ds) => setPlanCounters(ds.exists() ? (ds.data() as BusinessCountersDoc) : null),
+      () => undefined
+    );
+    return () => {
+      un1();
+      un2();
+    };
+  }, [cloud, uid]);
+
+  // Phase G · G2: the derived plan view for the UI (banner,
+  // locked doors, settings panel). Rebuilt per render from the
+  // subscribed docs, so a state boundary (trial end, grace
+  // start) is picked up on the next interaction; demo mode and
+  // registry-less namespaces stay null (dark surfaces).
+  const planView: PlanView | null =
+    cloud && planRegistry
+      ? planViewOf(planRegistry, planCounters, new Date().toISOString())
+      : null;
+
+  const clearPlanRefusal = useCallback(() => setPlanRefusal(null), []);
+
+  /* Phase G · G4 — the renewal subscriptions (design §3.5).
+   * The payment records + the platform config are the OWNER's
+   * surfaces (the payments rules read a record for its own
+   * business's owner alone), so they subscribe only in the
+   * owner's context; the business's own event log reads for
+   * owner + members (the suspension banner shows to every
+   * role). Demo mode subscribes none of it — no renewal
+   * surface exists there. */
+  useEffect(() => {
+    if (!cloud || !uid || role !== "owner") {
+      setOwnPayments([]);
+      setPlatformConfig(null);
+      return;
+    }
+    const db = getFirestoreDb();
+    if (!db) return;
+    const un1 = onSnapshot(
+      query(
+        collection(db, "platformPayments"),
+        where("businessId", "==", uid),
+        orderBy("submittedAt", "desc")
+      ),
+      (qs) =>
+        setOwnPayments(
+          qs.docs.map((d) =>
+            normOwnPayment(d.id, d.data() as Record<string, unknown>)
+          )
+        ),
+      () => undefined
+    );
+    const un2 = onSnapshot(
+      doc(db, "platformConfig", PLATFORM_CONFIG_DOC_ID),
+      (ds) =>
+        setPlatformConfig(
+          ds.exists() ? (ds.data() as PlatformConfigDoc) : null
+        ),
+      () => undefined
+    );
+    return () => {
+      un1();
+      un2();
+    };
+  }, [cloud, uid, role]);
+
+  useEffect(() => {
+    if (!cloud || !uid) {
+      setOwnEvents([]);
+      return;
+    }
+    const db = getFirestoreDb();
+    if (!db) return;
+    const un = onSnapshot(
+      query(
+        collection(db, "businessEvents"),
+        where("businessId", "==", uid),
+        orderBy("at", "desc"),
+        limit(50)
+      ),
+      (qs) =>
+        setOwnEvents(
+          qs.docs.map((d) => normOwnEvent(d.data() as Record<string, unknown>))
+        ),
+      () => undefined
+    );
+    return () => un();
+  }, [cloud, uid]);
+
+  /* Phase H · H3 — the storefront subscriptions (design §2):
+   * the business's published snapshot + its order inbox, read
+   * through membership (rules v10: members read both; the public
+   * leg of the snapshot is separate and unauthenticated). Demo
+   * mode subscribes neither — demo publishes nothing and takes
+   * no orders (§5.3); the desk shows the labelled preview. */
+  useEffect(() => {
+    if (!cloud || !uid) {
+      setStorefront(null);
+      setStoreOrders([]);
+      return;
+    }
+    const db = getFirestoreDb();
+    if (!db) return;
+    const un1 = onSnapshot(
+      query(
+        collection(db, "storefronts"),
+        where("businessId", "==", uid),
+        limit(1)
+      ),
+      (qs) =>
+        setStorefront(
+          qs.docs.length > 0 ? (qs.docs[0].data() as StorefrontDoc) : null
+        ),
+      () => undefined
+    );
+    const un2 = onSnapshot(
+      query(
+        collection(db, "storeOrders"),
+        where("businessId", "==", uid),
+        orderBy("createdAt", "desc")
+      ),
+      (qs) =>
+        setStoreOrders(
+          qs.docs.map((d) => normStoreOrder(d.id, d.data() as Record<string, unknown>))
+        ),
+      () => undefined
+    );
+    return () => {
+      un1();
+      un2();
+    };
+  }, [cloud, uid]);
+
+  // Phase G · G4: the suspension banner's reason (§2.4) — the
+  // latest suspension act's recorded reason, while the shop is
+  // in fact suspended (a later activation clears it in the
+  // derivation itself).
+  const suspensionReason: string | null =
+    planView?.state === "suspended"
+      ? latestSuspensionReason(ownEvents)
+      : null;
+
+  /* (The G4 submitRenewalPayment action is defined below,
+   * after cloudCtx — it executes lib/renewal's plan through
+   * the same registry plan executor.) */
+
+  /** Phase G · G2: the client-side invoice-event pre-check
+   *  (design §4.2). Mirrors the rules exactly and refuses ONLY
+   *  under enforcement; a refusal is recorded for the shell's
+   *  mapped banner and the caller aborts before composing any
+   *  write. No registry (demo/pre-G) always passes. */
+  const planInvoiceCheck = useCallback((): boolean => {
+    const reg = planRegistryRef.current;
+    if (!reg) return false;
+    const refusal = planInvoiceRefusal(
+      reg,
+      planCountersRef.current,
+      new Date().toISOString()
+    );
+    if (refusal) {
+      setPlanRefusal(refusal);
+      return true;
+    }
+    return false;
+  }, []);
+
+  /** Phase G · G2 (design §4.2): ride the posting batch with
+   *  the invoice counter's next value — lib/plans'
+   *  nextInvoiceCounter over the live counter doc (a trial
+   *  counter never rolls: the count is the pool consumption).
+   *  No counter doc (pre-G namespace) rides nothing; the rules'
+   *  enforce-gated pairing is equally inert there. The write
+   *  carries the doc's full counter shape — the counter rule's
+   *  diff then sees exactly the one family's change. */
+  const rideInvoiceCounter = useCallback(
+    (batch: ReturnType<typeof writeBatch>, db: Firestore, shopUid: string) => {
+      const cur = planCountersRef.current;
+      if (!cur) return;
+      const next = nextInvoiceCounter(
+        cur,
+        planRegistryRef.current?.plan ?? null,
+        new Date().toISOString()
+      );
+      batch.update(doc(db, "businessCounters", shopUid), {
+        invoiceMonth: next.invoiceMonth,
+        invoiceCount: next.invoiceCount,
+        memberCount: next.memberCount,
+      });
+    },
+    []
+  );
+
+  /** Phase G · G2 (design §4.2): the seat counter's ride on the
+   *  invite/removal batches (+1 at invite, −1 at removal). */
+  const rideMemberCounter = useCallback(
+    (
+      batch: ReturnType<typeof writeBatch>,
+      db: Firestore,
+      shopUid: string,
+      delta: 1 | -1
+    ) => {
+      const cur = planCountersRef.current;
+      if (!cur) return;
+      const next = nextMemberCounter(cur, delta);
+      batch.update(doc(db, "businessCounters", shopUid), {
+        invoiceMonth: next.invoiceMonth,
+        invoiceCount: next.invoiceCount,
+        memberCount: next.memberCount,
+      });
+    },
+    []
+  );
+
   /* ---------------- shared helpers ---------------- */
   const cloudCtx = useCallback((): { db: Firestore; uid: string } | null => {
     if (!cloud || !uid) return null;
     const db = getFirestoreDb();
     return db ? { db, uid } : null;
   }, [cloud, uid]);
+
+  /** Phase G · G4 (design §3.5): the owner's renewal
+   *  submission. lib/renewal composes the record from the
+   *  catalogue — born `submitted`, in the owner's own name —
+   *  and this executes the plan's single platform write via
+   *  the registry plan executor. It composes NO journal entry
+   *  and touches no shop path: a plan payment is platform
+   *  paperwork, settled later from the console queue.
+   *  Owner-only, and inert without a registry (demo / pre-G),
+   *  where the renewal surface never renders. */
+  const submitRenewalPayment = useCallback(
+    async (
+      form: RenewalSubmissionForm
+    ): Promise<{ ok: boolean; reason?: string }> => {
+      const ctx = cloudCtx();
+      if (!ctx || roleRef.current !== "owner") {
+        return { ok: false, reason: "unavailable" };
+      }
+      const res = planRenewalSubmission({
+        registry: planRegistryRef.current,
+        businessId: ctx.uid,
+        planId: form.planId,
+        billing: form.billing,
+        method: form.method,
+        reference: form.reference,
+        ownerNote: form.ownerNote,
+        actor: ctx.uid,
+        now: new Date().toISOString(),
+      });
+      if (!res.ok) return { ok: false, reason: res.reason };
+      try {
+        await applyRegistryWrites(ctx.db, res.writes);
+        return { ok: true };
+      } catch {
+        return { ok: false, reason: "write-failed" };
+      }
+    },
+    [cloudCtx]
+  );
+
+  /* ---------------- Phase G · G6: backup & restore ----------------
+   * Design §9 + §3.7: the export assembles from the owner's own
+   * one-shot reads (a point-in-time file, not subscription drift),
+   * is owner-only, and consults nothing about the business's plan
+   * — reads are never gated, so the backup is available in trial,
+   * grace, read-only and suspended states alike. The restore is a
+   * transplant into this namespace only when the pure planner
+   * (lib/backup) proves it empty-or-resumable; the executor below
+   * performs the plan's document writes in order, in batches —
+   * it composes no journal entry and no plan write of its own. */
+
+  const exportBusinessBackup = useCallback(
+    async (): Promise<BusinessBackup | null> => {
+      const ctx = cloudCtx();
+      if (!ctx || roleRef.current !== "owner") return null;
+      const { db, uid } = ctx;
+      try {
+        const readTenant = async (name: string): Promise<JsonDoc[]> => {
+          const snap = await getDocs(collection(db, "users", uid, name));
+          return snap.docs.map(
+            (d) => exportableDoc({ ...(d.data() as JsonDoc), id: d.id })
+          );
+        };
+        const collections: Record<string, JsonDoc[]> = {};
+        for (const name of TENANT_COLLECTIONS) {
+          collections[name] = await readTenant(name);
+        }
+        const ownerSnap = await getDoc(doc(db, "users", uid));
+        const owner = ownerSnap.exists()
+          ? exportableDoc(ownerSnap.data() as JsonDoc)
+          : {};
+        const readSingle = async (path: string): Promise<JsonDoc | null> => {
+          const snap = await getDoc(doc(db, path));
+          return snap.exists() ? exportableDoc(snap.data() as JsonDoc) : null;
+        };
+        const readKeyed = async (path: string) => {
+          const snap = await getDocs(collection(db, path));
+          return snap.docs.map((d) => ({
+            key: d.id,
+            data: exportableDoc(d.data() as JsonDoc),
+          }));
+        };
+        const readSlice = async (name: string) => {
+          const snap = await getDocs(
+            query(collection(db, name), where("businessId", "==", uid))
+          );
+          return snap.docs.map((d) => ({
+            key: d.id,
+            data: exportableDoc(d.data() as JsonDoc),
+          }));
+        };
+        const readStorefront = async () => {
+          const snap = await getDocs(
+            query(collection(db, "storefronts"), where("businessId", "==", uid), limit(1))
+          );
+          return snap.docs.length > 0
+            ? { key: snap.docs[0].id, data: exportableDoc(snap.docs[0].data() as JsonDoc) }
+            : null;
+        };
+        const [registry, counters, stats, members, invites, events, payments, storefront, storeOrders] =
+          await Promise.all([
+            readSingle(`businesses/${uid}`),
+            readSingle(`businessCounters/${uid}`),
+            readSingle(`businessStats/${uid}`),
+            readKeyed(`businessMembers/${uid}/members`),
+            readKeyed(`businessInvites/${uid}/invites`),
+            readSlice("businessEvents"),
+            readSlice("platformPayments"),
+            readStorefront(),
+            readSlice("storeOrders"),
+          ]);
+        return assembleBackup({
+          businessId: uid,
+          exportedAt: new Date().toISOString(),
+          exportedBy: "web",
+          owner,
+          collections,
+          platform: {
+            registry, counters, stats, members, invites, events, payments,
+            storefront, storeOrders,
+          },
+        });
+      } catch {
+        return null;
+      }
+    },
+    [cloudCtx]
+  );
+
+  const planBusinessRestore = useCallback(
+    async (file: unknown): Promise<RestorePlan | null> => {
+      const ctx = cloudCtx();
+      if (!ctx || roleRef.current !== "owner") return null;
+      const { db, uid } = ctx;
+      try {
+        const collections: RestoreTargetState["collections"] = {};
+        for (const name of TENANT_COLLECTIONS) {
+          const snap = await getDocs(collection(db, "users", uid, name));
+          collections[name] = snap.docs.map(
+            (d) => ({ ...(d.data() as JsonDoc), id: d.id })
+          );
+        }
+        const ownerSnap = await getDoc(doc(db, "users", uid));
+        const readKeyed = async (path: string) => {
+          const snap = await getDocs(collection(db, path));
+          return snap.docs.map((d) => ({
+            key: d.id,
+            data: d.data() as JsonDoc,
+          }));
+        };
+        const [members, invites] = await Promise.all([
+          readKeyed(`businessMembers/${uid}/members`),
+          readKeyed(`businessInvites/${uid}/invites`),
+        ]);
+        // Phase H · H3: the restore's storefront subset probe —
+        // the target business's own snapshot (any slug) + inbox.
+        const frontSnap = await getDocs(
+          query(collection(db, "storefronts"), where("businessId", "==", uid), limit(1))
+        );
+        const orderSnap = await getDocs(
+          query(collection(db, "storeOrders"), where("businessId", "==", uid))
+        );
+        const target: RestoreTargetState = {
+          owner: ownerSnap.exists() ? (ownerSnap.data() as JsonDoc) : null,
+          collections,
+          members,
+          invites,
+          storefront:
+            frontSnap.docs.length > 0
+              ? { key: frontSnap.docs[0].id, data: frontSnap.docs[0].data() as JsonDoc }
+              : null,
+          storeOrders: orderSnap.docs.map((d) => ({
+            key: d.id,
+            // createdAt is a server timestamp on the live doc;
+            // the backup carries its ISO form (exportableDoc),
+            // so the subset test must compare like with like.
+            data: exportableDoc(d.data() as JsonDoc),
+          })),
+        };
+        return planRestore({
+          file,
+          targetBusinessId: uid,
+          target,
+          actorUid: uid,
+          nowISO: new Date().toISOString(),
+        });
+      } catch {
+        return null;
+      }
+    },
+    [cloudCtx]
+  );
+
+  const executeBusinessRestore = useCallback(
+    async (plan: RestorePlan): Promise<{ ok: boolean; reason?: string }> => {
+      const ctx = cloudCtx();
+      if (!ctx || roleRef.current !== "owner") {
+        return { ok: false, reason: "unavailable" };
+      }
+      if (!plan.ok) return { ok: false, reason: plan.reason };
+      try {
+        let batch = writeBatch(ctx.db);
+        let n = 0;
+        const flush = async () => {
+          if (n > 0) {
+            await batch.commit();
+            batch = writeBatch(ctx.db);
+            n = 0;
+          }
+        };
+        for (const w of plan.writes) {
+          if (w.kind === "set") {
+            // Phase H · H3: an inbox doc's createdAt rides the
+            // backup as an ISO string (the export's canonical
+            // form); restore it as the timestamp it was born as,
+            // so a restored inbox is indistinguishable in type
+            // from a live one.
+            const data =
+              w.path.startsWith("storeOrders/") &&
+              typeof w.data.createdAt === "string"
+                ? { ...w.data, createdAt: Timestamp.fromDate(new Date(w.data.createdAt)) }
+                : w.data;
+            batch.set(doc(ctx.db, w.path), data);
+          } else {
+            batch.set(doc(collection(ctx.db, w.collection)), w.data);
+          }
+          n++;
+          if (n >= 450) await flush();
+        }
+        await flush();
+        return { ok: true };
+      } catch {
+        return { ok: false, reason: "write-failed" };
+      }
+    },
+    [cloudCtx]
+  );
+
+  /* ---------------- Fix Round 2 · FR2: demo data + trash ---------------- */
+
+  /** Classification from LOADED state — what the Dashboard and
+   *  Settings buttons show. The actions below re-classify from
+   *  fresh reads before writing, so a stale subscription can
+   *  never seed into a real book. */
+  const demoClass = useMemo<BusinessContentClass>(() => {
+    const idDocs = (list: Array<{ id: string }>) => list.map((d) => ({ id: d.id }));
+    const docs: Partial<Record<string, Array<{ id: string }>>> = {
+      products: idDocs(products),
+      sales: idDocs(sales),
+    };
+    for (const name of DEMO_CONTENT_COLLECTIONS) {
+      if (name === "products" || name === "sales") continue;
+      docs[name] = idDocs(
+        ((cols as unknown as Record<string, Array<{ id: string }>>)[name] ?? [])
+      );
+    }
+    return classifyBusinessContent(docs);
+  }, [products, sales, cols]);
+
+  /** Fresh content ids for the FR2 decisions (never state). */
+  const readContentIds = useCallback(async (db: Firestore, businessId: string) => {
+    const ids: Partial<Record<string, Set<string>>> = {};
+    for (const name of DEMO_CONTENT_COLLECTIONS) {
+      const snap = await getDocs(collection(db, "users", businessId, name));
+      ids[name] = new Set(snap.docs.map((d) => d.id));
+    }
+    return ids;
+  }, []);
+
+  const classFromIds = (ids: Partial<Record<string, Set<string>>>): BusinessContentClass => {
+    const docs: Partial<Record<string, Array<{ id: string }>>> = {};
+    for (const [name, set] of Object.entries(ids)) {
+      docs[name] = [...(set ?? [])].map((id) => ({ id }));
+    }
+    return classifyBusinessContent(docs);
+  };
+
+  /** The post-seed summary, confirmed from the writes actually
+   *  committed — the same shape as the pre-list, so the panel
+   *  shows "what was added" from evidence, not from the plan. */
+  const summaryFromWrites = (writes: DemoSeedWrite[]): DemoSummary => {
+    const counts = summarizeSeedWrites(writes);
+    const writtenProducts = writes
+      .filter((w) => w.collection === "products")
+      .map((w) => w.data);
+    const num = (v: unknown) => (typeof v === "number" ? v : 0);
+    return {
+      products: counts.products ?? 0,
+      customers: counts.customers ?? 0,
+      suppliers: counts.suppliers ?? 0,
+      salesRows: counts.sales ?? 0,
+      journalEntries: counts.journal ?? 0,
+      stockCost: writtenProducts.reduce((n, pr) => n + num(pr.stockQty) * num(pr.costPrice), 0),
+      stockRetail: writtenProducts.reduce((n, pr) => n + num(pr.stockQty) * num(pr.salePrice), 0),
+    };
+  };
+
+  /** FR2 item 1 — "Add demo data": owner-only, cloud-only, and
+   *  refused unless the business is EMPTY (fresh classification
+   *  first). A demo-only business takes the re-add path, a real
+   *  business is refused outright — demo seed never mixes into
+   *  real books. */
+  const addDemoData = useCallback(async (): Promise<{
+    ok: boolean;
+    reason?: string;
+    summary?: DemoSummary;
+  }> => {
+    const ctx = cloudCtx();
+    if (!ctx || roleRef.current !== "owner") return { ok: false, reason: "unavailable" };
+    const { db, uid } = ctx;
+    try {
+      const existing = await readContentIds(db, uid);
+      const cls = classFromIds(existing);
+      if (cls !== "empty") {
+        return { ok: false, reason: cls === "real" ? "real" : "already" };
+      }
+      const writes = await seedDemoCollections(db, uid, existing);
+      return { ok: true, summary: summaryFromWrites(writes) };
+    } catch {
+      return { ok: false, reason: "write-failed" };
+    }
+  }, [cloudCtx, readContentIds]);
+
+  /** FR2 item 1 — "Re-add demo data": the honest reset. Only a
+   *  demo-only business re-seeds: its demo docs are wiped first
+   *  and the set is planned again, so the result is exactly the
+   *  demo set — never a duplicate layer. Empty and real
+   *  businesses are refused (empty has nothing to re-add; real
+   *  must never be mixed with demo). */
+  const resetDemoData = useCallback(async (): Promise<{
+    ok: boolean;
+    reason?: string;
+    summary?: DemoSummary;
+  }> => {
+    const ctx = cloudCtx();
+    if (!ctx || roleRef.current !== "owner") return { ok: false, reason: "unavailable" };
+    const { db, uid } = ctx;
+    try {
+      const existing = await readContentIds(db, uid);
+      const cls = classFromIds(existing);
+      if (cls === "empty") return { ok: false, reason: "empty" };
+      if (cls === "real") {
+        /* Mixed (demo + real) vs pure real: the refusal message
+         * differs, so the UI can say exactly what is in the way. */
+        const demoIds = demoSetIds();
+        const hasDemo = DEMO_CONTENT_COLLECTIONS.some((name) =>
+          [...(demoIds[name] ?? [])].some((id) => existing[name]?.has(id))
+        );
+        return { ok: false, reason: hasDemo ? "mixed" : "real" };
+      }
+      const demoIds = demoSetIds();
+      for (const name of DEMO_CONTENT_COLLECTIONS) {
+        const ids = [...(demoIds[name] ?? [])].filter((id) => existing[name]?.has(id));
+        for (let i = 0; i < ids.length; i += 450) {
+          const batch = writeBatch(db);
+          for (const id of ids.slice(i, i + 450)) {
+            batch.delete(doc(db, "users", uid, name, id));
+          }
+          await batch.commit();
+        }
+      }
+      const writes = await seedDemoCollections(db, uid, {});
+      return { ok: true, summary: summaryFromWrites(writes) };
+    } catch {
+      return { ok: false, reason: "write-failed" };
+    }
+  }, [cloudCtx, readContentIds]);
+
+  /** FR2 item 2 — list the trash panel's snapshots, sweeping
+   *  expired ones lazily (manifest + chunks deleted on load).
+   *  Restored snapshots stay as consumed history; active ones
+   *  carry their Restore / Delete-permanently buttons. */
+  const listTrash = useCallback(async (): Promise<TrashManifest[]> => {
+    const ctx = cloudCtx();
+    if (!ctx || roleRef.current !== "owner") return [];
+    try {
+      const manifests = await readTrashManifests(ctx.db, ctx.uid);
+      const now = new Date().toISOString();
+      const kept: TrashManifest[] = [];
+      for (const m of manifests) {
+        if (trashPanelState(m, now) === "expired") {
+          await deleteTrashDocs(ctx.db, ctx.uid, m.trashId);
+        } else {
+          kept.push(m);
+        }
+      }
+      return kept;
+    } catch {
+      return [];
+    }
+  }, [cloudCtx]);
+
+  /** FR2 item 2 — "Clear data": snapshot the ENTIRE business into
+   *  trash first (the G6 backup format, verified before it is
+   *  ever stored), then wipe the tenant data. The owner doc
+   *  survives (modified: clearing flag cleared, demoState none,
+   *  lock emptied); the structural accounts and the default
+   *  warehouse survive (they are byte-identical to the backup,
+   *  so the restore subset test still passes); registry,
+   *  counters, memberships and events are platform data and are
+   *  NOT wiped — clearing cannot evade invoice limits. The
+   *  storefront snapshot and inbox are NOT touched: a published
+   *  storefront stays live until the owner unpublishes it, and
+   *  the panel says so. Clearing again while an ACTIVE snapshot
+   *  exists refuses with reason "replace" until the caller
+   *  confirms (replaceConfirmed) — the old trash is then lost.
+   *  The clear window (owner-doc `clearing` flag) is closed in
+   *  a finally: a half-failed wipe never strands it open, and
+   *  the trash snapshot restores over any half-wipe (remaining
+   *  docs are byte-identical to the backup, so the guard's
+   *  subset test passes them). */
+  const clearBusinessData = useCallback(async (opts?: {
+    replaceConfirmed?: boolean;
+  }): Promise<{
+    ok: boolean;
+    reason?: string;
+    manifest?: TrashManifest;
+    replaced?: TrashManifest | null;
+  }> => {
+    const ctx = cloudCtx();
+    if (!ctx || roleRef.current !== "owner") return { ok: false, reason: "unavailable" };
+    const { db, uid } = ctx;
+    try {
+      const now = new Date().toISOString();
+      const existing = await readTrashManifests(db, uid);
+      const replaced = clearReplacesTrash(existing, now);
+      if (replaced && !opts?.replaceConfirmed) {
+        return { ok: false, reason: "replace", replaced };
+      }
+      const backup = await exportBusinessBackup();
+      if (!backup) return { ok: false, reason: "unavailable" };
+      if (!verifyBackup(backup).ok) return { ok: false, reason: "corrupt" };
+      if (replaced) await deleteTrashDocs(db, uid, replaced.trashId);
+      const trashId = `trash-${Date.now().toString(36)}${Math.floor(Math.random() * 1e6).toString(36)}`;
+      const { manifest, chunks } = trashManifestFor({
+        trashId,
+        backup,
+        clearedAtISO: now,
+        replacedTrashId: replaced?.trashId ?? null,
+      });
+      await setDoc(doc(db, "businessTrash", uid, "snapshots", trashId), manifest);
+      for (let i = 0; i < chunks.length; i += 450) {
+        const batch = writeBatch(db);
+        for (const c of chunks.slice(i, i + 450)) {
+          batch.set(
+            doc(db, "businessTrash", uid, "snapshots", trashId, "chunks", String(c.index)),
+            { index: c.index, data: c.data }
+          );
+        }
+        await batch.commit();
+      }
+      await updateDoc(doc(db, "users", uid), { clearing: now });
+      try {
+        for (const name of TENANT_COLLECTIONS) {
+          if (name === "accounts") continue;
+          const snap = await getDocs(collection(db, "users", uid, name));
+          const victims =
+            name === "warehouses"
+              ? snap.docs.filter((d) => d.id !== DEFAULT_WAREHOUSE_ID)
+              : snap.docs;
+          for (let i = 0; i < victims.length; i += 450) {
+            const batch = writeBatch(db);
+            for (const d of victims.slice(i, i + 450)) batch.delete(d.ref);
+            await batch.commit();
+          }
+        }
+      } finally {
+        await updateDoc(doc(db, "users", uid), {
+          clearing: deleteField(),
+          demoState: "none",
+          lockedThrough: "",
+        });
+      }
+      await setDoc(doc(collection(db, "businessEvents")), {
+        businessId: uid,
+        kind: "data.cleared",
+        actor: uid,
+        at: now,
+        detail: { trashId, totalDocs: manifest.totalDocs },
+      });
+      return { ok: true, manifest, replaced: replaced ?? null };
+    } catch {
+      return { ok: false, reason: "write-failed" };
+    }
+  }, [cloudCtx, exportBusinessBackup]);
+
+  /** FR2 item 2 — restore from trash: the EXISTING restore
+   *  pipeline, guard and all. A business that gained new data
+   *  after clearing is refused with the existing
+   *  "target-not-empty" reason — never merged. On success the
+   *  snapshot is CONSUMED: its manifest flips to "restored" and
+   *  its chunks are dropped, so it can never restore again. */
+  const restoreFromTrash = useCallback(async (
+    trashId: string
+  ): Promise<{ ok: boolean; reason?: string }> => {
+    const ctx = cloudCtx();
+    if (!ctx || roleRef.current !== "owner") return { ok: false, reason: "unavailable" };
+    const { db, uid } = ctx;
+    try {
+      const manifestSnap = await getDoc(doc(db, "businessTrash", uid, "snapshots", trashId));
+      if (!manifestSnap.exists()) return { ok: false, reason: "missing" };
+      const manifest = manifestSnap.data() as TrashManifest;
+      const now = new Date().toISOString();
+      if (!canRestoreFromTrash(manifest, now)) {
+        return { ok: false, reason: trashPanelState(manifest, now) };
+      }
+      const chunkSnap = await getDocs(
+        collection(db, "businessTrash", uid, "snapshots", trashId, "chunks")
+      );
+      const chunks = chunkSnap.docs.map((d) => ({
+        index: Number(d.id),
+        data: (d.data() as { data: string }).data,
+      }));
+      const json = reassembleChunks(chunks, manifest.chunkCount);
+      if (!json) return { ok: false, reason: "corrupt" };
+      const file = JSON.parse(json) as unknown;
+      if (!verifyBackup(file).ok) return { ok: false, reason: "corrupt" };
+      const plan = await planBusinessRestore(file);
+      if (!plan) return { ok: false, reason: "unavailable" };
+      if (!plan.ok) return { ok: false, reason: plan.reason };
+      const res = await executeBusinessRestore(plan);
+      if (!res.ok) return { ok: false, reason: res.reason };
+      await updateDoc(doc(db, "businessTrash", uid, "snapshots", trashId), {
+        status: "restored",
+      });
+      for (let i = 0; i < chunkSnap.docs.length; i += 450) {
+        const batch = writeBatch(db);
+        for (const d of chunkSnap.docs.slice(i, i + 450)) batch.delete(d.ref);
+        await batch.commit();
+      }
+      return { ok: true };
+    } catch {
+      return { ok: false, reason: "write-failed" };
+    }
+  }, [cloudCtx, planBusinessRestore, executeBusinessRestore]);
+
+  /** FR2 item 2 — delete a trash snapshot permanently (manifest
+   *  + chunks), with its audit event. */
+  const deleteTrashPermanently = useCallback(async (
+    trashId: string
+  ): Promise<{ ok: boolean; reason?: string }> => {
+    const ctx = cloudCtx();
+    if (!ctx || roleRef.current !== "owner") return { ok: false, reason: "unavailable" };
+    try {
+      await deleteTrashDocs(ctx.db, ctx.uid, trashId);
+      await setDoc(doc(collection(ctx.db, "businessEvents")), {
+        businessId: ctx.uid,
+        kind: "data.trashDeleted",
+        actor: ctx.uid,
+        at: new Date().toISOString(),
+        detail: { trashId },
+      });
+      return { ok: true };
+    } catch {
+      return { ok: false, reason: "write-failed" };
+    }
+  }, [cloudCtx]);
+
+  /** FR2 item 3 — retry a failed business setup: complete the
+   *  skeleton from the registry's own name/phone. Idempotent
+   *  (merge-writes, fixed ids), so a repeated retry is safe. */
+  const retryBusinessSetup = useCallback(async (): Promise<boolean> => {
+    const ctx = cloudCtx();
+    if (!ctx || roleRef.current !== "owner") return false;
+    try {
+      const regSnap = await getDoc(doc(ctx.db, "businesses", ctx.uid));
+      if (!regSnap.exists()) return false;
+      const reg = regSnap.data() as { name?: string; phone?: string; city?: string };
+      await createEmptyNamespace(
+        ctx.db, ctx.uid, user?.email ?? null,
+        reg.name ?? "Shop", reg.phone ?? "", reg.city ?? ""
+      );
+      setSetupIncomplete(false);
+      return true;
+    } catch {
+      return false;
+    }
+  }, [cloudCtx, user?.email]);
 
   /** Generic dual-path doc write for the simple collections. */
   const putDoc = useCallback(
@@ -2197,6 +3658,10 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
         { account: inventoryAccountFor(product), debit: 0, credit: qty * product.costPrice },
       ]);
       guardPostings(entry); // A5 choke point (before any write)
+      // Phase G · G2: the client plan gate (design §4.2) — a
+      // counter sale is an invoice event; it refuses here, with
+      // mapped copy, before any write is composed.
+      if (planInvoiceCheck()) return false;
       const ctx = cloudCtx();
       if (ctx) {
         const batch = writeBatch(ctx.db);
@@ -2206,6 +3671,10 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
         });
         batchLevelDelta(batch, ctx.db, ctx.uid, defWh, productId, -qty);
         postEntry(batch, entry);
+        // Phase G · G2 (§4.2): the invoice counter rides the
+        // counter sale's batch, paired by the rules via
+        // getAfter().
+        rideInvoiceCounter(batch, ctx.db, ctx.uid);
         void batch.commit();
         return true;
       }
@@ -2227,7 +3696,7 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
       appendJournalDemo(entry);
       return true;
     },
-    [cloudCtx, appendJournalDemo, resolveAccountId, resolveSlab, qtyAtWh, applyDemoLevels]
+    [cloudCtx, appendJournalDemo, resolveAccountId, resolveSlab, qtyAtWh, applyDemoLevels, planInvoiceCheck, rideInvoiceCounter]
   );
 
   /* ---------------- billing ---------------- */
@@ -2307,6 +3776,36 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
         const p = productsRef.current.find((x) => x.id === pid);
         if (!p || qtyAtWh(p, billWh) < q - 1e-9) return false;
       }
+      // Phase H · H1: a points tender part is validated against
+      // the DERIVED loyalty position before anything is composed.
+      // The desk quotes from the same fold (lib/loyalty), so a
+      // mismatch means stale state — another terminal spent the
+      // points, the balance moved, the cap changed — and the save
+      // refuses rather than posting a leg the liability cannot
+      // cover (the insufficient-position discipline). Points are
+      // stamped like a cheque part: the stamp is consumed here
+      // and the journal leg is authoritative.
+      const loyaltySt = resolveLoyaltySettings(settingsRef.current);
+      const rawPointsParts = bill.payments.filter((p) => p.instrument === "points");
+      let loyaltyLegPoints = 0;
+      if (rawPointsParts.length > 0) {
+        if (!bill.customerId) return false;
+        const wantedPoints = rawPointsParts.reduce(
+          (a, p) => a + Math.max(0, Math.floor(p.loyaltyPoints ?? 0)),
+          0
+        );
+        const wantedRs = round2(rawPointsParts.reduce((a, p) => a + (p.amount || 0), 0));
+        const quote = loyaltyRedemptionQuote(
+          journalRef.current,
+          bill.customerId,
+          wantedPoints,
+          loyaltyRedeemCapRs(bill.total, loyaltySt)
+        );
+        if (quote.points !== wantedPoints || Math.abs(quote.rs - wantedRs) > 0.005) {
+          return false;
+        }
+        loyaltyLegPoints = quote.points;
+      }
       const chequeIds = bill.payments.map((p) =>
         p.instrument === "cheque" ? newId("chq") : null
       );
@@ -2318,20 +3817,28 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
       // chosen at deposit) — it stamps the registry id instead,
       // and the capture draft is consumed here, never stored.
       const payments: BillPayment[] = bill.payments.map((p, i) =>
-        p.instrument === "cheque"
+        p.instrument === "points"
           ? {
               method: p.method,
               amount: p.amount,
               accountId: null,
-              instrument: "cheque" as const,
-              chequeId: chequeIds[i],
+              instrument: "points" as const,
+              loyaltyPoints: p.loyaltyPoints ?? null,
             }
-          : {
-              method: p.method,
-              amount: p.amount,
-              accountId:
-                p.method === "credit" ? null : resolveAccountId(p.method, p.accountId),
-            }
+          : p.instrument === "cheque"
+            ? {
+                method: p.method,
+                amount: p.amount,
+                accountId: null,
+                instrument: "cheque" as const,
+                chequeId: chequeIds[i],
+              }
+            : {
+                method: p.method,
+                amount: p.amount,
+                accountId:
+                  p.method === "credit" ? null : resolveAccountId(p.method, p.accountId),
+              }
       );
       // C1: the posted bill carries the RESOLVED warehouse — it is
       // the only warehouse returns/voids will consult (§1.6).
@@ -2384,22 +3891,35 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
       );
       const lines: JournalEntry["lines"] = [
         ...payments.map((p) =>
-          p.instrument === "cheque"
+          p.instrument === "points"
             ? {
-                // B5: the cheque line rides INSIDE the ordinary
-                // bill entry in place of the money line it
-                // replaces (refType stays the host's: "bill").
-                account: "cheques_in_hand" as const,
+                // H1: the points leg rides INSIDE the bill entry
+                // exactly like the cheque leg — Dr loyalty_payable
+                // (ref = the customer) settles that share of the
+                // bill against the liability, so Phase B void /
+                // return mirrors reverse it with no loyalty code
+                // in the mirror at all.
+                account: "loyalty_payable" as const,
                 debit: p.amount,
                 credit: 0,
-                ref: p.chequeId ?? null,
+                ref: bill.customerId,
               }
-            : {
-                account: accountForMethod(p.method),
-                debit: p.amount,
-                credit: 0,
-                ref: p.method === "credit" ? bill.customerId : p.accountId,
-              }
+            : p.instrument === "cheque"
+              ? {
+                  // B5: the cheque line rides INSIDE the ordinary
+                  // bill entry in place of the money line it
+                  // replaces (refType stays the host's: "bill").
+                  account: "cheques_in_hand" as const,
+                  debit: p.amount,
+                  credit: 0,
+                  ref: p.chequeId ?? null,
+                }
+              : {
+                  account: accountForMethod(p.method),
+                  debit: p.amount,
+                  credit: 0,
+                  ref: p.method === "credit" ? bill.customerId : p.accountId,
+                }
         ),
         ...(discountDebit > 0
           ? [{ account: "sales_discount" as const, debit: discountDebit, credit: 0 }]
@@ -2540,7 +4060,27 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
       const quotationStatusUpdate = statusUpdates.quotation ?? null;
       const jobStatusUpdate = statusUpdates.job ?? null;
 
-      guardPostings(entry); // A5 choke point (before any write)
+      // Phase H · H1: the bill's points tender rides its payload
+      // (the fold reads the count here; the rupee leg is already
+      // in the lines above), and the EARN — the cost of the
+      // points this bill grants — is composed by lib/loyalty (one
+      // of the design's named loyalty compositions) and written in
+      // this bill's OWN batch below: a bill and its earn can never
+      // half-land. Walk-in bills and a disabled programme compose
+      // nothing (the composer returns null).
+      if (loyaltyLegPoints > 0) entry.loyaltyPointsUsed = loyaltyLegPoints;
+      const loyaltyEarn = buildLoyaltyEarnEntry({
+        journal: journalRef.current,
+        bill: posted,
+        settings: loyaltySt,
+        ts: now,
+      });
+      guardPostings(entry, ...(loyaltyEarn ? [loyaltyEarn] : [])); // A5 choke point (before any write)
+      // Phase G · G2: the client plan gate (design §4.2) — an
+      // invoice event refuses HERE, with mapped copy, before
+      // any write is composed (createBill and finalizeBill both
+      // land in this one function, so both postings gate once).
+      if (planInvoiceCheck()) return false;
       const ctx = cloudCtx();
       if (ctx) {
         const batch = writeBatch(ctx.db);
@@ -2554,6 +4094,10 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
           batchLevelDelta(batch, ctx.db, ctx.uid, billWh, it.productId, -it.qty);
         }
         postEntry(batch, entry);
+        if (loyaltyEarn) postEntry(batch, loyaltyEarn);
+        // Phase G · G2 (§4.2): the invoice counter rides the
+        // posting batch — the rules pair it via getAfter().
+        rideInvoiceCounter(batch, ctx.db, ctx.uid);
         if (creditEntry) batch.set(doc(ctx.db, "users", ctx.uid, "credits", creditEntry.id), { ...creditEntry });
         for (const chq of newCheques) {
           batch.set(doc(ctx.db, "users", ctx.uid, "cheques", chq.id), { ...chq });
@@ -2596,7 +4140,7 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
         credits: creditEntry ? [...prev.credits, creditEntry] : prev.credits,
         cheques: newCheques.length > 0 ? [...prev.cheques, ...newCheques] : prev.cheques,
         stockLevels: demoLevels,
-        journal: [...prev.journal, entry],
+        journal: [...prev.journal, entry, ...(loyaltyEarn ? [loyaltyEarn] : [])],
         saleOrders: orderStatusUpdate
           ? prev.saleOrders.map((o) =>
               o.id === orderStatusUpdate.id ? { ...o, status: orderStatusUpdate.status } : o
@@ -2629,7 +4173,7 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
       );
       return true;
     },
-    [cloudCtx, resolveAccountId, resolveWh, qtyAtWh]
+    [cloudCtx, resolveAccountId, resolveWh, qtyAtWh, planInvoiceCheck, rideInvoiceCounter]
   );
 
   const buildBill = useCallback(
@@ -2866,6 +4410,20 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
       // price, so it is already inside (gross − discountShare).
       const refundTotal = gross - discountShare + taxShares.exclusiveTaxShare;
 
+      // Phase H · H1 (§1.1/§1.4): a points-paid bill's RETURN
+      // re-credits POINTS, never cash — the tender unwinds in the
+      // same proportion as this give-back (fold-priced by
+      // lib/loyalty, LIFO at the vintages' snapshot rates), and
+      // the money split below shrinks by exactly that value: the
+      // customer gets back what they actually surrendered. A VOID
+      // computes no share here — it mirrors the tender whole
+      // through the payments flatMap's points branch instead.
+      const loyaltyShare =
+        opts.kind === "return" && bill.customerId
+          ? loyaltyRecreditForReturn(journalRef.current, bill, refundTotal, completesBill)
+          : { points: 0, rs: 0 };
+      const moneyGiveBack = round2(refundTotal - loyaltyShare.rs);
+
       // F-6: refunds may only eat into the bill's STILL-UNPAID udhaar
       // (its given amount, net of prior return reversals and of
       // repayments FIFO-allocated to this bill). Udhaar the customer
@@ -2875,8 +4433,8 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
       const creditReduction =
         opts.kind === "void"
           ? creditPosition.outstanding
-          : Math.min(refundTotal, creditPosition.outstanding);
-      const cashRefund = refundTotal - creditReduction;
+          : Math.min(moneyGiveBack, creditPosition.outstanding);
+      const cashRefund = moneyGiveBack - creditReduction;
 
       const now = new Date().toISOString();
       const refundMethod = opts.refundMethod ?? "cash";
@@ -2911,6 +4469,21 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
               ...bill.payments
                 .filter((p) => p.method !== "credit")
                 .flatMap((p) => {
+                  if (p.instrument === "points") {
+                    // H1: the points tender hands back as POINTS —
+                    // the whole leg returns to the liability
+                    // (Cr loyalty_payable, ref = the customer);
+                    // the fold reads the count off the void
+                    // entry's `loyaltyPointsReturned` payload.
+                    return [
+                      {
+                        account: "loyalty_payable" as const,
+                        debit: 0,
+                        credit: p.amount,
+                        ref: bill.customerId,
+                      },
+                    ];
+                  }
                   if (p.instrument === "cheque" && p.chequeId) {
                     const chq = colsRef.current.cheques.find((c) => c.id === p.chequeId);
                     if (chq && (chq.status === "bounced" || chq.status === "returned")) {
@@ -2982,6 +4555,9 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
         ...(creditReduction > 0
           ? [{ account: "receivables" as const, debit: 0, credit: creditReduction, ref: bill.customerId }]
           : []),
+        ...(loyaltyShare.rs > 0
+          ? [{ account: "loyalty_payable" as const, debit: 0, credit: loyaltyShare.rs, ref: bill.customerId }]
+          : []),
         ...refundLines,
         { account: "cogs", debit: 0, credit: cost },
       ];
@@ -2992,6 +4568,16 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
         linesJ,
         { ts: now }
       );
+      // H1: the fold reads the re-credited points count off this
+      // payload — a return's proportional share, or a void's whole
+      // tender (read off the bill's own entry payload).
+      if (loyaltyShare.points > 0) entry.loyaltyPointsReturned = loyaltyShare.points;
+      if (opts.kind === "void") {
+        const usedPts =
+          journalRef.current.find((e) => e.refId === bill.id && e.refType === "bill")
+            ?.loyaltyPointsUsed ?? 0;
+        if (usedPts > 0) entry.loyaltyPointsReturned = usedPts;
+      }
       // B5: the void hands the still-in-hand cheques back — their
       // registry docs close as "returned", citing this void entry,
       // in the SAME batch as the void posting (above).
@@ -3040,6 +4626,12 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
         items: retItems,
         refundAmount: cashRefund,
         creditReduction,
+        // H1: the points share of this give-back, stamped so the
+        // NEXT return's clawback arithmetic reads prior give-backs
+        // whole (refund + udhaar + points) from the docs alone.
+        ...(loyaltyShare.rs > 0
+          ? { loyaltyRecreditRs: loyaltyShare.rs, loyaltyRecreditPoints: loyaltyShare.points }
+          : {}),
         method: refundMethod,
         accountId: opts.kind === "return" ? refundAccountId : null,
         dayOffset: 0,
@@ -3089,6 +4681,52 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
               };
             })()
           : null;
+      // Phase H · H1 (§1.4): the clawback companion — the earn on
+      // the given-back portion returns as a negative-points
+      // `loyalty_earn` entry, computed cumulatively and FLOORED so
+      // the remainder always stays with the customer; a completing
+      // return (and every void) absorbs the earn's exact
+      // remainder, and the void's companion marks the earn entry
+      // reversed. Composed by lib/loyalty (a named loyalty
+      // composition), posted in THIS batch — a return and its
+      // clawback can never half-land. Its refId names the credit
+      // note when one wraps this return, else the return itself;
+      // a void's names the bill it annuls.
+      const earnEntry0 = bill.customerId
+        ? billLoyaltyEarnEntry(journalRef.current, bill.id)
+        : null;
+      const clawPoints =
+        opts.kind === "void"
+          ? earnEntry0
+            ? (earnEntry0.points ?? 0) - billLoyaltyClawedPoints(journalRef.current, bill.id)
+            : 0
+          : loyaltyClawbackPoints({
+              journal: journalRef.current,
+              bill,
+              refundTotalRs: refundTotal,
+              priorRefundedRs: returnsRef.current
+                .filter((r) => r.billId === bill.id)
+                .reduce(
+                  (a, r) => a + r.refundAmount + (r.creditReduction ?? 0) + (r.loyaltyRecreditRs ?? 0),
+                  0
+                ),
+              completesBill,
+            });
+      const clawbackEntry =
+        earnEntry0 && clawPoints > 0
+          ? buildLoyaltyClawbackEntry({
+              journal: journalRef.current,
+              bill,
+              clawPoints,
+              refId: opts.kind === "void" ? bill.id : (note?.id ?? ret.id),
+              memo:
+                opts.kind === "void"
+                  ? `Loyalty earn reversed — Bill #${bill.billNo} voided`
+                  : `Loyalty points taken back — return on Bill #${bill.billNo}`,
+              ts: now,
+              reversesId: opts.kind === "void" ? earnEntry0.id : null,
+            })
+          : null;
       const returnedQty = { ...(bill.returnedQty ?? {}) };
       for (const it of retItems) returnedQty[it.productId] = (returnedQty[it.productId] ?? 0) + it.qty;
       const allReturned = bill.items.every((i) => (returnedQty[i.productId] ?? 0) >= i.qty);
@@ -3107,7 +4745,7 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
       // (never the bill's own date), so a void/return of a bill from
       // a closed period posts cleanly into the open period — the
       // guard verifies exactly that here.
-      guardPostings(entry);
+      guardPostings(entry, ...(clawbackEntry ? [clawbackEntry] : []));
       const ctx = cloudCtx();
       if (ctx) {
         const batch = writeBatch(ctx.db);
@@ -3129,6 +4767,7 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
           batch.set(doc(ctx.db, "users", ctx.uid, "cheques", u.id), { ...u });
         }
         postEntry(batch, entry);
+        if (clawbackEntry) postEntry(batch, clawbackEntry);
         if (creditReversal)
           batch.set(doc(ctx.db, "users", ctx.uid, "credits", creditReversal.id), { ...creditReversal });
         void batch.commit();
@@ -3152,7 +4791,7 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
           voidChequeUpdates.length > 0
             ? prev.cheques.map((c) => voidChequeUpdates.find((u) => u.id === c.id) ?? c)
             : prev.cheques,
-        journal: [...prev.journal, entry],
+        journal: [...prev.journal, entry, ...(clawbackEntry ? [clawbackEntry] : [])],
       }));
       setSales((prev) => [...prev, ...negSales]);
       setProducts((prev) =>
@@ -3235,6 +4874,42 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
     },
     [reverseBillItems, role]
   );
+
+  /** Phase H · H1 (§1.5): post the expiry releases the DERIVED
+   *  due-list names — one entry per due vintage, composed by
+   *  lib/loyalty, all in one batch. Expiry is never automatic and
+   *  never backdated: the releases post at today's instant under
+   *  the period guard like every posting, and the liability keeps
+   *  carrying unposted expiries honestly until the owner acts.
+   *  Gated on the `loyalty` matrix row (owner/manager write). */
+  const postLoyaltyExpiries = useCallback((): number => {
+    if (!can(roleRef.current, "loyalty", "write")) return 0;
+    const nowIso = new Date().toISOString();
+    const due = loyaltyExpiryDue(journalRef.current, nowIso);
+    if (due.length === 0) return 0;
+    const names = new Map(colsRef.current.customers.map((c) => [c.id, c.name]));
+    const entries = due
+      .map((d) =>
+        buildLoyaltyExpiryEntry({
+          customerId: d.customerId,
+          customerName: names.get(d.customerId) ?? d.customerId,
+          vintage: d.vintage,
+          ts: nowIso,
+        })
+      )
+      .filter((e): e is JournalEntry => e !== null);
+    if (entries.length === 0) return 0;
+    guardPostings(...entries); // A5 choke point (before any write)
+    const ctx = cloudCtx();
+    if (ctx) {
+      const batch = writeBatch(ctx.db);
+      for (const e of entries) postEntry(batch, e);
+      void batch.commit();
+      return entries.length;
+    }
+    setCols((prev) => ({ ...prev, journal: [...prev.journal, ...entries] }));
+    return entries.length;
+  }, [cloudCtx]);
 
   /* ---------------- document chain (Phase B · B1) ----------------
    * Quotations + sale orders. THE CARDINAL RULE (design §2.2):
@@ -5851,6 +7526,208 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
     [cloudCtx, user]
   );
 
+  /* ---------------- fiscal-year close (Phase D · D4) -------- */
+
+  /**
+   * Close a fiscal year (design §4.2/§4.3): the derived checklist
+   * is recomputed HERE, before composing any write — hard gates
+   * (trial balance zero, purchases clearing zero) refuse, and
+   * warnings refuse until the desk has acknowledged them. The
+   * close itself is ONE batch: the closing entry (composed in
+   * lib/fiscal, dated the FY's last day), the `periods` audit doc
+   * (kind "fiscal_year", recording the pre-close lock and the
+   * warnings tick), and `lockedThrough` advanced to the FY end
+   * if it does not already reach it — monotonic, like every lock
+   * movement. The closing entry passes the posting guard against
+   * the PRE-close lock state (design §4.3's ordering note): a
+   * year whose last day already sits inside an earlier lock
+   * refuses whole, with nothing half-committed.
+   * Owner-only (matrix row `fiscalClose` — the matrix's only
+   * owner-exclusive Phase D row).
+   */
+  const closeFiscalYear = useCallback(
+    (
+      fyStartDate: string,
+      opts: { note: string; ackWarnings: boolean }
+    ): FiscalCloseResult => {
+      if (!can(roleRef.current, "fiscalClose", "write"))
+        return { ok: false, reason: "permission" };
+      if (!isValidDateISO(fyStartDate)) return { ok: false, reason: "invalid" };
+      const settings = settingsRef.current;
+      const range = fiscalYearRange(settings, startOfDayPktInstant(fyStartDate));
+      if (range.startDate !== fyStartDate) return { ok: false, reason: "invalid" };
+      if (range.endDate >= todayPktISO()) return { ok: false, reason: "notpast" };
+      const cols = colsRef.current;
+      const state = fiscalCloseState(cols.journal, cols.periods, range);
+      if (state.closed) return { ok: false, reason: "closed" };
+      const checklist = fiscalYearCloseChecklist({
+        journal: cols.journal,
+        payrollRuns: cols.payrollRuns,
+        productionOrders: cols.productionOrders,
+        cheques: cols.cheques,
+        products: productsRef.current,
+        range,
+        lockedThrough: settings.lockedThrough,
+      });
+      if (!checklist.hardGatesPass) return { ok: false, reason: "gate" };
+      if (checklist.warningIds.length > 0 && !opts.ackWarnings)
+        return { ok: false, reason: "warnings" };
+      const periodId = newId("per");
+      const entry = buildFiscalClosingEntry(cols.journal, range, periodId);
+      if (entry) {
+        try {
+          guardPostings(entry); // pre-close lock state — see header
+        } catch (err) {
+          if (isPeriodLockedError(err)) return { ok: false, reason: "locked" };
+          throw err;
+        }
+      }
+      const cur = settings.lockedThrough ?? "";
+      const lockTarget = endOfDayPktInstant(range.endDate);
+      const newLock = lockTarget > cur ? lockTarget : cur;
+      const period: Period = {
+        id: periodId,
+        kind: "fiscal_year",
+        from: range.fromTs,
+        to: lockTarget,
+        action: "close",
+        byUid: user?.uid ?? "",
+        byEmail: user?.email ?? "",
+        ts: new Date().toISOString(),
+        note: opts.note.trim(),
+        prevLockedThrough: cur,
+        entryId: entry?.id ?? null,
+        warningsAcked: opts.ackWarnings,
+      };
+      const ctx = cloudCtx();
+      if (ctx) {
+        const batch = writeBatch(ctx.db);
+        if (entry) postEntry(batch, entry);
+        batch.set(doc(ctx.db, "users", ctx.uid, "periods", period.id), { ...period });
+        if (newLock !== cur)
+          batch.update(doc(ctx.db, "users", ctx.uid), { lockedThrough: newLock });
+        void batch.commit();
+        return { ok: true };
+      }
+      setCols((prev) => ({
+        ...prev,
+        journal: entry ? [...prev.journal, entry] : prev.journal,
+        periods: [...prev.periods, period],
+        settings: { ...prev.settings, lockedThrough: newLock },
+      }));
+      return { ok: true };
+    },
+    [cloudCtx, user, guardPostings, postEntry]
+  );
+
+  /**
+   * Fix Round 1 · F5: post the one-time opening-stock entry
+   * (lib/fiscal `buildOpeningStockEntry` — Dr inventory[/raw] /
+   * Cr capital), the owner path for a shop whose opening stock
+   * predates its books. Gated like the fiscal close (owner-only
+   * matrix row `fiscalClose`), dated today, and passed through
+   * the same posting guard — a today that already sits inside a
+   * period lock refuses whole. ONE entry, append-only: a wrong
+   * amount is corrected later by a reversing entry, never by
+   * editing this one.
+   */
+  const postOpeningStock = useCallback(
+    (amount: number, rawShare: number): FiscalCloseResult => {
+      if (!can(roleRef.current, "fiscalClose", "write"))
+        return { ok: false, reason: "permission" };
+      const entry = buildOpeningStockEntry(amount, rawShare);
+      if (!entry) return { ok: false, reason: "invalid" };
+      try {
+        guardPostings(entry);
+      } catch (err) {
+        if (isPeriodLockedError(err)) return { ok: false, reason: "locked" };
+        throw err;
+      }
+      const ctx = cloudCtx();
+      if (ctx) {
+        const batch = writeBatch(ctx.db);
+        postEntry(batch, entry);
+        void batch.commit();
+        return { ok: true };
+      }
+      setCols((prev) => ({ ...prev, journal: [...prev.journal, entry] }));
+      return { ok: true };
+    },
+    [cloudCtx, guardPostings, postEntry]
+  );
+
+  /**
+   * Reopen a closed fiscal year (design §4.4): the closing
+   * entry's exact mirror (dated today — a reversal never
+   * backdates into the lock the close set), a `periods` reopen
+   * doc citing the close it unwinds, and `lockedThrough`
+   * restored to the close doc's `prevLockedThrough` — one batch.
+   * Refused when the year is not closed, and when a LATER year
+   * is still closed (closes unwind in reverse order only — the
+   * stack discipline). The journal keeps both events forever.
+   */
+  const reopenFiscalYear = useCallback(
+    (fyStartDate: string, reason: string): FiscalCloseResult => {
+      if (!can(roleRef.current, "fiscalClose", "write"))
+        return { ok: false, reason: "permission" };
+      if (!reason.trim()) return { ok: false, reason: "reason" };
+      if (!isValidDateISO(fyStartDate)) return { ok: false, reason: "invalid" };
+      const settings = settingsRef.current;
+      const range = fiscalYearRange(settings, startOfDayPktInstant(fyStartDate));
+      if (range.startDate !== fyStartDate) return { ok: false, reason: "invalid" };
+      const cols = colsRef.current;
+      const state = fiscalCloseState(cols.journal, cols.periods, range);
+      if (!state.closed || !state.closeDoc) return { ok: false, reason: "notclosed" };
+      if (fiscalReopenBlocker(cols.journal, cols.periods, state.closeDoc))
+        return { ok: false, reason: "stack" };
+      const nowTs = new Date().toISOString();
+      const mirror = state.entry
+        ? buildFiscalReopenEntry(state.entry, nowTs)
+        : null;
+      if (mirror) {
+        try {
+          guardPostings(mirror);
+        } catch (err) {
+          if (isPeriodLockedError(err)) return { ok: false, reason: "locked" };
+          throw err;
+        }
+      }
+      const cur = settings.lockedThrough ?? "";
+      const restored = state.closeDoc.prevLockedThrough ?? "";
+      const period: Period = {
+        id: newId("per"),
+        kind: "fiscal_year",
+        from: state.closeDoc.from,
+        to: state.closeDoc.to,
+        action: "reopen",
+        byUid: user?.uid ?? "",
+        byEmail: user?.email ?? "",
+        ts: nowTs,
+        note: reason.trim(),
+        prevLockedThrough: cur,
+        entryId: mirror?.id ?? null,
+        reopensPeriodId: state.closeDoc.id,
+      };
+      const ctx = cloudCtx();
+      if (ctx) {
+        const batch = writeBatch(ctx.db);
+        if (mirror) postEntry(batch, mirror);
+        batch.set(doc(ctx.db, "users", ctx.uid, "periods", period.id), { ...period });
+        batch.update(doc(ctx.db, "users", ctx.uid), { lockedThrough: restored });
+        void batch.commit();
+        return { ok: true };
+      }
+      setCols((prev) => ({
+        ...prev,
+        journal: mirror ? [...prev.journal, mirror] : prev.journal,
+        periods: [...prev.periods, period],
+        settings: { ...prev.settings, lockedThrough: restored },
+      }));
+      return { ok: true };
+    },
+    [cloudCtx, user, guardPostings, postEntry]
+  );
+
   /* ---------------- adjustments / day close ---------------- */
   /** Single internal path for every stock adjustment: moves stock,
    *  writes the adjustments-log row, and posts the journal entry at cost
@@ -7529,6 +9406,302 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
     [cloudCtx, guardPostings, postEntry, appendJournalDemo, resolveAccountId]
   );
 
+  /* ---------------- loans (Phase D · D3) ----------------
+   * Design §3: one register, two directions. A loan is BORN
+   * with its drawdown (doc + entry + opening diary events in
+   * ONE batch — a cloud loan never exists journalless, §10.3);
+   * charges accrue only as discrete desk-confirmed events, one
+   * per instalment; repayments carry their principal/charge
+   * split on the diary (attribution), never on the journal
+   * lines; corrections are mirror entries with negated diary
+   * events — the journal and the diary are both append-only.
+   * Write-offs do not exist (§3.4: no gain/loss code, and a
+   * waiver is never faked as a repayment). Every action gates
+   * on the `loans` matrix row (owner/accountant write, manager
+   * read — the A3 row, consumed unchanged). */
+
+  /** Shared dual-path writer: loan doc + its entries, one batch. */
+  const commitLoan = useCallback(
+    (loan: Loan, entries: JournalEntry[]): void => {
+      guardPostings(...entries); // A5 choke point (before any write)
+      const ctx = cloudCtx();
+      if (ctx) {
+        const batch = writeBatch(ctx.db);
+        batch.set(doc(ctx.db, "users", ctx.uid, "loans", loan.id), { ...loan });
+        for (const e of entries) postEntry(batch, e);
+        void batch.commit();
+        return;
+      }
+      setCols((prev) => ({
+        ...prev,
+        loans: prev.loans.some((l) => l.id === loan.id)
+          ? prev.loans.map((l) => (l.id === loan.id ? loan : l))
+          : [...prev.loans, loan],
+        journal: [...prev.journal, ...entries],
+      }));
+    },
+    [cloudCtx, guardPostings, postEntry]
+  );
+
+  const createLoan = useCallback(
+    (input: {
+      direction: LoanDirection;
+      partyName: string;
+      partyId?: string | null;
+      principal: number;
+      chargeType: Loan["chargeType"];
+      chargeRate: number;
+      feeAmount: number;
+      startDateISO: string;
+      instalmentCount: number;
+      instalmentEvery: Loan["instalmentEvery"];
+      firstDueISO: string;
+      method: PayMethod;
+      accountId?: string | null;
+      note?: string;
+    }): string | null => {
+      if (!can(roleRef.current, "loans", "write")) return null;
+      if (input.method === "credit") return null; // money methods only
+      const principal = Math.round((input.principal + Number.EPSILON) * 100) / 100;
+      const feeAmount = Math.round((input.feeAmount + Number.EPSILON) * 100) / 100;
+      const terms = {
+        direction: input.direction,
+        partyName: input.partyName,
+        principal,
+        chargeType: input.chargeType,
+        chargeRate: input.chargeRate,
+        feeAmount,
+        instalmentCount: Math.floor(input.instalmentCount),
+      };
+      // Composition refusals (§3.2/§3.4) — charged receivable
+      // lending included: refused here, never silently zeroed.
+      if (loanTermsError(terms)) return null;
+      if (!isISODate(input.startDateISO) || !isISODate(input.firstDueISO)) {
+        return null;
+      }
+      const number = nextDocNumber(
+        "loan",
+        colsRef.current.loans.map((l) => l.number),
+        settingsRef.current
+      );
+      const accountId = resolveAccountId(input.method, input.accountId);
+      const loan: Loan = {
+        id: newId("loan"),
+        number,
+        direction: input.direction,
+        partyName: input.partyName.trim(),
+        partyId: input.partyId ?? null,
+        principal,
+        chargeType: input.chargeType,
+        chargeRate: input.chargeType === "flat" || input.chargeType === "reducing"
+          ? input.chargeRate
+          : 0,
+        chargeAmount: loanChargeAmount(terms),
+        startDateISO: input.startDateISO,
+        instalmentCount: terms.instalmentCount,
+        instalmentEvery: input.instalmentEvery,
+        firstDueISO: input.firstDueISO,
+        events: [],
+        status: "active",
+        note: input.note?.trim() ?? "",
+        dayOffset: 0,
+        ts: new Date().toISOString(),
+      };
+      const entry = buildLoanDrawdownEntry(loan, {
+        method: input.method,
+        accountId,
+        feeAmount,
+      });
+      const now = new Date().toISOString();
+      const events: LoanEvent[] = [
+        {
+          kind: "drawdown",
+          amount: principal,
+          principalPart: principal,
+          chargePart: 0,
+          accountId,
+          entryId: entry.id,
+          dayOffset: 0,
+          ts: now,
+        },
+      ];
+      if (feeAmount > 0) {
+        // The fee leg of the SAME entry (§3.4): expensed at
+        // drawdown, netted from the proceeds — never an accrual.
+        events.push({
+          kind: "fee",
+          amount: feeAmount,
+          principalPart: 0,
+          chargePart: feeAmount,
+          accountId,
+          entryId: entry.id,
+          dayOffset: 0,
+          ts: now,
+        });
+      }
+      commitLoan({ ...loan, events }, [entry]);
+      return loan.id;
+    },
+    [commitLoan, resolveAccountId]
+  );
+
+  const accrueLoanCharge = useCallback(
+    (loanId: string, instalmentN: number): boolean => {
+      if (!can(roleRef.current, "loans", "write")) return false;
+      const cur = colsRef.current.loans.find((l) => l.id === loanId);
+      if (!cur || cur.status !== "active" || cur.direction !== "payable") {
+        return false;
+      }
+      if (cur.chargeType !== "flat" && cur.chargeType !== "reducing") {
+        return false;
+      }
+      // Ordinal discipline (§3.4): charges accrue in due order,
+      // one event per instalment — the desk confirms the NEXT
+      // un-accrued instalment, never a later one, never twice.
+      if (instalmentN !== accruedChargeCount(cur) + 1) return false;
+      const instalment = loanSchedule(cur).find((i) => i.n === instalmentN);
+      if (!instalment || !(instalment.chargePart > 0)) return false;
+      const entry = buildLoanChargeEntry(cur, { instalment });
+      const event: LoanEvent = {
+        kind: "charge",
+        amount: instalment.chargePart,
+        principalPart: 0,
+        chargePart: instalment.chargePart,
+        accountId: null,
+        entryId: entry.id,
+        dayOffset: 0,
+        ts: new Date().toISOString(),
+      };
+      commitLoan({ ...cur, events: [...cur.events, event] }, [entry]);
+      return true;
+    },
+    [commitLoan]
+  );
+
+  const repayLoan = useCallback(
+    (
+      loanId: string,
+      input: {
+        amount: number;
+        method: PayMethod;
+        accountId?: string | null;
+        principalPart?: number;
+        chargePart?: number;
+      }
+    ): boolean => {
+      if (!can(roleRef.current, "loans", "write")) return false;
+      if (input.method === "credit") return false; // money methods only
+      const amount = Math.round((input.amount + Number.EPSILON) * 100) / 100;
+      if (!Number.isFinite(amount) || !(amount > 0)) return false;
+      const cur = colsRef.current.loans.find((l) => l.id === loanId);
+      if (!cur || cur.status !== "active") return false;
+      // The split is attribution (§3.3): charges-first by
+      // default, desk-overridable — validated against the
+      // derived position, and overpayment beyond the derived
+      // outstanding refuses pre-composition (§3.4).
+      const split =
+        input.principalPart !== undefined && input.chargePart !== undefined
+          ? {
+              principalPart:
+                Math.round((input.principalPart + Number.EPSILON) * 100) / 100,
+              chargePart:
+                Math.round((input.chargePart + Number.EPSILON) * 100) / 100,
+            }
+          : defaultRepaymentSplit(cur, amount);
+      if (repaymentSplitError(cur, amount, split)) return false;
+      const accountId = resolveAccountId(input.method, input.accountId);
+      const entry = buildLoanRepaymentEntry(cur, {
+        amount,
+        method: input.method,
+        accountId,
+      });
+      const event: LoanEvent = {
+        kind: "repayment",
+        amount,
+        principalPart: split.principalPart,
+        chargePart: split.chargePart,
+        accountId,
+        entryId: entry.id,
+        dayOffset: 0,
+        ts: new Date().toISOString(),
+      };
+      const next: Loan = { ...cur, events: [...cur.events, event] };
+      commitLoan({ ...next, status: loanStatusFor(next) }, [entry]);
+      return true;
+    },
+    [commitLoan, resolveAccountId]
+  );
+
+  const reverseLoanEvent = useCallback(
+    (loanId: string, entryId: string): boolean => {
+      if (!can(roleRef.current, "loans", "write")) return false;
+      const cur = colsRef.current.loans.find((l) => l.id === loanId);
+      if (!cur) return false;
+      // Every standing event the entry posted (a drawdown and
+      // its netted fee share one entry — they reverse together,
+      // because the mirror reverses the whole entry).
+      const standing = cur.events.filter(
+        (ev) => ev.entryId === entryId && ev.amount > 0
+      );
+      if (standing.length === 0) return false;
+      const journal = journalRef.current;
+      if (journal.some((e) => e.reversesId === entryId)) return false;
+      const original = journal.find((e) => e.id === entryId);
+      if (!original) return false;
+      const kinds = new Set(standing.map((ev) => ev.kind));
+      if (kinds.has("drawdown")) {
+        // Stack discipline: a drawdown reverses only when no
+        // repayment or charge stands against it — those reverse
+        // first. The loan then reads cancelled (§3.3).
+        const othersStanding = cur.events.some(
+          (ev) =>
+            ev.entryId !== entryId &&
+            ev.amount > 0 &&
+            (ev.kind === "repayment" || ev.kind === "charge")
+        );
+        if (othersStanding) return false;
+      }
+      const mirror = buildMirrorEntry(
+        original,
+        `Loan reversal ${cur.number} — ${cur.partyName}`
+      );
+      const now = new Date().toISOString();
+      const negated: LoanEvent[] = standing.map((ev) => ({
+        ...ev,
+        amount: -ev.amount,
+        principalPart: -ev.principalPart,
+        chargePart: -ev.chargePart,
+        entryId: mirror.id,
+        dayOffset: 0,
+        ts: now,
+      }));
+      const next: Loan = { ...cur, events: [...cur.events, ...negated] };
+      commitLoan(
+        {
+          ...next,
+          status: kinds.has("drawdown") ? "cancelled" : loanStatusFor(next),
+        },
+        [mirror]
+      );
+      return true;
+    },
+    [commitLoan]
+  );
+
+  const deleteLoan = useCallback(
+    (id: string): boolean => {
+      // Rules mirror: loans delete is owner-only, and the store
+      // additionally enforces never-used (no diary events) —
+      // a loan that moved money is a posted record (§6.2).
+      if (roleRef.current !== "owner") return false;
+      const cur = colsRef.current.loans.find((l) => l.id === id);
+      if (!cur || cur.events.length > 0) return false;
+      removeDoc("loans", id);
+      return true;
+    },
+    [removeDoc]
+  );
+
   const saveDayClose = useCallback(
     (d: Omit<DayClose, "id" | "ts" | "dayOffset">) => {
       if (!can(roleRef.current, "dayClose", "write")) return; // A3 guard
@@ -7536,6 +9709,30 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
       putDoc("dayCloses", row);
     },
     [putDoc]
+  );
+
+  /* ---------------- brand assets (Phase E · E2) ----------------
+   * Owner-only writes (design §5: the rules carry the same gate —
+   * read canAccess, write isOwner). The asset arrives fully
+   * formed from the lib/branding pipeline with its cap already
+   * enforced; the store re-pins the doc id to the kind (the
+   * fixed-id discipline) so a slot can never fork into two docs.
+   * Assets assert no history: replace overwrites the same doc,
+   * removal deletes it, and past prints are paper, not data. */
+  const setBrandingAsset = useCallback(
+    (asset: BrandingAsset) => {
+      if (roleRef.current !== "owner") return;
+      putDoc("branding", { ...asset, id: asset.kind });
+    },
+    [putDoc]
+  );
+
+  const removeBrandingAsset = useCallback(
+    (kind: BrandingAssetKind) => {
+      if (roleRef.current !== "owner") return;
+      removeDoc("branding", kind);
+    },
+    [removeDoc]
   );
 
   /* ---------------- settings & staff ---------------- */
@@ -7553,15 +9750,462 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
     [cloudCtx]
   );
 
+  /* ---------------- Phase H · H3: the storefront ----------------
+   * Design §2. The publish write is the owner's alone (rules v10
+   * key it to the uid in the doc's businessId); conversion and
+   * dismissal are member acts on the `storefront` matrix row,
+   * and conversion additionally rides the `saleOrders` row (it
+   * births an SO). NOTHING here composes a journal entry: the
+   * inbox is paper, the SO is a Phase B document, and money
+   * exists only when a bill is later posted from that SO
+   * through the ordinary desks. Demo mode refuses every write —
+   * demo publishes nothing and takes no orders (§5.3). */
+
+  const publishStorefront = useCallback(
+    async (input: {
+      slug?: string;
+      tagline?: string | null;
+      notice?: string | null;
+      excludedProductIds: string[];
+      includeProductIds: string[];
+    }): Promise<{ ok: boolean; reason?: string }> => {
+      const ctx = cloudCtx();
+      if (!ctx || roleRef.current !== "owner") {
+        return { ok: false, reason: "unavailable" };
+      }
+      const prev = storefrontRef.current;
+      const slug = prev ? prev.slug : (input.slug ?? "").trim();
+      if (!prev) {
+        const problem = slugProblem(slug);
+        if (problem) return { ok: false, reason: `slug-${problem}` };
+      }
+      const logo = colsRef.current.branding.find((b) => b.kind === "logo");
+      const snapshot = assembleStorefrontSnapshot({
+        businessId: ctx.uid,
+        slug,
+        settings: settingsRef.current,
+        city: planRegistryRef.current?.city ?? null,
+        logoDataUrl: logo?.dataUrl ?? null,
+        products: productsRef.current,
+        excludedProductIds: input.excludedProductIds,
+        includeProductIds: input.includeProductIds,
+        tagline: input.tagline,
+        notice: input.notice,
+        previous: prev,
+        nowISO: new Date().toISOString(),
+      });
+      try {
+        await setDoc(doc(ctx.db, "storefronts", slug), { ...snapshot });
+        // The slug label rides the owner doc so print/link seams
+        // can render the store link without a platform read.
+        updateSettings({ storefrontSlug: slug });
+        return { ok: true };
+      } catch {
+        return { ok: false, reason: "write-failed" };
+      }
+    },
+    [cloudCtx, updateSettings]
+  );
+
+  const unpublishStorefront = useCallback(async (): Promise<{
+    ok: boolean;
+    reason?: string;
+  }> => {
+    const ctx = cloudCtx();
+    const prev = storefrontRef.current;
+    if (!ctx || roleRef.current !== "owner" || !prev) {
+      return { ok: false, reason: "unavailable" };
+    }
+    try {
+      await setDoc(doc(ctx.db, "storefronts", prev.slug), {
+        ...prev,
+        enabled: false,
+        updatedAt: new Date().toISOString(),
+      });
+      return { ok: true };
+    } catch {
+      return { ok: false, reason: "write-failed" };
+    }
+  }, [cloudCtx]);
+
+  const setStorefrontAutoRepublish = useCallback(
+    (on: boolean) => {
+      updateSettings({ storefront: { autoRepublish: on } });
+    },
+    [updateSettings]
+  );
+
+  /* §2.2's client setting: while the store is live and the owner
+   * opted in, a product change re-publishes — but only when the
+   * PUBLIC content actually moved (storefrontContentEqual), so
+   * the subscription's own echo never loops a write. */
+  const autoRepublishTick = useCallback(async () => {
+    const ctx = cloudCtx();
+    const prev = storefrontRef.current;
+    if (!ctx || roleRef.current !== "owner" || !prev || !prev.enabled) return;
+    if (settingsRef.current.storefront?.autoRepublish !== true) return;
+    const logo = colsRef.current.branding.find((b) => b.kind === "logo");
+    const next = assembleStorefrontSnapshot({
+      businessId: ctx.uid,
+      slug: prev.slug,
+      settings: settingsRef.current,
+      city: planRegistryRef.current?.city ?? null,
+      logoDataUrl: logo?.dataUrl ?? null,
+      products: productsRef.current,
+      previous: prev,
+      nowISO: new Date().toISOString(),
+    });
+    if (storefrontContentEqual(prev, next)) return;
+    try {
+      await setDoc(doc(ctx.db, "storefronts", prev.slug), { ...next });
+    } catch {
+      /* best effort — the desk's manual Republish remains */
+    }
+  }, [cloudCtx]);
+
+  useEffect(() => {
+    if (!cloud) return;
+    const h = setTimeout(() => void autoRepublishTick(), 1200);
+    return () => clearTimeout(h);
+  }, [cloud, products, autoRepublishTick]);
+
+  const convertStoreOrder = useCallback(
+    async (
+      orderId: string
+    ): Promise<{ ok: boolean; reason?: string; soNumber?: string }> => {
+      if (
+        !can(roleRef.current, "storefront", "write") ||
+        !can(roleRef.current, "saleOrders", "write")
+      ) {
+        return { ok: false, reason: "forbidden" };
+      }
+      const order = storeOrdersRef.current.find((o) => o.id === orderId);
+      if (!order || order.state !== "new") {
+        return { ok: false, reason: "not-new" };
+      }
+      // Re-plan at the moment of the act — never trust a plan
+      // the screen composed earlier against staler data.
+      const plan = planStoreConversion(
+        order,
+        storefrontRef.current,
+        productsRef.current,
+        colsRef.current.customers
+      );
+      if (!plan) return { ok: false, reason: "nothing-to-convert" };
+      const nowISO = new Date().toISOString();
+      const number = nextDocNumber(
+        "saleOrder",
+        colsRef.current.saleOrders.map((o) => o.number),
+        settingsRef.current
+      );
+      // Resolve the customer: the phone match when one exists,
+      // else a new customer born from the order's own details —
+      // in the SAME batch as the SO and the state flip.
+      // Phase H · H6 (audit fix 2): storefront consent is applied
+      // HERE, when the order's customer is resolved — from the
+      // ORDER's own waOptIn flag, the customer's tick on the
+      // public checkout form, and from nothing else. An order
+      // without the flag stamps nothing: consent is never
+      // inferred from an order's existence or asserted by the
+      // desk on the customer's behalf.
+      const consent =
+        order.waOptIn === true
+          ? waConsentPatch("storefront", true, nowISO)
+          : null;
+      let customerId = plan.customer?.id ?? null;
+      let newCustomer: Customer | null = null;
+      if (!plan.customer) {
+        newCustomer = {
+          id: newId("cu"),
+          name: order.customerName,
+          phone: order.phone,
+          address: "",
+          note: "",
+          ts: nowISO,
+          ...(consent ?? {}),
+        };
+        customerId = newCustomer.id;
+      }
+      const soFields = buildStoreSaleOrder(order, plan, {
+        number,
+        customerId,
+        customerName: plan.customer?.name ?? order.customerName,
+        customerPhone: plan.customer?.phone ?? order.phone,
+        products: productsRef.current,
+        taxSlabs: taxSlabsRef.current,
+        settings: settingsRef.current,
+        nowISO,
+      });
+      const so: SaleOrder = { ...soFields, id: newId("so") };
+      const ctx = cloudCtx();
+      if (ctx) {
+        try {
+          const batch = writeBatch(ctx.db);
+          if (newCustomer) {
+            batch.set(
+              doc(ctx.db, "users", ctx.uid, "customers", newCustomer.id),
+              { ...newCustomer }
+            );
+          } else if (consent && plan.customer) {
+            batch.update(
+              doc(ctx.db, "users", ctx.uid, "customers", plan.customer.id),
+              { ...consent }
+            );
+          }
+          batch.set(doc(ctx.db, "users", ctx.uid, "saleOrders", so.id), { ...so });
+          batch.update(doc(ctx.db, "storeOrders", order.id), {
+            state: "converted",
+            convertedSoId: so.id,
+            convertedBy: user?.uid ?? "",
+            convertedAt: nowISO,
+          });
+          await batch.commit();
+          return { ok: true, soNumber: number };
+        } catch {
+          return { ok: false, reason: "write-failed" };
+        }
+      }
+      // Demo mode holds no inbox (the preview takes no orders),
+      // so this path is unreachable in practice; it exists so
+      // the action is total over the store's modes.
+      return { ok: false, reason: "unavailable" };
+    },
+    [cloudCtx, user]
+  );
+
+  const dismissStoreOrder = useCallback(
+    async (orderId: string): Promise<{ ok: boolean; reason?: string }> => {
+      if (!can(roleRef.current, "storefront", "write")) {
+        return { ok: false, reason: "forbidden" };
+      }
+      const order = storeOrdersRef.current.find((o) => o.id === orderId);
+      if (!order || order.state !== "new") {
+        return { ok: false, reason: "not-new" };
+      }
+      const ctx = cloudCtx();
+      if (!ctx) return { ok: false, reason: "unavailable" };
+      try {
+        await updateDoc(doc(ctx.db, "storeOrders", order.id), {
+          state: "dismissed",
+          dismissedBy: user?.uid ?? "",
+          dismissedAt: new Date().toISOString(),
+        });
+        return { ok: true };
+      } catch {
+        return { ok: false, reason: "write-failed" };
+      }
+    },
+    [cloudCtx, user]
+  );
+
+  /* ---------------- Phase H · WhatsApp marketing ----------------
+   * Design §3: the organisation of marketing — consent,
+   * templates, campaigns, the send queue, the log — as tenant
+   * collections written through the generic putDoc path (demo:
+   * local state, hermetic by construction; the send step opens
+   * wa.me in the shopkeeper's own WhatsApp in both modes, §5.3).
+   * NOTHING here composes a journal entry: marketing moves no
+   * money, and the makeEntry site count stays exactly 24. */
+  const waPlanViewNow = (): PlanView | null =>
+    planRegistryRef.current
+      ? planViewOf(
+          planRegistryRef.current,
+          planCountersRef.current,
+          new Date().toISOString()
+        )
+      : null;
+
+  const saveWaTemplate = useCallback(
+    (input: {
+      id?: string;
+      name: string;
+      kind: WaTemplateKind;
+      body: string;
+    }): string => {
+      if (!can(roleRef.current, "whatsapp", "write")) return "";
+      const now = new Date().toISOString();
+      const existing = input.id
+        ? colsRef.current.waTemplates.find((x) => x.id === input.id)
+        : undefined;
+      const tpl: WaTemplate = {
+        id: input.id ?? newId("wt"),
+        name: input.name.trim(),
+        kind: input.kind,
+        body: input.body,
+        createdBy: existing?.createdBy ?? user?.uid ?? "",
+        ts: existing?.ts ?? now,
+      };
+      if (!tpl.name || !tpl.body.trim()) return "";
+      putDoc("waTemplates", tpl);
+      return tpl.id;
+    },
+    [putDoc, user]
+  );
+
+  const deleteWaTemplate = useCallback(
+    (id: string) => {
+      if (!can(roleRef.current, "whatsapp", "write")) return;
+      removeDoc("waTemplates", id);
+    },
+    [removeDoc]
+  );
+
+  const createWaCampaign = useCallback(
+    (input: { name: string; templateId: string; audience: WaAudience }): string => {
+      if (!can(roleRef.current, "whatsapp", "write")) return "";
+      if (!input.name.trim() || !input.templateId) return "";
+      const campaign: WaCampaign = {
+        id: newId("wc"),
+        name: input.name.trim(),
+        templateId: input.templateId,
+        audience: input.audience,
+        resolvedCount: null,
+        createdBy: user?.uid ?? "",
+        ts: new Date().toISOString(),
+        state: "draft",
+      };
+      putDoc("waCampaigns", campaign);
+      return campaign.id;
+    },
+    [putDoc, user]
+  );
+
+  const launchWaCampaign = useCallback(
+    (campaignId: string): { ok: boolean; reason?: string; count?: number } => {
+      if (!can(roleRef.current, "whatsapp", "write")) {
+        return { ok: false, reason: "forbidden" };
+      }
+      const cols = colsRef.current;
+      const campaign = cols.waCampaigns.find((c) => c.id === campaignId);
+      if (!campaign || campaign.state !== "draft") {
+        return { ok: false, reason: "not-draft" };
+      }
+      if (!cols.waTemplates.some((x) => x.id === campaign.templateId)) {
+        return { ok: false, reason: "no-template" };
+      }
+      // The plan gates read the ASSIGNMENT SNAPSHOT (lib/whatsapp
+      // mirrors the doctrine): a shop whose snapshot lacks the
+      // module is refused even if today's catalogue grants it,
+      // and a lapsed plan pauses sending — never reading.
+      const pv = waPlanViewNow();
+      if (!waModuleAllowed(pv)) return { ok: false, reason: "plan-module" };
+      if (!waSendingAllowed(pv)) return { ok: false, reason: "plan-state" };
+      const plan = planWaLaunch(
+        campaign,
+        {
+          customers: cols.customers,
+          credits: cols.credits,
+          journal: cols.journal,
+          bills: cols.bills,
+          saleOrders: cols.saleOrders,
+          jobs: cols.jobs,
+          settings: settingsRef.current,
+          nowISO: new Date().toISOString(),
+        },
+        () => newId("ws")
+      );
+      for (const s of plan.sends) putDoc("waSends", s);
+      const launched: WaCampaign = {
+        ...campaign,
+        state: "sending",
+        resolvedCount: plan.resolvedCount,
+      };
+      putDoc("waCampaigns", launched);
+      return { ok: true, count: plan.resolvedCount };
+    },
+    [putDoc]
+  );
+
+  const advanceWaSend = useCallback(
+    (
+      campaignId: string,
+      act: "opened" | "sent",
+      afterId?: string | null
+    ): { ok: boolean; reason?: string; outcome?: WaSend["state"] } => {
+      if (!can(roleRef.current, "whatsapp", "write")) {
+        return { ok: false, reason: "forbidden" };
+      }
+      const cols = colsRef.current;
+      const campaign = cols.waCampaigns.find((c) => c.id === campaignId);
+      if (!campaign || campaign.state !== "sending") {
+        return { ok: false, reason: "not-sending" };
+      }
+      const sends = cols.waSends
+        .filter((s) => s.campaignId === campaignId)
+        .sort((a, b) => a.ts.localeCompare(b.ts) || a.id.localeCompare(b.id));
+      const step = waQueueStep(sends, cols.customers, afterId ?? null);
+      if (!step) return { ok: false, reason: "queue-empty" };
+      // A sendable head under a paused plan refuses BEFORE any
+      // write (invariant 5: sending degrades; reading and the
+      // log's truth do not — a skip verdict below still records,
+      // because it sends nothing).
+      if (step.action === "send" && !waSendingAllowed(waPlanViewNow())) {
+        return { ok: false, reason: "plan-state" };
+      }
+      const next = waSendTransition(step.send, act, step.customer);
+      putDoc("waSends", next);
+      const after = sends.map((s) => (s.id === next.id ? next : s));
+      if (waCampaignProgress(after).complete) {
+        const closed: WaCampaign = { ...campaign, state: "done" };
+        putDoc("waCampaigns", closed);
+      }
+      return { ok: true, outcome: next.state };
+    },
+    [putDoc]
+  );
+
+  const finishWaCampaign = useCallback(
+    (campaignId: string) => {
+      if (!can(roleRef.current, "whatsapp", "write")) return;
+      const campaign = colsRef.current.waCampaigns.find(
+        (c) => c.id === campaignId
+      );
+      if (campaign && campaign.state === "sending") {
+        const closed: WaCampaign = { ...campaign, state: "done" };
+        putDoc("waCampaigns", closed);
+      }
+    },
+    [putDoc]
+  );
+
+  const setCustomerWaConsent = useCallback(
+    (customerId: string, agreed: boolean, source: WaConsentSource) => {
+      // Rides updateCustomer's own customersManage guard.
+      updateCustomer(
+        customerId,
+        waConsentPatch(source, agreed, new Date().toISOString())
+      );
+    },
+    [updateCustomer]
+  );
+
+  const setWaServiceIntervalDays = useCallback(
+    (days: number) => {
+      const resolved = resolveWaSettings({
+        whatsapp: { serviceIntervalDays: days },
+      });
+      updateSettings({
+        whatsapp: { serviceIntervalDays: resolved.serviceIntervalDays },
+      });
+    },
+    [updateSettings]
+  );
+
   /**
-   * A3 staff management (design §3.1). Every change writes THREE
-   * places in ONE batch: the owner doc's `staff[]` (management
-   * record), the `staffEmails` mirror (the currently-published rules
-   * and older clients resolve through it), and `staffIndex/{email}`
-   * (the doc rules v3 read the role from). Removal deletes the index
-   * doc and both lists together — revocation stays instant.
+   * A3 staff management (design §3.1), on the G1 tenancy write set
+   * (design §1.3). Every change writes the owner doc's `staff[]`
+   * (management record) and the `staffEmails` mirror (the leg both
+   * published rule versions resolve through) in ONE batch, plus —
+   * since G1 — the platform grant: adding staff writes a
+   * `businessInvites` doc (the invitee's own client claims it into
+   * a uid-keyed membership at their next sign-in) and a
+   * `businessEvents` audit entry; role changes land on the invite
+   * or membership the member actually has (a pre-G legacy member
+   * with neither keeps the A3 `staffIndex` write); removal deletes
+   * the index doc, the invite and the membership together with
+   * both lists — revocation stays instant on the next read.
    * Owner-only: the store refuses for every staff role, and the
-   * owner doc + staffIndex rules refuse server-side as well.
+   * rules refuse server-side as well.
    */
   const addStaff = useCallback(
     (emailRaw: string, staffRole: StaffRole) => {
@@ -7578,16 +10222,47 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
       const staff = [...(cur.staff ?? []).filter((m) => m.email !== email), member];
       const ctx = cloudCtx();
       if (ctx) {
+        // Phase G · G2: the member-cap pre-check (design §4.2)
+        // — under enforcement a full house refuses here with
+        // mapped copy, before any write is composed. (Checked
+        // before the batch: the seat is created by the invite
+        // write below, and the cap counts seats + the owner.)
+        const reg = planRegistryRef.current;
+        if (reg) {
+          const refusal = planMemberRefusal(reg, planCountersRef.current);
+          if (refusal) {
+            setPlanRefusal(refusal);
+            return;
+          }
+        }
         const batch = writeBatch(ctx.db);
         batch.update(doc(ctx.db, "users", ctx.uid), {
           staffEmails: arrayUnion(email),
           staff,
         });
-        batch.set(doc(ctx.db, "staffIndex", email), {
-          ownerUid: ctx.uid,
+        // Phase G · G1 (design §1.3): the grant is an INVITE —
+        // claimed into a membership by the invitee's own client
+        // at their next sign-in (the rules gate the claim by
+        // email ownership). staffIndex is no longer written by
+        // addStaff: the legacy leg keeps serving pre-G staff, and
+        // an unclaimed invite confers nothing.
+        batch.set(doc(ctx.db, "businessInvites", ctx.uid, "invites", email), {
           email,
-          addedAt: member.addedAt,
           role: staffRole,
+          status: "pending",
+          invitedBy: ctx.uid,
+          createdAt: member.addedAt,
+        });
+        // Phase G · G2 (§4.2): the seat is created WITH the
+        // invite — memberCount +1 rides this batch, paired by
+        // the invites create leg via getAfter().
+        rideMemberCounter(batch, ctx.db, ctx.uid, 1);
+        batch.set(doc(collection(ctx.db, "businessEvents")), {
+          businessId: ctx.uid,
+          kind: "invite.created",
+          actor: ctx.uid,
+          at: member.addedAt,
+          detail: { email, role: staffRole },
         });
         void batch.commit();
         return;
@@ -7601,7 +10276,7 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
         },
       }));
     },
-    [cloudCtx]
+    [cloudCtx, rideMemberCounter]
   );
 
   const setStaffRole = useCallback(
@@ -7617,11 +10292,40 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
       if (ctx) {
         const batch = writeBatch(ctx.db);
         batch.update(doc(ctx.db, "users", ctx.uid), { staff });
-        batch.set(
-          doc(ctx.db, "staffIndex", email),
-          { ownerUid: ctx.uid, email, role: staffRole },
-          { merge: true }
-        );
+        // G1: the role lives on the invite (pending) or the
+        // membership (claimed) — whichever this member has. A
+        // member with NEITHER is a pre-G legacy member: their
+        // staffIndex doc gets the role, exactly as A3 wrote it.
+        const inv = invitesRef.current.find((i) => i.email === email);
+        const mem = membershipsRef.current.find((m) => m.email === email);
+        if (inv) {
+          batch.set(
+            doc(ctx.db, "businessInvites", ctx.uid, "invites", email),
+            { role: staffRole },
+            { merge: true }
+          );
+        }
+        if (mem) {
+          batch.set(
+            doc(ctx.db, "businessMembers", ctx.uid, "members", mem.memberUid),
+            { role: staffRole },
+            { merge: true }
+          );
+        }
+        if (!inv && !mem) {
+          batch.set(
+            doc(ctx.db, "staffIndex", email),
+            { ownerUid: ctx.uid, email, role: staffRole },
+            { merge: true }
+          );
+        }
+        batch.set(doc(collection(ctx.db, "businessEvents")), {
+          businessId: ctx.uid,
+          kind: "membership.roleChanged",
+          actor: ctx.uid,
+          at: new Date().toISOString(),
+          detail: { email, role: staffRole },
+        });
         void batch.commit();
         return;
       }
@@ -7643,6 +10347,36 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
           staff,
         });
         batch.delete(doc(ctx.db, "staffIndex", email));
+        // G1: the G-era grants die in the same batch — the invite
+        // (if never claimed) and the membership (if claimed). The
+        // mirror cut above already denies BOTH access legs on the
+        // member's next read; these deletes make it structural,
+        // and the removed member's live session loses the shop
+        // when its membership watcher re-resolves.
+        const inv = invitesRef.current.find((i) => i.email === email);
+        if (inv) {
+          batch.delete(doc(ctx.db, "businessInvites", ctx.uid, "invites", email));
+        }
+        const mem = membershipsRef.current.find((m) => m.email === email);
+        if (mem) {
+          batch.delete(
+            doc(ctx.db, "businessMembers", ctx.uid, "members", mem.memberUid)
+          );
+        }
+        // Phase G · G2 (§4.2): removing a member who holds a
+        // grant (invite or membership) frees the seat —
+        // memberCount −1 rides this batch ONCE; the invites and
+        // members delete legs both validate the same net −1. A
+        // pre-G legacy removal (neither grant exists) carries
+        // no counter write: no seat was ever counted for them.
+        if (inv || mem) rideMemberCounter(batch, ctx.db, ctx.uid, -1);
+        batch.set(doc(collection(ctx.db, "businessEvents")), {
+          businessId: ctx.uid,
+          kind: "membership.removed",
+          actor: ctx.uid,
+          at: new Date().toISOString(),
+          detail: { email },
+        });
         void batch.commit();
         return;
       }
@@ -7655,7 +10389,7 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
         },
       }));
     },
-    [cloudCtx]
+    [cloudCtx, rideMemberCounter]
   );
 
   /* ---------------- bulk import ---------------- */
@@ -7752,6 +10486,42 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
       ...cols,
       role,
       isStaff,
+      memberships,
+      invites,
+      planView,
+      planRefusal,
+      clearPlanRefusal,
+      ownPayments,
+      platformConfig,
+      suspensionReason,
+      submitRenewalPayment,
+      exportBusinessBackup,
+      planBusinessRestore,
+      executeBusinessRestore,
+      demoClass,
+      addDemoData,
+      resetDemoData,
+      listTrash,
+      clearBusinessData,
+      restoreFromTrash,
+      deleteTrashPermanently,
+      setupIncomplete,
+      retryBusinessSetup,
+      storefront,
+      storeOrders,
+      publishStorefront,
+      unpublishStorefront,
+      setStorefrontAutoRepublish,
+      convertStoreOrder,
+      dismissStoreOrder,
+      saveWaTemplate,
+      deleteWaTemplate,
+      createWaCampaign,
+      launchWaCampaign,
+      advanceWaSend,
+      finishWaCampaign,
+      setCustomerWaConsent,
+      setWaServiceIntervalDays,
       addProduct,
       updateProduct,
       deleteProduct,
@@ -7763,6 +10533,7 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
       finalizeBill,
       discardHeldBill,
       voidBill,
+      postLoyaltyExpiries,
       returnItems,
       returnItemsWithNote,
       addSupplier,
@@ -7802,6 +10573,9 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
       recordTaxPayment,
       closePeriod,
       reopenPeriod,
+      closeFiscalYear,
+      postOpeningStock,
+      reopenFiscalYear,
       createQuotation,
       updateQuotation,
       deleteQuotation,
@@ -7867,9 +10641,16 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
       reversePayrollPayment,
       reversePayrollRun,
       giveSalaryAdvance,
+      createLoan,
+      accrueLoanCharge,
+      repayLoan,
+      reverseLoanEvent,
+      deleteLoan,
       recordAdjustment,
       saveDayClose,
       updateSettings,
+      setBrandingAsset,
+      removeBrandingAsset,
       addStaff,
       setStaffRole,
       removeStaff,
@@ -7878,7 +10659,7 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
     [
       ready, products, sales, cols, role, isStaff,
       addProduct, updateProduct, deleteProduct, adjustStock, recordSale, resetDemo,
-      createBill, holdBill, finalizeBill, discardHeldBill, voidBill, returnItems,
+      createBill, holdBill, finalizeBill, discardHeldBill, voidBill, postLoyaltyExpiries, returnItems,
       returnItemsWithNote,
       addSupplier, updateSupplier, deleteSupplier, recordPurchase, recordPurchaseReturn, recordSupplierPayment,
       createPurchaseOrder, updatePurchaseOrder, deletePurchaseOrder,
@@ -7890,6 +10671,7 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
       setDefaultMoneyAccount, transferFunds,
       addTaxSlab, updateTaxSlab, deleteTaxSlab, setTaxDefault, recordTaxPayment,
       closePeriod, reopenPeriod,
+      closeFiscalYear, reopenFiscalYear, postOpeningStock,
       createQuotation, updateQuotation, deleteQuotation, issueQuotation,
       decideQuotation, cancelQuotation, convertQuotationToOrder,
       createSaleOrder, updateSaleOrder, deleteSaleOrder, confirmSaleOrder,
@@ -7910,7 +10692,20 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
       addEmployee, updateEmployee, deleteEmployee, setAttendanceMark,
       composePayrollRun, updatePayrollRun, deletePayrollRun, finalisePayrollRun,
       payPayrollEmployee, reversePayrollPayment, reversePayrollRun, giveSalaryAdvance,
-      recordAdjustment, saveDayClose, updateSettings, addStaff, setStaffRole, removeStaff, importProducts,
+      createLoan, accrueLoanCharge, repayLoan, reverseLoanEvent, deleteLoan,
+      recordAdjustment, saveDayClose, updateSettings, setBrandingAsset, removeBrandingAsset,
+      addStaff, setStaffRole, removeStaff, importProducts,
+      memberships, invites,
+      planView, planRefusal, clearPlanRefusal,
+      ownPayments, platformConfig, suspensionReason, submitRenewalPayment,
+      exportBusinessBackup, planBusinessRestore, executeBusinessRestore,
+      demoClass, addDemoData, resetDemoData, listTrash, clearBusinessData,
+      restoreFromTrash, deleteTrashPermanently, setupIncomplete, retryBusinessSetup,
+      storefront, storeOrders, publishStorefront, unpublishStorefront,
+      setStorefrontAutoRepublish, convertStoreOrder, dismissStoreOrder,
+      saveWaTemplate, deleteWaTemplate, createWaCampaign, launchWaCampaign,
+      advanceWaSend, finishWaCampaign, setCustomerWaConsent,
+      setWaServiceIntervalDays,
     ]
   );
 
@@ -7919,78 +10714,93 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
 
 /* ---------------- seeding (module scope) ---------------- */
 
-/** Write the full bundled seed into a fresh `users/{uid}` namespace. */
-async function seedNamespace(db: Firestore, uid: string, email: string | null) {
-  const cols = seedCollections();
-  const products = getSeedProducts();
-  const sales = getSeedSales();
-  const settings = getSeedSettings();
-  const docs: Array<{ ref: ReturnType<typeof doc>; data: Record<string, unknown> }> = [];
-  const push = (name: string, items: Array<{ id: string }>) => {
-    for (const it of items) {
-      docs.push({ ref: doc(db, "users", uid, name, it.id), data: { ...it } });
-    }
-  };
-  push("products", products);
-  push("sales", sales);
-  push("bills", cols.bills);
-  push("suppliers", cols.suppliers);
-  push("purchases", cols.purchases);
-  push("supplierPayments", cols.supplierPayments);
-  push("expenses", cols.expenses);
-  push("credits", cols.credits);
-  push("customers", cols.customers);
-  push("returns", cols.returns);
-  push("adjustments", cols.adjustments);
-  push("dayCloses", cols.dayCloses);
-  push("cashEntries", cols.cashEntries);
-  push("journal", cols.journal);
-  push("accounts", cols.accounts);
-  push("taxSlabs", cols.taxSlabs);
-  // Phase C · C1: a fresh shop is born MIGRATED — the default
-  // warehouse plus complete stock rows at the seed totals (§10.1).
-  // The Godown is demo flavour only (production shops add their
-  // own second warehouse from the management surface).
-  push("warehouses", cols.warehouses.filter((w) => w.id === DEFAULT_WAREHOUSE_ID));
-  push("stockLevels", cols.stockLevels);
-  // Phase B · B1/B2: `quotations` / `saleOrders` / `deliveryChallans`
-  // are deliberately NOT pushed — a production shop's document
-  // collections start EMPTY (the demo discoverability documents
-  // live only in demo mode's seedCollections; design §10). Absent
-  // collections subscribe as empty lists, exactly as every Phase A
-  // collection began.
+/** Fix Round 2 · FR2: a fresh business starts EMPTY. The owner
+ *  doc skeleton (lib/tenancy's newBusinessSkeleton — the same
+ *  fixed ids and content the first-business skeleton always
+ *  used) + the five money accounts + the default warehouse.
+ *  No content docs, no journal entries: demo data arrives only
+ *  through the explicit owner act (seedDemoCollections below),
+ *  never at signup. Merge-writes throughout, so completing a
+ *  half-born business (phase-2 failure) is idempotent. */
+async function createEmptyNamespace(
+  db: Firestore,
+  uid: string,
+  email: string | null,
+  shopName: string,
+  phone: string,
+  address: string
+) {
+  const skel = newBusinessSkeleton({
+    businessId: uid,
+    ownerUid: uid,
+    ownerEmail: email ?? "",
+    name: shopName,
+    phone,
+    address,
+    nowISO: new Date().toISOString(),
+  });
+  const docs: Array<{ ref: ReturnType<typeof doc>; data: Record<string, unknown> }> = [
+    { ref: doc(db, "users", uid), data: { ...skel.ownerDoc } },
+    ...skel.accounts.map((acc) => ({
+      ref: doc(db, "users", uid, "accounts", String(acc.id)),
+      data: acc,
+    })),
+    { ref: doc(db, "users", uid, "warehouses", String(skel.warehouse.id)), data: skel.warehouse },
+  ];
   for (let i = 0; i < docs.length; i += 450) {
     const batch = writeBatch(db);
-    for (const d of docs.slice(i, i + 450)) batch.set(d.ref, d.data);
+    for (const d of docs.slice(i, i + 450)) batch.set(d.ref, d.data, { merge: true });
     await batch.commit();
   }
-  await setDoc(doc(db, "users", uid), {
-    email,
-    seededAt: new Date().toISOString(),
-    seedV2: true,
-    // Fresh shops are born with the Phase A accounts in place and
-    // an (empty) RBAC staff record — both migration steps are no-ops.
-    // A4: the sample slab (inactive, §2.5) is seeded above; tax
-    // defaults are null, so the tax step is a no-op too.
-    // A5: fiscal defaults (PK fiscal year, 1 July) + no lock, so
-    // the periods step is likewise a no-op for fresh shops.
-    phaseA: { accountsV1: true, rbacV1: true, taxV1: true, periodsV1: true },
-    // C1: born migrated (warehouse + rows pushed above).
-    phaseC: { stockV1: true },
-    // D1: born migrated — the hrV1 step writes no data (§10.1);
-    // the HR collections start empty for a fresh shop too.
-    phaseD: { hrV1: true },
-    defaultSalesTaxSlabId: null,
-    defaultPurchaseTaxSlabId: null,
-    fiscalYearStartMonth: 7,
-    fiscalYearStartDay: 1,
-    lockedThrough: "",
-    shopName: settings.shopName,
-    address: settings.address,
-    phone: settings.phone,
-    staffEmails: settings.staffEmails,
-    staff: [],
-  });
+}
+
+/** Fix Round 2 · FR2: the explicit demo-data act's writer — every
+ *  demo document NOT already present (lib/demo's plan), in
+ *  450-doc batches, then the owner doc's demoState flips to
+ *  "seeded". This writer never decides: the caller classified
+ *  first (empty → add; demo-only → wipe then re-add; real →
+ *  refused before this function is ever called). Returns the
+ *  writes committed, so the caller confirms the post-summary
+ *  from what was actually written. */
+async function seedDemoCollections(
+  db: Firestore,
+  uid: string,
+  existingIds: Partial<Record<string, Set<string>>>
+) {
+  const writes = planDemoSeed(existingIds);
+  for (let i = 0; i < writes.length; i += 450) {
+    const batch = writeBatch(db);
+    for (const w of writes.slice(i, i + 450)) {
+      batch.set(doc(db, "users", uid, w.collection, w.id), w.data);
+    }
+    await batch.commit();
+  }
+  await updateDoc(doc(db, "users", uid), { demoState: "seeded" });
+  return writes;
+}
+
+/** Fix Round 2 · FR2: read a business's trash manifests, newest
+ *  first. The manifest is the panel's whole truth — counts and
+ *  fingerprint without reassembling anything. */
+async function readTrashManifests(db: Firestore, businessId: string): Promise<TrashManifest[]> {
+  const snap = await getDocs(collection(db, "businessTrash", businessId, "snapshots"));
+  return (snap.docs.map((d) => d.data() as TrashManifest)).sort((a, b) =>
+    b.clearedAt.localeCompare(a.clearedAt)
+  );
+}
+
+/** Fix Round 2 · FR2: delete a trash snapshot's chunk docs, then
+ *  its manifest — the whole snapshot, leaving nothing behind. */
+async function deleteTrashDocs(db: Firestore, businessId: string, trashId: string) {
+  const chunkSnap = await getDocs(
+    collection(db, "businessTrash", businessId, "snapshots", trashId, "chunks")
+  );
+  for (let i = 0; i < chunkSnap.docs.length; i += 450) {
+    const batch = writeBatch(db);
+    for (const d of chunkSnap.docs.slice(i, i + 450)) batch.delete(d.ref);
+    await batch.commit();
+  }
+  await deleteDoc(doc(db, "businessTrash", businessId, "snapshots", trashId));
 }
 
 /** Top up a PRE-Complete-edition namespace: write only the new
@@ -8202,6 +11012,206 @@ async function ensureStock(db: Firestore, uid: string) {
  */
 async function ensurePhaseD(db: Firestore, uid: string) {
   await updateDoc(doc(db, "users", uid), { "phaseD.hrV1": true });
+}
+
+/* ---------------- Phase G · G1: tenancy registry (module scope) ----------------
+ * The design §7.2 lazy migration and the §4.3 trial birth, executed
+ * from the pure lib/tenancy plans. EVERY write lands in a platform
+ * collection — zero writes inside any users/{uid} tree, zero
+ * journal entries — and the registry doc's own existence is the
+ * idempotency marker (no flag is written anywhere), so a second
+ * sign-in writes nothing new. */
+
+/** Phase G · G4: the registry read seam normalizes Firestore
+ *  Timestamps to ISO strings (the console's PlatformData
+ *  precedent) — a trial end is STORED as a timestamp at birth
+ *  (the rules validate it as one), while every lib derivation
+ *  (plan state, the renewal quote) speaks ISO. Paid period
+ *  fields are stored as strings already; the conversion is a
+ *  no-op for them. */
+function isoValueOf(v: unknown): unknown {
+  if (v == null || typeof v === "string") return v;
+  const t = v as { toDate?: () => Date };
+  if (typeof t.toDate === "function") return t.toDate().toISOString();
+  return v;
+}
+
+function normPlanRegistryDoc(
+  raw: Record<string, unknown>
+): BusinessRegistryDoc {
+  const plan = (raw.plan ?? {}) as Record<string, unknown>;
+  return {
+    ...(raw as unknown as BusinessRegistryDoc),
+    createdAt: isoValueOf(raw.createdAt) as string,
+    plan: {
+      ...(plan as unknown as BusinessRegistryDoc["plan"]),
+      periodFrom: isoValueOf(plan.periodFrom) as string,
+      periodTo: isoValueOf(plan.periodTo) as string | null,
+      trialEndsAt: isoValueOf(plan.trialEndsAt) as string | null,
+      assignedAt: isoValueOf(plan.assignedAt) as string,
+    },
+  };
+}
+
+/** Phase G · G4: a renewal record as the owner reads it back —
+ *  the doc id attached, every date an ISO string (the console
+ *  writes settlement fields as ISO already; the birth fields
+ *  are ISO by construction of the submission plan). */
+function normOwnPayment(
+  id: string,
+  raw: Record<string, unknown>
+): PlatformPaymentDoc {
+  return {
+    ...(raw as unknown as PlatformPaymentDoc),
+    id,
+    periodFrom: isoValueOf(raw.periodFrom) as string,
+    periodTo: isoValueOf(raw.periodTo) as string,
+    submittedAt: isoValueOf(raw.submittedAt) as string,
+    confirmedAt: isoValueOf(raw.confirmedAt) as string | null,
+  };
+}
+
+function normOwnEvent(raw: Record<string, unknown>): BusinessEventDoc {
+  return {
+    ...(raw as unknown as BusinessEventDoc),
+    at: isoValueOf(raw.at) as string,
+  };
+}
+
+/** Phase H · H3: an inbox doc off the wire — its `createdAt` was
+ *  written as a server timestamp by the public page; normalize
+ *  it to the ISO string the lib's shapes carry. */
+function normStoreOrder(id: string, raw: Record<string, unknown>): StoreOrder {
+  return {
+    ...(raw as unknown as StoreOrder),
+    id,
+    createdAt: isoValueOf(raw.createdAt) as string,
+  };
+}
+
+/** Execute a lib/tenancy write plan (set/add ops only — the index
+ *  op belongs to the session resolver in AuthProvider). */
+async function applyRegistryWrites(
+  db: Firestore,
+  writes: PlatformWrite[]
+): Promise<void> {
+  const batch = writeBatch(db);
+  let n = 0;
+  for (const w of writes) {
+    if (w.kind === "set") {
+      batch.set(doc(db, w.path), registryWriteData(w.path, w.data));
+      n++;
+    } else if (w.kind === "add") {
+      batch.set(doc(collection(db, w.collection)), w.data);
+      n++;
+    }
+  }
+  if (n > 0) await batch.commit();
+}
+
+/** Phase G · G6: make a Firestore document JSON-safe for the
+ *  backup file — recursively converts any Firestore Timestamp
+ *  (in practice only the registry's trial end, written as a real
+ *  timestamp at birth) to its ISO string. Tenant documents store
+ *  ISO strings already, so for them this is a faithful pass. */
+function exportableDoc<T>(value: T): T {
+  if (value && typeof value === "object") {
+    const maybeTs = value as { toDate?: unknown };
+    if (typeof maybeTs.toDate === "function") {
+      return (maybeTs.toDate as () => Date).call(value).toISOString() as T;
+    }
+    if (Array.isArray(value)) {
+      return value.map((v) => exportableDoc(v)) as T;
+    }
+    const out: Record<string, unknown> = {};
+    for (const [k, v] of Object.entries(value as Record<string, unknown>)) {
+      out[k] = exportableDoc(v);
+    }
+    return out as T;
+  }
+  return value;
+}
+
+/** The plans are pure data (ISO strings), but the rules validate
+ *  the registry's trial end as a Firestore TIMESTAMP
+ *  (businessBirthOk: `trialEndsAt is timestamp` and after
+ *  request.time) — so a businesses/ write converts that one field
+ *  at the executor seam. Everything else passes through as-is. */
+function registryWriteData(
+  path: string,
+  data: Record<string, unknown>
+): Record<string, unknown> {
+  if (!path.startsWith("businesses/")) return data;
+  const plan = data.plan as { trialEndsAt?: unknown } | undefined;
+  if (plan && typeof plan.trialEndsAt === "string") {
+    return {
+      ...data,
+      plan: {
+        ...plan,
+        trialEndsAt: Timestamp.fromDate(new Date(plan.trialEndsAt)),
+      },
+    };
+  }
+  return data;
+}
+
+/** §7.2: a pre-G owner's first G sign-in — the `founding` comp
+ *  assignment (Advanced limits, no expiry), membership mirrors
+ *  for resolvable staff, and counters initialised from a labelled
+ *  baseline count of the existing bills/sales. */
+async function ensureBusinessRegistry(
+  db: Firestore,
+  uid: string,
+  ownerEmail: string | null,
+  ownerData: Record<string, unknown>
+): Promise<void> {
+  const regRef = doc(db, "businesses", uid);
+  const reg = await getDoc(regRef);
+  if (reg.exists()) return;
+  const [billSnap, saleSnap] = await Promise.all([
+    getDocs(collection(db, "users", uid, "bills")),
+    getDocs(collection(db, "users", uid, "sales")),
+  ]);
+  const bills = billSnap.docs.map(
+    (d) => d.data() as { ts: string; status?: string }
+  );
+  const sales = saleSnap.docs.map((d) => d.data() as { ts: string });
+  const writes = planMigration({
+    ownerUid: uid,
+    ownerEmail: ownerEmail ?? "",
+    shopName: String(ownerData.shopName ?? ""),
+    phone: String(ownerData.phone ?? ""),
+    staffEmails: Array.isArray(ownerData.staffEmails)
+      ? (ownerData.staffEmails as string[])
+      : [],
+    registryExists: false,
+    bills,
+    sales,
+    nowISO: new Date().toISOString(),
+  });
+  await applyRegistryWrites(db, writes);
+}
+
+/** §4.3: a brand-new business's registry birth — the trial
+ *  snapshot (2 users / 200 invoices / standard modules, 14 days),
+ *  counters at zero, memberCount 1. */
+async function createTrialRegistry(
+  db: Firestore,
+  uid: string,
+  ownerEmail: string | null
+): Promise<void> {
+  const regRef = doc(db, "businesses", uid);
+  const reg = await getDoc(regRef);
+  if (reg.exists()) return;
+  const settings = getSeedSettings();
+  const writes = planTrialBirth({
+    ownerUid: uid,
+    ownerEmail: ownerEmail ?? "",
+    shopName: settings.shopName,
+    phone: settings.phone,
+    nowISO: new Date().toISOString(),
+  });
+  await applyRegistryWrites(db, writes);
 }
 
 export function useStore(): StoreValue {

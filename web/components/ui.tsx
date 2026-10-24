@@ -127,6 +127,21 @@ export function IconMoon({ className }: IconProps) {
     </svg>
   );
 }
+export function IconPalette({ className }: IconProps) {
+  return (
+    <svg viewBox="0 0 24 24" {...base} className={className} aria-hidden="true">
+      <path d="M12 21a9 9 0 1 1 9-9c0 2-1.6 3.5-3.6 3.5h-1.9a2.6 2.6 0 0 0-2 4.1c.4.5-.1 1.4-1.5 1.4Z" />
+      <path d="M7.2 10.2h.01M10.4 6.6h.01M15.6 6.9h.01M17.4 10.6h.01" />
+    </svg>
+  );
+}
+export function IconCheck({ className }: IconProps) {
+  return (
+    <svg viewBox="0 0 24 24" {...base} className={className} aria-hidden="true">
+      <path d="M20 6 9 17l-5-5" />
+    </svg>
+  );
+}
 export function IconSend({ className }: IconProps) {
   return (
     <svg viewBox="0 0 24 24" {...base} className={className} aria-hidden="true">
@@ -175,6 +190,15 @@ export function IconLogout({ className }: IconProps) {
     <svg viewBox="0 0 24 24" {...base} className={className} aria-hidden="true">
       <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
       <path d="m16 17 5-5-5-5M21 12H9" />
+    </svg>
+  );
+}
+export function IconLock({ className }: IconProps) {
+  return (
+    <svg viewBox="0 0 24 24" {...base} className={className} aria-hidden="true">
+      <rect x="5" y="11" width="14" height="9" rx="2" />
+      <path d="M8 11V7a4 4 0 0 1 8 0v4" />
+      <path d="M12 15.5h.01" />
     </svg>
   );
 }

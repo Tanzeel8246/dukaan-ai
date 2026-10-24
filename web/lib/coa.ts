@@ -18,6 +18,9 @@
  * Phase D · D1 adds the registry's ONE Phase D code additively —
  * `loans_receivable` (design §3.1) — under the same discipline: no
  * existing code changes name, type or meaning.
+ * Phase H · H1 adds the registry's TWO Phase H codes additively —
+ * `loyalty_payable` + `expense_loyalty` (Phase H design §1.2) —
+ * under the same discipline. Registry count: 28 → 30.
  */
 import type { AccountCode } from "./types";
 
@@ -42,8 +45,9 @@ export interface AccountMeta {
    */
   normalBalance: NormalBalance | null;
   /** "v1" = Complete edition; "A" = added by ERP Phase A;
-   *  "D" = added by ERP Phase D (D1: `loans_receivable` only). */
-  since: "v1" | "A" | "D";
+   *  "D" = added by ERP Phase D (D1: `loans_receivable` only);
+   *  "H" = added by ERP Phase H (H1: the loyalty pair only). */
+  since: "v1" | "A" | "D" | "H";
 }
 
 export const CHART_OF_ACCOUNTS: Record<AccountCode, AccountMeta> = {
@@ -78,6 +82,9 @@ export const CHART_OF_ACCOUNTS: Record<AccountCode, AccountMeta> = {
   retained_earnings: { type: "equity", normalBalance: "credit", since: "A" },
   /* ---- Phase D · D1 — additive (design §3.1) ---- */
   loans_receivable: { type: "asset", normalBalance: "debit", since: "D" },
+  /* ---- Phase H · H1 — additive (Phase H design §1.2) ---- */
+  loyalty_payable: { type: "liability", normalBalance: "credit", since: "H" },
+  expense_loyalty: { type: "expense", normalBalance: "debit", since: "H" },
 };
 
 /** Every valid account code, in registry order. */

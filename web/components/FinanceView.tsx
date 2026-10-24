@@ -6,6 +6,8 @@ import { useStore } from "./StoreProvider";
 import { useAuth } from "./AuthProvider";
 import { useLang } from "./LangProvider";
 import PermDenied from "./PermDenied";
+import FiscalClosePanel from "./FiscalClosePanel";
+import ExportsPanel from "./ExportsPanel";
 import { can } from "@/lib/permissions";
 import { IconCash, IconChart, IconTruck } from "./ui";
 import { fmtDate, fmtPKR } from "@/lib/format";
@@ -29,6 +31,7 @@ import {
 } from "@/lib/ledger";
 import { pendingOutTotal, unclearedInTotal } from "@/lib/cheques";
 import { salaryPayableComposition } from "@/lib/payroll";
+import { loansRegisterTotals } from "@/lib/loans";
 import {
   currentFiscalYear,
   previousFiscalYear,
@@ -103,6 +106,7 @@ export default function FinanceView() {
     employees,
     accounts,
     cheques,
+    loans,
     settings,
     addCashEntry,
     recordTaxPayment,
@@ -253,6 +257,18 @@ export default function FinanceView() {
         return tail
           ? `${t("fin.ref.salaryAdvance")} — ${tail}`
           : t("fin.ref.salaryAdvance");
+      case "loan_drawdown":
+        return tail
+          ? `${t("fin.ref.loanDrawdown")} — ${tail}`
+          : t("fin.ref.loanDrawdown");
+      case "loan_charge":
+        return tail
+          ? `${t("fin.ref.loanCharge")} — ${tail}`
+          : t("fin.ref.loanCharge");
+      case "loan_repayment":
+        return tail
+          ? `${t("fin.ref.loanRepayment")} — ${tail}`
+          : t("fin.ref.loanRepayment");
       case "cheque_return":
         return tail
           ? `${t("fin.ref.chequeReturn")} — ${tail}`
@@ -347,6 +363,17 @@ export default function FinanceView() {
   // account's two-part truth (per-employee positions + the
   // unassigned production bucket) beside its GL balance.
   const salComp = useMemo(() => salaryPayableComposition(journal), [journal]);
+  // Phase D · D3 (§3.5): the loans register's derived totals
+  // beside the ledger's own balances for the two loan accounts —
+  // for drawn loans the two always agree (§3.3's identity).
+  const loanTotals = useMemo(() => loansRegisterTotals(loans), [loans]);
+  const loansGl = useMemo(
+    () => ({
+      payable: accountNormalBalance(journal, "loans_payable"),
+      receivable: accountNormalBalance(journal, "loans_receivable"),
+    }),
+    [journal]
+  );
   const canWriteFinance = can(role, "finance", "write");
   const taxAcct =
     liveAccounts.find((a) => a.id === taxAcctId) ??
@@ -803,6 +830,46 @@ export default function FinanceView() {
           </section>
         )}
 
+        {/* Phase D · D3 (§3.5): loans breakdown — the register's
+            derived outstanding beside the ledger balances of the
+            two loan accounts, rendered when the shop carries any
+            loan at all. */}
+        {(loans.length > 0 || loansGl.payable !== 0 || loansGl.receivable !== 0) && (
+          <section className="card" aria-label={t("fin.loan.title")} style={{ marginBottom: 24 }}>
+            <h2 style={{ fontSize: "1.3rem", marginBottom: 4 }}>{t("fin.loan.title")}</h2>
+            <p style={{ color: "var(--muted)", fontSize: "0.92rem", marginBottom: 14 }}>
+              {t("fin.loan.caption")}
+            </p>
+            <div style={{ display: "grid", gap: 10, fontSize: "0.97rem" }}>
+              <div style={{ display: "flex", justifyContent: "space-between", gap: 12 }}>
+                <span>{t("fin.loan.borrowed")}</span>
+                <b>{fmtPKR(loanTotals.borrowedOutstanding)}</b>
+              </div>
+              <div style={{ display: "flex", justifyContent: "space-between", gap: 12 }}>
+                <span>{t("fin.loan.lent")}</span>
+                <b>{fmtPKR(loanTotals.lentOutstanding)}</b>
+              </div>
+              <div style={{ display: "flex", justifyContent: "space-between", gap: 12 }}>
+                <span>
+                  {t("fin.loan.payableGl")} ({accountLabel("loans_payable")})
+                </span>
+                <b>{fmtPKR(loansGl.payable)}</b>
+              </div>
+              <div style={{ display: "flex", justifyContent: "space-between", gap: 12 }}>
+                <span>
+                  {t("fin.loan.receivableGl")} ({accountLabel("loans_receivable")})
+                </span>
+                <b>{fmtPKR(loansGl.receivable)}</b>
+              </div>
+            </div>
+            <div style={{ marginTop: 14 }}>
+              <Link href="/loans" className="btn btn-ghost btn-sm">
+                {t("fin.loan.open")}
+              </Link>
+            </div>
+          </section>
+        )}
+
         <div className="grid-2" style={{ alignItems: "start", marginBottom: 24 }}>
           <section className="card" aria-label={t("fin.pl.title", { month: plLabel })}>
             <h2 style={{ fontSize: "1.3rem", marginBottom: 4 }}>
@@ -879,6 +946,10 @@ export default function FinanceView() {
             <AgingTable title={t("fin.aging.payablesTitle")} buckets={data.payAging} />
           </div>
         </div>
+
+        {/* Phase D · D4: fiscal-year close — checklist, closing
+            entry summary, openings and reopen (owner-only inside). */}
+        <FiscalClosePanel />
 
         <div className="grid-2" style={{ alignItems: "start", marginBottom: 24 }}>
           <section className="card" aria-label={t("fin.cash.title")}>
@@ -974,6 +1045,10 @@ export default function FinanceView() {
                 {t("fin.export.customers")}
               </button>
             </div>
+            {/* Phase D · D5 (design §5): Tally XML + journal CSV —
+                the journal joins the exportable datasets, gated on
+                the trialBalanceExports row inside the panel. */}
+            <ExportsPanel />
           </section>
         </div>
 

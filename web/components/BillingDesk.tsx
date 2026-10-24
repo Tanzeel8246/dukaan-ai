@@ -4,6 +4,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { useStore, type NewBillInput } from "./StoreProvider";
 import { useAuth } from "./AuthProvider";
 import { useLang } from "./LangProvider";
+import { usePinGate } from "./PinGate";
 import PermDenied from "./PermDenied";
 import { can } from "@/lib/permissions";
 import {
@@ -18,6 +19,8 @@ import {
   SearchClear,
   pickerKeyDown,
 } from "./ui";
+import { brandingDataUrls } from "@/lib/branding";
+import { groupIban, validatePkIban } from "@/lib/raast";
 import { fmtDate, fmtNum, fmtPKR, fmtUnit } from "@/lib/format";
 import { billTaxLines, computeBillTaxes, resolveTaxSlab } from "@/lib/tax";
 import { billMatches, filterProducts, findProductBySku } from "@/lib/search";
@@ -34,6 +37,13 @@ import {
   resolveWarehouseId,
 } from "@/lib/stock";
 import type { I18nKey } from "@/lib/i18n";
+import {
+  customerLoyalty,
+  loyaltyEarnQuote,
+  loyaltyRedeemCapRs,
+  loyaltyRedemptionQuote,
+  resolveLoyaltySettings,
+} from "@/lib/loyalty";
 import type { Bill, BillPayment, PayMethod } from "@/lib/types";
 import { AccountPicker } from "./MoneyAccounts";
 import {
@@ -43,6 +53,7 @@ import {
   emptyChequeForm,
   type ChequeFormState,
 } from "./ChequeCapture";
+import { BillPrintSheet } from "./DocPrintSheet";
 
 interface CartLine {
   productId: string;
@@ -65,9 +76,13 @@ interface PayRow {
   accountId: string;
   /** Phase B · B5: "cheque" when this part is paid by cheque — an
    *  INSTRUMENT on the row, not a sixth method (the row's method
-   *  rides as "bank"); `cheque` holds the capture fields. */
-  instrument: "cheque" | null;
+   *  rides as "bank"); `cheque` holds the capture fields.
+   *  Phase H · H1: "points" is the second instrument — the row's
+   *  method rides as "cash" and `points` holds the count typed;
+   *  the part's rupee amount is the fold's quote, never typed. */
+  instrument: "cheque" | "points" | null;
   cheque: ChequeFormState;
+  points: string;
 }
 
 const blankPayRow = (): PayRow => ({
@@ -76,6 +91,7 @@ const blankPayRow = (): PayRow => ({
   accountId: "",
   instrument: null,
   cheque: emptyChequeForm(),
+  points: "",
 });
 
 const PAY_METHODS: PayMethod[] = ["cash", "jazzcash", "easypaisa", "bank", "credit"];
@@ -148,11 +164,14 @@ export default function BillingDesk() {
     billDraft,
     clearBillDraft,
     cheques,
+    journal,
     warehouses,
     stockLevels,
     jobs,
+    branding,
   } = useStore();
   const { role } = useAuth();
+  const { requirePin } = usePinGate();
   /** A3: voiding a posted bill is owner/manager only (matrix row
    *  billingVoid); create/finalize/returns stay open to cashiers. */
   const canVoid = can(role, "billingVoid", "write");
@@ -164,11 +183,16 @@ export default function BillingDesk() {
   const { t } = useLang();
   const payLabel = (m: PayMethod) => t(PAY_KEY[m]);
   /** B5: a cheque part displays as the instrument it is (with its
-   *  leaf number from the registry), never as a bank payment. */
+   *  leaf number from the registry), never as a bank payment.
+   *  H1: a points part displays as points (count + settled value),
+   *  never as the cash method its row rides on. */
   const payDisplay = (p: BillPayment): string => {
     if (p.instrument === "cheque") {
       const c = p.chequeId ? cheques.find((x) => x.id === p.chequeId) : undefined;
       return `${t("chq.payOption")}${c ? ` ${c.chequeNo}` : ""} ${fmtPKR(p.amount)}`;
+    }
+    if (p.instrument === "points") {
+      return `${t("bill.pointsPart")} ${p.loyaltyPoints ?? 0} · ${fmtPKR(p.amount)}`;
     }
     return `${payLabel(p.method)} ${fmtPKR(p.amount)}`;
   };
@@ -283,6 +307,42 @@ export default function BillingDesk() {
     [cart, byId, taxSlabs, settings, subtotal, discountAmount]
   );
   const total = cartTax.total;
+  // Phase H · H1: the selected customer's derived loyalty
+  // position and this cart's earn preview — folded from the
+  // journal by lib/loyalty on every render, never stored. The
+  // points tender quotes from the same fold the store validates
+  // against, so desk and posting can only disagree when the
+  // journal moved in between (and then the store refuses).
+  const loyaltySt = useMemo(() => resolveLoyaltySettings(settings), [settings]);
+  const loyaltyPos = useMemo(
+    () =>
+      customerId
+        ? customerLoyalty(journal, customerId, loyaltySt, new Date().toISOString())
+        : null,
+    [journal, customerId, loyaltySt]
+  );
+  const earnQuote = useMemo(
+    () =>
+      customerId && total > 0
+        ? loyaltyEarnQuote(journal, customerId, total, loyaltySt, new Date().toISOString())
+        : null,
+    [journal, customerId, total, loyaltySt]
+  );
+  /** One points quote for the whole bill: every points row's
+   *  typed count aggregates into a single tender part. */
+  const pointsQuote = useMemo(() => {
+    const wanted = payments
+      .filter((r) => r.instrument === "points")
+      .reduce((a, r) => a + Math.max(0, Math.floor(parseFloat(r.points) || 0)), 0);
+    if (!customerId || wanted <= 0) return { points: 0, rs: 0 };
+    const target = heldId ? (bills.find((b) => b.id === heldId)?.total ?? total) : total;
+    return loyaltyRedemptionQuote(
+      journal,
+      customerId,
+      wanted,
+      loyaltyRedeemCapRs(target, loyaltySt)
+    );
+  }, [payments, customerId, heldId, bills, total, journal, loyaltySt]);
   // Receipt-style grouping of the preview: exclusive slabs add on
   // top; inclusive slabs are shown as information (already inside
   // the prices), mirroring lib/tax.billTaxLines for posted bills.
@@ -304,10 +364,27 @@ export default function BillingDesk() {
     return [...groups.values()];
   }, [cartTax]);
 
-  const parsedPayments: BillPayment[] = useMemo(
-    () =>
-      payments
-        .map((r) => ({
+  const parsedPayments: BillPayment[] = useMemo(() => {
+    let pointsPartEmitted = false;
+    return payments
+      .map((r) => {
+        if (r.instrument === "points") {
+          // H1: the points part's amount is the fold's quote (the
+          // aggregate of every points row), emitted once — extra
+          // points rows fold into it above.
+          if (pointsPartEmitted) {
+            return { method: "cash" as PayMethod, amount: 0, accountId: null };
+          }
+          pointsPartEmitted = true;
+          return {
+            method: "cash" as PayMethod,
+            amount: pointsQuote.rs,
+            accountId: null,
+            instrument: "points" as const,
+            loyaltyPoints: pointsQuote.points,
+          };
+        }
+        return {
           method: r.method,
           amount: Math.max(0, parseFloat(r.amount) || 0),
           accountId:
@@ -319,10 +396,10 @@ export default function BillingDesk() {
           ...(r.instrument === "cheque"
             ? { instrument: "cheque" as const, cheque: chequeDraftOf(r.cheque) }
             : {}),
-        }))
-        .filter((p) => p.amount > 0),
-    [payments]
-  );
+        };
+      })
+      .filter((p) => p.amount > 0);
+  }, [payments, pointsQuote]);
   const paidSum = parsedPayments.reduce((a, p) => a + p.amount, 0);
 
   /* Phase C · C5 (R-C7): when this bill cites a JOB, the
@@ -724,6 +801,11 @@ export default function BillingDesk() {
     const hasCredit = parsedPayments.some((p) => p.method === "credit");
     if (hasCredit && !customerName.trim())
       return t("billing.errCreditNeedsName");
+    // H1: points belong to a named customer — a points row on a
+    // walk-in bill can never quote, so say so in words here (the
+    // store refuses it too).
+    if (payments.some((r) => r.instrument === "points") && !customerId)
+      return t("bill.pointsNeedsCustomer");
     return null;
   };
 
@@ -821,7 +903,14 @@ export default function BillingDesk() {
               method: p.method,
               amount: String(p.amount),
               accountId: p.accountId ?? "",
-              instrument: p.instrument === "cheque" ? ("cheque" as const) : null,
+              instrument:
+                p.instrument === "cheque"
+                  ? ("cheque" as const)
+                  : p.instrument === "points"
+                    ? ("points" as const)
+                    : null,
+              points:
+                p.instrument === "points" ? String(p.loyaltyPoints ?? "") : "",
               cheque: chq
                 ? chequeFormOf({
                     chequeNo: chq.chequeNo,
@@ -842,17 +931,26 @@ export default function BillingDesk() {
 
   const fillRemaining = () => {
     setPayments((prev) => {
-      const cashIdx = prev.findIndex((r) => r.method === "cash" && r.instrument !== "cheque");
+      const cashIdx = prev.findIndex(
+        (r) => r.method === "cash" && r.instrument !== "cheque" && r.instrument !== "points"
+      );
       if (cashIdx === -1) {
         return [
           { ...blankPayRow(), amount: String(Math.max(0, total)) },
           ...prev,
         ];
       }
-      const otherSum = prev.reduce(
-        (a, r, i) => (i === cashIdx ? a : a + (parseFloat(r.amount) || 0)),
-        0
-      );
+      // H1: points rows contribute their (single, aggregate)
+      // quoted value once, not their (empty) amount text.
+      const hasPointsRow = prev.some((r, i) => i !== cashIdx && r.instrument === "points");
+      const otherSum =
+        prev.reduce(
+          (a, r, i) =>
+            i === cashIdx || r.instrument === "points"
+              ? a
+              : a + (parseFloat(r.amount) || 0),
+          0
+        ) + (hasPointsRow ? pointsQuote.rs : 0);
       return prev.map((r, i) =>
         i === cashIdx ? { ...r, amount: String(Math.max(0, total - otherSum)) } : r
       );
@@ -910,7 +1008,14 @@ export default function BillingDesk() {
     succeed(t("billing.successReturned", { no: bill.billNo }));
   };
 
-  const doVoid = (bill: Bill) => {
+  const doVoid = async (bill: Bill) => {
+    /* E5 (design §4.6): voiding a posted bill is a gated action —
+     * the PIN challenge is a view-layer precondition; a cancelled
+     * or failed challenge composes nothing. */
+    if (!(await requirePin("pin.gate.actVoid"))) {
+      setConfirmVoid(false);
+      return;
+    }
     const ok = voidBill(bill.id);
     setConfirmVoid(false);
     if (ok) succeed(t("billing.successVoided", { no: bill.billNo }));
@@ -950,6 +1055,17 @@ export default function BillingDesk() {
           : t("billing.wa.tax", { label, amount: fmtPKR(g.amount) });
       }),
       t("billing.wa.total", { amount: fmtPKR(bill.total) }),
+      /* Phase E · E3 (§1.9): one Raast line when the shop has a
+       * validated IBAN on record — a customer who cannot scan
+       * can still transfer. Text only: wa.me cannot attach the
+       * printed bill (§12.3). */
+      ...(settings.raastIban && validatePkIban(settings.raastIban).ok
+        ? [
+            t("billing.wa.raastLine", {
+              iban: groupIban(settings.raastIban),
+            }),
+          ]
+        : []),
       ...(bill.payments.length > 0
         ? [
             t("billing.wa.payment", {
@@ -1452,7 +1568,13 @@ export default function BillingDesk() {
                     <div style={{ display: "flex", gap: 10, alignItems: "center" }}>
                       <div className="field" style={{ flex: "0 0 170px" }}>
                         <select
-                          value={row.instrument === "cheque" ? "cheque" : row.method}
+                          value={
+                            row.instrument === "cheque"
+                              ? "cheque"
+                              : row.instrument === "points"
+                                ? "points"
+                                : row.method
+                          }
                           onChange={(e) =>
                             setPayments((prev) =>
                               prev.map((r, j) => {
@@ -1466,6 +1588,18 @@ export default function BillingDesk() {
                                     ...r,
                                     instrument: "cheque" as const,
                                     method: "bank" as PayMethod,
+                                    accountId: "",
+                                  };
+                                }
+                                // H1: "points" is the seventh choice
+                                // — the second instrument; the row's
+                                // method rides as "cash" and the
+                                // amount is the fold's quote.
+                                if (e.target.value === "points") {
+                                  return {
+                                    ...r,
+                                    instrument: "points" as const,
+                                    method: "cash" as PayMethod,
                                     accountId: "",
                                   };
                                 }
@@ -1488,9 +1622,14 @@ export default function BillingDesk() {
                             </option>
                           ))}
                           <option value="cheque">{t("chq.payOption")}</option>
+                          {customerId && (
+                            <option value="points">{t("bill.payPoints")}</option>
+                          )}
                         </select>
                       </div>
-                      {row.method !== "credit" && row.instrument !== "cheque" && (
+                      {row.method !== "credit" &&
+                        row.instrument !== "cheque" &&
+                        row.instrument !== "points" && (
                         <div style={{ flex: "0 0 170px" }}>
                           <AccountPicker
                             method={row.method}
@@ -1504,19 +1643,35 @@ export default function BillingDesk() {
                         </div>
                       )}
                       <div className="field" style={{ flex: 1 }}>
-                        <input
-                          type="number"
-                          min={0}
-                          step="any"
-                          value={row.amount}
-                          onChange={(e) =>
-                            setPayments((prev) =>
-                              prev.map((r, j) => (j === i ? { ...r, amount: e.target.value } : r))
-                            )
-                          }
-                          placeholder={t("billing.payAmountPlaceholder")}
-                          aria-label={t("billing.payAmountAria")}
-                        />
+                        {row.instrument === "points" ? (
+                          <input
+                            type="number"
+                            min={0}
+                            step={1}
+                            value={row.points}
+                            onChange={(e) =>
+                              setPayments((prev) =>
+                                prev.map((r, j) => (j === i ? { ...r, points: e.target.value } : r))
+                              )
+                            }
+                            placeholder={t("bill.pointsUsePh")}
+                            aria-label={t("bill.pointsUsePh")}
+                          />
+                        ) : (
+                          <input
+                            type="number"
+                            min={0}
+                            step="any"
+                            value={row.amount}
+                            onChange={(e) =>
+                              setPayments((prev) =>
+                                prev.map((r, j) => (j === i ? { ...r, amount: e.target.value } : r))
+                              )
+                            }
+                            placeholder={t("billing.payAmountPlaceholder")}
+                            aria-label={t("billing.payAmountAria")}
+                          />
+                        )}
                       </div>
                       <button
                         type="button"
@@ -1545,6 +1700,15 @@ export default function BillingDesk() {
                             )
                           }
                         />
+                      </div>
+                    )}
+                    {row.instrument === "points" && (
+                      <div className="hint">
+                        {t("bill.pointsBalance")}:{" "}
+                        {(loyaltyPos?.redeemablePoints ?? 0).toLocaleString()}
+                        {pointsQuote.points > 0 &&
+                          ` · ${pointsQuote.points.toLocaleString()} = ${fmtPKR(pointsQuote.rs)}`}{" "}
+                        · {t("bill.pointsMaxNote", { cap: loyaltySt.redeemCapPct })}
                       </div>
                     )}
                   </div>
@@ -1583,6 +1747,24 @@ export default function BillingDesk() {
                 {t("billing.creditNote", { amount: fmtPKR(Math.max(0, remaining)) })}
               </div>
             </div>
+
+            {/* H1: the earn preview — what this bill will grant,
+                folded from the same settings + journal the store
+                posts against. Walk-in bills say plainly that they
+                earn nothing (design §1.4). */}
+            {loyaltySt.enabled && !heldId && cart.length > 0 &&
+              (customerId ? (
+                earnQuote && (
+                  <div className="hint">
+                    {t("bill.earnPreview", { points: earnQuote.points })}
+                    {loyaltyPos && loyaltyPos.tier !== "standard"
+                      ? ` · ${t(`loyalty.tier.${loyaltyPos.tier}` as I18nKey)}`
+                      : ""}
+                  </div>
+                )
+              ) : (
+                <div className="hint">{t("bill.walkinNoEarn")}</div>
+              ))}
 
             {heldBill && (
               <div className="note-box" style={{ marginTop: 0 }}>
@@ -1751,84 +1933,14 @@ export default function BillingDesk() {
               </div>
 
               <div className="grid-2" style={{ alignItems: "start" }}>
-                <div className="receipt-sheet">
-                  <div className={"receipt" + (thermal ? " receipt-80" : "")}>
-                    <h3>{settings.shopName || "Dukaan AI"}</h3>
-                    <div className="r-shop">
-                      {[settings.address, settings.phone].filter(Boolean).join(" · ")}
-                    </div>
-                    <div className="r-row">
-                      <span>{t("billing.rcpt.billNo", { no: selected.billNo })}</span>
-                      <span>{fmtDateTime(selected.ts)}</span>
-                    </div>
-                    <div className="r-row">
-                      <span>{t("billing.rcpt.customer")}</span>
-                      <span>
-                        {selected.customerName || t("billing.walkIn")}
-                        {selected.customerPhone ? ` · ${selected.customerPhone}` : ""}
-                      </span>
-                    </div>
-                    <table>
-                      <thead>
-                        <tr>
-                          <th>{t("billing.rcpt.item")}</th>
-                          <th>{t("billing.rcpt.qty")}</th>
-                          <th>{t("billing.rcpt.price")}</th>
-                          <th>{t("billing.rcpt.amount")}</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {selected.items.map((it) => (
-                          <tr key={it.productId}>
-                            <td>{it.name}</td>
-                            <td>{fmtQty(it.qty)}</td>
-                            <td>{fmtPKR(it.unitPrice)}</td>
-                            <td>{fmtPKR(it.total)}</td>
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
-                    <div className="r-row">
-                      <span>{t("billing.rcpt.subtotal")}</span>
-                      <span>{fmtPKR(selected.subtotal)}</span>
-                    </div>
-                    {selected.discountAmount > 0 && (
-                      <div className="r-row">
-                        <span>{t("billing.rcpt.discount")}</span>
-                        <span>− {fmtPKR(selected.discountAmount)}</span>
-                      </div>
-                    )}
-                    {billTaxLines(selected).map((g) => (
-                      <div className="r-row" key={`${g.name}|${g.inclusive ? "in" : "ex"}`}>
-                        <span>
-                          {g.name}
-                          {g.kind === "percent" ? ` ${g.rate}%` : ""}
-                          {g.inclusive ? ` (${t("billing.tax.includedNote")})` : ""}
-                        </span>
-                        <span>{fmtPKR(g.amount)}</span>
-                      </div>
-                    ))}
-                    <div className="r-total">
-                      <span>{t("billing.rcpt.total")}</span>
-                      <span>{fmtPKR(selected.total)}</span>
-                    </div>
-                    {selected.payments.map((p, i) => (
-                      <div className="r-row" key={i}>
-                        <span>
-                          {p.instrument === "cheque"
-                            ? `${t("chq.payOption")}${
-                                p.chequeId
-                                  ? ` ${cheques.find((x) => x.id === p.chequeId)?.chequeNo ?? ""}`
-                                  : ""
-                              }`
-                            : payLabel(p.method)}
-                        </span>
-                        <span>{fmtPKR(p.amount)}</span>
-                      </div>
-                    ))}
-                    <div className="r-foot">{t("billing.rcpt.thanks")}</div>
-                  </div>
-                </div>
+                <BillPrintSheet
+                  bill={selected}
+                  settings={settings}
+                  products={products}
+                  cheques={cheques}
+                  assets={brandingDataUrls(branding)}
+                  thermal={thermal}
+                />
 
                 <div>
                   {canVoid &&

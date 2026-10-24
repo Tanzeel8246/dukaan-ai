@@ -16,7 +16,9 @@
  * is Urdu the sheet carries its own `dir="rtl"` + Nastaliq class —
  * the page around it may well be in English.
  */
-import { translate, type Lang } from "@/lib/i18n";
+import { isNaskhLang, langDir, translate, type Lang } from "@/lib/i18n";
+import { resolvePrintDesign } from "@/lib/print";
+import { PrintFooter, PrintHeader, PrintPageStyle, type PrintAssets } from "./PrintChrome";
 import type { ShopSettings } from "@/lib/types";
 
 export interface ReportSheetSection {
@@ -41,25 +43,32 @@ export default function ReportPrintSheet({
   data,
   settings,
   outLang,
+  assets,
 }: {
   data: ReportSheetData;
   settings: ShopSettings;
   outLang: Lang;
+  /** Phase E · E2: brand assets — reports gain the letterhead
+   *  header/footer chrome (§2.3); every other slot stays off for
+   *  reports under the §1.5 matrix. */
+  assets?: PrintAssets | null;
 }) {
   const tr = (key: Parameters<typeof translate>[1]) => translate(outLang, key);
+  // Reports are always A4 (§1.5): the template's header toggles
+  // and footer note dress the report, its paper never applies —
+  // the chrome is fed the design with the paper pinned to A4 so
+  // its suppression rules judge the sheet actually printing.
+  const design = { ...resolvePrintDesign(settings), paper: "a4" as const };
   return (
     <div
       className="receipt-sheet"
-      dir={outLang === "ur" ? "rtl" : "ltr"}
+      dir={langDir(outLang)}
       lang={outLang}
       aria-hidden="true"
     >
-      <div className={`receipt report-doc${outLang === "ur" ? " ur" : ""}`}>
-        <h3>{settings.shopName}</h3>
-        <div className="r-shop">
-          {settings.address ? `${settings.address} · ` : ""}
-          {settings.phone}
-        </div>
+      <PrintPageStyle paper="a4" />
+      <div className={`receipt report-doc${outLang === "ur" ? " ur" : isNaskhLang(outLang) ? " naskh" : ""}`}>
+        <PrintHeader settings={settings} design={design} assets={assets} />
         <div className="r-title">
           <span>{data.title}</span>
           <span>{data.period}</span>
@@ -114,7 +123,13 @@ export default function ReportPrintSheet({
             <span>{value}</span>
           </div>
         ))}
-        <div className="r-foot">{tr("rep.footer")}</div>
+        <PrintFooter
+          settings={settings}
+          design={design}
+          assets={assets}
+          doc={{ kind: "report" }}
+          footText={tr("rep.footer")}
+        />
       </div>
     </div>
   );

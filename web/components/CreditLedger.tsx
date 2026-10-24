@@ -13,6 +13,7 @@ import {
   customerOutstanding,
   totalOutstandingCredit,
 } from "@/lib/ledger";
+import { brandingDataUrls } from "@/lib/branding";
 import { creditGroupMatches } from "@/lib/search";
 import { receiptVoucherData } from "@/lib/documents";
 import { VoucherPrintSheet } from "./DocPrintSheet";
@@ -52,7 +53,7 @@ interface Group {
 const WALKIN = "__walkin";
 
 export default function CreditLedger() {
-  const { ready, customers, credits, accounts, cheques, settings, addCredit, addRepayment } = useStore();
+  const { ready, customers, credits, accounts, cheques, settings, branding, addCredit, addRepayment } = useStore();
   const { role } = useAuth();
   /* A3: giving standalone udhaar is owner/manager; recording a
    * repayment is open to every role (separate matrix rows). */
@@ -735,6 +736,7 @@ export default function CreditLedger() {
               balanceAfter: customerOutstanding(credits, creditKey(printRow)),
             })}
             settings={settings}
+            assets={brandingDataUrls(branding)}
           />
         )}
       </div>

@@ -1,0 +1,4432 @@
+{
+  "about": "H4 core fixture — expected values computed by the compiled web lib/storefront (+ plans + backup) over the H3 suite's cases; consumed by flutter-app/test/h4_fixtures_test.dart. Regenerate: node fixtures-export-h4.js (after compiling harness/tsconfig).",
+  "now": "2026-10-23T10:00:00.000Z",
+  "businessId": "bizH3",
+  "settings": {
+    "shopName": "Madina General Store",
+    "phone": "0301-2345678"
+  },
+  "products": [
+    {
+      "id": "p-rice",
+      "name": "Rice Basmati 5kg",
+      "urduName": "چاول باسمتی",
+      "category": "Grocery",
+      "salePrice": 1450,
+      "costPrice": 1200,
+      "stockQty": 40,
+      "reorderLevel": 5,
+      "unit": "bag"
+    },
+    {
+      "id": "p-oil",
+      "name": "Cooking Oil 5L",
+      "category": "Grocery",
+      "salePrice": 2600,
+      "costPrice": 2450,
+      "stockQty": 3,
+      "reorderLevel": 5,
+      "unit": "tin"
+    },
+    {
+      "id": "p-soap",
+      "name": "Soap Bar",
+      "category": "Care",
+      "salePrice": 120,
+      "costPrice": 80,
+      "stockQty": 0,
+      "reorderLevel": 2,
+      "unit": "pc"
+    },
+    {
+      "id": "p-tea",
+      "name": "Tea 500g",
+      "category": "Grocery",
+      "salePrice": 950,
+      "costPrice": 800,
+      "stockQty": 12,
+      "reorderLevel": 3,
+      "unit": "pack"
+    }
+  ],
+  "slugCases": [
+    {
+      "input": "madina-store",
+      "problem": null,
+      "ok": true
+    },
+    {
+      "input": "a1b",
+      "problem": null,
+      "ok": true
+    },
+    {
+      "input": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+      "problem": null,
+      "ok": true
+    },
+    {
+      "input": "",
+      "problem": "too-short",
+      "ok": false
+    },
+    {
+      "input": "ab",
+      "problem": "too-short",
+      "ok": false
+    },
+    {
+      "input": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+      "problem": "too-long",
+      "ok": false
+    },
+    {
+      "input": "Madina",
+      "problem": "bad-chars",
+      "ok": false
+    },
+    {
+      "input": "my shop",
+      "problem": "bad-chars",
+      "ok": false
+    },
+    {
+      "input": "-lead",
+      "problem": "bad-chars",
+      "ok": false
+    },
+    {
+      "input": "trail-",
+      "problem": "bad-chars",
+      "ok": false
+    },
+    {
+      "input": "double--hyphen",
+      "problem": "bad-chars",
+      "ok": false
+    },
+    {
+      "input": "under_score",
+      "problem": "bad-chars",
+      "ok": false
+    },
+    {
+      "input": "demo",
+      "problem": "reserved",
+      "ok": false
+    },
+    {
+      "input": "platform",
+      "problem": "reserved",
+      "ok": false
+    },
+    {
+      "input": "s",
+      "problem": "too-short",
+      "ok": false
+    },
+    {
+      "input": "storefront",
+      "problem": "reserved",
+      "ok": false
+    },
+    {
+      "input": "my-shop-2",
+      "problem": null,
+      "ok": true
+    }
+  ],
+  "suggestCases": [
+    {
+      "name": "Madina General Store",
+      "slug": "madina-general-store"
+    },
+    {
+      "name": "مدینہ سٹور",
+      "slug": ""
+    },
+    {
+      "name": "Demo",
+      "slug": ""
+    },
+    {
+      "name": "  Al-Noor  Mart!! ",
+      "slug": "al-noor-mart"
+    }
+  ],
+  "bandCases": [
+    {
+      "stockQty": 0,
+      "reorderLevel": 5,
+      "band": "out"
+    },
+    {
+      "stockQty": -2,
+      "reorderLevel": 5,
+      "band": "out"
+    },
+    {
+      "stockQty": 5,
+      "reorderLevel": 5,
+      "band": "low"
+    },
+    {
+      "stockQty": 6,
+      "reorderLevel": 5,
+      "band": "in"
+    },
+    {
+      "stockQty": 1,
+      "reorderLevel": 0,
+      "band": "in"
+    },
+    {
+      "stockQty": 3,
+      "reorderLevel": 5,
+      "band": "low"
+    }
+  ],
+  "snapshotCases": {
+    "first": {
+      "businessId": "bizH3",
+      "slug": "madina-store",
+      "shopName": "Madina General Store",
+      "phone": "0301-2345678",
+      "enabled": true,
+      "publishedAt": "2026-10-23T10:00:00.000Z",
+      "updatedAt": "2026-10-23T10:00:00.000Z",
+      "currency": "PKR",
+      "products": [
+        {
+          "productId": "p-soap",
+          "name": "Soap Bar",
+          "price": 120,
+          "unit": "pc",
+          "stockState": "out",
+          "sort": 0,
+          "category": "Care"
+        },
+        {
+          "productId": "p-oil",
+          "name": "Cooking Oil 5L",
+          "price": 2600,
+          "unit": "tin",
+          "stockState": "low",
+          "sort": 1,
+          "category": "Grocery"
+        },
+        {
+          "productId": "p-rice",
+          "name": "Rice Basmati 5kg",
+          "price": 1450,
+          "unit": "bag",
+          "stockState": "in",
+          "sort": 2,
+          "nameUr": "چاول باسمتی",
+          "category": "Grocery"
+        },
+        {
+          "productId": "p-tea",
+          "name": "Tea 500g",
+          "price": 950,
+          "unit": "pack",
+          "stockState": "in",
+          "sort": 3,
+          "category": "Grocery"
+        }
+      ],
+      "city": "Sargodha"
+    },
+    "hidden": {
+      "businessId": "bizH3",
+      "slug": "madina-store",
+      "shopName": "Madina General Store",
+      "phone": "0301-2345678",
+      "enabled": true,
+      "publishedAt": "2026-10-23T10:00:00.000Z",
+      "updatedAt": "2026-10-23T10:00:00.000Z",
+      "currency": "PKR",
+      "products": [
+        {
+          "productId": "p-soap",
+          "name": "Soap Bar",
+          "price": 120,
+          "unit": "pc",
+          "stockState": "out",
+          "sort": 0,
+          "category": "Care"
+        },
+        {
+          "productId": "p-oil",
+          "name": "Cooking Oil 5L",
+          "price": 2600,
+          "unit": "tin",
+          "stockState": "low",
+          "sort": 1,
+          "category": "Grocery"
+        },
+        {
+          "productId": "p-rice",
+          "name": "Rice Basmati 5kg",
+          "price": 1450,
+          "unit": "bag",
+          "stockState": "in",
+          "sort": 2,
+          "nameUr": "چاول باسمتی",
+          "category": "Grocery"
+        },
+        {
+          "productId": "p-tea",
+          "name": "Tea 500g",
+          "price": 950,
+          "unit": "pack",
+          "stockState": "hidden",
+          "sort": 3,
+          "category": "Grocery"
+        }
+      ],
+      "city": "Sargodha"
+    },
+    "stillHidden": {
+      "businessId": "bizH3",
+      "slug": "madina-store",
+      "shopName": "Madina General Store",
+      "phone": "0301-2345678",
+      "enabled": true,
+      "publishedAt": "2026-10-23T10:00:00.000Z",
+      "updatedAt": "2026-10-23T10:00:00.000Z",
+      "currency": "PKR",
+      "products": [
+        {
+          "productId": "p-soap",
+          "name": "Soap Bar",
+          "price": 120,
+          "unit": "pc",
+          "stockState": "out",
+          "sort": 0,
+          "category": "Care"
+        },
+        {
+          "productId": "p-oil",
+          "name": "Cooking Oil 5L",
+          "price": 2600,
+          "unit": "tin",
+          "stockState": "low",
+          "sort": 1,
+          "category": "Grocery"
+        },
+        {
+          "productId": "p-rice",
+          "name": "Rice Basmati 5kg",
+          "price": 1450,
+          "unit": "bag",
+          "stockState": "in",
+          "sort": 2,
+          "nameUr": "چاول باسمتی",
+          "category": "Grocery"
+        },
+        {
+          "productId": "p-tea",
+          "name": "Tea 500g",
+          "price": 950,
+          "unit": "pack",
+          "stockState": "hidden",
+          "sort": 3,
+          "category": "Grocery"
+        }
+      ],
+      "city": "Sargodha"
+    },
+    "shown": {
+      "businessId": "bizH3",
+      "slug": "madina-store",
+      "shopName": "Madina General Store",
+      "phone": "0301-2345678",
+      "enabled": true,
+      "publishedAt": "2026-10-23T10:00:00.000Z",
+      "updatedAt": "2026-10-23T10:00:00.000Z",
+      "currency": "PKR",
+      "products": [
+        {
+          "productId": "p-soap",
+          "name": "Soap Bar",
+          "price": 120,
+          "unit": "pc",
+          "stockState": "out",
+          "sort": 0,
+          "category": "Care"
+        },
+        {
+          "productId": "p-oil",
+          "name": "Cooking Oil 5L",
+          "price": 2600,
+          "unit": "tin",
+          "stockState": "low",
+          "sort": 1,
+          "category": "Grocery"
+        },
+        {
+          "productId": "p-rice",
+          "name": "Rice Basmati 5kg",
+          "price": 1450,
+          "unit": "bag",
+          "stockState": "in",
+          "sort": 2,
+          "nameUr": "چاول باسمتی",
+          "category": "Grocery"
+        },
+        {
+          "productId": "p-tea",
+          "name": "Tea 500g",
+          "price": 950,
+          "unit": "pack",
+          "stockState": "in",
+          "sort": 3,
+          "category": "Grocery"
+        }
+      ],
+      "city": "Sargodha"
+    },
+    "priceMoved": {
+      "businessId": "bizH3",
+      "slug": "madina-store",
+      "shopName": "Madina General Store",
+      "phone": "0301-2345678",
+      "enabled": true,
+      "publishedAt": "2026-10-23T10:00:00.000Z",
+      "updatedAt": "2026-10-23T10:00:00.000Z",
+      "currency": "PKR",
+      "products": [
+        {
+          "productId": "p-soap",
+          "name": "Soap Bar",
+          "price": 120,
+          "unit": "pc",
+          "stockState": "out",
+          "sort": 0,
+          "category": "Care"
+        },
+        {
+          "productId": "p-oil",
+          "name": "Cooking Oil 5L",
+          "price": 2600,
+          "unit": "tin",
+          "stockState": "low",
+          "sort": 1,
+          "category": "Grocery"
+        },
+        {
+          "productId": "p-rice",
+          "name": "Rice Basmati 5kg",
+          "price": 1500,
+          "unit": "bag",
+          "stockState": "in",
+          "sort": 2,
+          "nameUr": "چاول باسمتی",
+          "category": "Grocery"
+        },
+        {
+          "productId": "p-tea",
+          "name": "Tea 500g",
+          "price": 950,
+          "unit": "pack",
+          "stockState": "in",
+          "sort": 3,
+          "category": "Grocery"
+        }
+      ],
+      "city": "Sargodha"
+    },
+    "contentEqualRestamped": true,
+    "contentEqualPriceMoved": false,
+    "contentEqualNull": false,
+    "contentEqualSame": true
+  },
+  "litCases": [
+    {
+      "name": "advanced-active",
+      "registry": {
+        "ownerUid": "bizH3",
+        "ownerEmail": "o@x.pk",
+        "name": "Shop",
+        "phone": "",
+        "city": "",
+        "createdAt": "2026-10-01T00:00:00.000Z",
+        "status": "active",
+        "enforce": false,
+        "plan": {
+          "planId": "advanced",
+          "tierRank": 3,
+          "usersLimit": 10,
+          "invoiceLimit": 10000,
+          "modulesTier": "advanced",
+          "periodFrom": "2026-10-01T00:00:00.000Z",
+          "periodTo": "2026-11-01T00:00:00.000Z",
+          "trialEndsAt": null,
+          "assignedBy": "admin",
+          "assignedAt": "2026-10-01T00:00:00.000Z"
+        }
+      },
+      "doc": {
+        "businessId": "bizH3",
+        "slug": "madina-store",
+        "shopName": "Madina General Store",
+        "phone": "0301-2345678",
+        "enabled": true,
+        "publishedAt": "2026-10-23T10:00:00.000Z",
+        "updatedAt": "2026-10-23T10:00:00.000Z",
+        "currency": "PKR",
+        "products": [
+          {
+            "productId": "p-soap",
+            "name": "Soap Bar",
+            "price": 120,
+            "unit": "pc",
+            "stockState": "out",
+            "sort": 0,
+            "category": "Care"
+          },
+          {
+            "productId": "p-oil",
+            "name": "Cooking Oil 5L",
+            "price": 2600,
+            "unit": "tin",
+            "stockState": "low",
+            "sort": 1,
+            "category": "Grocery"
+          },
+          {
+            "productId": "p-rice",
+            "name": "Rice Basmati 5kg",
+            "price": 1450,
+            "unit": "bag",
+            "stockState": "in",
+            "sort": 2,
+            "nameUr": "چاول باسمتی",
+            "category": "Grocery"
+          },
+          {
+            "productId": "p-tea",
+            "name": "Tea 500g",
+            "price": 950,
+            "unit": "pack",
+            "stockState": "in",
+            "sort": 3,
+            "category": "Grocery"
+          }
+        ],
+        "city": "Sargodha"
+      },
+      "lit": true
+    },
+    {
+      "name": "founding",
+      "registry": {
+        "ownerUid": "bizH3",
+        "ownerEmail": "o@x.pk",
+        "name": "Shop",
+        "phone": "",
+        "city": "",
+        "createdAt": "2026-10-01T00:00:00.000Z",
+        "status": "active",
+        "enforce": false,
+        "plan": {
+          "planId": "founding",
+          "tierRank": 3,
+          "usersLimit": 10,
+          "invoiceLimit": 10000,
+          "modulesTier": "advanced",
+          "periodFrom": "2026-10-01T00:00:00.000Z",
+          "periodTo": null,
+          "trialEndsAt": null,
+          "assignedBy": "migration",
+          "assignedAt": "2026-10-01T00:00:00.000Z"
+        }
+      },
+      "doc": {
+        "businessId": "bizH3",
+        "slug": "madina-store",
+        "shopName": "Madina General Store",
+        "phone": "0301-2345678",
+        "enabled": true,
+        "publishedAt": "2026-10-23T10:00:00.000Z",
+        "updatedAt": "2026-10-23T10:00:00.000Z",
+        "currency": "PKR",
+        "products": [
+          {
+            "productId": "p-soap",
+            "name": "Soap Bar",
+            "price": 120,
+            "unit": "pc",
+            "stockState": "out",
+            "sort": 0,
+            "category": "Care"
+          },
+          {
+            "productId": "p-oil",
+            "name": "Cooking Oil 5L",
+            "price": 2600,
+            "unit": "tin",
+            "stockState": "low",
+            "sort": 1,
+            "category": "Grocery"
+          },
+          {
+            "productId": "p-rice",
+            "name": "Rice Basmati 5kg",
+            "price": 1450,
+            "unit": "bag",
+            "stockState": "in",
+            "sort": 2,
+            "nameUr": "چاول باسمتی",
+            "category": "Grocery"
+          },
+          {
+            "productId": "p-tea",
+            "name": "Tea 500g",
+            "price": 950,
+            "unit": "pack",
+            "stockState": "in",
+            "sort": 3,
+            "category": "Grocery"
+          }
+        ],
+        "city": "Sargodha"
+      },
+      "lit": true
+    },
+    {
+      "name": "trial",
+      "registry": {
+        "ownerUid": "bizH3",
+        "ownerEmail": "o@x.pk",
+        "name": "Shop",
+        "phone": "",
+        "city": "",
+        "createdAt": "2026-10-01T00:00:00.000Z",
+        "status": "active",
+        "enforce": false,
+        "plan": {
+          "planId": "trial",
+          "tierRank": 0,
+          "usersLimit": 2,
+          "invoiceLimit": 200,
+          "modulesTier": "standard",
+          "periodFrom": "2026-10-20T00:00:00.000Z",
+          "periodTo": null,
+          "trialEndsAt": "2026-11-03T00:00:00.000Z",
+          "assignedBy": "signup",
+          "assignedAt": "2026-10-20T00:00:00.000Z"
+        }
+      },
+      "doc": {
+        "businessId": "bizH3",
+        "slug": "madina-store",
+        "shopName": "Madina General Store",
+        "phone": "0301-2345678",
+        "enabled": true,
+        "publishedAt": "2026-10-23T10:00:00.000Z",
+        "updatedAt": "2026-10-23T10:00:00.000Z",
+        "currency": "PKR",
+        "products": [
+          {
+            "productId": "p-soap",
+            "name": "Soap Bar",
+            "price": 120,
+            "unit": "pc",
+            "stockState": "out",
+            "sort": 0,
+            "category": "Care"
+          },
+          {
+            "productId": "p-oil",
+            "name": "Cooking Oil 5L",
+            "price": 2600,
+            "unit": "tin",
+            "stockState": "low",
+            "sort": 1,
+            "category": "Grocery"
+          },
+          {
+            "productId": "p-rice",
+            "name": "Rice Basmati 5kg",
+            "price": 1450,
+            "unit": "bag",
+            "stockState": "in",
+            "sort": 2,
+            "nameUr": "چاول باسمتی",
+            "category": "Grocery"
+          },
+          {
+            "productId": "p-tea",
+            "name": "Tea 500g",
+            "price": 950,
+            "unit": "pack",
+            "stockState": "in",
+            "sort": 3,
+            "category": "Grocery"
+          }
+        ],
+        "city": "Sargodha"
+      },
+      "lit": false
+    },
+    {
+      "name": "standard",
+      "registry": {
+        "ownerUid": "bizH3",
+        "ownerEmail": "o@x.pk",
+        "name": "Shop",
+        "phone": "",
+        "city": "",
+        "createdAt": "2026-10-01T00:00:00.000Z",
+        "status": "active",
+        "enforce": false,
+        "plan": {
+          "planId": "standard",
+          "tierRank": 2,
+          "usersLimit": 5,
+          "invoiceLimit": 2000,
+          "modulesTier": "standard",
+          "periodFrom": "2026-10-01T00:00:00.000Z",
+          "periodTo": "2026-11-01T00:00:00.000Z",
+          "trialEndsAt": null,
+          "assignedBy": "admin",
+          "assignedAt": "2026-10-01T00:00:00.000Z"
+        }
+      },
+      "doc": {
+        "businessId": "bizH3",
+        "slug": "madina-store",
+        "shopName": "Madina General Store",
+        "phone": "0301-2345678",
+        "enabled": true,
+        "publishedAt": "2026-10-23T10:00:00.000Z",
+        "updatedAt": "2026-10-23T10:00:00.000Z",
+        "currency": "PKR",
+        "products": [
+          {
+            "productId": "p-soap",
+            "name": "Soap Bar",
+            "price": 120,
+            "unit": "pc",
+            "stockState": "out",
+            "sort": 0,
+            "category": "Care"
+          },
+          {
+            "productId": "p-oil",
+            "name": "Cooking Oil 5L",
+            "price": 2600,
+            "unit": "tin",
+            "stockState": "low",
+            "sort": 1,
+            "category": "Grocery"
+          },
+          {
+            "productId": "p-rice",
+            "name": "Rice Basmati 5kg",
+            "price": 1450,
+            "unit": "bag",
+            "stockState": "in",
+            "sort": 2,
+            "nameUr": "چاول باسمتی",
+            "category": "Grocery"
+          },
+          {
+            "productId": "p-tea",
+            "name": "Tea 500g",
+            "price": 950,
+            "unit": "pack",
+            "stockState": "in",
+            "sort": 3,
+            "category": "Grocery"
+          }
+        ],
+        "city": "Sargodha"
+      },
+      "lit": false
+    },
+    {
+      "name": "advanced-grace",
+      "registry": {
+        "ownerUid": "bizH3",
+        "ownerEmail": "o@x.pk",
+        "name": "Shop",
+        "phone": "",
+        "city": "",
+        "createdAt": "2026-10-01T00:00:00.000Z",
+        "status": "active",
+        "enforce": false,
+        "plan": {
+          "planId": "advanced",
+          "tierRank": 3,
+          "usersLimit": 10,
+          "invoiceLimit": 10000,
+          "modulesTier": "advanced",
+          "periodFrom": "2026-09-01T00:00:00.000Z",
+          "periodTo": "2026-10-10T00:00:00.000Z",
+          "trialEndsAt": null,
+          "assignedBy": "admin",
+          "assignedAt": "2026-09-01T00:00:00.000Z"
+        }
+      },
+      "doc": {
+        "businessId": "bizH3",
+        "slug": "madina-store",
+        "shopName": "Madina General Store",
+        "phone": "0301-2345678",
+        "enabled": true,
+        "publishedAt": "2026-10-23T10:00:00.000Z",
+        "updatedAt": "2026-10-23T10:00:00.000Z",
+        "currency": "PKR",
+        "products": [
+          {
+            "productId": "p-soap",
+            "name": "Soap Bar",
+            "price": 120,
+            "unit": "pc",
+            "stockState": "out",
+            "sort": 0,
+            "category": "Care"
+          },
+          {
+            "productId": "p-oil",
+            "name": "Cooking Oil 5L",
+            "price": 2600,
+            "unit": "tin",
+            "stockState": "low",
+            "sort": 1,
+            "category": "Grocery"
+          },
+          {
+            "productId": "p-rice",
+            "name": "Rice Basmati 5kg",
+            "price": 1450,
+            "unit": "bag",
+            "stockState": "in",
+            "sort": 2,
+            "nameUr": "چاول باسمتی",
+            "category": "Grocery"
+          },
+          {
+            "productId": "p-tea",
+            "name": "Tea 500g",
+            "price": 950,
+            "unit": "pack",
+            "stockState": "in",
+            "sort": 3,
+            "category": "Grocery"
+          }
+        ],
+        "city": "Sargodha"
+      },
+      "lit": false
+    },
+    {
+      "name": "suspended",
+      "registry": {
+        "ownerUid": "bizH3",
+        "ownerEmail": "o@x.pk",
+        "name": "Shop",
+        "phone": "",
+        "city": "",
+        "createdAt": "2026-10-01T00:00:00.000Z",
+        "status": "suspended",
+        "enforce": false,
+        "plan": {
+          "planId": "advanced",
+          "tierRank": 3,
+          "usersLimit": 10,
+          "invoiceLimit": 10000,
+          "modulesTier": "advanced",
+          "periodFrom": "2026-10-01T00:00:00.000Z",
+          "periodTo": "2026-11-01T00:00:00.000Z",
+          "trialEndsAt": null,
+          "assignedBy": "admin",
+          "assignedAt": "2026-10-01T00:00:00.000Z"
+        }
+      },
+      "doc": {
+        "businessId": "bizH3",
+        "slug": "madina-store",
+        "shopName": "Madina General Store",
+        "phone": "0301-2345678",
+        "enabled": true,
+        "publishedAt": "2026-10-23T10:00:00.000Z",
+        "updatedAt": "2026-10-23T10:00:00.000Z",
+        "currency": "PKR",
+        "products": [
+          {
+            "productId": "p-soap",
+            "name": "Soap Bar",
+            "price": 120,
+            "unit": "pc",
+            "stockState": "out",
+            "sort": 0,
+            "category": "Care"
+          },
+          {
+            "productId": "p-oil",
+            "name": "Cooking Oil 5L",
+            "price": 2600,
+            "unit": "tin",
+            "stockState": "low",
+            "sort": 1,
+            "category": "Grocery"
+          },
+          {
+            "productId": "p-rice",
+            "name": "Rice Basmati 5kg",
+            "price": 1450,
+            "unit": "bag",
+            "stockState": "in",
+            "sort": 2,
+            "nameUr": "چاول باسمتی",
+            "category": "Grocery"
+          },
+          {
+            "productId": "p-tea",
+            "name": "Tea 500g",
+            "price": 950,
+            "unit": "pack",
+            "stockState": "in",
+            "sort": 3,
+            "category": "Grocery"
+          }
+        ],
+        "city": "Sargodha"
+      },
+      "lit": false
+    },
+    {
+      "name": "disabled-doc",
+      "registry": {
+        "ownerUid": "bizH3",
+        "ownerEmail": "o@x.pk",
+        "name": "Shop",
+        "phone": "",
+        "city": "",
+        "createdAt": "2026-10-01T00:00:00.000Z",
+        "status": "active",
+        "enforce": false,
+        "plan": {
+          "planId": "advanced",
+          "tierRank": 3,
+          "usersLimit": 10,
+          "invoiceLimit": 10000,
+          "modulesTier": "advanced",
+          "periodFrom": "2026-10-01T00:00:00.000Z",
+          "periodTo": "2026-11-01T00:00:00.000Z",
+          "trialEndsAt": null,
+          "assignedBy": "admin",
+          "assignedAt": "2026-10-01T00:00:00.000Z"
+        }
+      },
+      "doc": {
+        "businessId": "bizH3",
+        "slug": "madina-store",
+        "shopName": "Madina General Store",
+        "phone": "0301-2345678",
+        "enabled": false,
+        "publishedAt": "2026-10-23T10:00:00.000Z",
+        "updatedAt": "2026-10-23T10:00:00.000Z",
+        "currency": "PKR",
+        "products": [
+          {
+            "productId": "p-soap",
+            "name": "Soap Bar",
+            "price": 120,
+            "unit": "pc",
+            "stockState": "out",
+            "sort": 0,
+            "category": "Care"
+          },
+          {
+            "productId": "p-oil",
+            "name": "Cooking Oil 5L",
+            "price": 2600,
+            "unit": "tin",
+            "stockState": "low",
+            "sort": 1,
+            "category": "Grocery"
+          },
+          {
+            "productId": "p-rice",
+            "name": "Rice Basmati 5kg",
+            "price": 1450,
+            "unit": "bag",
+            "stockState": "in",
+            "sort": 2,
+            "nameUr": "چاول باسمتی",
+            "category": "Grocery"
+          },
+          {
+            "productId": "p-tea",
+            "name": "Tea 500g",
+            "price": 950,
+            "unit": "pack",
+            "stockState": "in",
+            "sort": 3,
+            "category": "Grocery"
+          }
+        ],
+        "city": "Sargodha"
+      },
+      "lit": false
+    },
+    {
+      "name": "no-registry",
+      "registry": null,
+      "doc": {
+        "businessId": "bizH3",
+        "slug": "madina-store",
+        "shopName": "Madina General Store",
+        "phone": "0301-2345678",
+        "enabled": true,
+        "publishedAt": "2026-10-23T10:00:00.000Z",
+        "updatedAt": "2026-10-23T10:00:00.000Z",
+        "currency": "PKR",
+        "products": [
+          {
+            "productId": "p-soap",
+            "name": "Soap Bar",
+            "price": 120,
+            "unit": "pc",
+            "stockState": "out",
+            "sort": 0,
+            "category": "Care"
+          },
+          {
+            "productId": "p-oil",
+            "name": "Cooking Oil 5L",
+            "price": 2600,
+            "unit": "tin",
+            "stockState": "low",
+            "sort": 1,
+            "category": "Grocery"
+          },
+          {
+            "productId": "p-rice",
+            "name": "Rice Basmati 5kg",
+            "price": 1450,
+            "unit": "bag",
+            "stockState": "in",
+            "sort": 2,
+            "nameUr": "چاول باسمتی",
+            "category": "Grocery"
+          },
+          {
+            "productId": "p-tea",
+            "name": "Tea 500g",
+            "price": 950,
+            "unit": "pack",
+            "stockState": "in",
+            "sort": 3,
+            "category": "Grocery"
+          }
+        ],
+        "city": "Sargodha"
+      },
+      "lit": false
+    },
+    {
+      "name": "no-doc",
+      "registry": {
+        "ownerUid": "bizH3",
+        "ownerEmail": "o@x.pk",
+        "name": "Shop",
+        "phone": "",
+        "city": "",
+        "createdAt": "2026-10-01T00:00:00.000Z",
+        "status": "active",
+        "enforce": false,
+        "plan": {
+          "planId": "advanced",
+          "tierRank": 3,
+          "usersLimit": 10,
+          "invoiceLimit": 10000,
+          "modulesTier": "advanced",
+          "periodFrom": "2026-10-01T00:00:00.000Z",
+          "periodTo": "2026-11-01T00:00:00.000Z",
+          "trialEndsAt": null,
+          "assignedBy": "admin",
+          "assignedAt": "2026-10-01T00:00:00.000Z"
+        }
+      },
+      "doc": null,
+      "lit": false
+    }
+  ],
+  "litStateCases": [
+    {
+      "tier": "advanced",
+      "state": "active",
+      "enabled": true,
+      "lit": true
+    },
+    {
+      "tier": "advanced",
+      "state": "founding",
+      "enabled": true,
+      "lit": true
+    },
+    {
+      "tier": "standard",
+      "state": "active",
+      "enabled": true,
+      "lit": false
+    },
+    {
+      "tier": "advanced",
+      "state": "grace",
+      "enabled": true,
+      "lit": false
+    },
+    {
+      "tier": "advanced",
+      "state": "readonly",
+      "enabled": true,
+      "lit": false
+    },
+    {
+      "tier": "advanced",
+      "state": "suspended",
+      "enabled": true,
+      "lit": false
+    },
+    {
+      "tier": "advanced",
+      "state": "trial",
+      "enabled": true,
+      "lit": false
+    },
+    {
+      "tier": "advanced",
+      "state": "active",
+      "enabled": false,
+      "lit": false
+    }
+  ],
+  "shapeCases": [
+    {
+      "name": "good",
+      "data": {
+        "businessId": "bizH3",
+        "slug": "madina-store",
+        "customerName": "Ahmed Raza",
+        "phone": "0301-2345678",
+        "lines": [
+          {
+            "productId": "p-rice",
+            "qty": 2
+          }
+        ],
+        "fulfilment": "pickup",
+        "createdAt": "2026-10-23T10:00:00.000Z",
+        "state": "new"
+      },
+      "ok": true
+    },
+    {
+      "name": "good-with-note",
+      "data": {
+        "businessId": "bizH3",
+        "slug": "madina-store",
+        "customerName": "Ahmed Raza",
+        "phone": "0301-2345678",
+        "lines": [
+          {
+            "productId": "p-rice",
+            "qty": 2
+          }
+        ],
+        "fulfilment": "pickup",
+        "createdAt": "2026-10-23T10:00:00.000Z",
+        "state": "new",
+        "note": "please pack separately"
+      },
+      "ok": true
+    },
+    {
+      "name": "extra-key-coupon",
+      "data": {
+        "businessId": "bizH3",
+        "slug": "madina-store",
+        "customerName": "Ahmed Raza",
+        "phone": "0301-2345678",
+        "lines": [
+          {
+            "productId": "p-rice",
+            "qty": 2
+          }
+        ],
+        "fulfilment": "pickup",
+        "createdAt": "2026-10-23T10:00:00.000Z",
+        "state": "new",
+        "coupon": "SAVE10"
+      },
+      "ok": false
+    },
+    {
+      "name": "extra-key-total",
+      "data": {
+        "businessId": "bizH3",
+        "slug": "madina-store",
+        "customerName": "Ahmed Raza",
+        "phone": "0301-2345678",
+        "lines": [
+          {
+            "productId": "p-rice",
+            "qty": 2
+          }
+        ],
+        "fulfilment": "pickup",
+        "createdAt": "2026-10-23T10:00:00.000Z",
+        "state": "new",
+        "total": 2900
+      },
+      "ok": false
+    },
+    {
+      "name": "state-converted",
+      "data": {
+        "businessId": "bizH3",
+        "slug": "madina-store",
+        "customerName": "Ahmed Raza",
+        "phone": "0301-2345678",
+        "lines": [
+          {
+            "productId": "p-rice",
+            "qty": 2
+          }
+        ],
+        "fulfilment": "pickup",
+        "createdAt": "2026-10-23T10:00:00.000Z",
+        "state": "converted"
+      },
+      "ok": false
+    },
+    {
+      "name": "state-dismissed",
+      "data": {
+        "businessId": "bizH3",
+        "slug": "madina-store",
+        "customerName": "Ahmed Raza",
+        "phone": "0301-2345678",
+        "lines": [
+          {
+            "productId": "p-rice",
+            "qty": 2
+          }
+        ],
+        "fulfilment": "pickup",
+        "createdAt": "2026-10-23T10:00:00.000Z",
+        "state": "dismissed"
+      },
+      "ok": false
+    },
+    {
+      "name": "createdAt-not-a-date",
+      "data": {
+        "businessId": "bizH3",
+        "slug": "madina-store",
+        "customerName": "Ahmed Raza",
+        "phone": "0301-2345678",
+        "lines": [
+          {
+            "productId": "p-rice",
+            "qty": 2
+          }
+        ],
+        "fulfilment": "pickup",
+        "createdAt": "not-a-date",
+        "state": "new"
+      },
+      "ok": false
+    },
+    {
+      "name": "slug-unslug",
+      "data": {
+        "businessId": "bizH3",
+        "slug": "Demo",
+        "customerName": "Ahmed Raza",
+        "phone": "0301-2345678",
+        "lines": [
+          {
+            "productId": "p-rice",
+            "qty": 2
+          }
+        ],
+        "fulfilment": "pickup",
+        "createdAt": "2026-10-23T10:00:00.000Z",
+        "state": "new"
+      },
+      "ok": false
+    },
+    {
+      "name": "qty-zero",
+      "data": {
+        "businessId": "bizH3",
+        "slug": "madina-store",
+        "customerName": "Ahmed Raza",
+        "phone": "0301-2345678",
+        "lines": [
+          {
+            "productId": "p-rice",
+            "qty": 0
+          }
+        ],
+        "fulfilment": "pickup",
+        "createdAt": "2026-10-23T10:00:00.000Z",
+        "state": "new"
+      },
+      "ok": false
+    },
+    {
+      "name": "qty-1000",
+      "data": {
+        "businessId": "bizH3",
+        "slug": "madina-store",
+        "customerName": "Ahmed Raza",
+        "phone": "0301-2345678",
+        "lines": [
+          {
+            "productId": "p-rice",
+            "qty": 1000
+          }
+        ],
+        "fulfilment": "pickup",
+        "createdAt": "2026-10-23T10:00:00.000Z",
+        "state": "new"
+      },
+      "ok": false
+    },
+    {
+      "name": "qty-fractional",
+      "data": {
+        "businessId": "bizH3",
+        "slug": "madina-store",
+        "customerName": "Ahmed Raza",
+        "phone": "0301-2345678",
+        "lines": [
+          {
+            "productId": "p-rice",
+            "qty": 1.5
+          }
+        ],
+        "fulfilment": "pickup",
+        "createdAt": "2026-10-23T10:00:00.000Z",
+        "state": "new"
+      },
+      "ok": false
+    },
+    {
+      "name": "line-with-price",
+      "data": {
+        "businessId": "bizH3",
+        "slug": "madina-store",
+        "customerName": "Ahmed Raza",
+        "phone": "0301-2345678",
+        "lines": [
+          {
+            "productId": "p-rice",
+            "qty": 1,
+            "price": 1
+          }
+        ],
+        "fulfilment": "pickup",
+        "createdAt": "2026-10-23T10:00:00.000Z",
+        "state": "new"
+      },
+      "ok": false
+    },
+    {
+      "name": "no-lines",
+      "data": {
+        "businessId": "bizH3",
+        "slug": "madina-store",
+        "customerName": "Ahmed Raza",
+        "phone": "0301-2345678",
+        "lines": [],
+        "fulfilment": "pickup",
+        "createdAt": "2026-10-23T10:00:00.000Z",
+        "state": "new"
+      },
+      "ok": false
+    },
+    {
+      "name": "51-lines",
+      "data": {
+        "businessId": "bizH3",
+        "slug": "madina-store",
+        "customerName": "Ahmed Raza",
+        "phone": "0301-2345678",
+        "lines": [
+          {
+            "productId": "p-rice",
+            "qty": 1
+          },
+          {
+            "productId": "p-rice",
+            "qty": 1
+          },
+          {
+            "productId": "p-rice",
+            "qty": 1
+          },
+          {
+            "productId": "p-rice",
+            "qty": 1
+          },
+          {
+            "productId": "p-rice",
+            "qty": 1
+          },
+          {
+            "productId": "p-rice",
+            "qty": 1
+          },
+          {
+            "productId": "p-rice",
+            "qty": 1
+          },
+          {
+            "productId": "p-rice",
+            "qty": 1
+          },
+          {
+            "productId": "p-rice",
+            "qty": 1
+          },
+          {
+            "productId": "p-rice",
+            "qty": 1
+          },
+          {
+            "productId": "p-rice",
+            "qty": 1
+          },
+          {
+            "productId": "p-rice",
+            "qty": 1
+          },
+          {
+            "productId": "p-rice",
+            "qty": 1
+          },
+          {
+            "productId": "p-rice",
+            "qty": 1
+          },
+          {
+            "productId": "p-rice",
+            "qty": 1
+          },
+          {
+            "productId": "p-rice",
+            "qty": 1
+          },
+          {
+            "productId": "p-rice",
+            "qty": 1
+          },
+          {
+            "productId": "p-rice",
+            "qty": 1
+          },
+          {
+            "productId": "p-rice",
+            "qty": 1
+          },
+          {
+            "productId": "p-rice",
+            "qty": 1
+          },
+          {
+            "productId": "p-rice",
+            "qty": 1
+          },
+          {
+            "productId": "p-rice",
+            "qty": 1
+          },
+          {
+            "productId": "p-rice",
+            "qty": 1
+          },
+          {
+            "productId": "p-rice",
+            "qty": 1
+          },
+          {
+            "productId": "p-rice",
+            "qty": 1
+          },
+          {
+            "productId": "p-rice",
+            "qty": 1
+          },
+          {
+            "productId": "p-rice",
+            "qty": 1
+          },
+          {
+            "productId": "p-rice",
+            "qty": 1
+          },
+          {
+            "productId": "p-rice",
+            "qty": 1
+          },
+          {
+            "productId": "p-rice",
+            "qty": 1
+          },
+          {
+            "productId": "p-rice",
+            "qty": 1
+          },
+          {
+            "productId": "p-rice",
+            "qty": 1
+          },
+          {
+            "productId": "p-rice",
+            "qty": 1
+          },
+          {
+            "productId": "p-rice",
+            "qty": 1
+          },
+          {
+            "productId": "p-rice",
+            "qty": 1
+          },
+          {
+            "productId": "p-rice",
+            "qty": 1
+          },
+          {
+            "productId": "p-rice",
+            "qty": 1
+          },
+          {
+            "productId": "p-rice",
+            "qty": 1
+          },
+          {
+            "productId": "p-rice",
+            "qty": 1
+          },
+          {
+            "productId": "p-rice",
+            "qty": 1
+          },
+          {
+            "productId": "p-rice",
+            "qty": 1
+          },
+          {
+            "productId": "p-rice",
+            "qty": 1
+          },
+          {
+            "productId": "p-rice",
+            "qty": 1
+          },
+          {
+            "productId": "p-rice",
+            "qty": 1
+          },
+          {
+            "productId": "p-rice",
+            "qty": 1
+          },
+          {
+            "productId": "p-rice",
+            "qty": 1
+          },
+          {
+            "productId": "p-rice",
+            "qty": 1
+          },
+          {
+            "productId": "p-rice",
+            "qty": 1
+          },
+          {
+            "productId": "p-rice",
+            "qty": 1
+          },
+          {
+            "productId": "p-rice",
+            "qty": 1
+          },
+          {
+            "productId": "p-rice",
+            "qty": 1
+          }
+        ],
+        "fulfilment": "pickup",
+        "createdAt": "2026-10-23T10:00:00.000Z",
+        "state": "new"
+      },
+      "ok": false
+    },
+    {
+      "name": "name-61",
+      "data": {
+        "businessId": "bizH3",
+        "slug": "madina-store",
+        "customerName": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "phone": "0301-2345678",
+        "lines": [
+          {
+            "productId": "p-rice",
+            "qty": 2
+          }
+        ],
+        "fulfilment": "pickup",
+        "createdAt": "2026-10-23T10:00:00.000Z",
+        "state": "new"
+      },
+      "ok": false
+    },
+    {
+      "name": "name-blank",
+      "data": {
+        "businessId": "bizH3",
+        "slug": "madina-store",
+        "customerName": "   ",
+        "phone": "0301-2345678",
+        "lines": [
+          {
+            "productId": "p-rice",
+            "qty": 2
+          }
+        ],
+        "fulfilment": "pickup",
+        "createdAt": "2026-10-23T10:00:00.000Z",
+        "state": "new"
+      },
+      "ok": false
+    },
+    {
+      "name": "phone-short",
+      "data": {
+        "businessId": "bizH3",
+        "slug": "madina-store",
+        "customerName": "Ahmed Raza",
+        "phone": "123",
+        "lines": [
+          {
+            "productId": "p-rice",
+            "qty": 2
+          }
+        ],
+        "fulfilment": "pickup",
+        "createdAt": "2026-10-23T10:00:00.000Z",
+        "state": "new"
+      },
+      "ok": false
+    },
+    {
+      "name": "phone-20",
+      "data": {
+        "businessId": "bizH3",
+        "slug": "madina-store",
+        "customerName": "Ahmed Raza",
+        "phone": "00000000000000000000",
+        "lines": [
+          {
+            "productId": "p-rice",
+            "qty": 2
+          }
+        ],
+        "fulfilment": "pickup",
+        "createdAt": "2026-10-23T10:00:00.000Z",
+        "state": "new"
+      },
+      "ok": false
+    },
+    {
+      "name": "note-301",
+      "data": {
+        "businessId": "bizH3",
+        "slug": "madina-store",
+        "customerName": "Ahmed Raza",
+        "phone": "0301-2345678",
+        "lines": [
+          {
+            "productId": "p-rice",
+            "qty": 2
+          }
+        ],
+        "fulfilment": "pickup",
+        "createdAt": "2026-10-23T10:00:00.000Z",
+        "state": "new",
+        "note": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+      },
+      "ok": false
+    },
+    {
+      "name": "fulfilment-cod",
+      "data": {
+        "businessId": "bizH3",
+        "slug": "madina-store",
+        "customerName": "Ahmed Raza",
+        "phone": "0301-2345678",
+        "lines": [
+          {
+            "productId": "p-rice",
+            "qty": 2
+          }
+        ],
+        "fulfilment": "cod",
+        "createdAt": "2026-10-23T10:00:00.000Z",
+        "state": "new"
+      },
+      "ok": false
+    },
+    {
+      "name": "not-an-object",
+      "data": "order please",
+      "ok": false
+    },
+    {
+      "name": "businessId-empty",
+      "data": {
+        "businessId": "",
+        "slug": "madina-store",
+        "customerName": "Ahmed Raza",
+        "phone": "0301-2345678",
+        "lines": [
+          {
+            "productId": "p-rice",
+            "qty": 2
+          }
+        ],
+        "fulfilment": "pickup",
+        "createdAt": "2026-10-23T10:00:00.000Z",
+        "state": "new"
+      },
+      "ok": false
+    }
+  ],
+  "composeCases": {
+    "merged": {
+      "businessId": "bizH3",
+      "slug": "madina-store",
+      "customerName": "Ahmed Raza",
+      "phone": "0301-2345678",
+      "lines": [
+        {
+          "productId": "p-rice",
+          "qty": 5
+        },
+        {
+          "productId": "p-oil",
+          "qty": 1
+        }
+      ],
+      "fulfilment": "delivery",
+      "createdAt": "2026-10-23T10:00:00.000Z",
+      "state": "new"
+    },
+    "overflow": null
+  },
+  "phoneCases": [
+    {
+      "phone": "0301-2345678",
+      "normalized": "03012345678"
+    },
+    {
+      "phone": "+92 301 2345678",
+      "normalized": "03012345678"
+    },
+    {
+      "phone": "0092 301 2345678",
+      "normalized": "03012345678"
+    },
+    {
+      "phone": "3012345678",
+      "normalized": "3012345678"
+    }
+  ],
+  "pageModel": {
+    "shopName": "Madina General Store",
+    "phone": "0301-2345678",
+    "currency": "PKR",
+    "cards": [
+      {
+        "productId": "p-soap",
+        "name": "Soap Bar",
+        "price": 120,
+        "unit": "pc",
+        "category": "Care",
+        "stockState": "out",
+        "orderable": false
+      },
+      {
+        "productId": "p-oil",
+        "name": "Cooking Oil 5L",
+        "price": 2600,
+        "unit": "tin",
+        "category": "Grocery",
+        "stockState": "low",
+        "orderable": true
+      },
+      {
+        "productId": "p-rice",
+        "name": "Rice Basmati 5kg",
+        "price": 1450,
+        "unit": "bag",
+        "category": "Grocery",
+        "stockState": "in",
+        "orderable": true,
+        "nameUr": "چاول باسمتی"
+      }
+    ],
+    "groups": [
+      {
+        "category": "Care",
+        "cards": [
+          {
+            "productId": "p-soap",
+            "name": "Soap Bar",
+            "price": 120,
+            "unit": "pc",
+            "category": "Care",
+            "stockState": "out",
+            "orderable": false
+          }
+        ]
+      },
+      {
+        "category": "Grocery",
+        "cards": [
+          {
+            "productId": "p-oil",
+            "name": "Cooking Oil 5L",
+            "price": 2600,
+            "unit": "tin",
+            "category": "Grocery",
+            "stockState": "low",
+            "orderable": true
+          },
+          {
+            "productId": "p-rice",
+            "name": "Rice Basmati 5kg",
+            "price": 1450,
+            "unit": "bag",
+            "category": "Grocery",
+            "stockState": "in",
+            "orderable": true,
+            "nameUr": "چاول باسمتی"
+          }
+        ]
+      }
+    ],
+    "city": "Sargodha"
+  },
+  "conversionCases": {
+    "customers": [
+      {
+        "id": "cu-1",
+        "name": "Ahmed Raza",
+        "phone": "+92 301 2345678",
+        "address": "",
+        "note": "",
+        "ts": "2026-10-23T10:00:00.000Z"
+      }
+    ],
+    "order": {
+      "id": "ord-1",
+      "businessId": "bizH3",
+      "slug": "madina-store",
+      "customerName": "Ahmed Raza",
+      "phone": "0301-2345678",
+      "lines": [
+        {
+          "productId": "p-rice",
+          "qty": 2
+        },
+        {
+          "productId": "p-oil",
+          "qty": 1
+        }
+      ],
+      "fulfilment": "pickup",
+      "createdAt": "2026-10-23T10:00:00.000Z",
+      "state": "new"
+    },
+    "productsMoved": [
+      {
+        "id": "p-rice",
+        "name": "Rice Basmati 5kg",
+        "urduName": "چاول باسمتی",
+        "category": "Grocery",
+        "salePrice": 1500,
+        "costPrice": 1200,
+        "stockQty": 40,
+        "reorderLevel": 5,
+        "unit": "bag"
+      },
+      {
+        "id": "p-soap",
+        "name": "Soap Bar",
+        "category": "Care",
+        "salePrice": 120,
+        "costPrice": 80,
+        "stockQty": 0,
+        "reorderLevel": 2,
+        "unit": "pc"
+      },
+      {
+        "id": "p-tea",
+        "name": "Tea 500g",
+        "category": "Grocery",
+        "salePrice": 950,
+        "costPrice": 800,
+        "stockQty": 12,
+        "reorderLevel": 3,
+        "unit": "pack"
+      }
+    ],
+    "clean": {
+      "lines": [
+        {
+          "productId": "p-rice",
+          "name": "Rice Basmati 5kg",
+          "qty": 2,
+          "unitPrice": 1450,
+          "total": 2900,
+          "sourceProductId": "p-rice"
+        },
+        {
+          "productId": "p-oil",
+          "name": "Cooking Oil 5L",
+          "qty": 1,
+          "unitPrice": 2600,
+          "total": 2600,
+          "sourceProductId": "p-oil"
+        }
+      ],
+      "drift": [
+        {
+          "productId": "p-rice",
+          "name": "Rice Basmati 5kg",
+          "qty": 2,
+          "publishedPrice": 1450,
+          "livePrice": 1450,
+          "priceChanged": false,
+          "productMissing": false
+        },
+        {
+          "productId": "p-oil",
+          "name": "Cooking Oil 5L",
+          "qty": 1,
+          "publishedPrice": 2600,
+          "livePrice": 2600,
+          "priceChanged": false,
+          "productMissing": false
+        }
+      ],
+      "droppedCount": 0,
+      "customer": {
+        "id": "cu-1",
+        "name": "Ahmed Raza",
+        "phone": "+92 301 2345678",
+        "address": "",
+        "note": "",
+        "ts": "2026-10-23T10:00:00.000Z"
+      }
+    },
+    "drift": {
+      "lines": [
+        {
+          "productId": "p-rice",
+          "name": "Rice Basmati 5kg",
+          "qty": 2,
+          "unitPrice": 1500,
+          "total": 3000,
+          "sourceProductId": "p-rice"
+        }
+      ],
+      "drift": [
+        {
+          "productId": "p-rice",
+          "name": "Rice Basmati 5kg",
+          "qty": 2,
+          "publishedPrice": 1450,
+          "livePrice": 1500,
+          "priceChanged": true,
+          "productMissing": false
+        },
+        {
+          "productId": "p-oil",
+          "name": "Cooking Oil 5L",
+          "qty": 1,
+          "publishedPrice": 2600,
+          "livePrice": null,
+          "priceChanged": false,
+          "productMissing": true
+        }
+      ],
+      "droppedCount": 1,
+      "customer": {
+        "id": "cu-1",
+        "name": "Ahmed Raza",
+        "phone": "+92 301 2345678",
+        "address": "",
+        "note": "",
+        "ts": "2026-10-23T10:00:00.000Z"
+      }
+    },
+    "allMissingNull": true,
+    "convertedNull": true,
+    "dismissedNull": true,
+    "noSnapshotPlan": {
+      "lines": [
+        {
+          "productId": "p-rice",
+          "name": "Rice Basmati 5kg",
+          "qty": 2,
+          "unitPrice": 1450,
+          "total": 2900,
+          "sourceProductId": "p-rice"
+        },
+        {
+          "productId": "p-oil",
+          "name": "Cooking Oil 5L",
+          "qty": 1,
+          "unitPrice": 2600,
+          "total": 2600,
+          "sourceProductId": "p-oil"
+        }
+      ],
+      "drift": [
+        {
+          "productId": "p-rice",
+          "name": "Rice Basmati 5kg",
+          "qty": 2,
+          "publishedPrice": null,
+          "livePrice": 1450,
+          "priceChanged": false,
+          "productMissing": false
+        },
+        {
+          "productId": "p-oil",
+          "name": "Cooking Oil 5L",
+          "qty": 1,
+          "publishedPrice": null,
+          "livePrice": 2600,
+          "priceChanged": false,
+          "productMissing": false
+        }
+      ],
+      "droppedCount": 0,
+      "customer": {
+        "id": "cu-1",
+        "name": "Ahmed Raza",
+        "phone": "+92 301 2345678",
+        "address": "",
+        "note": "",
+        "ts": "2026-10-23T10:00:00.000Z"
+      }
+    },
+    "soFromDrift": {
+      "number": "SO-1",
+      "customerId": "cu-1",
+      "customerName": "Ahmed Raza",
+      "customerPhone": "+92 301 2345678",
+      "lines": [
+        {
+          "productId": "p-rice",
+          "name": "Rice Basmati 5kg",
+          "qty": 2,
+          "unitPrice": 1500,
+          "total": 3000,
+          "sourceProductId": "p-rice"
+        }
+      ],
+      "subtotal": 3000,
+      "discountType": "flat",
+      "discountValue": 0,
+      "discountAmount": 0,
+      "estimatedTax": 0,
+      "total": 3000,
+      "source": null,
+      "sourceType": "storefront",
+      "sourceOrderId": "ord-1",
+      "expectedDate": null,
+      "note": "",
+      "status": "open",
+      "dayOffset": 0,
+      "ts": "2026-10-23T10:00:00.000Z"
+    },
+    "counts": {
+      "fresh": 1,
+      "converted": 1,
+      "dismissed": 1
+    }
+  },
+  "journey": {
+    "order": {
+      "id": "ord-9",
+      "businessId": "bizH3",
+      "slug": "madina-store",
+      "customerName": "Ahmed Raza",
+      "phone": "0301-2345678",
+      "lines": [
+        {
+          "productId": "p-rice",
+          "qty": 2
+        }
+      ],
+      "fulfilment": "pickup",
+      "createdAt": "2026-10-23T10:00:00.000Z",
+      "state": "new"
+    },
+    "plan": {
+      "lines": [
+        {
+          "productId": "p-rice",
+          "name": "Rice Basmati 5kg",
+          "qty": 2,
+          "unitPrice": 1450,
+          "total": 2900,
+          "sourceProductId": "p-rice"
+        }
+      ],
+      "drift": [
+        {
+          "productId": "p-rice",
+          "name": "Rice Basmati 5kg",
+          "qty": 2,
+          "publishedPrice": 1450,
+          "livePrice": 1450,
+          "priceChanged": false,
+          "productMissing": false
+        }
+      ],
+      "droppedCount": 0,
+      "customer": {
+        "id": "cu-1",
+        "name": "Ahmed Raza",
+        "phone": "+92 301 2345678",
+        "address": "",
+        "note": "",
+        "ts": "2026-10-23T10:00:00.000Z"
+      }
+    },
+    "so": {
+      "number": "SO-9",
+      "customerId": "cu-1",
+      "customerName": "Ahmed Raza",
+      "customerPhone": "0301-2345678",
+      "lines": [
+        {
+          "productId": "p-rice",
+          "name": "Rice Basmati 5kg",
+          "qty": 2,
+          "unitPrice": 1450,
+          "total": 2900,
+          "sourceProductId": "p-rice"
+        }
+      ],
+      "subtotal": 2900,
+      "discountType": "flat",
+      "discountValue": 0,
+      "discountAmount": 0,
+      "estimatedTax": 0,
+      "total": 2900,
+      "source": null,
+      "sourceType": "storefront",
+      "sourceOrderId": "ord-9",
+      "expectedDate": null,
+      "note": "",
+      "status": "open",
+      "dayOffset": 0,
+      "ts": "2026-10-23T10:00:00.000Z"
+    }
+  },
+  "backupCases": {
+    "inputs": {
+      "businessId": "bizH3",
+      "exportedAt": "2026-10-23T10:00:00.000Z",
+      "exportedBy": "web",
+      "owner": {
+        "shopName": "Madina General Store"
+      },
+      "collections": {
+        "products": [],
+        "sales": [],
+        "bills": [],
+        "suppliers": [],
+        "purchases": [],
+        "supplierPayments": [],
+        "expenses": [],
+        "credits": [],
+        "customers": [],
+        "returns": [],
+        "adjustments": [],
+        "dayCloses": [],
+        "cashEntries": [],
+        "journal": [
+          {
+            "id": "j-seed-sale-13",
+            "memo": "Daily sales summary (seed history)",
+            "refType": "seed",
+            "refId": null,
+            "dayOffset": 13,
+            "ts": "2026-10-10T08:05:00.000Z",
+            "lines": [
+              {
+                "account": "cash",
+                "debit": 32220,
+                "credit": 0
+              },
+              {
+                "account": "cogs",
+                "debit": 29274,
+                "credit": 0
+              },
+              {
+                "account": "sales_revenue",
+                "debit": 0,
+                "credit": 32220
+              },
+              {
+                "account": "inventory",
+                "debit": 0,
+                "credit": 29274
+              }
+            ]
+          },
+          {
+            "id": "j-seed-sale-12",
+            "memo": "Daily sales summary (seed history)",
+            "refType": "seed",
+            "refId": null,
+            "dayOffset": 12,
+            "ts": "2026-10-11T08:05:00.000Z",
+            "lines": [
+              {
+                "account": "cash",
+                "debit": 29240,
+                "credit": 0
+              },
+              {
+                "account": "cogs",
+                "debit": 26567,
+                "credit": 0
+              },
+              {
+                "account": "sales_revenue",
+                "debit": 0,
+                "credit": 29240
+              },
+              {
+                "account": "inventory",
+                "debit": 0,
+                "credit": 26567
+              }
+            ]
+          },
+          {
+            "id": "j-seed-sale-11",
+            "memo": "Daily sales summary (seed history)",
+            "refType": "seed",
+            "refId": null,
+            "dayOffset": 11,
+            "ts": "2026-10-12T08:05:00.000Z",
+            "lines": [
+              {
+                "account": "cash",
+                "debit": 28055,
+                "credit": 0
+              },
+              {
+                "account": "cogs",
+                "debit": 25469,
+                "credit": 0
+              },
+              {
+                "account": "sales_revenue",
+                "debit": 0,
+                "credit": 28055
+              },
+              {
+                "account": "inventory",
+                "debit": 0,
+                "credit": 25469
+              }
+            ]
+          },
+          {
+            "id": "j-seed-sale-10",
+            "memo": "Daily sales summary (seed history)",
+            "refType": "seed",
+            "refId": null,
+            "dayOffset": 10,
+            "ts": "2026-10-13T08:05:00.000Z",
+            "lines": [
+              {
+                "account": "cash",
+                "debit": 38220,
+                "credit": 0
+              },
+              {
+                "account": "cogs",
+                "debit": 34740,
+                "credit": 0
+              },
+              {
+                "account": "sales_revenue",
+                "debit": 0,
+                "credit": 38220
+              },
+              {
+                "account": "inventory",
+                "debit": 0,
+                "credit": 34740
+              }
+            ]
+          },
+          {
+            "id": "j-seed-sale-9",
+            "memo": "Daily sales summary (seed history)",
+            "refType": "seed",
+            "refId": null,
+            "dayOffset": 9,
+            "ts": "2026-10-14T08:05:00.000Z",
+            "lines": [
+              {
+                "account": "cash",
+                "debit": 27675,
+                "credit": 0
+              },
+              {
+                "account": "cogs",
+                "debit": 25144,
+                "credit": 0
+              },
+              {
+                "account": "sales_revenue",
+                "debit": 0,
+                "credit": 27675
+              },
+              {
+                "account": "inventory",
+                "debit": 0,
+                "credit": 25144
+              }
+            ]
+          },
+          {
+            "id": "j-seed-sale-8",
+            "memo": "Daily sales summary (seed history)",
+            "refType": "seed",
+            "refId": null,
+            "dayOffset": 8,
+            "ts": "2026-10-15T08:05:00.000Z",
+            "lines": [
+              {
+                "account": "cash",
+                "debit": 27070,
+                "credit": 0
+              },
+              {
+                "account": "cogs",
+                "debit": 24577,
+                "credit": 0
+              },
+              {
+                "account": "sales_revenue",
+                "debit": 0,
+                "credit": 27070
+              },
+              {
+                "account": "inventory",
+                "debit": 0,
+                "credit": 24577
+              }
+            ]
+          },
+          {
+            "id": "j-seed-sale-7",
+            "memo": "Daily sales summary (seed history)",
+            "refType": "seed",
+            "refId": null,
+            "dayOffset": 7,
+            "ts": "2026-10-16T08:05:00.000Z",
+            "lines": [
+              {
+                "account": "cash",
+                "debit": 30175,
+                "credit": 0
+              },
+              {
+                "account": "cogs",
+                "debit": 27402,
+                "credit": 0
+              },
+              {
+                "account": "sales_revenue",
+                "debit": 0,
+                "credit": 30175
+              },
+              {
+                "account": "inventory",
+                "debit": 0,
+                "credit": 27402
+              }
+            ]
+          },
+          {
+            "id": "j-seed-sale-6",
+            "memo": "Daily sales summary (seed history)",
+            "refType": "seed",
+            "refId": null,
+            "dayOffset": 6,
+            "ts": "2026-10-17T08:05:00.000Z",
+            "lines": [
+              {
+                "account": "cash",
+                "debit": 29720,
+                "credit": 0
+              },
+              {
+                "account": "cogs",
+                "debit": 26996,
+                "credit": 0
+              },
+              {
+                "account": "sales_revenue",
+                "debit": 0,
+                "credit": 29720
+              },
+              {
+                "account": "inventory",
+                "debit": 0,
+                "credit": 26996
+              }
+            ]
+          },
+          {
+            "id": "j-seed-sale-5",
+            "memo": "Daily sales summary (seed history)",
+            "refType": "seed",
+            "refId": null,
+            "dayOffset": 5,
+            "ts": "2026-10-18T08:05:00.000Z",
+            "lines": [
+              {
+                "account": "cash",
+                "debit": 26755,
+                "credit": 0
+              },
+              {
+                "account": "cogs",
+                "debit": 24207,
+                "credit": 0
+              },
+              {
+                "account": "sales_revenue",
+                "debit": 0,
+                "credit": 26755
+              },
+              {
+                "account": "inventory",
+                "debit": 0,
+                "credit": 24207
+              }
+            ]
+          },
+          {
+            "id": "j-seed-sale-4",
+            "memo": "Daily sales summary (seed history)",
+            "refType": "seed",
+            "refId": null,
+            "dayOffset": 4,
+            "ts": "2026-10-19T08:05:00.000Z",
+            "lines": [
+              {
+                "account": "cash",
+                "debit": 29155,
+                "credit": 0
+              },
+              {
+                "account": "cogs",
+                "debit": 26404,
+                "credit": 0
+              },
+              {
+                "account": "sales_revenue",
+                "debit": 0,
+                "credit": 29155
+              },
+              {
+                "account": "inventory",
+                "debit": 0,
+                "credit": 26404
+              }
+            ]
+          },
+          {
+            "id": "j-seed-sale-3",
+            "memo": "Daily sales summary (seed history)",
+            "refType": "seed",
+            "refId": null,
+            "dayOffset": 3,
+            "ts": "2026-10-20T08:05:00.000Z",
+            "lines": [
+              {
+                "account": "cash",
+                "debit": 32220,
+                "credit": 0
+              },
+              {
+                "account": "cogs",
+                "debit": 29155,
+                "credit": 0
+              },
+              {
+                "account": "sales_revenue",
+                "debit": 0,
+                "credit": 32220
+              },
+              {
+                "account": "inventory",
+                "debit": 0,
+                "credit": 29155
+              }
+            ]
+          },
+          {
+            "id": "j-seed-sale-2",
+            "memo": "Daily sales summary (seed history)",
+            "refType": "seed",
+            "refId": null,
+            "dayOffset": 2,
+            "ts": "2026-10-21T08:05:00.000Z",
+            "lines": [
+              {
+                "account": "cash",
+                "debit": 30565,
+                "credit": 0
+              },
+              {
+                "account": "cogs",
+                "debit": 27701,
+                "credit": 0
+              },
+              {
+                "account": "sales_revenue",
+                "debit": 0,
+                "credit": 30565
+              },
+              {
+                "account": "inventory",
+                "debit": 0,
+                "credit": 27701
+              }
+            ]
+          },
+          {
+            "id": "j-seed-sale-1",
+            "memo": "Daily sales summary (seed history)",
+            "refType": "seed",
+            "refId": null,
+            "dayOffset": 1,
+            "ts": "2026-10-22T08:05:00.000Z",
+            "lines": [
+              {
+                "account": "cash",
+                "debit": 27535,
+                "credit": 0
+              },
+              {
+                "account": "cogs",
+                "debit": 24927,
+                "credit": 0
+              },
+              {
+                "account": "sales_revenue",
+                "debit": 0,
+                "credit": 27535
+              },
+              {
+                "account": "inventory",
+                "debit": 0,
+                "credit": 24927
+              }
+            ]
+          },
+          {
+            "id": "j-seed-sale-0",
+            "memo": "Daily sales summary (seed history)",
+            "refType": "seed",
+            "refId": null,
+            "dayOffset": 0,
+            "ts": "2026-10-23T08:05:00.000Z",
+            "lines": [
+              {
+                "account": "cash",
+                "debit": 13375,
+                "credit": 0
+              },
+              {
+                "account": "cogs",
+                "debit": 12206,
+                "credit": 0
+              },
+              {
+                "account": "sales_revenue",
+                "debit": 0,
+                "credit": 13375
+              },
+              {
+                "account": "inventory",
+                "debit": 0,
+                "credit": 12206
+              }
+            ]
+          },
+          {
+            "id": "j-seed-pur-pur-1",
+            "memo": "Purchase on credit (seed) — Weekly restock — oil, atta, sugar.",
+            "refType": "seed",
+            "refId": "pur-1",
+            "dayOffset": 3,
+            "ts": "2026-10-20T08:05:00.000Z",
+            "lines": [
+              {
+                "account": "purchases",
+                "debit": 47900,
+                "credit": 0
+              },
+              {
+                "account": "inventory",
+                "debit": 47900,
+                "credit": 0
+              },
+              {
+                "account": "purchases",
+                "debit": 0,
+                "credit": 47900
+              },
+              {
+                "account": "payables",
+                "debit": 0,
+                "credit": 47900,
+                "ref": "sup-1"
+              }
+            ]
+          },
+          {
+            "id": "j-seed-spay-spay-1",
+            "memo": "Supplier payment (seed)",
+            "refType": "seed",
+            "refId": "spay-1",
+            "dayOffset": 2,
+            "ts": "2026-10-21T08:05:00.000Z",
+            "lines": [
+              {
+                "account": "payables",
+                "debit": 20000,
+                "credit": 0,
+                "ref": "sup-1"
+              },
+              {
+                "account": "wallet",
+                "debit": 0,
+                "credit": 20000
+              }
+            ]
+          },
+          {
+            "id": "j-seed-exp-exp-1",
+            "memo": "Expense — electricity (seed)",
+            "refType": "seed",
+            "refId": "exp-1",
+            "dayOffset": 0,
+            "ts": "2026-10-23T08:05:00.000Z",
+            "lines": [
+              {
+                "account": "expense_electricity",
+                "debit": 8450,
+                "credit": 0
+              },
+              {
+                "account": "cash",
+                "debit": 0,
+                "credit": 8450
+              }
+            ]
+          },
+          {
+            "id": "j-seed-exp-exp-2",
+            "memo": "Expense — rent (seed)",
+            "refType": "seed",
+            "refId": "exp-2",
+            "dayOffset": 12,
+            "ts": "2026-10-11T08:05:00.000Z",
+            "lines": [
+              {
+                "account": "expense_rent",
+                "debit": 25000,
+                "credit": 0
+              },
+              {
+                "account": "wallet",
+                "debit": 0,
+                "credit": 25000
+              }
+            ]
+          },
+          {
+            "id": "j-seed-cr-cr-1",
+            "memo": "Udhaar given (cash loan) — Haji Muhammad Saleem (seed)",
+            "refType": "seed",
+            "refId": "cr-1",
+            "dayOffset": 5,
+            "ts": "2026-10-18T08:05:00.000Z",
+            "lines": [
+              {
+                "account": "receivables",
+                "debit": 8500,
+                "credit": 0,
+                "ref": "cu-1"
+              },
+              {
+                "account": "cash",
+                "debit": 0,
+                "credit": 8500
+              }
+            ]
+          },
+          {
+            "id": "j-seed-cr-cr-2",
+            "memo": "Udhaar repayment — Haji Muhammad Saleem (seed)",
+            "refType": "seed",
+            "refId": "cr-2",
+            "dayOffset": 1,
+            "ts": "2026-10-22T08:05:00.000Z",
+            "lines": [
+              {
+                "account": "cash",
+                "debit": 3000,
+                "credit": 0
+              },
+              {
+                "account": "receivables",
+                "debit": 0,
+                "credit": 3000,
+                "ref": "cu-1"
+              }
+            ]
+          },
+          {
+            "id": "j-seed-opening",
+            "memo": "Opening balance — inventory & till trued up to physical count (go-live)",
+            "refType": "seed",
+            "refId": null,
+            "dayOffset": 0,
+            "ts": "2026-10-23T08:05:00.000Z",
+            "lines": [
+              {
+                "account": "inventory",
+                "debit": 589674,
+                "credit": 0
+              },
+              {
+                "account": "cash",
+                "debit": 0,
+                "credit": 338030
+              },
+              {
+                "account": "capital",
+                "debit": 0,
+                "credit": 251644
+              }
+            ]
+          }
+        ],
+        "accounts": [],
+        "taxSlabs": [],
+        "periods": [],
+        "quotations": [],
+        "saleOrders": [],
+        "deliveryChallans": [],
+        "purchaseOrders": [],
+        "notes": [],
+        "purchaseReturns": [],
+        "cheques": [],
+        "warehouses": [],
+        "stockLevels": [],
+        "stockTransfers": [],
+        "boms": [],
+        "productionOrders": [],
+        "jobs": [],
+        "employees": [],
+        "attendance": [],
+        "payrollRuns": [],
+        "loans": [],
+        "branding": []
+      },
+      "platform": {
+        "registry": null,
+        "counters": null,
+        "stats": null,
+        "members": [],
+        "invites": [],
+        "events": [],
+        "payments": [],
+        "storefront": {
+          "key": "madina-store",
+          "data": {
+            "businessId": "bizH3",
+            "slug": "madina-store",
+            "shopName": "Madina General Store",
+            "phone": "0301-2345678",
+            "enabled": true,
+            "publishedAt": "2026-10-23T10:00:00.000Z",
+            "updatedAt": "2026-10-23T10:00:00.000Z",
+            "currency": "PKR",
+            "products": [
+              {
+                "productId": "p-soap",
+                "name": "Soap Bar",
+                "price": 120,
+                "unit": "pc",
+                "stockState": "out",
+                "sort": 0,
+                "category": "Care"
+              },
+              {
+                "productId": "p-oil",
+                "name": "Cooking Oil 5L",
+                "price": 2600,
+                "unit": "tin",
+                "stockState": "low",
+                "sort": 1,
+                "category": "Grocery"
+              },
+              {
+                "productId": "p-rice",
+                "name": "Rice Basmati 5kg",
+                "price": 1450,
+                "unit": "bag",
+                "stockState": "in",
+                "sort": 2,
+                "nameUr": "چاول باسمتی",
+                "category": "Grocery"
+              },
+              {
+                "productId": "p-tea",
+                "name": "Tea 500g",
+                "price": 950,
+                "unit": "pack",
+                "stockState": "in",
+                "sort": 3,
+                "category": "Grocery"
+              }
+            ],
+            "city": "Sargodha"
+          }
+        },
+        "storeOrders": [
+          {
+            "key": "ord-1",
+            "data": {
+              "businessId": "bizH3",
+              "slug": "madina-store",
+              "customerName": "Ahmed Raza",
+              "phone": "0301-2345678",
+              "lines": [
+                {
+                  "productId": "p-rice",
+                  "qty": 2
+                }
+              ],
+              "fulfilment": "pickup",
+              "createdAt": "2026-10-23T10:00:00.000Z",
+              "state": "new"
+            }
+          },
+          {
+            "key": "ord-x",
+            "data": {
+              "businessId": "another-shop",
+              "slug": "madina-store",
+              "customerName": "Ahmed Raza",
+              "phone": "0301-2345678",
+              "lines": [
+                {
+                  "productId": "p-rice",
+                  "qty": 2
+                }
+              ],
+              "fulfilment": "pickup",
+              "createdAt": "2026-10-23T10:00:00.000Z",
+              "state": "new"
+            }
+          }
+        ]
+      }
+    },
+    "file": {
+      "kind": "dukaan-ai/business-backup",
+      "formatVersion": 1,
+      "phaseVersion": "G6",
+      "exportedBy": "web",
+      "exportedAt": "2026-10-23T10:00:00.000Z",
+      "manifest": {
+        "schemaVersion": 1,
+        "businessId": "bizH3",
+        "exportedAt": "2026-10-23T10:00:00.000Z",
+        "counts": {
+          "products": 0,
+          "sales": 0,
+          "bills": 0,
+          "suppliers": 0,
+          "purchases": 0,
+          "supplierPayments": 0,
+          "expenses": 0,
+          "credits": 0,
+          "customers": 0,
+          "returns": 0,
+          "adjustments": 0,
+          "dayCloses": 0,
+          "cashEntries": 0,
+          "journal": 21,
+          "accounts": 0,
+          "taxSlabs": 0,
+          "periods": 0,
+          "quotations": 0,
+          "saleOrders": 0,
+          "deliveryChallans": 0,
+          "purchaseOrders": 0,
+          "notes": 0,
+          "purchaseReturns": 0,
+          "cheques": 0,
+          "warehouses": 0,
+          "stockLevels": 0,
+          "stockTransfers": 0,
+          "boms": 0,
+          "productionOrders": 0,
+          "jobs": 0,
+          "employees": 0,
+          "attendance": 0,
+          "payrollRuns": 0,
+          "loans": 0,
+          "branding": 0
+        },
+        "platformCounts": {
+          "registry": 0,
+          "members": 0,
+          "invites": 0,
+          "counters": 0,
+          "stats": 0,
+          "events": 0,
+          "payments": 0,
+          "storefront": 1,
+          "storeOrders": 1
+        },
+        "totalDocs": 22,
+        "journalCount": 21,
+        "journalFingerprint": "4cadd7302606c4cbb7ef2900445868bc806185e5fb8f2a8c2b3717ef501cfd96"
+      },
+      "owner": {
+        "shopName": "Madina General Store"
+      },
+      "collections": {
+        "products": [],
+        "sales": [],
+        "bills": [],
+        "suppliers": [],
+        "purchases": [],
+        "supplierPayments": [],
+        "expenses": [],
+        "credits": [],
+        "customers": [],
+        "returns": [],
+        "adjustments": [],
+        "dayCloses": [],
+        "cashEntries": [],
+        "journal": [
+          {
+            "id": "j-seed-sale-13",
+            "memo": "Daily sales summary (seed history)",
+            "refType": "seed",
+            "refId": null,
+            "dayOffset": 13,
+            "ts": "2026-10-10T08:05:00.000Z",
+            "lines": [
+              {
+                "account": "cash",
+                "debit": 32220,
+                "credit": 0
+              },
+              {
+                "account": "cogs",
+                "debit": 29274,
+                "credit": 0
+              },
+              {
+                "account": "sales_revenue",
+                "debit": 0,
+                "credit": 32220
+              },
+              {
+                "account": "inventory",
+                "debit": 0,
+                "credit": 29274
+              }
+            ]
+          },
+          {
+            "id": "j-seed-exp-exp-2",
+            "memo": "Expense — rent (seed)",
+            "refType": "seed",
+            "refId": "exp-2",
+            "dayOffset": 12,
+            "ts": "2026-10-11T08:05:00.000Z",
+            "lines": [
+              {
+                "account": "expense_rent",
+                "debit": 25000,
+                "credit": 0
+              },
+              {
+                "account": "wallet",
+                "debit": 0,
+                "credit": 25000
+              }
+            ]
+          },
+          {
+            "id": "j-seed-sale-12",
+            "memo": "Daily sales summary (seed history)",
+            "refType": "seed",
+            "refId": null,
+            "dayOffset": 12,
+            "ts": "2026-10-11T08:05:00.000Z",
+            "lines": [
+              {
+                "account": "cash",
+                "debit": 29240,
+                "credit": 0
+              },
+              {
+                "account": "cogs",
+                "debit": 26567,
+                "credit": 0
+              },
+              {
+                "account": "sales_revenue",
+                "debit": 0,
+                "credit": 29240
+              },
+              {
+                "account": "inventory",
+                "debit": 0,
+                "credit": 26567
+              }
+            ]
+          },
+          {
+            "id": "j-seed-sale-11",
+            "memo": "Daily sales summary (seed history)",
+            "refType": "seed",
+            "refId": null,
+            "dayOffset": 11,
+            "ts": "2026-10-12T08:05:00.000Z",
+            "lines": [
+              {
+                "account": "cash",
+                "debit": 28055,
+                "credit": 0
+              },
+              {
+                "account": "cogs",
+                "debit": 25469,
+                "credit": 0
+              },
+              {
+                "account": "sales_revenue",
+                "debit": 0,
+                "credit": 28055
+              },
+              {
+                "account": "inventory",
+                "debit": 0,
+                "credit": 25469
+              }
+            ]
+          },
+          {
+            "id": "j-seed-sale-10",
+            "memo": "Daily sales summary (seed history)",
+            "refType": "seed",
+            "refId": null,
+            "dayOffset": 10,
+            "ts": "2026-10-13T08:05:00.000Z",
+            "lines": [
+              {
+                "account": "cash",
+                "debit": 38220,
+                "credit": 0
+              },
+              {
+                "account": "cogs",
+                "debit": 34740,
+                "credit": 0
+              },
+              {
+                "account": "sales_revenue",
+                "debit": 0,
+                "credit": 38220
+              },
+              {
+                "account": "inventory",
+                "debit": 0,
+                "credit": 34740
+              }
+            ]
+          },
+          {
+            "id": "j-seed-sale-9",
+            "memo": "Daily sales summary (seed history)",
+            "refType": "seed",
+            "refId": null,
+            "dayOffset": 9,
+            "ts": "2026-10-14T08:05:00.000Z",
+            "lines": [
+              {
+                "account": "cash",
+                "debit": 27675,
+                "credit": 0
+              },
+              {
+                "account": "cogs",
+                "debit": 25144,
+                "credit": 0
+              },
+              {
+                "account": "sales_revenue",
+                "debit": 0,
+                "credit": 27675
+              },
+              {
+                "account": "inventory",
+                "debit": 0,
+                "credit": 25144
+              }
+            ]
+          },
+          {
+            "id": "j-seed-sale-8",
+            "memo": "Daily sales summary (seed history)",
+            "refType": "seed",
+            "refId": null,
+            "dayOffset": 8,
+            "ts": "2026-10-15T08:05:00.000Z",
+            "lines": [
+              {
+                "account": "cash",
+                "debit": 27070,
+                "credit": 0
+              },
+              {
+                "account": "cogs",
+                "debit": 24577,
+                "credit": 0
+              },
+              {
+                "account": "sales_revenue",
+                "debit": 0,
+                "credit": 27070
+              },
+              {
+                "account": "inventory",
+                "debit": 0,
+                "credit": 24577
+              }
+            ]
+          },
+          {
+            "id": "j-seed-sale-7",
+            "memo": "Daily sales summary (seed history)",
+            "refType": "seed",
+            "refId": null,
+            "dayOffset": 7,
+            "ts": "2026-10-16T08:05:00.000Z",
+            "lines": [
+              {
+                "account": "cash",
+                "debit": 30175,
+                "credit": 0
+              },
+              {
+                "account": "cogs",
+                "debit": 27402,
+                "credit": 0
+              },
+              {
+                "account": "sales_revenue",
+                "debit": 0,
+                "credit": 30175
+              },
+              {
+                "account": "inventory",
+                "debit": 0,
+                "credit": 27402
+              }
+            ]
+          },
+          {
+            "id": "j-seed-sale-6",
+            "memo": "Daily sales summary (seed history)",
+            "refType": "seed",
+            "refId": null,
+            "dayOffset": 6,
+            "ts": "2026-10-17T08:05:00.000Z",
+            "lines": [
+              {
+                "account": "cash",
+                "debit": 29720,
+                "credit": 0
+              },
+              {
+                "account": "cogs",
+                "debit": 26996,
+                "credit": 0
+              },
+              {
+                "account": "sales_revenue",
+                "debit": 0,
+                "credit": 29720
+              },
+              {
+                "account": "inventory",
+                "debit": 0,
+                "credit": 26996
+              }
+            ]
+          },
+          {
+            "id": "j-seed-cr-cr-1",
+            "memo": "Udhaar given (cash loan) — Haji Muhammad Saleem (seed)",
+            "refType": "seed",
+            "refId": "cr-1",
+            "dayOffset": 5,
+            "ts": "2026-10-18T08:05:00.000Z",
+            "lines": [
+              {
+                "account": "receivables",
+                "debit": 8500,
+                "credit": 0,
+                "ref": "cu-1"
+              },
+              {
+                "account": "cash",
+                "debit": 0,
+                "credit": 8500
+              }
+            ]
+          },
+          {
+            "id": "j-seed-sale-5",
+            "memo": "Daily sales summary (seed history)",
+            "refType": "seed",
+            "refId": null,
+            "dayOffset": 5,
+            "ts": "2026-10-18T08:05:00.000Z",
+            "lines": [
+              {
+                "account": "cash",
+                "debit": 26755,
+                "credit": 0
+              },
+              {
+                "account": "cogs",
+                "debit": 24207,
+                "credit": 0
+              },
+              {
+                "account": "sales_revenue",
+                "debit": 0,
+                "credit": 26755
+              },
+              {
+                "account": "inventory",
+                "debit": 0,
+                "credit": 24207
+              }
+            ]
+          },
+          {
+            "id": "j-seed-sale-4",
+            "memo": "Daily sales summary (seed history)",
+            "refType": "seed",
+            "refId": null,
+            "dayOffset": 4,
+            "ts": "2026-10-19T08:05:00.000Z",
+            "lines": [
+              {
+                "account": "cash",
+                "debit": 29155,
+                "credit": 0
+              },
+              {
+                "account": "cogs",
+                "debit": 26404,
+                "credit": 0
+              },
+              {
+                "account": "sales_revenue",
+                "debit": 0,
+                "credit": 29155
+              },
+              {
+                "account": "inventory",
+                "debit": 0,
+                "credit": 26404
+              }
+            ]
+          },
+          {
+            "id": "j-seed-pur-pur-1",
+            "memo": "Purchase on credit (seed) — Weekly restock — oil, atta, sugar.",
+            "refType": "seed",
+            "refId": "pur-1",
+            "dayOffset": 3,
+            "ts": "2026-10-20T08:05:00.000Z",
+            "lines": [
+              {
+                "account": "purchases",
+                "debit": 47900,
+                "credit": 0
+              },
+              {
+                "account": "inventory",
+                "debit": 47900,
+                "credit": 0
+              },
+              {
+                "account": "purchases",
+                "debit": 0,
+                "credit": 47900
+              },
+              {
+                "account": "payables",
+                "debit": 0,
+                "credit": 47900,
+                "ref": "sup-1"
+              }
+            ]
+          },
+          {
+            "id": "j-seed-sale-3",
+            "memo": "Daily sales summary (seed history)",
+            "refType": "seed",
+            "refId": null,
+            "dayOffset": 3,
+            "ts": "2026-10-20T08:05:00.000Z",
+            "lines": [
+              {
+                "account": "cash",
+                "debit": 32220,
+                "credit": 0
+              },
+              {
+                "account": "cogs",
+                "debit": 29155,
+                "credit": 0
+              },
+              {
+                "account": "sales_revenue",
+                "debit": 0,
+                "credit": 32220
+              },
+              {
+                "account": "inventory",
+                "debit": 0,
+                "credit": 29155
+              }
+            ]
+          },
+          {
+            "id": "j-seed-sale-2",
+            "memo": "Daily sales summary (seed history)",
+            "refType": "seed",
+            "refId": null,
+            "dayOffset": 2,
+            "ts": "2026-10-21T08:05:00.000Z",
+            "lines": [
+              {
+                "account": "cash",
+                "debit": 30565,
+                "credit": 0
+              },
+              {
+                "account": "cogs",
+                "debit": 27701,
+                "credit": 0
+              },
+              {
+                "account": "sales_revenue",
+                "debit": 0,
+                "credit": 30565
+              },
+              {
+                "account": "inventory",
+                "debit": 0,
+                "credit": 27701
+              }
+            ]
+          },
+          {
+            "id": "j-seed-spay-spay-1",
+            "memo": "Supplier payment (seed)",
+            "refType": "seed",
+            "refId": "spay-1",
+            "dayOffset": 2,
+            "ts": "2026-10-21T08:05:00.000Z",
+            "lines": [
+              {
+                "account": "payables",
+                "debit": 20000,
+                "credit": 0,
+                "ref": "sup-1"
+              },
+              {
+                "account": "wallet",
+                "debit": 0,
+                "credit": 20000
+              }
+            ]
+          },
+          {
+            "id": "j-seed-cr-cr-2",
+            "memo": "Udhaar repayment — Haji Muhammad Saleem (seed)",
+            "refType": "seed",
+            "refId": "cr-2",
+            "dayOffset": 1,
+            "ts": "2026-10-22T08:05:00.000Z",
+            "lines": [
+              {
+                "account": "cash",
+                "debit": 3000,
+                "credit": 0
+              },
+              {
+                "account": "receivables",
+                "debit": 0,
+                "credit": 3000,
+                "ref": "cu-1"
+              }
+            ]
+          },
+          {
+            "id": "j-seed-sale-1",
+            "memo": "Daily sales summary (seed history)",
+            "refType": "seed",
+            "refId": null,
+            "dayOffset": 1,
+            "ts": "2026-10-22T08:05:00.000Z",
+            "lines": [
+              {
+                "account": "cash",
+                "debit": 27535,
+                "credit": 0
+              },
+              {
+                "account": "cogs",
+                "debit": 24927,
+                "credit": 0
+              },
+              {
+                "account": "sales_revenue",
+                "debit": 0,
+                "credit": 27535
+              },
+              {
+                "account": "inventory",
+                "debit": 0,
+                "credit": 24927
+              }
+            ]
+          },
+          {
+            "id": "j-seed-exp-exp-1",
+            "memo": "Expense — electricity (seed)",
+            "refType": "seed",
+            "refId": "exp-1",
+            "dayOffset": 0,
+            "ts": "2026-10-23T08:05:00.000Z",
+            "lines": [
+              {
+                "account": "expense_electricity",
+                "debit": 8450,
+                "credit": 0
+              },
+              {
+                "account": "cash",
+                "debit": 0,
+                "credit": 8450
+              }
+            ]
+          },
+          {
+            "id": "j-seed-opening",
+            "memo": "Opening balance — inventory & till trued up to physical count (go-live)",
+            "refType": "seed",
+            "refId": null,
+            "dayOffset": 0,
+            "ts": "2026-10-23T08:05:00.000Z",
+            "lines": [
+              {
+                "account": "inventory",
+                "debit": 589674,
+                "credit": 0
+              },
+              {
+                "account": "cash",
+                "debit": 0,
+                "credit": 338030
+              },
+              {
+                "account": "capital",
+                "debit": 0,
+                "credit": 251644
+              }
+            ]
+          },
+          {
+            "id": "j-seed-sale-0",
+            "memo": "Daily sales summary (seed history)",
+            "refType": "seed",
+            "refId": null,
+            "dayOffset": 0,
+            "ts": "2026-10-23T08:05:00.000Z",
+            "lines": [
+              {
+                "account": "cash",
+                "debit": 13375,
+                "credit": 0
+              },
+              {
+                "account": "cogs",
+                "debit": 12206,
+                "credit": 0
+              },
+              {
+                "account": "sales_revenue",
+                "debit": 0,
+                "credit": 13375
+              },
+              {
+                "account": "inventory",
+                "debit": 0,
+                "credit": 12206
+              }
+            ]
+          }
+        ],
+        "accounts": [],
+        "taxSlabs": [],
+        "periods": [],
+        "quotations": [],
+        "saleOrders": [],
+        "deliveryChallans": [],
+        "purchaseOrders": [],
+        "notes": [],
+        "purchaseReturns": [],
+        "cheques": [],
+        "warehouses": [],
+        "stockLevels": [],
+        "stockTransfers": [],
+        "boms": [],
+        "productionOrders": [],
+        "jobs": [],
+        "employees": [],
+        "attendance": [],
+        "payrollRuns": [],
+        "loans": [],
+        "branding": []
+      },
+      "platform": {
+        "registry": null,
+        "members": [],
+        "invites": [],
+        "counters": null,
+        "stats": null,
+        "events": [],
+        "payments": [],
+        "storefront": {
+          "key": "madina-store",
+          "data": {
+            "businessId": "bizH3",
+            "slug": "madina-store",
+            "shopName": "Madina General Store",
+            "phone": "0301-2345678",
+            "enabled": true,
+            "publishedAt": "2026-10-23T10:00:00.000Z",
+            "updatedAt": "2026-10-23T10:00:00.000Z",
+            "currency": "PKR",
+            "products": [
+              {
+                "productId": "p-soap",
+                "name": "Soap Bar",
+                "price": 120,
+                "unit": "pc",
+                "stockState": "out",
+                "sort": 0,
+                "category": "Care"
+              },
+              {
+                "productId": "p-oil",
+                "name": "Cooking Oil 5L",
+                "price": 2600,
+                "unit": "tin",
+                "stockState": "low",
+                "sort": 1,
+                "category": "Grocery"
+              },
+              {
+                "productId": "p-rice",
+                "name": "Rice Basmati 5kg",
+                "price": 1450,
+                "unit": "bag",
+                "stockState": "in",
+                "sort": 2,
+                "nameUr": "چاول باسمتی",
+                "category": "Grocery"
+              },
+              {
+                "productId": "p-tea",
+                "name": "Tea 500g",
+                "price": 950,
+                "unit": "pack",
+                "stockState": "in",
+                "sort": 3,
+                "category": "Grocery"
+              }
+            ],
+            "city": "Sargodha"
+          }
+        },
+        "storeOrders": [
+          {
+            "key": "ord-1",
+            "data": {
+              "businessId": "bizH3",
+              "slug": "madina-store",
+              "customerName": "Ahmed Raza",
+              "phone": "0301-2345678",
+              "lines": [
+                {
+                  "productId": "p-rice",
+                  "qty": 2
+                }
+              ],
+              "fulfilment": "pickup",
+              "createdAt": "2026-10-23T10:00:00.000Z",
+              "state": "new"
+            }
+          }
+        ]
+      }
+    },
+    "fileVerifies": true,
+    "foreignFront": {
+      "storefront": null,
+      "counts": {
+        "registry": 0,
+        "members": 0,
+        "invites": 0,
+        "counters": 0,
+        "stats": 0,
+        "events": 0,
+        "payments": 0,
+        "storefront": 0,
+        "storeOrders": 0
+      }
+    },
+    "legacyVerifies": true,
+    "planEmpty": {
+      "ok": true,
+      "skipped": 0,
+      "alreadyRestored": false,
+      "setPaths": [
+        "users/bizH3/journal/j-seed-sale-13",
+        "users/bizH3/journal/j-seed-exp-exp-2",
+        "users/bizH3/journal/j-seed-sale-12",
+        "users/bizH3/journal/j-seed-sale-11",
+        "users/bizH3/journal/j-seed-sale-10",
+        "users/bizH3/journal/j-seed-sale-9",
+        "users/bizH3/journal/j-seed-sale-8",
+        "users/bizH3/journal/j-seed-sale-7",
+        "users/bizH3/journal/j-seed-sale-6",
+        "users/bizH3/journal/j-seed-cr-cr-1",
+        "users/bizH3/journal/j-seed-sale-5",
+        "users/bizH3/journal/j-seed-sale-4",
+        "users/bizH3/journal/j-seed-pur-pur-1",
+        "users/bizH3/journal/j-seed-sale-3",
+        "users/bizH3/journal/j-seed-sale-2",
+        "users/bizH3/journal/j-seed-spay-spay-1",
+        "users/bizH3/journal/j-seed-cr-cr-2",
+        "users/bizH3/journal/j-seed-sale-1",
+        "users/bizH3/journal/j-seed-exp-exp-1",
+        "users/bizH3/journal/j-seed-opening",
+        "users/bizH3/journal/j-seed-sale-0",
+        "storefronts/madina-store",
+        "storeOrders/ord-1",
+        "users/bizH3"
+      ],
+      "addCollections": [
+        "businessEvents"
+      ],
+      "eventKind": "restore.performed"
+    },
+    "planForeignSlug": {
+      "ok": false,
+      "reason": "target-not-empty",
+      "conflicts": [
+        "storefronts/someone-else"
+      ]
+    },
+    "planSlugDiffContent": {
+      "ok": false,
+      "reason": "target-not-empty",
+      "conflicts": [
+        "storefronts/madina-store"
+      ]
+    },
+    "planForeignOrder": {
+      "ok": false,
+      "reason": "target-not-empty",
+      "conflicts": [
+        "storeOrders/ord-9"
+      ]
+    },
+    "planResumeTarget": {
+      "owner": {
+        "shopName": "Madina General Store"
+      },
+      "collections": {
+        "products": [],
+        "sales": [],
+        "bills": [],
+        "suppliers": [],
+        "purchases": [],
+        "supplierPayments": [],
+        "expenses": [],
+        "credits": [],
+        "customers": [],
+        "returns": [],
+        "adjustments": [],
+        "dayCloses": [],
+        "cashEntries": [],
+        "journal": [
+          {
+            "id": "j-seed-sale-13",
+            "memo": "Daily sales summary (seed history)",
+            "refType": "seed",
+            "refId": null,
+            "dayOffset": 13,
+            "ts": "2026-10-10T08:05:00.000Z",
+            "lines": [
+              {
+                "account": "cash",
+                "debit": 32220,
+                "credit": 0
+              },
+              {
+                "account": "cogs",
+                "debit": 29274,
+                "credit": 0
+              },
+              {
+                "account": "sales_revenue",
+                "debit": 0,
+                "credit": 32220
+              },
+              {
+                "account": "inventory",
+                "debit": 0,
+                "credit": 29274
+              }
+            ]
+          },
+          {
+            "id": "j-seed-sale-12",
+            "memo": "Daily sales summary (seed history)",
+            "refType": "seed",
+            "refId": null,
+            "dayOffset": 12,
+            "ts": "2026-10-11T08:05:00.000Z",
+            "lines": [
+              {
+                "account": "cash",
+                "debit": 29240,
+                "credit": 0
+              },
+              {
+                "account": "cogs",
+                "debit": 26567,
+                "credit": 0
+              },
+              {
+                "account": "sales_revenue",
+                "debit": 0,
+                "credit": 29240
+              },
+              {
+                "account": "inventory",
+                "debit": 0,
+                "credit": 26567
+              }
+            ]
+          },
+          {
+            "id": "j-seed-sale-11",
+            "memo": "Daily sales summary (seed history)",
+            "refType": "seed",
+            "refId": null,
+            "dayOffset": 11,
+            "ts": "2026-10-12T08:05:00.000Z",
+            "lines": [
+              {
+                "account": "cash",
+                "debit": 28055,
+                "credit": 0
+              },
+              {
+                "account": "cogs",
+                "debit": 25469,
+                "credit": 0
+              },
+              {
+                "account": "sales_revenue",
+                "debit": 0,
+                "credit": 28055
+              },
+              {
+                "account": "inventory",
+                "debit": 0,
+                "credit": 25469
+              }
+            ]
+          },
+          {
+            "id": "j-seed-sale-10",
+            "memo": "Daily sales summary (seed history)",
+            "refType": "seed",
+            "refId": null,
+            "dayOffset": 10,
+            "ts": "2026-10-13T08:05:00.000Z",
+            "lines": [
+              {
+                "account": "cash",
+                "debit": 38220,
+                "credit": 0
+              },
+              {
+                "account": "cogs",
+                "debit": 34740,
+                "credit": 0
+              },
+              {
+                "account": "sales_revenue",
+                "debit": 0,
+                "credit": 38220
+              },
+              {
+                "account": "inventory",
+                "debit": 0,
+                "credit": 34740
+              }
+            ]
+          },
+          {
+            "id": "j-seed-sale-9",
+            "memo": "Daily sales summary (seed history)",
+            "refType": "seed",
+            "refId": null,
+            "dayOffset": 9,
+            "ts": "2026-10-14T08:05:00.000Z",
+            "lines": [
+              {
+                "account": "cash",
+                "debit": 27675,
+                "credit": 0
+              },
+              {
+                "account": "cogs",
+                "debit": 25144,
+                "credit": 0
+              },
+              {
+                "account": "sales_revenue",
+                "debit": 0,
+                "credit": 27675
+              },
+              {
+                "account": "inventory",
+                "debit": 0,
+                "credit": 25144
+              }
+            ]
+          },
+          {
+            "id": "j-seed-sale-8",
+            "memo": "Daily sales summary (seed history)",
+            "refType": "seed",
+            "refId": null,
+            "dayOffset": 8,
+            "ts": "2026-10-15T08:05:00.000Z",
+            "lines": [
+              {
+                "account": "cash",
+                "debit": 27070,
+                "credit": 0
+              },
+              {
+                "account": "cogs",
+                "debit": 24577,
+                "credit": 0
+              },
+              {
+                "account": "sales_revenue",
+                "debit": 0,
+                "credit": 27070
+              },
+              {
+                "account": "inventory",
+                "debit": 0,
+                "credit": 24577
+              }
+            ]
+          },
+          {
+            "id": "j-seed-sale-7",
+            "memo": "Daily sales summary (seed history)",
+            "refType": "seed",
+            "refId": null,
+            "dayOffset": 7,
+            "ts": "2026-10-16T08:05:00.000Z",
+            "lines": [
+              {
+                "account": "cash",
+                "debit": 30175,
+                "credit": 0
+              },
+              {
+                "account": "cogs",
+                "debit": 27402,
+                "credit": 0
+              },
+              {
+                "account": "sales_revenue",
+                "debit": 0,
+                "credit": 30175
+              },
+              {
+                "account": "inventory",
+                "debit": 0,
+                "credit": 27402
+              }
+            ]
+          },
+          {
+            "id": "j-seed-sale-6",
+            "memo": "Daily sales summary (seed history)",
+            "refType": "seed",
+            "refId": null,
+            "dayOffset": 6,
+            "ts": "2026-10-17T08:05:00.000Z",
+            "lines": [
+              {
+                "account": "cash",
+                "debit": 29720,
+                "credit": 0
+              },
+              {
+                "account": "cogs",
+                "debit": 26996,
+                "credit": 0
+              },
+              {
+                "account": "sales_revenue",
+                "debit": 0,
+                "credit": 29720
+              },
+              {
+                "account": "inventory",
+                "debit": 0,
+                "credit": 26996
+              }
+            ]
+          },
+          {
+            "id": "j-seed-sale-5",
+            "memo": "Daily sales summary (seed history)",
+            "refType": "seed",
+            "refId": null,
+            "dayOffset": 5,
+            "ts": "2026-10-18T08:05:00.000Z",
+            "lines": [
+              {
+                "account": "cash",
+                "debit": 26755,
+                "credit": 0
+              },
+              {
+                "account": "cogs",
+                "debit": 24207,
+                "credit": 0
+              },
+              {
+                "account": "sales_revenue",
+                "debit": 0,
+                "credit": 26755
+              },
+              {
+                "account": "inventory",
+                "debit": 0,
+                "credit": 24207
+              }
+            ]
+          },
+          {
+            "id": "j-seed-sale-4",
+            "memo": "Daily sales summary (seed history)",
+            "refType": "seed",
+            "refId": null,
+            "dayOffset": 4,
+            "ts": "2026-10-19T08:05:00.000Z",
+            "lines": [
+              {
+                "account": "cash",
+                "debit": 29155,
+                "credit": 0
+              },
+              {
+                "account": "cogs",
+                "debit": 26404,
+                "credit": 0
+              },
+              {
+                "account": "sales_revenue",
+                "debit": 0,
+                "credit": 29155
+              },
+              {
+                "account": "inventory",
+                "debit": 0,
+                "credit": 26404
+              }
+            ]
+          },
+          {
+            "id": "j-seed-sale-3",
+            "memo": "Daily sales summary (seed history)",
+            "refType": "seed",
+            "refId": null,
+            "dayOffset": 3,
+            "ts": "2026-10-20T08:05:00.000Z",
+            "lines": [
+              {
+                "account": "cash",
+                "debit": 32220,
+                "credit": 0
+              },
+              {
+                "account": "cogs",
+                "debit": 29155,
+                "credit": 0
+              },
+              {
+                "account": "sales_revenue",
+                "debit": 0,
+                "credit": 32220
+              },
+              {
+                "account": "inventory",
+                "debit": 0,
+                "credit": 29155
+              }
+            ]
+          },
+          {
+            "id": "j-seed-sale-2",
+            "memo": "Daily sales summary (seed history)",
+            "refType": "seed",
+            "refId": null,
+            "dayOffset": 2,
+            "ts": "2026-10-21T08:05:00.000Z",
+            "lines": [
+              {
+                "account": "cash",
+                "debit": 30565,
+                "credit": 0
+              },
+              {
+                "account": "cogs",
+                "debit": 27701,
+                "credit": 0
+              },
+              {
+                "account": "sales_revenue",
+                "debit": 0,
+                "credit": 30565
+              },
+              {
+                "account": "inventory",
+                "debit": 0,
+                "credit": 27701
+              }
+            ]
+          },
+          {
+            "id": "j-seed-sale-1",
+            "memo": "Daily sales summary (seed history)",
+            "refType": "seed",
+            "refId": null,
+            "dayOffset": 1,
+            "ts": "2026-10-22T08:05:00.000Z",
+            "lines": [
+              {
+                "account": "cash",
+                "debit": 27535,
+                "credit": 0
+              },
+              {
+                "account": "cogs",
+                "debit": 24927,
+                "credit": 0
+              },
+              {
+                "account": "sales_revenue",
+                "debit": 0,
+                "credit": 27535
+              },
+              {
+                "account": "inventory",
+                "debit": 0,
+                "credit": 24927
+              }
+            ]
+          },
+          {
+            "id": "j-seed-sale-0",
+            "memo": "Daily sales summary (seed history)",
+            "refType": "seed",
+            "refId": null,
+            "dayOffset": 0,
+            "ts": "2026-10-23T08:05:00.000Z",
+            "lines": [
+              {
+                "account": "cash",
+                "debit": 13375,
+                "credit": 0
+              },
+              {
+                "account": "cogs",
+                "debit": 12206,
+                "credit": 0
+              },
+              {
+                "account": "sales_revenue",
+                "debit": 0,
+                "credit": 13375
+              },
+              {
+                "account": "inventory",
+                "debit": 0,
+                "credit": 12206
+              }
+            ]
+          },
+          {
+            "id": "j-seed-pur-pur-1",
+            "memo": "Purchase on credit (seed) — Weekly restock — oil, atta, sugar.",
+            "refType": "seed",
+            "refId": "pur-1",
+            "dayOffset": 3,
+            "ts": "2026-10-20T08:05:00.000Z",
+            "lines": [
+              {
+                "account": "purchases",
+                "debit": 47900,
+                "credit": 0
+              },
+              {
+                "account": "inventory",
+                "debit": 47900,
+                "credit": 0
+              },
+              {
+                "account": "purchases",
+                "debit": 0,
+                "credit": 47900
+              },
+              {
+                "account": "payables",
+                "debit": 0,
+                "credit": 47900,
+                "ref": "sup-1"
+              }
+            ]
+          },
+          {
+            "id": "j-seed-spay-spay-1",
+            "memo": "Supplier payment (seed)",
+            "refType": "seed",
+            "refId": "spay-1",
+            "dayOffset": 2,
+            "ts": "2026-10-21T08:05:00.000Z",
+            "lines": [
+              {
+                "account": "payables",
+                "debit": 20000,
+                "credit": 0,
+                "ref": "sup-1"
+              },
+              {
+                "account": "wallet",
+                "debit": 0,
+                "credit": 20000
+              }
+            ]
+          },
+          {
+            "id": "j-seed-exp-exp-1",
+            "memo": "Expense — electricity (seed)",
+            "refType": "seed",
+            "refId": "exp-1",
+            "dayOffset": 0,
+            "ts": "2026-10-23T08:05:00.000Z",
+            "lines": [
+              {
+                "account": "expense_electricity",
+                "debit": 8450,
+                "credit": 0
+              },
+              {
+                "account": "cash",
+                "debit": 0,
+                "credit": 8450
+              }
+            ]
+          },
+          {
+            "id": "j-seed-exp-exp-2",
+            "memo": "Expense — rent (seed)",
+            "refType": "seed",
+            "refId": "exp-2",
+            "dayOffset": 12,
+            "ts": "2026-10-11T08:05:00.000Z",
+            "lines": [
+              {
+                "account": "expense_rent",
+                "debit": 25000,
+                "credit": 0
+              },
+              {
+                "account": "wallet",
+                "debit": 0,
+                "credit": 25000
+              }
+            ]
+          },
+          {
+            "id": "j-seed-cr-cr-1",
+            "memo": "Udhaar given (cash loan) — Haji Muhammad Saleem (seed)",
+            "refType": "seed",
+            "refId": "cr-1",
+            "dayOffset": 5,
+            "ts": "2026-10-18T08:05:00.000Z",
+            "lines": [
+              {
+                "account": "receivables",
+                "debit": 8500,
+                "credit": 0,
+                "ref": "cu-1"
+              },
+              {
+                "account": "cash",
+                "debit": 0,
+                "credit": 8500
+              }
+            ]
+          },
+          {
+            "id": "j-seed-cr-cr-2",
+            "memo": "Udhaar repayment — Haji Muhammad Saleem (seed)",
+            "refType": "seed",
+            "refId": "cr-2",
+            "dayOffset": 1,
+            "ts": "2026-10-22T08:05:00.000Z",
+            "lines": [
+              {
+                "account": "cash",
+                "debit": 3000,
+                "credit": 0
+              },
+              {
+                "account": "receivables",
+                "debit": 0,
+                "credit": 3000,
+                "ref": "cu-1"
+              }
+            ]
+          },
+          {
+            "id": "j-seed-opening",
+            "memo": "Opening balance — inventory & till trued up to physical count (go-live)",
+            "refType": "seed",
+            "refId": null,
+            "dayOffset": 0,
+            "ts": "2026-10-23T08:05:00.000Z",
+            "lines": [
+              {
+                "account": "inventory",
+                "debit": 589674,
+                "credit": 0
+              },
+              {
+                "account": "cash",
+                "debit": 0,
+                "credit": 338030
+              },
+              {
+                "account": "capital",
+                "debit": 0,
+                "credit": 251644
+              }
+            ]
+          }
+        ],
+        "accounts": [],
+        "taxSlabs": [],
+        "periods": [],
+        "quotations": [],
+        "saleOrders": [],
+        "deliveryChallans": [],
+        "purchaseOrders": [],
+        "notes": [],
+        "purchaseReturns": [],
+        "cheques": [],
+        "warehouses": [],
+        "stockLevels": [],
+        "stockTransfers": [],
+        "boms": [],
+        "productionOrders": [],
+        "jobs": [],
+        "employees": [],
+        "attendance": [],
+        "payrollRuns": [],
+        "loans": [],
+        "branding": []
+      },
+      "members": [],
+      "invites": [],
+      "storefront": {
+        "key": "madina-store",
+        "data": {
+          "businessId": "bizH3",
+          "slug": "madina-store",
+          "shopName": "Madina General Store",
+          "phone": "0301-2345678",
+          "enabled": true,
+          "publishedAt": "2026-10-23T10:00:00.000Z",
+          "updatedAt": "2026-10-23T10:00:00.000Z",
+          "currency": "PKR",
+          "products": [
+            {
+              "productId": "p-soap",
+              "name": "Soap Bar",
+              "price": 120,
+              "unit": "pc",
+              "stockState": "out",
+              "sort": 0,
+              "category": "Care"
+            },
+            {
+              "productId": "p-oil",
+              "name": "Cooking Oil 5L",
+              "price": 2600,
+              "unit": "tin",
+              "stockState": "low",
+              "sort": 1,
+              "category": "Grocery"
+            },
+            {
+              "productId": "p-rice",
+              "name": "Rice Basmati 5kg",
+              "price": 1450,
+              "unit": "bag",
+              "stockState": "in",
+              "sort": 2,
+              "nameUr": "چاول باسمتی",
+              "category": "Grocery"
+            },
+            {
+              "productId": "p-tea",
+              "name": "Tea 500g",
+              "price": 950,
+              "unit": "pack",
+              "stockState": "in",
+              "sort": 3,
+              "category": "Grocery"
+            }
+          ],
+          "city": "Sargodha"
+        }
+      },
+      "storeOrders": [
+        {
+          "key": "ord-1",
+          "data": {
+            "businessId": "bizH3",
+            "slug": "madina-store",
+            "customerName": "Ahmed Raza",
+            "phone": "0301-2345678",
+            "lines": [
+              {
+                "productId": "p-rice",
+                "qty": 2
+              }
+            ],
+            "fulfilment": "pickup",
+            "createdAt": "2026-10-23T10:00:00.000Z",
+            "state": "new"
+          }
+        }
+      ]
+    },
+    "planResume": {
+      "ok": true,
+      "skipped": 23,
+      "alreadyRestored": true,
+      "setPaths": [],
+      "addCollections": [],
+      "eventKind": null
+    }
+  },
+  "linkCases": {
+    "path": "/s/madina-store",
+    "url": "https://dukaan-ai.codehubb.com/s/madina-store",
+    "resolved": "https://dukaan-ai.codehubb.com/s/madina-store",
+    "resolvedEmpty": null,
+    "resolvedAbsent": null,
+    "resolvedNull": null
+  }
+}

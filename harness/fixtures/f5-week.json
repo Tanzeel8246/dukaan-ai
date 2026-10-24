@@ -1,0 +1,2585 @@
+{
+ "version": 1,
+ "kind": "week-in-the-life",
+ "source": "web/lib via harness/out + StoreProvider template transcriptions (F1/F2 pattern); one evolving shop, 2026-09-07 → 2026-09-13",
+ "shop": {
+  "accounts": [
+   {
+    "id": "acct-till",
+    "name": "Main Till",
+    "kind": "cash",
+    "method": "cash",
+    "legacyFor": "cash",
+    "archived": false,
+    "sortOrder": 0,
+    "ts": "2026-01-01T00:00:00.000Z"
+   },
+   {
+    "id": "acct-wallet",
+    "name": "Wallet & Bank",
+    "kind": "wallet",
+    "method": null,
+    "legacyFor": "wallet",
+    "archived": false,
+    "sortOrder": 1,
+    "ts": "2026-01-01T00:00:00.000Z"
+   },
+   {
+    "id": "acct-jazz",
+    "name": "JazzCash",
+    "kind": "wallet",
+    "method": "jazzcash",
+    "legacyFor": null,
+    "archived": false,
+    "sortOrder": 2,
+    "ts": "2026-01-01T00:00:00.000Z"
+   }
+  ],
+  "products": [
+   {
+    "id": "p-tea",
+    "sku": "TEA-475",
+    "name": "Tapal Danedar Tea 475g",
+    "urduName": "چائے",
+    "category": "Grocery",
+    "unit": "pcs",
+    "costPrice": 800,
+    "salePrice": 1050,
+    "stockQty": 50,
+    "reorderLevel": 5,
+    "keywords": [],
+    "taxSlabId": null,
+    "taxExempt": false,
+    "stockClass": null
+   },
+   {
+    "id": "p-sugar",
+    "sku": "SUG-1KG",
+    "name": "Sugar 1kg",
+    "urduName": "چینی",
+    "category": "Grocery",
+    "unit": "kg",
+    "costPrice": 130,
+    "salePrice": 145,
+    "stockQty": 100,
+    "reorderLevel": 10,
+    "keywords": [],
+    "taxSlabId": null,
+    "taxExempt": false,
+    "stockClass": null
+   },
+   {
+    "id": "p-raw",
+    "sku": "RAW-LEAF",
+    "name": "Raw Tea Leaf 1kg",
+    "urduName": "کچی پتی",
+    "category": "Raw",
+    "unit": "kg",
+    "costPrice": 500,
+    "salePrice": 600,
+    "stockQty": 40,
+    "reorderLevel": 5,
+    "keywords": [],
+    "taxSlabId": null,
+    "taxExempt": false,
+    "stockClass": "raw"
+   },
+   {
+    "id": "p-oil",
+    "sku": "OIL-5L",
+    "name": "Cooking Oil 5L",
+    "urduName": "تیل",
+    "category": "Grocery",
+    "unit": "pcs",
+    "costPrice": 1000,
+    "salePrice": 1200,
+    "stockQty": 20,
+    "reorderLevel": 3,
+    "keywords": [],
+    "taxSlabId": "slab-gst-ex",
+    "taxExempt": false,
+    "stockClass": null
+   },
+   {
+    "id": "p-ghee",
+    "sku": "GHEE-1KG",
+    "name": "Desi Ghee 1kg",
+    "urduName": "گھی",
+    "category": "Grocery",
+    "unit": "kg",
+    "costPrice": 900,
+    "salePrice": 1170,
+    "stockQty": 15,
+    "reorderLevel": 3,
+    "keywords": [],
+    "taxSlabId": "slab-gst-in",
+    "taxExempt": false,
+    "stockClass": null
+   },
+   {
+    "id": "p-pack",
+    "name": "Packing Box",
+    "salePrice": 40,
+    "costPrice": 20,
+    "stockQty": 100,
+    "reorderLevel": 10,
+    "stockClass": null
+   },
+   {
+    "id": "p-blend",
+    "name": "House Tea Blend 500g",
+    "salePrice": 950,
+    "costPrice": 0,
+    "stockQty": 0,
+    "reorderLevel": 5,
+    "stockClass": null
+   }
+  ],
+  "slabs": [
+   {
+    "id": "slab-gst-ex",
+    "name": "GST 17%",
+    "kind": "percent",
+    "rate": 17,
+    "appliesTo": "both",
+    "inclusive": false,
+    "isDefault": false,
+    "active": true,
+    "ts": "2026-01-01T00:00:00.000Z"
+   },
+   {
+    "id": "slab-gst-in",
+    "name": "GST 17% incl",
+    "kind": "percent",
+    "rate": 17,
+    "appliesTo": "both",
+    "inclusive": true,
+    "isDefault": false,
+    "active": true,
+    "ts": "2026-01-01T00:00:00.000Z"
+   }
+  ],
+  "settings": {
+   "defaultSalesTaxSlabId": null,
+   "defaultPurchaseTaxSlabId": null
+  },
+  "customer": {
+   "id": "cust-1",
+   "name": "Ahmed Traders",
+   "phone": "03001234567"
+  },
+  "supplier": {
+   "id": "sup-1",
+   "name": "Lahore Tea Co"
+  },
+  "warehouses": [
+   {
+    "id": "wh-main",
+    "name": "Main Warehouse",
+    "note": "",
+    "isDefault": true,
+    "archived": false,
+    "sortOrder": 0,
+    "ts": "2026-01-01T00:00:00.000Z"
+   },
+   {
+    "id": "wh-godown",
+    "name": "Godown — Shahdara",
+    "note": "",
+    "isDefault": false,
+    "archived": false,
+    "sortOrder": 1,
+    "ts": "2026-01-01T00:00:00.000Z"
+   }
+  ],
+  "bom": {
+   "id": "bom-1",
+   "outputProductId": "p-blend",
+   "outputName": "House Tea Blend 500g",
+   "outputQty": 10,
+   "version": 1,
+   "lines": [
+    {
+     "productId": "p-raw",
+     "name": "Raw Tea Leaf 1kg",
+     "qty": 8
+    },
+    {
+     "productId": "p-sugar",
+     "name": "Sugar 1kg",
+     "qty": 2
+    },
+    {
+     "productId": "p-pack",
+     "name": "Packing Box",
+     "qty": 10
+    }
+   ],
+   "labourCost": 300,
+   "overheadCost": 100,
+   "active": true,
+   "note": "",
+   "ts": "2026-01-02T00:00:00.000Z"
+  },
+  "employees": [
+   {
+    "id": "emp-a",
+    "name": "Muhammad Aslam",
+    "phone": "03011111111",
+    "designation": "Counter in-charge",
+    "linkedUserEmail": null,
+    "joinDateISO": "2025-03-01",
+    "payBasis": "monthly",
+    "baseAmount": 30000,
+    "allowances": [
+     {
+      "label": "Transport",
+      "amount": 2000
+     }
+    ],
+    "paidLeaveDays": 2,
+    "active": true,
+    "note": "",
+    "ts": "2026-01-05T09:00:00.000Z"
+   },
+   {
+    "id": "emp-b",
+    "name": "Bilal Ahmed",
+    "phone": "03022222222",
+    "designation": "Loader",
+    "linkedUserEmail": null,
+    "joinDateISO": "2026-01-10",
+    "payBasis": "daily",
+    "baseAmount": 800,
+    "allowances": [],
+    "paidLeaveDays": 0,
+    "active": true,
+    "note": "",
+    "ts": "2026-01-05T09:00:00.000Z"
+   }
+  ],
+  "attendance": [
+   {
+    "id": "emp-a__2026-08",
+    "employeeId": "emp-a",
+    "month": "2026-08",
+    "days": {
+     "1": "present",
+     "2": "present",
+     "3": "present",
+     "4": "present",
+     "5": "present",
+     "6": "present",
+     "7": "present",
+     "8": "present",
+     "9": "present",
+     "10": "present",
+     "11": "present",
+     "12": "present",
+     "13": "present",
+     "14": "present",
+     "15": "present",
+     "16": "present",
+     "17": "present",
+     "18": "present",
+     "19": "present",
+     "20": "present",
+     "21": "present",
+     "22": "present",
+     "23": "present",
+     "24": "present",
+     "25": "present",
+     "26": "present",
+     "27": "absent",
+     "28": "absent",
+     "29": "half",
+     "30": "leave",
+     "31": "leave"
+    },
+    "ts": "2026-08-31T18:00:00.000Z"
+   },
+   {
+    "id": "emp-b__2026-08",
+    "employeeId": "emp-b",
+    "month": "2026-08",
+    "days": {
+     "1": "present",
+     "2": "present",
+     "3": "present",
+     "4": "present",
+     "5": "present",
+     "6": "present",
+     "7": "present",
+     "8": "present",
+     "9": "present",
+     "10": "present",
+     "11": "present",
+     "12": "present",
+     "13": "present",
+     "14": "present",
+     "15": "present",
+     "16": "present",
+     "17": "present",
+     "18": "present",
+     "19": "present",
+     "20": "present",
+     "21": "present",
+     "22": "present",
+     "23": "half",
+     "24": "half",
+     "25": "half",
+     "26": "half",
+     "27": "absent",
+     "28": "absent",
+     "29": "absent",
+     "30": "absent",
+     "31": "absent"
+    },
+    "ts": "2026-08-31T18:00:00.000Z"
+   }
+  ],
+  "fiscalSettings": {
+   "shopName": "Madina General Store",
+   "fiscalYearStartMonth": 7,
+   "fiscalYearStartDay": 1
+  }
+ },
+ "opening": {
+  "levels": [
+   {
+    "id": "wh-main__p-tea",
+    "productId": "p-tea",
+    "warehouseId": "wh-main",
+    "qty": 50
+   },
+   {
+    "id": "wh-main__p-sugar",
+    "productId": "p-sugar",
+    "warehouseId": "wh-main",
+    "qty": 100
+   },
+   {
+    "id": "wh-main__p-raw",
+    "productId": "p-raw",
+    "warehouseId": "wh-main",
+    "qty": 40
+   },
+   {
+    "id": "wh-main__p-oil",
+    "productId": "p-oil",
+    "warehouseId": "wh-main",
+    "qty": 20
+   },
+   {
+    "id": "wh-main__p-ghee",
+    "productId": "p-ghee",
+    "warehouseId": "wh-main",
+    "qty": 15
+   },
+   {
+    "id": "wh-main__p-pack",
+    "productId": "p-pack",
+    "warehouseId": "wh-main",
+    "qty": 100
+   },
+   {
+    "id": "wh-main__p-blend",
+    "productId": "p-blend",
+    "warehouseId": "wh-main",
+    "qty": 0
+   }
+  ]
+ },
+ "events": [
+  {
+   "seq": 1,
+   "day": 1,
+   "client": "web",
+   "kind": "purchase",
+   "title": "Purchase from Lahore Tea Co — tea, raw leaf, packing",
+   "entry": {
+    "id": "e01",
+    "ts": "2026-09-07T09:00:00.000Z",
+    "dayOffset": 0,
+    "dateISO": null,
+    "memo": "Purchase — stock received",
+    "refType": "purchase",
+    "refId": "pur-w1",
+    "reversesId": null,
+    "originDevice": null,
+    "lines": [
+     {
+      "account": "purchases",
+      "debit": 13400,
+      "credit": 0,
+      "ref": null
+     },
+     {
+      "account": "inventory",
+      "debit": 8400,
+      "credit": 0,
+      "ref": null
+     },
+     {
+      "account": "inventory_raw",
+      "debit": 5000,
+      "credit": 0,
+      "ref": null
+     },
+     {
+      "account": "purchases",
+      "debit": 0,
+      "credit": 13400,
+      "ref": null
+     },
+     {
+      "account": "payables",
+      "debit": 0,
+      "credit": 13400,
+      "ref": "sup-1"
+     }
+    ]
+   },
+   "docs": {
+    "purchase": {
+     "id": "pur-w1",
+     "supplierId": "sup-1",
+     "items": [
+      {
+       "productId": "p-tea",
+       "name": "Tapal Danedar Tea 475g",
+       "qty": 10,
+       "unitCost": 800,
+       "total": 8000,
+       "taxAmount": 0,
+       "taxSlabId": null,
+       "taxSlabName": null,
+       "taxRate": 0,
+       "taxKind": "percent",
+       "taxInclusive": false
+      },
+      {
+       "productId": "p-raw",
+       "name": "Raw Tea Leaf 1kg",
+       "qty": 10,
+       "unitCost": 500,
+       "total": 5000,
+       "taxAmount": 0,
+       "taxSlabId": null,
+       "taxSlabName": null,
+       "taxRate": 0,
+       "taxKind": "percent",
+       "taxInclusive": false
+      },
+      {
+       "productId": "p-pack",
+       "name": "Packing Box",
+       "qty": 20,
+       "unitCost": 20,
+       "total": 400,
+       "taxAmount": 0,
+       "taxSlabId": null,
+       "taxSlabName": null,
+       "taxRate": 0,
+       "taxKind": "percent",
+       "taxInclusive": false
+      }
+     ],
+     "total": 13400,
+     "netTotal": 13400,
+     "taxAmount": 0,
+     "note": "",
+     "dayOffset": 0,
+     "ts": "2026-09-07T09:00:00.000Z"
+    }
+   }
+  },
+  {
+   "seq": 2,
+   "day": 1,
+   "client": "app",
+   "kind": "counter_sale",
+   "title": "Counter sale — Sugar 1kg × 3",
+   "entry": {
+    "id": "e02",
+    "ts": "2026-09-07T11:00:00.000Z",
+    "dayOffset": 0,
+    "dateISO": null,
+    "memo": "Counter sale — Sugar 1kg × 3",
+    "refType": "sale",
+    "refId": "sale-w1",
+    "reversesId": null,
+    "originDevice": "Counter Tablet",
+    "lines": [
+     {
+      "account": "cash",
+      "debit": 435,
+      "credit": 0,
+      "ref": "acct-till"
+     },
+     {
+      "account": "cogs",
+      "debit": 390,
+      "credit": 0,
+      "ref": null
+     },
+     {
+      "account": "sales_revenue",
+      "debit": 0,
+      "credit": 435,
+      "ref": null
+     },
+     {
+      "account": "inventory",
+      "debit": 0,
+      "credit": 390,
+      "ref": null
+     }
+    ]
+   },
+   "docs": {
+    "sale": {
+     "id": "sale-w1",
+     "productId": "p-sugar",
+     "qty": 3
+    }
+   }
+  },
+  {
+   "seq": 3,
+   "day": 2,
+   "client": "app",
+   "kind": "bill",
+   "title": "Bill #101 — Ahmed Traders, part udhaar",
+   "entry": {
+    "id": "e03",
+    "ts": "2026-09-08T10:00:00.000Z",
+    "dayOffset": 0,
+    "dateISO": null,
+    "memo": "Bill #101 — Ahmed Traders",
+    "refType": "bill",
+    "refId": "bill-w1",
+    "reversesId": null,
+    "originDevice": "Counter Tablet",
+    "lines": [
+     {
+      "account": "cash",
+      "debit": 2504,
+      "credit": 0,
+      "ref": "acct-till"
+     },
+     {
+      "account": "receivables",
+      "debit": 1000,
+      "credit": 0,
+      "ref": "cust-1"
+     },
+     {
+      "account": "cogs",
+      "debit": 2600,
+      "credit": 0,
+      "ref": null
+     },
+     {
+      "account": "sales_revenue",
+      "debit": 0,
+      "credit": 3300,
+      "ref": null
+     },
+     {
+      "account": "tax_payable",
+      "debit": 0,
+      "credit": 204,
+      "ref": null
+     },
+     {
+      "account": "inventory",
+      "debit": 0,
+      "credit": 2600,
+      "ref": null
+     }
+    ]
+   },
+   "docs": {
+    "bill": {
+     "id": "bill-w1",
+     "billNo": 101,
+     "customerId": "cust-1",
+     "customerName": "Ahmed Traders",
+     "customerPhone": "03001234567",
+     "items": [
+      {
+       "productId": "p-tea",
+       "name": "Tapal Danedar Tea 475g",
+       "qty": 2,
+       "unitPrice": 1050,
+       "unitCost": 800,
+       "total": 2100,
+       "taxAmount": 0,
+       "taxSlabId": null,
+       "taxSlabName": null,
+       "taxRate": 0,
+       "taxKind": "percent",
+       "taxInclusive": false
+      },
+      {
+       "productId": "p-oil",
+       "name": "Cooking Oil 5L",
+       "qty": 1,
+       "unitPrice": 1200,
+       "unitCost": 1000,
+       "total": 1200,
+       "taxAmount": 204,
+       "taxSlabId": "slab-gst-ex",
+       "taxSlabName": "GST 17%",
+       "taxRate": 17,
+       "taxKind": "percent",
+       "taxInclusive": false
+      }
+     ],
+     "subtotal": 3300,
+     "discountType": "flat",
+     "discountValue": 0,
+     "discountAmount": 0,
+     "taxAmount": 204,
+     "total": 3504,
+     "payments": [
+      {
+       "method": "cash",
+       "amount": 2504,
+       "accountId": "acct-till"
+      },
+      {
+       "method": "credit",
+       "amount": 1000,
+       "accountId": null
+      }
+     ],
+     "status": "paid",
+     "returnedQty": {},
+     "dayOffset": 0,
+     "ts": "2026-09-08T10:00:00.000Z"
+    },
+    "creditRow": {
+     "id": "cr-bill-w1",
+     "customerId": "cust-1",
+     "customerName": "Ahmed Traders",
+     "customerPhone": "03001234567",
+     "kind": "credit",
+     "amount": 1000,
+     "note": "Bill #101 — part payment on udhaar",
+     "billId": "bill-w1",
+     "dayOffset": 0,
+     "ts": "2026-09-08T10:00:00.000Z"
+    }
+   }
+  },
+  {
+   "seq": 4,
+   "day": 2,
+   "client": "web",
+   "kind": "salary_advance",
+   "title": "Salary advance — Muhammad Aslam",
+   "entry": {
+    "id": "e04",
+    "ts": "2026-09-08T12:00:00.000Z",
+    "dayOffset": 0,
+    "dateISO": null,
+    "memo": "Salary advance — Muhammad Aslam",
+    "refType": "salary_advance",
+    "refId": "emp-a",
+    "reversesId": null,
+    "originDevice": null,
+    "lines": [
+     {
+      "account": "salary_payable",
+      "debit": 5000,
+      "credit": 0,
+      "ref": "emp-a"
+     },
+     {
+      "account": "cash",
+      "debit": 0,
+      "credit": 5000,
+      "ref": "acct-till"
+     }
+    ]
+   },
+   "docs": {
+    "input": {
+     "employeeId": "emp-a",
+     "name": "Muhammad Aslam",
+     "amount": 5000,
+     "method": "cash",
+     "accountId": "acct-till",
+     "ts": "2026-09-08T12:00:00.000Z"
+    }
+   }
+  },
+  {
+   "seq": 5,
+   "day": 3,
+   "client": "app",
+   "kind": "repayment",
+   "title": "Udhaar repayment — Ahmed Traders Rs 500",
+   "entry": {
+    "id": "e05",
+    "ts": "2026-09-09T10:00:00.000Z",
+    "dayOffset": 0,
+    "dateISO": null,
+    "memo": "Udhaar repayment — Ahmed Traders",
+    "refType": "repayment",
+    "refId": "cr-repay-w1",
+    "reversesId": null,
+    "originDevice": "Owner Phone",
+    "lines": [
+     {
+      "account": "cash",
+      "debit": 500,
+      "credit": 0,
+      "ref": "acct-till"
+     },
+     {
+      "account": "receivables",
+      "debit": 0,
+      "credit": 500,
+      "ref": "cust-1"
+     }
+    ]
+   },
+   "docs": {
+    "creditRow": {
+     "id": "cr-repay-w1",
+     "customerId": "cust-1",
+     "customerName": "Ahmed Traders",
+     "customerPhone": "03001234567",
+     "kind": "repayment",
+     "amount": 500,
+     "note": "Part repayment",
+     "method": "cash",
+     "accountId": "acct-till",
+     "billId": null,
+     "dayOffset": 0,
+     "ts": "2026-09-09T10:00:00.000Z"
+    }
+   }
+  },
+  {
+   "seq": 6,
+   "day": 3,
+   "client": "web",
+   "kind": "return",
+   "title": "Return against Bill #101 — Cooking Oil 5L × 1",
+   "entry": {
+    "id": "e06",
+    "ts": "2026-09-09T12:00:00.000Z",
+    "dayOffset": 0,
+    "dateISO": null,
+    "memo": "Return against Bill #101",
+    "refType": "return",
+    "refId": "bill-w1",
+    "reversesId": null,
+    "originDevice": null,
+    "lines": [
+     {
+      "account": "sales_revenue",
+      "debit": 1200,
+      "credit": 0,
+      "ref": null
+     },
+     {
+      "account": "tax_payable",
+      "debit": 204,
+      "credit": 0,
+      "ref": null
+     },
+     {
+      "account": "inventory",
+      "debit": 1000,
+      "credit": 0,
+      "ref": null
+     },
+     {
+      "account": "receivables",
+      "debit": 0,
+      "credit": 500,
+      "ref": "cust-1"
+     },
+     {
+      "account": "cash",
+      "debit": 0,
+      "credit": 904,
+      "ref": "acct-till"
+     },
+     {
+      "account": "cogs",
+      "debit": 0,
+      "credit": 1000,
+      "ref": null
+     }
+    ]
+   },
+   "docs": {
+    "bill": {
+     "id": "bill-w1",
+     "billNo": 101,
+     "customerId": "cust-1",
+     "customerName": "Ahmed Traders",
+     "customerPhone": "03001234567",
+     "items": [
+      {
+       "productId": "p-tea",
+       "name": "Tapal Danedar Tea 475g",
+       "qty": 2,
+       "unitPrice": 1050,
+       "unitCost": 800,
+       "total": 2100,
+       "taxAmount": 0,
+       "taxSlabId": null,
+       "taxSlabName": null,
+       "taxRate": 0,
+       "taxKind": "percent",
+       "taxInclusive": false
+      },
+      {
+       "productId": "p-oil",
+       "name": "Cooking Oil 5L",
+       "qty": 1,
+       "unitPrice": 1200,
+       "unitCost": 1000,
+       "total": 1200,
+       "taxAmount": 204,
+       "taxSlabId": "slab-gst-ex",
+       "taxSlabName": "GST 17%",
+       "taxRate": 17,
+       "taxKind": "percent",
+       "taxInclusive": false
+      }
+     ],
+     "subtotal": 3300,
+     "discountType": "flat",
+     "discountValue": 0,
+     "discountAmount": 0,
+     "taxAmount": 204,
+     "total": 3504,
+     "payments": [
+      {
+       "method": "cash",
+       "amount": 2504,
+       "accountId": "acct-till"
+      },
+      {
+       "method": "credit",
+       "amount": 1000,
+       "accountId": null
+      }
+     ],
+     "status": "paid",
+     "returnedQty": {},
+     "dayOffset": 0,
+     "ts": "2026-09-08T10:00:00.000Z"
+    },
+    "priorReturns": [],
+    "credits": [
+     {
+      "id": "cr-bill-w1",
+      "customerId": "cust-1",
+      "customerName": "Ahmed Traders",
+      "customerPhone": "03001234567",
+      "kind": "credit",
+      "amount": 1000,
+      "note": "Bill #101 — part payment on udhaar",
+      "billId": "bill-w1",
+      "dayOffset": 0,
+      "ts": "2026-09-08T10:00:00.000Z"
+     },
+     {
+      "id": "cr-repay-w1",
+      "customerId": "cust-1",
+      "customerName": "Ahmed Traders",
+      "customerPhone": "03001234567",
+      "kind": "repayment",
+      "amount": 500,
+      "note": "Part repayment",
+      "method": "cash",
+      "accountId": "acct-till",
+      "billId": null,
+      "dayOffset": 0,
+      "ts": "2026-09-09T10:00:00.000Z"
+     }
+    ],
+    "returnLines": [
+     {
+      "productId": "p-oil",
+      "qty": 1
+     }
+    ],
+    "saleReturn": {
+     "id": "ret-bill-w1-1",
+     "billId": "bill-w1",
+     "billNo": 101,
+     "items": [
+      {
+       "productId": "p-oil",
+       "name": "Cooking Oil 5L",
+       "qty": 1,
+       "unitPrice": 1200,
+       "unitCost": 1000,
+       "total": 1200,
+       "taxAmount": 204,
+       "taxSlabId": "slab-gst-ex",
+       "taxSlabName": "GST 17%",
+       "taxRate": 17,
+       "taxKind": "percent",
+       "taxInclusive": false
+      }
+     ],
+     "refundAmount": 904,
+     "creditReduction": 500,
+     "method": "cash",
+     "accountId": "acct-till",
+     "dayOffset": 0,
+     "ts": "2026-09-09T12:00:00.000Z"
+    }
+   }
+  },
+  {
+   "seq": 7,
+   "day": 4,
+   "client": "app",
+   "kind": "transfer_close_short",
+   "title": "Transfer TR-1 close-short — 1 kg sugar lost on the road",
+   "entry": {
+    "id": "e07",
+    "ts": "2026-09-10T09:30:00.000Z",
+    "dayOffset": 0,
+    "dateISO": null,
+    "memo": "Transfer loss — TR-1 (1 unit short on receipt)",
+    "refType": "transfer_loss",
+    "refId": "tr-w1",
+    "reversesId": null,
+    "originDevice": "Counter Tablet",
+    "lines": [
+     {
+      "account": "inventory_loss",
+      "debit": 130,
+      "credit": 0,
+      "ref": null
+     },
+     {
+      "account": "inventory",
+      "debit": 0,
+      "credit": 130,
+      "ref": null
+     }
+    ]
+   },
+   "docs": {
+    "transfer": {
+     "id": "tr-w1",
+     "number": "TR-1",
+     "fromWarehouseId": "wh-main",
+     "toWarehouseId": "wh-godown",
+     "lines": [
+      {
+       "productId": "p-sugar",
+       "name": "Sugar 1kg",
+       "qtySent": 10,
+       "qtyReceived": 9
+      }
+     ],
+     "note": "",
+     "status": "partially_received",
+     "dayOffset": 0,
+     "ts": "2026-09-10T09:00:00.000Z"
+    },
+    "shortages": [
+     {
+      "productId": "p-sugar",
+      "name": "Sugar 1kg",
+      "qty": 1
+     }
+    ],
+    "lossValue": 130
+   }
+  },
+  {
+   "seq": 8,
+   "day": 4,
+   "client": "web",
+   "kind": "expense",
+   "title": "Expense — September rent",
+   "entry": {
+    "id": "e08",
+    "ts": "2026-09-10T13:00:00.000Z",
+    "dayOffset": 0,
+    "dateISO": null,
+    "memo": "Expense — rent",
+    "refType": "expense",
+    "refId": "exp-w1",
+    "reversesId": null,
+    "originDevice": null,
+    "lines": [
+     {
+      "account": "expense_rent",
+      "debit": 5000,
+      "credit": 0,
+      "ref": null
+     },
+     {
+      "account": "cash",
+      "debit": 0,
+      "credit": 5000,
+      "ref": "acct-till"
+     }
+    ]
+   },
+   "docs": {
+    "expense": {
+     "id": "exp-w1",
+     "category": "rent",
+     "amount": 5000,
+     "method": "cash",
+     "accountId": "acct-till",
+     "note": "September rent",
+     "dayOffset": 0,
+     "ts": "2026-09-10T13:00:00.000Z"
+    }
+   }
+  },
+  {
+   "seq": 9,
+   "day": 5,
+   "client": "app",
+   "kind": "production_issue",
+   "title": "Production PR-1 — issue materials for 10 blends (labour accrued)",
+   "entry": {
+    "id": "e09",
+    "ts": "2026-09-11T09:05:00.000Z",
+    "dayOffset": 0,
+    "dateISO": null,
+    "memo": "Production issue — PR-1 · House Tea Blend 500g",
+    "refType": "production_issue",
+    "refId": "pr-w1",
+    "reversesId": null,
+    "originDevice": "Owner Phone",
+    "lines": [
+     {
+      "account": "wip",
+      "debit": 4860,
+      "credit": 0,
+      "ref": "pr-w1"
+     },
+     {
+      "account": "inventory_raw",
+      "debit": 0,
+      "credit": 4000,
+      "ref": "p-raw"
+     },
+     {
+      "account": "inventory",
+      "debit": 0,
+      "credit": 260,
+      "ref": "p-sugar"
+     },
+     {
+      "account": "inventory",
+      "debit": 0,
+      "credit": 200,
+      "ref": "p-pack"
+     },
+     {
+      "account": "salary_payable",
+      "debit": 0,
+      "credit": 400,
+      "ref": null
+     }
+    ]
+   },
+   "docs": {
+    "orderBefore": {
+     "id": "pr-w1",
+     "number": "PR-1",
+     "bomId": "bom-1",
+     "bomVersion": 1,
+     "bomSnapshot": {
+      "outputQty": 10,
+      "lines": [
+       {
+        "productId": "p-raw",
+        "name": "Raw Tea Leaf 1kg",
+        "qty": 8
+       },
+       {
+        "productId": "p-sugar",
+        "name": "Sugar 1kg",
+        "qty": 2
+       },
+       {
+        "productId": "p-pack",
+        "name": "Packing Box",
+        "qty": 10
+       }
+      ],
+      "labourCost": 300,
+      "overheadCost": 100
+     },
+     "outputProductId": "p-blend",
+     "outputName": "House Tea Blend 500g",
+     "warehouseId": "wh-main",
+     "plannedQty": 10,
+     "events": [],
+     "note": "",
+     "status": "open",
+     "dayOffset": 0,
+     "ts": "2026-09-11T09:00:00.000Z"
+    },
+    "input": {
+     "runQty": 10,
+     "lines": [
+      {
+       "productId": "p-raw",
+       "qty": 8
+      },
+      {
+       "productId": "p-sugar",
+       "qty": 2
+      },
+      {
+       "productId": "p-pack",
+       "qty": 10
+      }
+     ],
+     "labourCost": 300,
+     "overheadCost": 100,
+     "settlement": "accrue"
+    },
+    "levelsBefore": [
+     {
+      "id": "wh-main__p-tea",
+      "productId": "p-tea",
+      "warehouseId": "wh-main",
+      "qty": 58
+     },
+     {
+      "id": "wh-main__p-sugar",
+      "productId": "p-sugar",
+      "warehouseId": "wh-main",
+      "qty": 87
+     },
+     {
+      "id": "wh-main__p-raw",
+      "productId": "p-raw",
+      "warehouseId": "wh-main",
+      "qty": 50
+     },
+     {
+      "id": "wh-main__p-oil",
+      "productId": "p-oil",
+      "warehouseId": "wh-main",
+      "qty": 20
+     },
+     {
+      "id": "wh-main__p-ghee",
+      "productId": "p-ghee",
+      "warehouseId": "wh-main",
+      "qty": 15
+     },
+     {
+      "id": "wh-main__p-pack",
+      "productId": "p-pack",
+      "warehouseId": "wh-main",
+      "qty": 120
+     },
+     {
+      "id": "wh-main__p-blend",
+      "productId": "p-blend",
+      "warehouseId": "wh-main",
+      "qty": 0
+     },
+     {
+      "id": "wh-godown__p-sugar",
+      "productId": "p-sugar",
+      "warehouseId": "wh-godown",
+      "qty": 9
+     }
+    ]
+   }
+  },
+  {
+   "seq": 10,
+   "day": 5,
+   "client": "app",
+   "kind": "production_completion",
+   "title": "Production PR-1 — 10 blends completed, pool absorbed",
+   "entry": {
+    "id": "e10",
+    "ts": "2026-09-11T15:00:00.000Z",
+    "dayOffset": 0,
+    "dateISO": null,
+    "memo": "Production completion — PR-1 · House Tea Blend 500g (10 units)",
+    "refType": "production_complete",
+    "refId": "pr-w1",
+    "reversesId": null,
+    "originDevice": "Owner Phone",
+    "lines": [
+     {
+      "account": "inventory",
+      "debit": 4860,
+      "credit": 0,
+      "ref": "pr-w1"
+     },
+     {
+      "account": "wip",
+      "debit": 0,
+      "credit": 4860,
+      "ref": "pr-w1"
+     }
+    ]
+   },
+   "docs": {
+    "orderBefore": {
+     "id": "pr-w1",
+     "number": "PR-1",
+     "bomId": "bom-1",
+     "bomVersion": 1,
+     "bomSnapshot": {
+      "outputQty": 10,
+      "lines": [
+       {
+        "productId": "p-raw",
+        "name": "Raw Tea Leaf 1kg",
+        "qty": 8
+       },
+       {
+        "productId": "p-sugar",
+        "name": "Sugar 1kg",
+        "qty": 2
+       },
+       {
+        "productId": "p-pack",
+        "name": "Packing Box",
+        "qty": 10
+       }
+      ],
+      "labourCost": 300,
+      "overheadCost": 100
+     },
+     "outputProductId": "p-blend",
+     "outputName": "House Tea Blend 500g",
+     "warehouseId": "wh-main",
+     "plannedQty": 10,
+     "events": [
+      {
+       "kind": "issue",
+       "qty": 0,
+       "lines": [
+        {
+         "productId": "p-raw",
+         "name": "Raw Tea Leaf 1kg",
+         "qty": 8,
+         "unitCost": 500,
+         "value": 4000
+        },
+        {
+         "productId": "p-sugar",
+         "name": "Sugar 1kg",
+         "qty": 2,
+         "unitCost": 130,
+         "value": 260
+        },
+        {
+         "productId": "p-pack",
+         "name": "Packing Box",
+         "qty": 10,
+         "unitCost": 20,
+         "value": 200
+        }
+       ],
+       "labourCost": 300,
+       "overheadCost": 100,
+       "paidFromAccountId": "accrue",
+       "value": 4860,
+       "entryId": "e09"
+      }
+     ],
+     "note": "",
+     "status": "open",
+     "dayOffset": 0,
+     "ts": "2026-09-11T09:00:00.000Z"
+    },
+    "qty": 10,
+    "final": false,
+    "value": 4860,
+    "unitCost": 486
+   }
+  },
+  {
+   "seq": 11,
+   "day": 6,
+   "client": "web",
+   "kind": "payroll_accrual",
+   "title": "Payroll PAY-1 — August accrual (net per employee)",
+   "entry": {
+    "id": "e11",
+    "ts": "2026-09-12T19:05:00.000Z",
+    "dayOffset": 0,
+    "dateISO": null,
+    "memo": "Payroll PAY-1 — 2026-08",
+    "refType": "payroll_accrual",
+    "refId": "run-w1",
+    "reversesId": null,
+    "originDevice": null,
+    "lines": [
+     {
+      "account": "expense_salary",
+      "debit": 32000,
+      "credit": 0,
+      "ref": "emp-a"
+     },
+     {
+      "account": "salary_payable",
+      "debit": 0,
+      "credit": 32000,
+      "ref": "emp-a"
+     },
+     {
+      "account": "expense_salary",
+      "debit": 19200,
+      "credit": 0,
+      "ref": "emp-b"
+     },
+     {
+      "account": "salary_payable",
+      "debit": 0,
+      "credit": 19200,
+      "ref": "emp-b"
+     }
+    ]
+   },
+   "docs": {
+    "runDraft": {
+     "id": "run-w1",
+     "number": "PAY-1",
+     "month": "2026-08",
+     "lines": [
+      {
+       "employeeId": "emp-a",
+       "name": "Muhammad Aslam",
+       "payBasis": "monthly",
+       "daysInMonth": 31,
+       "present": 26,
+       "absent": 2,
+       "half": 1,
+       "leave": 2,
+       "unpaidAbsent": 0,
+       "earnedBase": 30000,
+       "allowances": [
+        {
+         "label": "Transport",
+         "amount": 2000
+        }
+       ],
+       "deductions": [],
+       "gross": 32000,
+       "netAccrued": 32000
+      },
+      {
+       "employeeId": "emp-b",
+       "name": "Bilal Ahmed",
+       "payBasis": "daily",
+       "daysInMonth": 31,
+       "present": 22,
+       "absent": 5,
+       "half": 4,
+       "leave": 0,
+       "unpaidAbsent": 0,
+       "earnedBase": 19200,
+       "allowances": [],
+       "deductions": [],
+       "gross": 19200,
+       "netAccrued": 19200
+      }
+     ],
+     "totals": {
+      "gross": 51200,
+      "deductions": 0,
+      "netAccrued": 51200
+     },
+     "payments": [],
+     "accrualEntryId": null,
+     "status": "draft",
+     "note": "",
+     "dayOffset": 0,
+     "ts": "2026-09-12T19:00:00.000Z"
+    }
+   }
+  },
+  {
+   "seq": 12,
+   "day": 6,
+   "client": "app",
+   "kind": "payroll_payment",
+   "title": "Salary paid — Muhammad Aslam (August remainder)",
+   "entry": {
+    "id": "e12",
+    "ts": "2026-09-12T19:30:00.000Z",
+    "dayOffset": 0,
+    "dateISO": null,
+    "memo": "Salary payment PAY-1 — Muhammad Aslam",
+    "refType": "payroll_payment",
+    "refId": "run-w1",
+    "reversesId": null,
+    "originDevice": "Owner Phone",
+    "lines": [
+     {
+      "account": "salary_payable",
+      "debit": 27000,
+      "credit": 0,
+      "ref": "emp-a"
+     },
+     {
+      "account": "cash",
+      "debit": 0,
+      "credit": 27000,
+      "ref": "acct-till"
+     }
+    ]
+   },
+   "docs": {
+    "input": {
+     "employeeId": "emp-a",
+     "name": "Muhammad Aslam",
+     "amount": 27000,
+     "method": "cash",
+     "accountId": "acct-till",
+     "ts": "2026-09-12T19:30:00.000Z"
+    },
+    "runBefore": {
+     "id": "run-w1",
+     "number": "PAY-1",
+     "month": "2026-08",
+     "lines": [
+      {
+       "employeeId": "emp-a",
+       "name": "Muhammad Aslam",
+       "payBasis": "monthly",
+       "daysInMonth": 31,
+       "present": 26,
+       "absent": 2,
+       "half": 1,
+       "leave": 2,
+       "unpaidAbsent": 0,
+       "earnedBase": 30000,
+       "allowances": [
+        {
+         "label": "Transport",
+         "amount": 2000
+        }
+       ],
+       "deductions": [],
+       "gross": 32000,
+       "netAccrued": 32000
+      },
+      {
+       "employeeId": "emp-b",
+       "name": "Bilal Ahmed",
+       "payBasis": "daily",
+       "daysInMonth": 31,
+       "present": 22,
+       "absent": 5,
+       "half": 4,
+       "leave": 0,
+       "unpaidAbsent": 0,
+       "earnedBase": 19200,
+       "allowances": [],
+       "deductions": [],
+       "gross": 19200,
+       "netAccrued": 19200
+      }
+     ],
+     "totals": {
+      "gross": 51200,
+      "deductions": 0,
+      "netAccrued": 51200
+     },
+     "payments": [],
+     "accrualEntryId": "e11",
+     "status": "posted",
+     "note": "",
+     "dayOffset": 0,
+     "ts": "2026-09-12T19:00:00.000Z"
+    }
+   }
+  },
+  {
+   "seq": 13,
+   "day": 6,
+   "client": "app",
+   "kind": "payroll_payment",
+   "title": "Salary paid — Bilal Ahmed (August, by bank)",
+   "entry": {
+    "id": "e13",
+    "ts": "2026-09-12T19:35:00.000Z",
+    "dayOffset": 0,
+    "dateISO": null,
+    "memo": "Salary payment PAY-1 — Bilal Ahmed",
+    "refType": "payroll_payment",
+    "refId": "run-w1",
+    "reversesId": null,
+    "originDevice": "Owner Phone",
+    "lines": [
+     {
+      "account": "salary_payable",
+      "debit": 19200,
+      "credit": 0,
+      "ref": "emp-b"
+     },
+     {
+      "account": "wallet",
+      "debit": 0,
+      "credit": 19200,
+      "ref": "acct-wallet"
+     }
+    ]
+   },
+   "docs": {
+    "input": {
+     "employeeId": "emp-b",
+     "name": "Bilal Ahmed",
+     "amount": 19200,
+     "method": "bank",
+     "accountId": "acct-wallet",
+     "ts": "2026-09-12T19:35:00.000Z"
+    },
+    "runBefore": {
+     "id": "run-w1",
+     "number": "PAY-1",
+     "month": "2026-08",
+     "lines": [
+      {
+       "employeeId": "emp-a",
+       "name": "Muhammad Aslam",
+       "payBasis": "monthly",
+       "daysInMonth": 31,
+       "present": 26,
+       "absent": 2,
+       "half": 1,
+       "leave": 2,
+       "unpaidAbsent": 0,
+       "earnedBase": 30000,
+       "allowances": [
+        {
+         "label": "Transport",
+         "amount": 2000
+        }
+       ],
+       "deductions": [],
+       "gross": 32000,
+       "netAccrued": 32000
+      },
+      {
+       "employeeId": "emp-b",
+       "name": "Bilal Ahmed",
+       "payBasis": "daily",
+       "daysInMonth": 31,
+       "present": 22,
+       "absent": 5,
+       "half": 4,
+       "leave": 0,
+       "unpaidAbsent": 0,
+       "earnedBase": 19200,
+       "allowances": [],
+       "deductions": [],
+       "gross": 19200,
+       "netAccrued": 19200
+      }
+     ],
+     "totals": {
+      "gross": 51200,
+      "deductions": 0,
+      "netAccrued": 51200
+     },
+     "payments": [
+      {
+       "employeeId": "emp-a",
+       "name": "Muhammad Aslam",
+       "amount": 27000,
+       "method": "cash",
+       "accountId": "acct-till",
+       "entryId": "e12",
+       "dayOffset": 0,
+       "ts": "2026-09-12T19:30:00.000Z"
+      }
+     ],
+     "accrualEntryId": "e11",
+     "status": "posted",
+     "note": "",
+     "dayOffset": 0,
+     "ts": "2026-09-12T19:00:00.000Z"
+    }
+   }
+  },
+  {
+   "seq": 14,
+   "day": 7,
+   "client": "app",
+   "kind": "payroll_bucket_payment",
+   "title": "Production labour bucket settled off PAY-1",
+   "entry": {
+    "id": "e14",
+    "ts": "2026-09-13T10:00:00.000Z",
+    "dayOffset": 0,
+    "dateISO": null,
+    "memo": "Salary payment PAY-1 — Production labour",
+    "refType": "payroll_payment",
+    "refId": "run-w1",
+    "reversesId": null,
+    "originDevice": "Owner Phone",
+    "lines": [
+     {
+      "account": "salary_payable",
+      "debit": 400,
+      "credit": 0,
+      "ref": null
+     },
+     {
+      "account": "cash",
+      "debit": 0,
+      "credit": 400,
+      "ref": "acct-till"
+     }
+    ]
+   },
+   "docs": {
+    "input": {
+     "employeeId": null,
+     "name": "Production labour",
+     "amount": 400,
+     "method": "cash",
+     "accountId": "acct-till",
+     "ts": "2026-09-13T10:00:00.000Z"
+    },
+    "runBefore": {
+     "id": "run-w1",
+     "number": "PAY-1",
+     "month": "2026-08",
+     "lines": [
+      {
+       "employeeId": "emp-a",
+       "name": "Muhammad Aslam",
+       "payBasis": "monthly",
+       "daysInMonth": 31,
+       "present": 26,
+       "absent": 2,
+       "half": 1,
+       "leave": 2,
+       "unpaidAbsent": 0,
+       "earnedBase": 30000,
+       "allowances": [
+        {
+         "label": "Transport",
+         "amount": 2000
+        }
+       ],
+       "deductions": [],
+       "gross": 32000,
+       "netAccrued": 32000
+      },
+      {
+       "employeeId": "emp-b",
+       "name": "Bilal Ahmed",
+       "payBasis": "daily",
+       "daysInMonth": 31,
+       "present": 22,
+       "absent": 5,
+       "half": 4,
+       "leave": 0,
+       "unpaidAbsent": 0,
+       "earnedBase": 19200,
+       "allowances": [],
+       "deductions": [],
+       "gross": 19200,
+       "netAccrued": 19200
+      }
+     ],
+     "totals": {
+      "gross": 51200,
+      "deductions": 0,
+      "netAccrued": 51200
+     },
+     "payments": [
+      {
+       "employeeId": "emp-a",
+       "name": "Muhammad Aslam",
+       "amount": 27000,
+       "method": "cash",
+       "accountId": "acct-till",
+       "entryId": "e12",
+       "dayOffset": 0,
+       "ts": "2026-09-12T19:30:00.000Z"
+      },
+      {
+       "employeeId": "emp-b",
+       "name": "Bilal Ahmed",
+       "amount": 19200,
+       "method": "bank",
+       "accountId": "acct-wallet",
+       "entryId": "e13",
+       "dayOffset": 0,
+       "ts": "2026-09-12T19:35:00.000Z"
+      }
+     ],
+     "accrualEntryId": "e11",
+     "status": "posted",
+     "note": "",
+     "dayOffset": 0,
+     "ts": "2026-09-12T19:00:00.000Z"
+    }
+   }
+  },
+  {
+   "seq": 15,
+   "day": 7,
+   "client": "web",
+   "kind": "supplier_payment",
+   "title": "Supplier payment PV-1 — Lahore Tea Co Rs 6,000",
+   "entry": {
+    "id": "e15",
+    "ts": "2026-09-13T11:00:00.000Z",
+    "dayOffset": 0,
+    "dateISO": null,
+    "memo": "Supplier payment",
+    "refType": "supplier_payment",
+    "refId": "spay-w1",
+    "reversesId": null,
+    "originDevice": null,
+    "lines": [
+     {
+      "account": "payables",
+      "debit": 6000,
+      "credit": 0,
+      "ref": "sup-1"
+     },
+     {
+      "account": "cash",
+      "debit": 0,
+      "credit": 6000,
+      "ref": "acct-till"
+     }
+    ]
+   },
+   "docs": {
+    "payment": {
+     "id": "spay-w1",
+     "supplierId": "sup-1",
+     "amount": 6000,
+     "method": "cash",
+     "accountId": "acct-till",
+     "voucherNo": "PV-1",
+     "note": "Part payment",
+     "dayOffset": 0,
+     "ts": "2026-09-13T11:00:00.000Z"
+    }
+   }
+  },
+  {
+   "seq": 16,
+   "day": 7,
+   "client": "web",
+   "kind": "fy_close",
+   "title": "FY-close drill — FY 2026-27 closed to retained earnings",
+   "entry": {
+    "id": "e16",
+    "ts": "2026-09-13T12:00:00.000Z",
+    "dayOffset": 0,
+    "dateISO": null,
+    "memo": "Fiscal year close — FY 2026-27",
+    "refType": "fy_close",
+    "refId": "per-fy1",
+    "reversesId": null,
+    "originDevice": null,
+    "lines": [
+     {
+      "account": "sales_revenue",
+      "debit": 2535,
+      "credit": 0,
+      "ref": null
+     },
+     {
+      "account": "cogs",
+      "debit": 0,
+      "credit": 1990,
+      "ref": null
+     },
+     {
+      "account": "expense_rent",
+      "debit": 0,
+      "credit": 5000,
+      "ref": null
+     },
+     {
+      "account": "expense_salary",
+      "debit": 0,
+      "credit": 51200,
+      "ref": null
+     },
+     {
+      "account": "inventory_loss",
+      "debit": 0,
+      "credit": 130,
+      "ref": null
+     },
+     {
+      "account": "retained_earnings",
+      "debit": 55785,
+      "credit": 0,
+      "ref": null
+     }
+    ]
+   },
+   "docs": {
+    "periodId": "per-fy1",
+    "range": {
+     "startDate": "2026-07-01",
+     "endDate": "2027-06-30",
+     "fromTs": "2026-06-30T19:00:00.000Z",
+     "toTs": "2027-06-30T19:00:00.000Z"
+    }
+   }
+  }
+ ],
+ "endState": {
+  "products": [
+   {
+    "id": "p-tea",
+    "sku": "TEA-475",
+    "name": "Tapal Danedar Tea 475g",
+    "urduName": "چائے",
+    "category": "Grocery",
+    "unit": "pcs",
+    "costPrice": 800,
+    "salePrice": 1050,
+    "stockQty": 58,
+    "reorderLevel": 5,
+    "keywords": [],
+    "taxSlabId": null,
+    "taxExempt": false,
+    "stockClass": null
+   },
+   {
+    "id": "p-sugar",
+    "sku": "SUG-1KG",
+    "name": "Sugar 1kg",
+    "urduName": "چینی",
+    "category": "Grocery",
+    "unit": "kg",
+    "costPrice": 130,
+    "salePrice": 145,
+    "stockQty": 94,
+    "reorderLevel": 10,
+    "keywords": [],
+    "taxSlabId": null,
+    "taxExempt": false,
+    "stockClass": null
+   },
+   {
+    "id": "p-raw",
+    "sku": "RAW-LEAF",
+    "name": "Raw Tea Leaf 1kg",
+    "urduName": "کچی پتی",
+    "category": "Raw",
+    "unit": "kg",
+    "costPrice": 500,
+    "salePrice": 600,
+    "stockQty": 42,
+    "reorderLevel": 5,
+    "keywords": [],
+    "taxSlabId": null,
+    "taxExempt": false,
+    "stockClass": "raw"
+   },
+   {
+    "id": "p-oil",
+    "sku": "OIL-5L",
+    "name": "Cooking Oil 5L",
+    "urduName": "تیل",
+    "category": "Grocery",
+    "unit": "pcs",
+    "costPrice": 1000,
+    "salePrice": 1200,
+    "stockQty": 20,
+    "reorderLevel": 3,
+    "keywords": [],
+    "taxSlabId": "slab-gst-ex",
+    "taxExempt": false,
+    "stockClass": null
+   },
+   {
+    "id": "p-ghee",
+    "sku": "GHEE-1KG",
+    "name": "Desi Ghee 1kg",
+    "urduName": "گھی",
+    "category": "Grocery",
+    "unit": "kg",
+    "costPrice": 900,
+    "salePrice": 1170,
+    "stockQty": 15,
+    "reorderLevel": 3,
+    "keywords": [],
+    "taxSlabId": "slab-gst-in",
+    "taxExempt": false,
+    "stockClass": null
+   },
+   {
+    "id": "p-pack",
+    "name": "Packing Box",
+    "salePrice": 40,
+    "costPrice": 20,
+    "stockQty": 110,
+    "reorderLevel": 10,
+    "stockClass": null
+   },
+   {
+    "id": "p-blend",
+    "name": "House Tea Blend 500g",
+    "salePrice": 950,
+    "costPrice": 0,
+    "stockQty": 10,
+    "reorderLevel": 5,
+    "stockClass": null
+   }
+  ],
+  "levels": [
+   {
+    "id": "wh-main__p-tea",
+    "productId": "p-tea",
+    "warehouseId": "wh-main",
+    "qty": 58
+   },
+   {
+    "id": "wh-main__p-sugar",
+    "productId": "p-sugar",
+    "warehouseId": "wh-main",
+    "qty": 85
+   },
+   {
+    "id": "wh-main__p-raw",
+    "productId": "p-raw",
+    "warehouseId": "wh-main",
+    "qty": 42
+   },
+   {
+    "id": "wh-main__p-oil",
+    "productId": "p-oil",
+    "warehouseId": "wh-main",
+    "qty": 20
+   },
+   {
+    "id": "wh-main__p-ghee",
+    "productId": "p-ghee",
+    "warehouseId": "wh-main",
+    "qty": 15
+   },
+   {
+    "id": "wh-main__p-pack",
+    "productId": "p-pack",
+    "warehouseId": "wh-main",
+    "qty": 110
+   },
+   {
+    "id": "wh-main__p-blend",
+    "productId": "p-blend",
+    "warehouseId": "wh-main",
+    "qty": 10
+   },
+   {
+    "id": "wh-godown__p-sugar",
+    "productId": "p-sugar",
+    "warehouseId": "wh-godown",
+    "qty": 9
+   }
+  ],
+  "credits": [
+   {
+    "id": "cr-bill-w1",
+    "customerId": "cust-1",
+    "customerName": "Ahmed Traders",
+    "customerPhone": "03001234567",
+    "kind": "credit",
+    "amount": 1000,
+    "note": "Bill #101 — part payment on udhaar",
+    "billId": "bill-w1",
+    "dayOffset": 0,
+    "ts": "2026-09-08T10:00:00.000Z"
+   },
+   {
+    "id": "cr-repay-w1",
+    "customerId": "cust-1",
+    "customerName": "Ahmed Traders",
+    "customerPhone": "03001234567",
+    "kind": "repayment",
+    "amount": 500,
+    "note": "Part repayment",
+    "method": "cash",
+    "accountId": "acct-till",
+    "billId": null,
+    "dayOffset": 0,
+    "ts": "2026-09-09T10:00:00.000Z"
+   },
+   {
+    "id": "cr-ret-bill-w1",
+    "customerId": "cust-1",
+    "customerName": "Ahmed Traders",
+    "customerPhone": "03001234567",
+    "kind": "credit",
+    "amount": -500,
+    "note": "Return on Bill #101 — udhaar reduced",
+    "billId": "bill-w1",
+    "dayOffset": 0,
+    "ts": "2026-09-09T12:00:00.000Z"
+   }
+  ],
+  "bills": [
+   {
+    "id": "bill-w1",
+    "billNo": 101,
+    "customerId": "cust-1",
+    "customerName": "Ahmed Traders",
+    "customerPhone": "03001234567",
+    "items": [
+     {
+      "productId": "p-tea",
+      "name": "Tapal Danedar Tea 475g",
+      "qty": 2,
+      "unitPrice": 1050,
+      "unitCost": 800,
+      "total": 2100,
+      "taxAmount": 0,
+      "taxSlabId": null,
+      "taxSlabName": null,
+      "taxRate": 0,
+      "taxKind": "percent",
+      "taxInclusive": false
+     },
+     {
+      "productId": "p-oil",
+      "name": "Cooking Oil 5L",
+      "qty": 1,
+      "unitPrice": 1200,
+      "unitCost": 1000,
+      "total": 1200,
+      "taxAmount": 204,
+      "taxSlabId": "slab-gst-ex",
+      "taxSlabName": "GST 17%",
+      "taxRate": 17,
+      "taxKind": "percent",
+      "taxInclusive": false
+     }
+    ],
+    "subtotal": 3300,
+    "discountType": "flat",
+    "discountValue": 0,
+    "discountAmount": 0,
+    "taxAmount": 204,
+    "total": 3504,
+    "payments": [
+     {
+      "method": "cash",
+      "amount": 2504,
+      "accountId": "acct-till"
+     },
+     {
+      "method": "credit",
+      "amount": 1000,
+      "accountId": null
+     }
+    ],
+    "status": "paid",
+    "returnedQty": {
+     "p-oil": 1
+    },
+    "dayOffset": 0,
+    "ts": "2026-09-08T10:00:00.000Z"
+   }
+  ],
+  "returns": [
+   {
+    "id": "ret-bill-w1-1",
+    "billId": "bill-w1",
+    "billNo": 101,
+    "items": [
+     {
+      "productId": "p-oil",
+      "name": "Cooking Oil 5L",
+      "qty": 1,
+      "unitPrice": 1200,
+      "unitCost": 1000,
+      "total": 1200,
+      "taxAmount": 204,
+      "taxSlabId": "slab-gst-ex",
+      "taxSlabName": "GST 17%",
+      "taxRate": 17,
+      "taxKind": "percent",
+      "taxInclusive": false
+     }
+    ],
+    "refundAmount": 904,
+    "creditReduction": 500,
+    "method": "cash",
+    "accountId": "acct-till",
+    "dayOffset": 0,
+    "ts": "2026-09-09T12:00:00.000Z"
+   }
+  ],
+  "sales": [
+   {
+    "id": "sale-w1",
+    "productId": "p-sugar",
+    "qty": 3,
+    "unitPrice": 145,
+    "unitCost": 130,
+    "billId": null,
+    "kind": "sale",
+    "total": 435,
+    "dayOffset": 0,
+    "ts": "2026-09-07T11:00:00.000Z"
+   },
+   {
+    "id": "bill-w1-s0",
+    "productId": "p-tea",
+    "qty": 2,
+    "unitPrice": 1050,
+    "unitCost": 800,
+    "total": 2100,
+    "billId": "bill-w1",
+    "kind": "sale",
+    "dayOffset": 0,
+    "ts": "2026-09-08T10:00:00.000Z"
+   },
+   {
+    "id": "bill-w1-s1",
+    "productId": "p-oil",
+    "qty": 1,
+    "unitPrice": 1200,
+    "unitCost": 1000,
+    "total": 1200,
+    "billId": "bill-w1",
+    "kind": "sale",
+    "dayOffset": 0,
+    "ts": "2026-09-08T10:00:00.000Z"
+   },
+   {
+    "id": "ret-bill-w1-1-s0",
+    "productId": "p-oil",
+    "qty": 1,
+    "unitPrice": 1200,
+    "unitCost": 1000,
+    "total": -1200,
+    "billId": "bill-w1",
+    "kind": "return",
+    "dayOffset": 0,
+    "ts": "2026-09-09T12:00:00.000Z"
+   }
+  ],
+  "purchases": [
+   {
+    "id": "pur-w1",
+    "supplierId": "sup-1",
+    "items": [
+     {
+      "productId": "p-tea",
+      "name": "Tapal Danedar Tea 475g",
+      "qty": 10,
+      "unitCost": 800,
+      "total": 8000,
+      "taxAmount": 0,
+      "taxSlabId": null,
+      "taxSlabName": null,
+      "taxRate": 0,
+      "taxKind": "percent",
+      "taxInclusive": false
+     },
+     {
+      "productId": "p-raw",
+      "name": "Raw Tea Leaf 1kg",
+      "qty": 10,
+      "unitCost": 500,
+      "total": 5000,
+      "taxAmount": 0,
+      "taxSlabId": null,
+      "taxSlabName": null,
+      "taxRate": 0,
+      "taxKind": "percent",
+      "taxInclusive": false
+     },
+     {
+      "productId": "p-pack",
+      "name": "Packing Box",
+      "qty": 20,
+      "unitCost": 20,
+      "total": 400,
+      "taxAmount": 0,
+      "taxSlabId": null,
+      "taxSlabName": null,
+      "taxRate": 0,
+      "taxKind": "percent",
+      "taxInclusive": false
+     }
+    ],
+    "total": 13400,
+    "netTotal": 13400,
+    "taxAmount": 0,
+    "note": "",
+    "dayOffset": 0,
+    "ts": "2026-09-07T09:00:00.000Z"
+   }
+  ],
+  "supplierPayments": [
+   {
+    "id": "spay-w1",
+    "supplierId": "sup-1",
+    "amount": 6000,
+    "method": "cash",
+    "accountId": "acct-till",
+    "voucherNo": "PV-1",
+    "note": "Part payment",
+    "dayOffset": 0,
+    "ts": "2026-09-13T11:00:00.000Z"
+   }
+  ],
+  "expenses": [
+   {
+    "id": "exp-w1",
+    "category": "rent",
+    "amount": 5000,
+    "method": "cash",
+    "accountId": "acct-till",
+    "note": "September rent",
+    "dayOffset": 0,
+    "ts": "2026-09-10T13:00:00.000Z"
+   }
+  ],
+  "transfer": {
+   "id": "tr-w1",
+   "number": "TR-1",
+   "fromWarehouseId": "wh-main",
+   "toWarehouseId": "wh-godown",
+   "lines": [
+    {
+     "productId": "p-sugar",
+     "name": "Sugar 1kg",
+     "qtySent": 10,
+     "qtyReceived": 9
+    }
+   ],
+   "note": "",
+   "status": "received",
+   "dayOffset": 0,
+   "ts": "2026-09-10T09:00:00.000Z"
+  },
+  "productionOrder": {
+   "id": "pr-w1",
+   "number": "PR-1",
+   "bomId": "bom-1",
+   "bomVersion": 1,
+   "bomSnapshot": {
+    "outputQty": 10,
+    "lines": [
+     {
+      "productId": "p-raw",
+      "name": "Raw Tea Leaf 1kg",
+      "qty": 8
+     },
+     {
+      "productId": "p-sugar",
+      "name": "Sugar 1kg",
+      "qty": 2
+     },
+     {
+      "productId": "p-pack",
+      "name": "Packing Box",
+      "qty": 10
+     }
+    ],
+    "labourCost": 300,
+    "overheadCost": 100
+   },
+   "outputProductId": "p-blend",
+   "outputName": "House Tea Blend 500g",
+   "warehouseId": "wh-main",
+   "plannedQty": 10,
+   "events": [
+    {
+     "kind": "issue",
+     "qty": 0,
+     "lines": [
+      {
+       "productId": "p-raw",
+       "name": "Raw Tea Leaf 1kg",
+       "qty": 8,
+       "unitCost": 500,
+       "value": 4000
+      },
+      {
+       "productId": "p-sugar",
+       "name": "Sugar 1kg",
+       "qty": 2,
+       "unitCost": 130,
+       "value": 260
+      },
+      {
+       "productId": "p-pack",
+       "name": "Packing Box",
+       "qty": 10,
+       "unitCost": 20,
+       "value": 200
+      }
+     ],
+     "labourCost": 300,
+     "overheadCost": 100,
+     "paidFromAccountId": "accrue",
+     "value": 4860,
+     "entryId": "e09"
+    },
+    {
+     "kind": "completion",
+     "qty": 10,
+     "lines": null,
+     "labourCost": null,
+     "overheadCost": null,
+     "paidFromAccountId": null,
+     "value": 4860,
+     "entryId": "e10"
+    }
+   ],
+   "note": "",
+   "status": "completed",
+   "dayOffset": 0,
+   "ts": "2026-09-11T09:00:00.000Z"
+  },
+  "payrollRun": {
+   "id": "run-w1",
+   "number": "PAY-1",
+   "month": "2026-08",
+   "lines": [
+    {
+     "employeeId": "emp-a",
+     "name": "Muhammad Aslam",
+     "payBasis": "monthly",
+     "daysInMonth": 31,
+     "present": 26,
+     "absent": 2,
+     "half": 1,
+     "leave": 2,
+     "unpaidAbsent": 0,
+     "earnedBase": 30000,
+     "allowances": [
+      {
+       "label": "Transport",
+       "amount": 2000
+      }
+     ],
+     "deductions": [],
+     "gross": 32000,
+     "netAccrued": 32000
+    },
+    {
+     "employeeId": "emp-b",
+     "name": "Bilal Ahmed",
+     "payBasis": "daily",
+     "daysInMonth": 31,
+     "present": 22,
+     "absent": 5,
+     "half": 4,
+     "leave": 0,
+     "unpaidAbsent": 0,
+     "earnedBase": 19200,
+     "allowances": [],
+     "deductions": [],
+     "gross": 19200,
+     "netAccrued": 19200
+    }
+   ],
+   "totals": {
+    "gross": 51200,
+    "deductions": 0,
+    "netAccrued": 51200
+   },
+   "payments": [
+    {
+     "employeeId": "emp-a",
+     "name": "Muhammad Aslam",
+     "amount": 27000,
+     "method": "cash",
+     "accountId": "acct-till",
+     "entryId": "e12",
+     "dayOffset": 0,
+     "ts": "2026-09-12T19:30:00.000Z"
+    },
+    {
+     "employeeId": "emp-b",
+     "name": "Bilal Ahmed",
+     "amount": 19200,
+     "method": "bank",
+     "accountId": "acct-wallet",
+     "entryId": "e13",
+     "dayOffset": 0,
+     "ts": "2026-09-12T19:35:00.000Z"
+    },
+    {
+     "employeeId": null,
+     "name": "Production labour",
+     "amount": 400,
+     "method": "cash",
+     "accountId": "acct-till",
+     "entryId": "e14",
+     "dayOffset": 0,
+     "ts": "2026-09-13T10:00:00.000Z"
+    }
+   ],
+   "accrualEntryId": "e11",
+   "status": "posted",
+   "note": "",
+   "dayOffset": 0,
+   "ts": "2026-09-12T19:00:00.000Z"
+  },
+  "periodDoc": {
+   "id": "per-fy1",
+   "kind": "fiscal_year",
+   "entryId": "e16"
+  }
+ },
+ "checkpoints": {
+  "salary": {
+   "afterAdvance": {
+    "glBalance": -5000,
+    "employees": [
+     {
+      "employeeId": "emp-a",
+      "position": 5000
+     }
+    ],
+    "owedToEmployees": 0,
+    "advancesOutstanding": 5000,
+    "unassignedAccrued": 0
+   },
+   "afterIssue": {
+    "glBalance": -4600,
+    "employees": [
+     {
+      "employeeId": "emp-a",
+      "position": 5000
+     }
+    ],
+    "owedToEmployees": 0,
+    "advancesOutstanding": 5000,
+    "unassignedAccrued": 400
+   },
+   "afterAccrual": {
+    "glBalance": 46600,
+    "employees": [
+     {
+      "employeeId": "emp-a",
+      "position": -27000
+     },
+     {
+      "employeeId": "emp-b",
+      "position": -19200
+     }
+    ],
+    "owedToEmployees": 46200,
+    "advancesOutstanding": 0,
+    "unassignedAccrued": 400
+   },
+   "afterPayments": {
+    "glBalance": 400,
+    "employees": [
+     {
+      "employeeId": "emp-a",
+      "position": 0
+     },
+     {
+      "employeeId": "emp-b",
+      "position": 0
+     }
+    ],
+    "owedToEmployees": 0,
+    "advancesOutstanding": 0,
+    "unassignedAccrued": 400
+   },
+   "final": {
+    "glBalance": 0,
+    "employees": [
+     {
+      "employeeId": "emp-a",
+      "position": 0
+     },
+     {
+      "employeeId": "emp-b",
+      "position": 0
+     }
+    ],
+    "owedToEmployees": 0,
+    "advancesOutstanding": 0,
+    "unassignedAccrued": 0
+   }
+  }
+ },
+ "expect": {
+  "trialBalance": {
+   "purchases": 0,
+   "inventory": 10680,
+   "inventory_raw": 1000,
+   "payables": -7400,
+   "cash": -40865,
+   "cogs": 0,
+   "sales_revenue": 0,
+   "receivables": 0,
+   "tax_payable": 0,
+   "salary_payable": 0,
+   "inventory_loss": 0,
+   "expense_rent": 0,
+   "wip": 0,
+   "expense_salary": 0,
+   "wallet": -19200,
+   "retained_earnings": 55785
+  },
+  "glCash": -40865,
+  "glWallet": -19200,
+  "receivables": 0,
+  "creditsOutstandingCust1": 0,
+  "payables": 7400,
+  "payablesBySupplier": {
+   "sup-1": 7400
+  },
+  "salaryPayable": 0,
+  "wip": 0,
+  "inventoryGl": 11680,
+  "inventoryValueDelta": 11680,
+  "blendUnitCost": 486,
+  "taxPayable": 0,
+  "retainedEarnings": -55785,
+  "pnl": {
+   "revenue": 2535,
+   "cogs": 1990,
+   "expensesTotal": 56200,
+   "net": -55785
+  },
+  "fyClose": {
+   "range": {
+    "startDate": "2026-07-01",
+    "endDate": "2027-06-30",
+    "fromTs": "2026-06-30T19:00:00.000Z",
+    "toTs": "2027-06-30T19:00:00.000Z"
+   },
+   "summaryNet": -55785
+  },
+  "production": {
+   "poolAfterIssue": 4860,
+   "poolFinal": 0,
+   "producedQty": 10,
+   "unitCost": 486
+  }
+ }
+}

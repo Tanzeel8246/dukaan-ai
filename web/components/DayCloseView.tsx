@@ -4,7 +4,9 @@ import { useMemo, useState } from "react";
 import { useStore } from "./StoreProvider";
 import { useAuth } from "./AuthProvider";
 import { useLang } from "./LangProvider";
+import { usePinGate } from "./PinGate";
 import { can } from "@/lib/permissions";
+import { businessDateISO, todayPktISO } from "@/lib/periods";
 import { IconCash } from "./ui";
 import { fmtDate, fmtPKR } from "@/lib/format";
 import type { I18nKey } from "@/lib/i18n";
@@ -14,6 +16,7 @@ import {
   dayCloseSummary,
   defaultAccountForMethod,
   expectedCloseForAccount,
+  lineResolvesTo,
   moneyAccountBalance,
 } from "@/lib/ledger";
 import type { PayMethod } from "@/lib/types";
@@ -50,6 +53,7 @@ export default function DayCloseView() {
     saveDayClose,
   } = useStore();
   const { role } = useAuth();
+  const { requirePin } = usePinGate();
   /* A3: performing a day close is owner/manager/cashier; the
    * accountant sees the close history read-only (matrix rows
    * dayClose / dayCloseHistory). */
@@ -104,11 +108,54 @@ export default function DayCloseView() {
     if (!ready) return 0;
     const sorted = [...dayCloses].sort((a, b) => b.ts.localeCompare(a.ts));
     if (sorted.length > 0) return sorted[0].countedCash;
-    // No earlier close: the till's journal balance (per-account form
-    // of the old whole-journal cashBalance default — same figure).
+    // No earlier close: the till's PRE-TODAY journal balance — the
+    // same figure `save` records as the opening (journalClose.
+    // opening). Fix Round 1 · F3: this used to default to the FULL
+    // journal balance, which already includes today's movements,
+    // so the form's opening double-counted today against the
+    // recorded close.
+    if (journalClose) return journalClose.opening;
     if (tillAccount) return moneyAccountBalance(journal, tillAccount);
     return cashBalance(journal);
-  }, [ready, dayCloses, journal, tillAccount]);
+  }, [ready, dayCloses, journal, tillAccount, journalClose]);
+
+  /**
+   * Fix Round 1 · F3: the un-closed backlog, honestly labelled.
+   * Days before today that moved the till and that no recorded
+   * close covers (a close covers through its `dateISO`). Their
+   * cash is NOT missing and NOT in today's figures: it already
+   * sits inside today's opening balance (the journal balance is
+   * cumulative) — this line exists so the owner SEES the backlog
+   * instead of the screen silently folding those days into
+   * "today", as the pre-fix screen did.
+   */
+  const backlog = useMemo(() => {
+    if (!ready || !tillAccount) return null;
+    const today = todayPktISO();
+    const lastCloseDate = dayCloses.reduce(
+      (m, d) => (d.dateISO > m ? d.dateISO : m),
+      ""
+    );
+    const dates = new Set<string>();
+    let net = 0;
+    for (const e of journal) {
+      const d = businessDateISO(e.ts);
+      if (!d || d >= today || d <= lastCloseDate) continue;
+      let moved = false;
+      let n = 0;
+      for (const l of e.lines) {
+        if (lineResolvesTo(l, tillAccount)) {
+          moved = true;
+          n += l.debit - l.credit;
+        }
+      }
+      if (moved) {
+        dates.add(d);
+        net += n;
+      }
+    }
+    return dates.size > 0 ? { days: dates.size, net } : null;
+  }, [ready, journal, tillAccount, dayCloses]);
 
   const openingCash =
     openingInput === null ? defaultOpening : Number(openingInput) || 0;
@@ -149,8 +196,11 @@ export default function DayCloseView() {
     });
   }, [ready, sales, bills, expenses, credits, supplierPayments, returns, cashEntries, openingCash]);
 
+  // A close belongs to the business day its `dateISO` names — the
+  // stored dayOffset is a frozen creation-day stamp and would
+  // match an earlier day's close forever (Fix Round 1 · F3).
   const todayClose = useMemo(
-    () => dayCloses.find((d) => d.dayOffset === 0) ?? null,
+    () => dayCloses.find((d) => d.dateISO === todayPktISO()) ?? null,
     [dayCloses]
   );
 
@@ -159,7 +209,7 @@ export default function DayCloseView() {
     [dayCloses]
   );
 
-  const save = (e: React.FormEvent) => {
+  const save = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
     setNotice(null);
@@ -168,13 +218,20 @@ export default function DayCloseView() {
       setError(t("dc.countedError"));
       return;
     }
+    /* E5 (design §4.6): submitting the day close is a gated
+     * action — PIN challenge first; cancel/fail composes
+     * nothing. */
+    if (!(await requirePin("pin.gate.actDayClose"))) return;
     // A2: the recorded expectation is the JOURNAL figure for the till
     // account; the operational summary remains the cross-check.
     const recordedExpected = journalClose ? journalClose.expected : summary.expectedCash;
     const recordedOpening = journalClose ? journalClose.opening : openingCash;
     const difference = countedCash - recordedExpected;
     saveDayClose({
-      dateISO: new Date().toISOString().slice(0, 10),
+      // The close belongs to the PKT business day (the UTC date
+      // slice this used to store is yesterday for the first five
+      // hours of every PKT day — Fix Round 1 · F3).
+      dateISO: todayPktISO(),
       accountId: tillAccount?.id ?? null,
       openingCash: recordedOpening,
       salesByMethod: { ...summary.salesByMethod },
@@ -389,6 +446,14 @@ export default function DayCloseView() {
                     {t("dc.journalNote", { account: tillAccount.name })}
                   </p>
                 </>
+              )}
+              {backlog && (
+                <p style={{ color: "var(--muted)", fontSize: "0.85rem", margin: 0 }}>
+                  {t("dc.backlog", {
+                    days: backlog.days,
+                    amount: fmtPKR(backlog.net),
+                  })}
+                </p>
               )}
               <div style={{ display: "flex", justifyContent: "space-between", gap: 12, alignItems: "center" }}>
                 <span>{t("dc.diff.label")}</span>

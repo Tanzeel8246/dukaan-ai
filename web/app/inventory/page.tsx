@@ -4,7 +4,7 @@ import InventoryManager from "@/components/InventoryManager";
 export const metadata: Metadata = {
   title: "Inventory — Stock Register",
   description:
-    "Manage your kiryana inventory: add, edit and delete products with SKU, stock, cost and sale prices. Low-stock rows are highlighted automatically.",
+    "Manage your business inventory: add, edit and delete products with SKU, stock, cost and sale prices. Low-stock rows are highlighted automatically.",
   alternates: { canonical: "https://dukaan-ai.codehubb.com/inventory" },
   openGraph: {
     title: "Inventory — Stock Register | Dukaan AI",

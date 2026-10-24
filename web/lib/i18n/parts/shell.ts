@@ -7,6 +7,12 @@ export const enShell = {
   "shell.checkingSession": "Checking your session…",
   "shell.langName": "English",
   "shell.toggleTheme": "Switch theme",
+  "shell.chooseTheme": "Choose theme",
+  "shell.theme.emerald": "Emerald Calm",
+  "shell.theme.midnight": "Midnight Slate",
+  "shell.theme.ocean": "Ocean",
+  "shell.theme.sand": "Warm Sand",
+  "shell.theme.dusk": "Dusk Violet",
   "shell.openMenu": "Open menu",
   "shell.closeMenu": "Close menu",
   "shell.menu": "Menu",
@@ -15,9 +21,14 @@ export const enShell = {
   "shell.mainNav": "Main navigation",
   "shell.homeLabel": "Dukaan AI home",
   "shell.footerTagline":
-    "Smart inventory, sales tracking and demand forecasting for the neighbourhood kiryana store — with an AI assistant that answers from your own shop data.",
+    "A complete ERP for every kind of business — smart stock, sales and accounts, demand forecasting, and an AI assistant that answers from your business's own data.",
   "shell.footerAppHeading": "App",
   "shell.footerAboutHeading": "About",
+  "shell.footerColSales": "Sales & Orders",
+  "shell.footerColStock": "Stock & Operations",
+  "shell.footerColGrowth": "Customers & Growth",
+  "shell.footerColFinance": "Finance & Reports",
+  "shell.footerColCompany": "Company & System",
   "shell.footerTech": "Next.js · Firebase · Flutter",
   "shell.demoPill": "Demo project — all data is fictional",
   "shell.footerByDemo": "Demo AI project crafted by",
@@ -28,6 +39,10 @@ export const enShell = {
   "shell.notFoundBody":
     "This page doesn't exist in the dukaan. Let's head back to the counter.",
   "shell.backHome": "Back to dashboard",
+  /* F5: the app shell's sync-status chip (the sync centre is an
+   * app-only surface, §3.5 — its status word lives in the shared
+   * dictionary so the apps never render a raw key). */
+  "sync.online": "Online",
 } as const;
 
 export const urShell: Record<keyof typeof enShell, string> = {
@@ -37,6 +52,12 @@ export const urShell: Record<keyof typeof enShell, string> = {
   "shell.checkingSession": "سیشن چیک ہو رہا ہے…",
   "shell.langName": "اردو",
   "shell.toggleTheme": "تھیم بدلیں",
+  "shell.chooseTheme": "تھیم منتخب کریں",
+  "shell.theme.emerald": "زمردی سکون",
+  "shell.theme.midnight": "نیم شب سلیٹ",
+  "shell.theme.ocean": "سمندری لہر",
+  "shell.theme.sand": "گرم ریت",
+  "shell.theme.dusk": "شفق بنفشی",
   "shell.openMenu": "مینیو کھولیں",
   "shell.closeMenu": "مینیو بند کریں",
   "shell.menu": "مینیو",
@@ -45,9 +66,14 @@ export const urShell: Record<keyof typeof enShell, string> = {
   "shell.mainNav": "مرکزی نیویگیشن",
   "shell.homeLabel": "Dukaan AI ہوم",
   "shell.footerTagline":
-    "آپ کے محلے کی کریانہ دکان کے لیے اسمارٹ اسٹاک، فروخت کا حساب اور طلب کی پیش گوئی — ایک اے آئی معاون کے ساتھ جو آپ کی اپنی دکان کے ڈیٹا سے جواب دیتا ہے۔",
+    "ہر قسم کے کاروبار کے لیے مکمل ERP — اسمارٹ اسٹاک، فروخت اور حساب، طلب کی پیشن گوئی، اور ایک آئی معاون جو آپ کے کاروبار کے ڈیٹا سے جواب دیتا ہے۔",
   "shell.footerAppHeading": "ایپ",
   "shell.footerAboutHeading": "ہمارے بارے میں",
+  "shell.footerColSales": "فروخت اور آرڈرز",
+  "shell.footerColStock": "اسٹاک اور آپریشن",
+  "shell.footerColGrowth": "گاہک اور کاروباری فروغ",
+  "shell.footerColFinance": "مالیات اور رپورٹیں",
+  "shell.footerColCompany": "کمپنی اور نظام",
   "shell.footerTech": "Next.js · Firebase · Flutter",
   "shell.demoPill": "ڈیمو پروجیکٹ — تمام ڈیٹا فرضی ہے",
   "shell.footerByDemo": "ڈیمو اے آئی پروجیکٹ — تیار کردہ",
@@ -57,4 +83,5 @@ export const urShell: Record<keyof typeof enShell, string> = {
   "shell.notFoundTitle": "صفحہ نہیں ملا",
   "shell.notFoundBody": "یہ صفحہ دکان میں موجود نہیں۔ آئیے واپس ڈیش بورڈ کی طرف چلیں۔",
   "shell.backHome": "ڈیش بورڈ پر واپس جائیں",
+  "sync.online": "آن لائن",
 };

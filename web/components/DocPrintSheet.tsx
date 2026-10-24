@@ -1,34 +1,60 @@
 "use client";
 
 /**
- * Phase B · B1 — the receipt-style print sheet for a quotation or a
- * sale order (design §1.1: documents print like bills, clearly
- * labelled as what they are). Fully dictionary-driven like the bill
- * receipt; figures are ESTIMATES (§7) and the sheet says so.
+ * The receipt-family print sheets. Every sheet renders through
+ * the shared print chrome (components/PrintChrome.tsx — header,
+ * footer, @page rule, items table) driven by the resolved
+ * PrintDesign (lib/print.ts); bodies — totals, document-specific
+ * blocks — are each sheet's own, unchanged in structure since
+ * the phase that introduced them:
  *
- * B2 adds the delivery-challan sheet: a delivery note in the same
- * machinery — quantities ONLY, no prices, no totals (§2.3). A
- * challan's prices can never become a second price promise, so
- * they are never printed.
- *
- * B4 adds the credit/debit NOTE sheet (§3.4): the formal paper for
- * a return that already posted — original document reference, the
- * returned lines, per-slab tax lines from the A4 snapshots on the
- * note's stamped items, goods/tax/total and the settlement legs.
+ * B1 quotation / sale order (figures are ESTIMATES, §7 — the
+ * sheet says so). B2 the delivery challan: quantities ONLY, no
+ * prices, no totals (§2.3) — a challan's prices can never become
+ * a second price promise, so they are never printed; the slot
+ * matrix in lib/print enforces the same rule structurally.
+ * B4 the credit/debit NOTE (§3.4): original reference, returned
+ * lines, per-slab tax lines from the A4 snapshots. B6 payment
+ * vouchers. C2 transfer, C4 production, C5 job work slip, D2
+ * salary slip. E1 adds the bill receipt (extracted from
+ * BillingDesk) as BillPrintSheet.
  */
 import { useLang } from "./LangProvider";
-import { fmtPKR } from "@/lib/format";
-import { taxLinesForItems } from "@/lib/tax";
+import { fmtDate, fmtPKR } from "@/lib/format";
+import { billTaxLines, taxLinesForItems } from "@/lib/tax";
 import type { VoucherPrintData } from "@/lib/documents";
-import type { I18nKey } from "@/lib/i18n";
+import type { I18nKey, Lang } from "@/lib/i18n";
+
+/** Intl locale for print-sheet dates per UI language (Phase H §4.5:
+ *  PS/FA ride the Afghan regional locales with LATIN digits forced —
+ *  digits stay Western Arabic numerals in every locale, as UR does;
+ *  dates stay the PKT/Gregorian business calendar, no Jalali). */
+const DATE_LOCALES: Record<Lang, string> = {
+  en: "en-PK",
+  ur: "ur-PK",
+  ps: "ps-AF-u-nu-latn",
+  fa: "fa-AF-u-nu-latn",
+};
 import { poolOf, producedQty } from "@/lib/production";
 import { jobMaterialsCost } from "@/lib/jobs";
+import { receiptClassName, resolvePrintDesign } from "@/lib/print";
+import {
+  PrintFooter,
+  PrintHeader,
+  PrintItemsTable,
+  PrintPageStyle,
+  type PrintAssets,
+} from "./PrintChrome";
 import type {
+  Bill,
   DeliveryChallan,
   DocNote,
   Job,
+  PayMethod,
   PayrollRun,
   PayrollRunLine,
+  PrintPaper,
+  Product,
   ProductionOrder,
   PurchaseOrder,
   PurchaseReturn,
@@ -46,22 +72,50 @@ const METHOD_KEY: Record<string, I18nKey> = {
   bank: "common.pay.bank",
 };
 
+/** The bill receipt's payment labels (BillingDesk's PAY_KEY,
+ *  including the credit row a part-paid bill can carry). */
+const BILL_PAY_KEY: Record<PayMethod, I18nKey> = {
+  cash: "common.pay.cash",
+  jazzcash: "common.pay.jazzcash",
+  easypaisa: "common.pay.easypaisa",
+  bank: "common.pay.bank",
+  credit: "common.pay.credit",
+};
+
 function fmtQty(n: number): string {
   return Number.isInteger(n) ? String(n) : String(Math.round(n * 1000) / 1000);
+}
+
+function fmtDateTime(ts: string): string {
+  const time = new Date(ts).toLocaleTimeString("en-GB", {
+    hour: "numeric",
+    minute: "2-digit",
+  });
+  return `${fmtDate(ts)} · ${time}`;
 }
 
 interface Props {
   doc: Quotation | SaleOrder;
   kind: "quotation" | "order";
   settings: ShopSettings;
+  /** Live product list for the §1.4 SKU / Urdu-name columns. */
+  products?: Product[];
+  /** Phase E · E2: the shop's brand assets (data-URL map from
+   *  lib/branding) — absent ⇒ every brand slot renders nothing,
+   *  exactly the E1 behaviour. */
+  assets?: PrintAssets | null;
   /** "From quotation QT-7" — shown on an order born of a quotation. */
   sourceLabel?: string;
+  /** Designer preview (§1.8): renders the sheet visibly inside a
+   *  screen-only frame — no print isolation, no @page rule. */
+  preview?: boolean;
 }
 
-export default function DocPrintSheet({ doc, kind, settings, sourceLabel }: Props) {
+export default function DocPrintSheet({ doc, kind, settings, products, assets, sourceLabel, preview }: Props) {
   const { t, lang } = useLang();
+  const design = resolvePrintDesign(settings);
   const dateStr = new Date(doc.ts).toLocaleDateString(
-    lang === "ur" ? "ur-PK" : "en-PK",
+    DATE_LOCALES[lang],
     { day: "numeric", month: "short", year: "numeric" }
   );
   const dateField =
@@ -70,13 +124,10 @@ export default function DocPrintSheet({ doc, kind, settings, sourceLabel }: Prop
       : (doc as SaleOrder).expectedDate;
 
   return (
-    <div className="receipt-sheet" aria-hidden="true">
-      <div className="receipt">
-        <h3>{settings.shopName}</h3>
-        <div className="r-shop">
-          {settings.address ? `${settings.address} · ` : ""}
-          {settings.phone}
-        </div>
+    <div className={preview ? undefined : "receipt-sheet"} aria-hidden={preview ? undefined : true}>
+      {!preview && <PrintPageStyle paper={design.paper} />}
+      <div className={receiptClassName(design)}>
+        <PrintHeader settings={settings} design={design} assets={assets} />
         <div className="r-title">
           <span>
             {kind === "quotation" ? t("quote.printTitle") : t("order.printTitle")}
@@ -103,26 +154,19 @@ export default function DocPrintSheet({ doc, kind, settings, sourceLabel }: Prop
             <span>{sourceLabel}</span>
           </div>
         )}
-        <table>
-          <thead>
-            <tr>
-              <th>{t("billing.rcpt.item")}</th>
-              <th className="num">{t("billing.rcpt.qty")}</th>
-              <th className="num">{t("billing.rcpt.price")}</th>
-              <th className="num">{t("billing.rcpt.amount")}</th>
-            </tr>
-          </thead>
-          <tbody>
-            {doc.lines.map((l) => (
-              <tr key={l.productId}>
-                <td>{l.name}</td>
-                <td className="num">{fmtQty(l.qty)}</td>
-                <td className="num">{fmtPKR(l.unitPrice)}</td>
-                <td className="num">{fmtPKR(l.qty * l.unitPrice)}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+        <PrintItemsTable
+          lines={doc.lines.map((l) => ({
+            productId: l.productId,
+            name: l.name,
+            qty: l.qty,
+            unitPrice: l.unitPrice,
+            amount: l.total,
+          }))}
+          design={design}
+          kind={kind}
+          products={products}
+          discountAmount={doc.discountAmount}
+        />
         <div className="r-row">
           <span>{t("billing.rcpt.subtotal")}</span>
           <span>{fmtPKR(doc.subtotal)}</span>
@@ -155,7 +199,128 @@ export default function DocPrintSheet({ doc, kind, settings, sourceLabel }: Prop
         <div className="r-shop" style={{ marginTop: 6 }}>
           {t("doc.estimateNote")}
         </div>
-        <div className="r-foot">{t("billing.rcpt.thanks")}</div>
+        <PrintFooter settings={settings} design={design} doc={{ kind }} assets={assets} />
+      </div>
+    </div>
+  );
+}
+
+/**
+ * Phase E · E1 — the BILL receipt, extracted from BillingDesk so
+ * the designer preview renders the very component the desk
+ * prints. Body identical to the inline receipt it replaces:
+ * bill/customer rows, the shared items table (in the receipt's
+ * historical `plain` convention), subtotal/discount/tax summary
+ * lines from the bill's A4 snapshots, total, payment rows.
+ * `thermal` is the desk's per-print override (§1.7): it selects
+ * the 80mm paper for this print, whatever the template says.
+ */
+export function BillPrintSheet({
+  bill,
+  settings,
+  products,
+  cheques,
+  assets,
+  thermal,
+  preview,
+}: {
+  bill: Bill;
+  settings: ShopSettings;
+  products?: Product[];
+  /** Cheque registry rows, for a cheque part's leaf number. */
+  cheques?: Array<{ id: string; chequeNo: string }>;
+  /** Phase E · E2: brand assets (see DocPrintSheet's Props). */
+  assets?: PrintAssets | null;
+  thermal?: boolean;
+  preview?: boolean;
+}) {
+  const { t } = useLang();
+  const design = resolvePrintDesign(settings);
+  const paper: PrintPaper = thermal ? "thermal80" : design.paper;
+  // The chrome sees the EFFECTIVE paper (the desk's thermal
+  // override included) so its suppression rules (§1.7) apply to
+  // the sheet actually being printed, not the template default.
+  const effDesign = paper === design.paper ? design : { ...design, paper };
+  return (
+    <div className={preview ? undefined : "receipt-sheet"}>
+      {!preview && <PrintPageStyle paper={paper} />}
+      <div className={receiptClassName(design, paper)}>
+        <PrintHeader settings={settings} design={effDesign} assets={assets} fallbackName="Dukaan AI" />
+        <div className="r-row">
+          <span>{t("billing.rcpt.billNo", { no: bill.billNo })}</span>
+          <span>{fmtDateTime(bill.ts)}</span>
+        </div>
+        <div className="r-row">
+          <span>{t("billing.rcpt.customer")}</span>
+          <span>
+            {bill.customerName || t("billing.walkIn")}
+            {bill.customerPhone ? ` · ${bill.customerPhone}` : ""}
+          </span>
+        </div>
+        <PrintItemsTable
+          lines={bill.items.map((it) => ({
+            productId: it.productId,
+            name: it.name,
+            qty: it.qty,
+            unitPrice: it.unitPrice,
+            amount: it.total,
+            taxAmount: it.taxAmount,
+          }))}
+          design={design}
+          kind="bill"
+          products={products}
+          discountAmount={bill.discountAmount}
+          plain
+        />
+        <div className="r-row">
+          <span>{t("billing.rcpt.subtotal")}</span>
+          <span>{fmtPKR(bill.subtotal)}</span>
+        </div>
+        {bill.discountAmount > 0 && (
+          <div className="r-row">
+            <span>{t("billing.rcpt.discount")}</span>
+            <span>− {fmtPKR(bill.discountAmount)}</span>
+          </div>
+        )}
+        {billTaxLines(bill).map((g) => (
+          <div className="r-row" key={`${g.name}|${g.inclusive ? "in" : "ex"}`}>
+            <span>
+              {g.name}
+              {g.kind === "percent" ? ` ${g.rate}%` : ""}
+              {g.inclusive ? ` (${t("billing.tax.includedNote")})` : ""}
+            </span>
+            <span>{fmtPKR(g.amount)}</span>
+          </div>
+        ))}
+        <div className="r-total">
+          <span>{t("billing.rcpt.total")}</span>
+          <span>{fmtPKR(bill.total)}</span>
+        </div>
+        {bill.payments.map((p, i) => (
+          <div className="r-row" key={i}>
+            <span>
+              {p.instrument === "cheque"
+                ? `${t("chq.payOption")}${
+                    p.chequeId
+                      ? ` ${cheques?.find((x) => x.id === p.chequeId)?.chequeNo ?? ""}`
+                      : ""
+                  }`
+                : t(BILL_PAY_KEY[p.method])}
+            </span>
+            <span>{fmtPKR(p.amount)}</span>
+          </div>
+        ))}
+        <PrintFooter
+          settings={settings}
+          design={effDesign}
+          assets={assets}
+          doc={{
+            kind: "bill",
+            status: bill.status,
+            billNo: bill.billNo,
+            total: bill.total,
+          }}
+        />
       </div>
     </div>
   );
@@ -174,25 +339,25 @@ export default function DocPrintSheet({ doc, kind, settings, sourceLabel }: Prop
 export function VoucherPrintSheet({
   data,
   settings,
+  assets,
 }: {
   data: VoucherPrintData;
   settings: ShopSettings;
+  assets?: PrintAssets | null;
 }) {
   const { t, lang } = useLang();
+  const design = resolvePrintDesign(settings);
   const dateStr = new Date(data.ts).toLocaleDateString(
-    lang === "ur" ? "ur-PK" : "en-PK",
+    DATE_LOCALES[lang],
     { day: "numeric", month: "short", year: "numeric" }
   );
   const isReceipt = data.kind === "receipt";
 
   return (
     <div className="receipt-sheet" aria-hidden="true">
-      <div className="receipt">
-        <h3>{settings.shopName}</h3>
-        <div className="r-shop">
-          {settings.address ? `${settings.address} · ` : ""}
-          {settings.phone}
-        </div>
+      <PrintPageStyle paper={design.paper} />
+      <div className={receiptClassName(design)}>
+        <PrintHeader settings={settings} design={design} assets={assets} />
         <div className="r-title">
           <span>
             {isReceipt ? t("voucher.receiptTitle") : t("voucher.paymentTitle")}
@@ -265,11 +430,7 @@ export function VoucherPrintSheet({
           </span>
           <span>{fmtPKR(data.balanceAfter)}</span>
         </div>
-        <div className="r-meta" style={{ marginTop: 14 }}>
-          <span>{t("voucher.signature")}</span>
-          <span>____________________</span>
-        </div>
-        <div className="r-foot">{t("billing.rcpt.thanks")}</div>
+        <PrintFooter settings={settings} design={design} doc={{ kind: "voucher" }} assets={assets} />
       </div>
     </div>
   );
@@ -283,27 +444,27 @@ export function VoucherPrintSheet({
 export function ChallanPrintSheet({
   doc,
   settings,
+  assets,
   sourceOrderLabel,
 }: {
   doc: DeliveryChallan;
   settings: ShopSettings;
+  assets?: PrintAssets | null;
   /** "SO-7" when the challan cites a sale order. */
   sourceOrderLabel?: string;
 }) {
   const { t, lang } = useLang();
+  const design = resolvePrintDesign(settings);
   const dateStr = new Date(doc.ts).toLocaleDateString(
-    lang === "ur" ? "ur-PK" : "en-PK",
+    DATE_LOCALES[lang],
     { day: "numeric", month: "short", year: "numeric" }
   );
 
   return (
     <div className="receipt-sheet" aria-hidden="true">
-      <div className="receipt">
-        <h3>{settings.shopName}</h3>
-        <div className="r-shop">
-          {settings.address ? `${settings.address} · ` : ""}
-          {settings.phone}
-        </div>
+      <PrintPageStyle paper={design.paper} />
+      <div className={receiptClassName(design)}>
+        <PrintHeader settings={settings} design={design} assets={assets} />
         <div className="r-title">
           <span>{t("challan.printTitle")}</span>
           <span>{doc.number ?? t("doc.draftLabel")}</span>
@@ -364,6 +525,7 @@ export function ChallanPrintSheet({
           <span>{t("challan.receivedBy")}</span>
           <span>____________________</span>
         </div>
+        <PrintFooter settings={settings} design={design} doc={{ kind: "challan" }} assets={assets} />
       </div>
     </div>
   );
@@ -379,24 +541,24 @@ export function ChallanPrintSheet({
 export function PoPrintSheet({
   doc,
   settings,
+  assets,
 }: {
   doc: PurchaseOrder;
   settings: ShopSettings;
+  assets?: PrintAssets | null;
 }) {
   const { t, lang } = useLang();
+  const design = resolvePrintDesign(settings);
   const dateStr = new Date(doc.ts).toLocaleDateString(
-    lang === "ur" ? "ur-PK" : "en-PK",
+    DATE_LOCALES[lang],
     { day: "numeric", month: "short", year: "numeric" }
   );
 
   return (
     <div className="receipt-sheet" aria-hidden="true">
-      <div className="receipt">
-        <h3>{settings.shopName}</h3>
-        <div className="r-shop">
-          {settings.address ? `${settings.address} · ` : ""}
-          {settings.phone}
-        </div>
+      <PrintPageStyle paper={design.paper} />
+      <div className={receiptClassName(design)}>
+        <PrintHeader settings={settings} design={design} assets={assets} />
         <div className="r-title">
           <span>{t("po.printTitle")}</span>
           <span>{doc.number ?? t("doc.draftLabel")}</span>
@@ -443,7 +605,7 @@ export function PoPrintSheet({
         <div className="r-shop" style={{ marginTop: 6 }}>
           {t("po.printNote")}
         </div>
-        <div className="r-foot">{t("billing.rcpt.thanks")}</div>
+        <PrintFooter settings={settings} design={design} doc={{ kind: "po" }} assets={assets} />
       </div>
     </div>
   );
@@ -461,11 +623,16 @@ export function PoPrintSheet({
 export function NotePrintSheet({
   note,
   settings,
+  products,
+  assets,
   sourceReturn,
   purchaseTs,
 }: {
   note: DocNote;
   settings: ShopSettings;
+  /** Live product list for the §1.4 SKU / Urdu-name columns. */
+  products?: Product[];
+  assets?: PrintAssets | null;
   /** The SaleReturn (credit) / PurchaseReturn (debit) the note
    *  wraps — supplies the settlement legs' amounts. */
   sourceReturn?: SaleReturn | PurchaseReturn | null;
@@ -473,8 +640,9 @@ export function NotePrintSheet({
   purchaseTs?: string | null;
 }) {
   const { t, lang } = useLang();
+  const design = resolvePrintDesign(settings);
   const dateFmt = (ts: string) =>
-    new Date(ts).toLocaleDateString(lang === "ur" ? "ur-PK" : "en-PK", {
+    new Date(ts).toLocaleDateString(DATE_LOCALES[lang], {
       day: "numeric",
       month: "short",
       year: "numeric",
@@ -495,12 +663,9 @@ export function NotePrintSheet({
 
   return (
     <div className="receipt-sheet" aria-hidden="true">
-      <div className="receipt">
-        <h3>{settings.shopName}</h3>
-        <div className="r-shop">
-          {settings.address ? `${settings.address} · ` : ""}
-          {settings.phone}
-        </div>
+      <PrintPageStyle paper={design.paper} />
+      <div className={receiptClassName(design)}>
+        <PrintHeader settings={settings} design={design} assets={assets} />
         <div className="r-title">
           <span>
             {isCredit ? t("note.print.creditTitle") : t("note.print.debitTitle")}
@@ -525,26 +690,20 @@ export function NotePrintSheet({
           </span>
           <span></span>
         </div>
-        <table>
-          <thead>
-            <tr>
-              <th>{t("billing.rcpt.item")}</th>
-              <th className="num">{t("billing.rcpt.qty")}</th>
-              <th className="num">{t("billing.rcpt.price")}</th>
-              <th className="num">{t("billing.rcpt.amount")}</th>
-            </tr>
-          </thead>
-          <tbody>
-            {note.items.map((l) => (
-              <tr key={l.productId}>
-                <td>{l.name}</td>
-                <td className="num">{fmtQty(l.qty)}</td>
-                <td className="num">{fmtPKR(l.unitPrice)}</td>
-                <td className="num">{fmtPKR(l.total)}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+        <PrintItemsTable
+          lines={note.items.map((l) => ({
+            productId: l.productId,
+            name: l.name,
+            qty: l.qty,
+            unitPrice: l.unitPrice,
+            amount: l.total,
+            taxAmount: l.taxAmount,
+          }))}
+          design={design}
+          kind="note"
+          products={products}
+          discountAmount={0}
+        />
         <div className="r-row">
           <span>{t("note.print.goods")}</span>
           <span>{fmtPKR(note.goodsAmount)}</span>
@@ -598,7 +757,7 @@ export function NotePrintSheet({
         <div className="r-shop" style={{ marginTop: 6 }}>
           {t("note.print.footer")}
         </div>
-        <div className="r-foot">{t("billing.rcpt.thanks")}</div>
+        <PrintFooter settings={settings} design={design} doc={{ kind: "note" }} assets={assets} />
       </div>
     </div>
   );
@@ -615,28 +774,28 @@ export function NotePrintSheet({
 export function TransferPrintSheet({
   transfer,
   settings,
+  assets,
   fromName,
   toName,
 }: {
   transfer: StockTransfer;
   settings: ShopSettings;
+  assets?: PrintAssets | null;
   fromName: string;
   toName: string;
 }) {
   const { t, lang } = useLang();
+  const design = resolvePrintDesign(settings);
   const dateStr = new Date(transfer.ts).toLocaleDateString(
-    lang === "ur" ? "ur-PK" : "en-PK",
+    DATE_LOCALES[lang],
     { day: "numeric", month: "short", year: "numeric" }
   );
 
   return (
     <div className="receipt-sheet" aria-hidden="true">
-      <div className="receipt">
-        <h3>{settings.shopName}</h3>
-        <div className="r-shop">
-          {settings.address ? `${settings.address} · ` : ""}
-          {settings.phone}
-        </div>
+      <PrintPageStyle paper={design.paper} />
+      <div className={receiptClassName(design)}>
+        <PrintHeader settings={settings} design={design} assets={assets} />
         <div className="r-title">
           <span>{t("tr.print.title")}</span>
           <span>{transfer.number ?? t("doc.draftLabel")}</span>
@@ -699,15 +858,18 @@ export function TransferPrintSheet({
 export function ProductionPrintSheet({
   order,
   settings,
+  assets,
   warehouseName,
 }: {
   order: ProductionOrder;
   settings: ShopSettings;
+  assets?: PrintAssets | null;
   warehouseName: string;
 }) {
   const { t, lang } = useLang();
+  const design = resolvePrintDesign(settings);
   const dateStr = new Date(order.ts).toLocaleDateString(
-    lang === "ur" ? "ur-PK" : "en-PK",
+    DATE_LOCALES[lang],
     { day: "numeric", month: "short", year: "numeric" }
   );
   const produced = producedQty(order);
@@ -721,12 +883,9 @@ export function ProductionPrintSheet({
 
   return (
     <div className="receipt-sheet" aria-hidden="true">
-      <div className="receipt">
-        <h3>{settings.shopName}</h3>
-        <div className="r-shop">
-          {settings.address ? `${settings.address} · ` : ""}
-          {settings.phone}
-        </div>
+      <PrintPageStyle paper={design.paper} />
+      <div className={receiptClassName(design)}>
+        <PrintHeader settings={settings} design={design} assets={assets} />
         <div className="r-title">
           <span>{t("mfg.print.title")}</span>
           <span>{order.number ?? t("mfg.po.draftLabel")}</span>
@@ -820,20 +979,23 @@ export function ProductionPrintSheet({
 export function JobPrintSheet({
   job,
   settings,
+  assets,
   warehouseName,
 }: {
   job: Job;
   settings: ShopSettings;
+  assets?: PrintAssets | null;
   warehouseName: string;
 }) {
   const { t, lang } = useLang();
+  const design = resolvePrintDesign(settings);
   const dateStr = new Date(job.ts).toLocaleDateString(
-    lang === "ur" ? "ur-PK" : "en-PK",
+    DATE_LOCALES[lang],
     { day: "numeric", month: "short", year: "numeric" }
   );
   const dueStr = job.dueDateISO
     ? new Date(`${job.dueDateISO}T00:00:00`).toLocaleDateString(
-        lang === "ur" ? "ur-PK" : "en-PK",
+        DATE_LOCALES[lang],
         { day: "numeric", month: "short", year: "numeric" }
       )
     : "—";
@@ -844,12 +1006,9 @@ export function JobPrintSheet({
 
   return (
     <div className="receipt-sheet" aria-hidden="true">
-      <div className="receipt">
-        <h3>{settings.shopName}</h3>
-        <div className="r-shop">
-          {settings.address ? `${settings.address} · ` : ""}
-          {settings.phone}
-        </div>
+      <PrintPageStyle paper={design.paper} />
+      <div className={receiptClassName(design)}>
+        <PrintHeader settings={settings} design={design} assets={assets} />
         <div className="r-title">
           <span>{t("job.print.title")}</span>
           <span>{job.number}</span>
@@ -931,6 +1090,7 @@ export function JobPrintSheet({
           <span>{t("job.print.receivedBy")}</span>
           <span>____________________</span>
         </div>
+        <PrintFooter settings={settings} design={design} doc={{ kind: "job" }} assets={assets} />
       </div>
     </div>
   );
@@ -952,6 +1112,7 @@ export function SalarySlipSheet({
   designation,
   figures,
   settings,
+  assets,
 }: {
   run: PayrollRun;
   line: PayrollRunLine;
@@ -963,20 +1124,19 @@ export function SalarySlipSheet({
     stillOwed: number;
   };
   settings: ShopSettings;
+  assets?: PrintAssets | null;
 }) {
   const { t } = useLang();
+  const design = resolvePrintDesign(settings);
   const advanceAfter = Math.max(
     0,
     Math.round((figures.advanceBefore - figures.advanceRecovered) * 100) / 100
   );
   return (
     <div className="receipt-sheet" aria-hidden="true">
-      <div className="receipt">
-        <h3>{settings.shopName}</h3>
-        <div className="r-shop">
-          {settings.address ? `${settings.address} · ` : ""}
-          {settings.phone}
-        </div>
+      <PrintPageStyle paper={design.paper} />
+      <div className={receiptClassName(design)}>
+        <PrintHeader settings={settings} design={design} assets={assets} />
         <div className="r-title">
           <span>{t("slip.title")}</span>
           <span>{run.number ?? ""}</span>
@@ -1088,10 +1248,7 @@ export function SalarySlipSheet({
           <span>{fmtPKR(figures.stillOwed)}</span>
         </div>
         {run.note && <div className="r-meta">{run.note}</div>}
-        <div className="r-meta" style={{ marginTop: 16 }}>
-          <span>{t("slip.signature")}</span>
-          <span>____________________</span>
-        </div>
+        <PrintFooter settings={settings} design={design} doc={{ kind: "salarySlip" }} assets={assets} />
       </div>
     </div>
   );

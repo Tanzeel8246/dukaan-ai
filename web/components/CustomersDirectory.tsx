@@ -7,9 +7,23 @@ import { useLang } from "./LangProvider";
 import { can } from "@/lib/permissions";
 import { IconClose, IconEdit, IconPlus, IconSearch, IconTrash, SearchClear } from "./ui";
 import { fmtDate, fmtNum, fmtPKR } from "@/lib/format";
+import { customerOptedIn, waConsentPatch } from "@/lib/whatsapp";
 import { creditKey, customerOutstanding } from "@/lib/ledger";
 import { customerMatches } from "@/lib/search";
+import {
+  customerLoyalty,
+  loyaltyCustomerIds,
+  resolveLoyaltySettings,
+  type CustomerLoyalty,
+} from "@/lib/loyalty";
+import type { I18nKey } from "@/lib/i18n";
 import type { BillStatus, Customer } from "@/lib/types";
+
+const TIER_KEY: Record<CustomerLoyalty["tier"], I18nKey> = {
+  standard: "loyalty.tier.standard",
+  silver: "loyalty.tier.silver",
+  gold: "loyalty.tier.gold",
+};
 
 const BILL_STATUS_KEY = {
   paid: "cust.billStatus.paid",
@@ -19,7 +33,7 @@ const BILL_STATUS_KEY = {
   returned: "cust.billStatus.returned",
 } as const satisfies Record<BillStatus, string>;
 
-const EMPTY_FORM = { name: "", phone: "", address: "", note: "" };
+const EMPTY_FORM = { name: "", phone: "", address: "", note: "", waOptIn: false };
 
 export default function CustomersDirectory() {
   const {
@@ -27,9 +41,12 @@ export default function CustomersDirectory() {
     bills,
     customers,
     credits,
+    journal,
+    settings,
     addCustomer,
     updateCustomer,
     deleteCustomer,
+    setCustomerWaConsent,
   } = useStore();
   const { role } = useAuth();
   /* A3: the directory is read-only for accountants (matrix row
@@ -64,6 +81,19 @@ export default function CustomersDirectory() {
       )
       .reduce((a, b) => a + b.total, 0);
 
+  /* Phase H · H1: derived loyalty positions (folded from the
+   * journal by lib/loyalty — the customer card shows points, their
+   * rupee value and the tier; nothing is stored on the customer). */
+  const loyaltyByCustomer = useMemo(() => {
+    const st = resolveLoyaltySettings(settings);
+    const nowIso = new Date().toISOString();
+    const map = new Map<string, CustomerLoyalty>();
+    for (const cid of loyaltyCustomerIds(journal)) {
+      map.set(cid, customerLoyalty(journal, cid, st, nowIso));
+    }
+    return map;
+  }, [journal, settings]);
+
   const openAdd = () => {
     setEditing(null);
     setForm(EMPTY_FORM);
@@ -73,7 +103,15 @@ export default function CustomersDirectory() {
 
   const openEdit = (c: Customer) => {
     setEditing(c);
-    setForm({ name: c.name, phone: c.phone, address: c.address, note: c.note });
+    setForm({
+      name: c.name,
+      phone: c.phone,
+      address: c.address,
+      note: c.note,
+      // Phase H · WhatsApp: the consent checkbox reflects the
+      // stored stamp — default OFF for every legacy record.
+      waOptIn: customerOptedIn(c),
+    });
     setFormError("");
     setFormOpen(true);
   };
@@ -90,11 +128,26 @@ export default function CustomersDirectory() {
       address: form.address.trim(),
       note: form.note.trim(),
     };
+    // Phase H · WhatsApp (design §3.2): consent is a deliberate
+    // counter capture — the stamp lands ONLY when the box is
+    // ticked (or its state changed), never as a side effect of
+    // saving the form. Import stays consent-free by lib rule.
+    const nowISO = new Date().toISOString();
     if (editing) {
-      updateCustomer(editing.id, payload);
+      const changed = form.waOptIn !== customerOptedIn(editing);
+      updateCustomer(
+        editing.id,
+        changed
+          ? { ...payload, ...waConsentPatch("counter", form.waOptIn, nowISO) }
+          : payload
+      );
       setNotice({ ok: true, text: t("cust.notice.updated", { name: payload.name }) });
     } else {
-      addCustomer(payload);
+      addCustomer(
+        form.waOptIn
+          ? { ...payload, ...waConsentPatch("counter", true, nowISO) }
+          : payload
+      );
       setNotice({ ok: true, text: t("cust.notice.added", { name: payload.name }) });
     }
     setFormOpen(false);
@@ -196,6 +249,21 @@ export default function CustomersDirectory() {
                       <b>{c.name}</b>
                       {c.note && (
                         <div style={{ fontSize: "0.82rem", color: "var(--muted)" }}>{c.note}</div>
+                      )}
+                      {(() => {
+                        const lp = loyaltyByCustomer.get(c.id);
+                        if (!lp || (lp.points === 0 && lp.rupees === 0)) return null;
+                        return (
+                          <div style={{ fontSize: "0.82rem", color: "var(--muted)" }}>
+                            {t("cust.loyaltyPoints")}: {lp.points.toLocaleString()} ·{" "}
+                            {fmtPKR(lp.rupees)} · {t(TIER_KEY[lp.tier])}
+                          </div>
+                        );
+                      })()}
+                      {customerOptedIn(c) && (
+                        <div style={{ fontSize: "0.82rem", color: "var(--muted)" }}>
+                          ✓ {t("wa.consent.on")}
+                        </div>
                       )}
                     </td>
                     <td style={{ whiteSpace: "nowrap" }}>{c.phone || "—"}</td>
@@ -317,6 +385,23 @@ export default function CustomersDirectory() {
                       placeholder={t("cust.form.notePh")}
                     />
                   </div>
+                  <div className="field">
+                    <label
+                      htmlFor="cu-wa"
+                      style={{ display: "flex", gap: 10, alignItems: "center", cursor: "pointer" }}
+                    >
+                      <input
+                        id="cu-wa"
+                        type="checkbox"
+                        checked={form.waOptIn}
+                        onChange={(e) =>
+                          setForm((s) => ({ ...s, waOptIn: e.target.checked }))
+                        }
+                      />
+                      <span>{t("wa.consent.label")}</span>
+                    </label>
+                    <span className="hint">{t("wa.consent.sub")}</span>
+                  </div>
                 </div>
                 <div className="modal-actions">
                   <button type="button" className="btn btn-ghost" onClick={() => setFormOpen(false)}>
@@ -432,6 +517,60 @@ export default function CustomersDirectory() {
                     <div className="kpi-sub">{t("cust.profile.khataSub")}</div>
                   </div>
                 </div>
+              </div>
+
+              {(() => {
+                const lp = loyaltyByCustomer.get(profile.id);
+                if (!lp || lp.vintages.length === 0) return null;
+                return (
+                  <div className="note-box" style={{ marginBottom: 22 }}>
+                    {t("cust.loyaltyPoints")}: <b>{lp.points.toLocaleString()}</b> ·{" "}
+                    {fmtPKR(lp.rupees)} · {t(TIER_KEY[lp.tier])}
+                  </div>
+                );
+              })()}
+
+              <div className="note-box" style={{ marginBottom: 22 }}>
+                {customerOptedIn(profile) ? (
+                  <>
+                    {t("wa.consent.on")}
+                    {profile.waOptInAt &&
+                      ` · ${t("wa.consent.since", {
+                        date: fmtDate(profile.waOptInAt),
+                        source: t(
+                          profile.waOptInSource === "storefront"
+                            ? "wa.consent.sourceStorefront"
+                            : "wa.consent.sourceCounter"
+                        ),
+                      })}`}
+                  </>
+                ) : (
+                  <>{t("wa.consent.off")}</>
+                )}
+                {canWrite && (
+                  <div style={{ marginTop: 10 }}>
+                    <button
+                      type="button"
+                      className="btn btn-ghost btn-sm"
+                      onClick={() => {
+                        const next = !customerOptedIn(profile);
+                        setCustomerWaConsent(profile.id, next, "counter");
+                        setProfile({
+                          ...profile,
+                          ...waConsentPatch("counter", next, new Date().toISOString()),
+                        });
+                        setNotice({
+                          ok: true,
+                          text: t("wa.notice.consentSaved", { name: profile.name }),
+                        });
+                      }}
+                    >
+                      {customerOptedIn(profile)
+                        ? t("wa.consent.optOut")
+                        : t("wa.consent.optIn")}
+                    </button>
+                  </div>
+                )}
               </div>
 
               <h3 style={{ fontSize: "1.1rem", marginBottom: 10 }}>

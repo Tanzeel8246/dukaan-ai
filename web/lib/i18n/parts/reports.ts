@@ -167,6 +167,17 @@ export const enReports = {
   "rep.tb.difference": "Difference",
   "rep.tb.balanced": "Balanced — total debits equal total credits",
   "rep.tb.unbalanced": "Out of balance",
+  /* ---- balance sheet (Fix Round 1 · F2) ---- */
+  "rep.bs.title": "Balance Sheet",
+  "rep.bs.desc":
+    "What the shop owns and owes as at the end of the period, from the journal: assets on one side, liabilities, capital and the unclosed result on the other — the two sides must be equal.",
+  "rep.bs.asAt": "As at {date}",
+  "rep.bs.assets": "Assets",
+  "rep.bs.liabilities": "Liabilities",
+  "rep.bs.equity": "Capital & Equity",
+  "rep.bs.result": "Result to date (unclosed)",
+  "rep.bs.totalAssets": "Total Assets",
+  "rep.bs.totalLiabEquity": "Total Liabilities & Equity",
   "rep.tot.otherRevenue": "Other revenue (journal only)",
   "rep.tot.plNetRevenue": "Net revenue per profit & loss",
 } as const;
@@ -332,6 +343,17 @@ export const urReports: Record<keyof typeof enReports, string> = {
   "rep.tb.difference": "فرق",
   "rep.tb.balanced": "متوازن — کل ڈیبٹ کل کریڈٹ کے برابر ہے",
   "rep.tb.unbalanced": "غیر متوازن",
+  /* ---- balance sheet (Fix Round 1 · F2) ---- */
+  "rep.bs.title": "بیلنس شیٹ",
+  "rep.bs.desc":
+    "مدت کے اختتام پر دکان کے اثاثے اور واجبات، جرنل سے: ایک طرف اثاثے، دوسری طرف واجبات، سرمایہ اور غیر بند نتیجہ — دونوں طرفیں برابر ہونی چاہئیں۔",
+  "rep.bs.asAt": "{date} تک کی صورتحال",
+  "rep.bs.assets": "اثاثے",
+  "rep.bs.liabilities": "واجبات",
+  "rep.bs.equity": "سرمایہ و حقوق",
+  "rep.bs.result": "اب تک کا نتیجہ (غیر بند)",
+  "rep.bs.totalAssets": "کل اثاثے",
+  "rep.bs.totalLiabEquity": "کل واجبات و حقوق",
   "rep.tot.otherRevenue": "دیگر آمدنی (صرف جرنل میں)",
   "rep.tot.plNetRevenue": "نفع و نقصان کے مطابق خالص آمدنی",
 };

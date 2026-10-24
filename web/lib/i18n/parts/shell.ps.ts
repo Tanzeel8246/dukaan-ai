@@ -1,0 +1,45 @@
+/** i18n part: shell — Pashto (پښتو) DRAFT dictionary (Phase H design §4.1).
+ *  Machine-drafted once at build time; every key's review state lives in
+ *  ../review-manifest.json. A draft is a starting point for a named human
+ *  reviewer — never finished copy, never runtime translation. */
+import type { enShell } from "./shell";
+
+export const psShell: Record<keyof typeof enShell, string> = {
+  "shell.brandFallback": "Dukaan AI",
+  "shell.demoMode": "ډیمو موډ",
+  "shell.demoBadgeTitle": "نمونوي معلومات چلېږي — ژوندي کولو لپاره Firebase سره وصل کړئ",
+  "shell.checkingSession": "ستاسو سېشن کتل کېږي…",
+  "shell.langName": "پښتو",
+  "shell.toggleTheme": "تیم بدل کړئ",
+  "shell.chooseTheme": "تیم وټاکئ",
+  "shell.theme.emerald": "زمردي سکون",
+  "shell.theme.midnight": "نیمې شپې سلیټ",
+  "shell.theme.ocean": "سمندري څپه",
+  "shell.theme.sand": "ګرمې شګې",
+  "shell.theme.dusk": "ماښامي بنفشي",
+  "shell.openMenu": "مینو پرانیزئ",
+  "shell.closeMenu": "مینو بند کړئ",
+  "shell.menu": "مینو",
+  "shell.collapseSidebar": "اړخ پټه راټوله کړئ",
+  "shell.expandSidebar": "اړخ پټه پراخه کړئ",
+  "shell.mainNav": "اصلي لارښود",
+  "shell.homeLabel": "Dukaan AI کور",
+  "shell.footerTagline": "د هر ډول کاروبار لپاره بشپړ ERP — هوښیار موجودي، پلور او حسابونه، د تقاضا وړاندوینه، او د AI مرستیال چې ستاسو د کاروبار له خپلو معلوماتو څخه ځواب ورکوي۔",
+  "shell.footerAppHeading": "ایپ",
+  "shell.footerAboutHeading": "زموږ په اړه",
+  "shell.footerColSales": "پلور او امرونه",
+  "shell.footerColStock": "موجودي او عملیات",
+  "shell.footerColGrowth": "پېرودونکي او وده",
+  "shell.footerColFinance": "مالي چارې او راپورونه",
+  "shell.footerColCompany": "شرکت او سیسټم",
+  "shell.footerTech": "Next.js · Firebase · Flutter",
+  "shell.demoPill": "ډیمو پروژه — ټول معلومات فرضي دي",
+  "shell.footerByDemo": "ډیمو AI پروژه — جوړه کړې",
+  "shell.footerByProd": "د هټۍ مدیریت سیسټم — د",
+  "shell.footerRightsDemo": "© 2026 Dukaan AI · فرضي ډیمو معلومات",
+  "shell.footerRights": "© 2026 Dukaan AI",
+  "shell.notFoundTitle": "پاڼه ونه موندل شوه",
+  "shell.notFoundBody": "دا پاڼه په هټۍ کې نشته۔ راځئ بېرته ډشبورډ ته لاړ شو۔",
+  "shell.backHome": "ډشبورډ ته بېرته لاړ شئ",
+  "sync.online": "آنلاین",
+};

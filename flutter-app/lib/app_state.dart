@@ -15,6 +15,16 @@ import 'core/pinlock.dart';
 import 'l10n/app_strings.dart';
 import 'theme/themes.dart';
 
+/// The four locales (Phase H design §4.1): en | ur | ps | fa.
+const List<String> kLangs = ['en', 'ur', 'ps', 'fa'];
+
+/// Direction truth table (§4.5): ur/ps/fa are RTL, en is LTR. The
+/// shell's UR flip carries PS/FA wholesale — no new layout logic.
+bool langIsRtl(String l) => l == 'ur' || l == 'ps' || l == 'fa';
+
+/// PS/FA are Naskh-script locales (Nastaliq is never forced on them).
+bool langIsNaskh(String l) => l == 'ps' || l == 'fa';
+
 class AppState extends ChangeNotifier {
   final _secure = const FlutterSecureStorage();
   String themeId = defaultThemeId;
@@ -22,6 +32,8 @@ class AppState extends ChangeNotifier {
   Timer? _idleTimer;
 
   bool get isUrdu => lang == 'ur';
+  bool get isRtl => langIsRtl(lang);
+  bool get isNaskh => langIsNaskh(lang);
   DukaanTokens get tokens => dukaanThemes[themeId] ?? dukaanThemes[defaultThemeId]!;
 
   Future<void> init() async {
@@ -29,6 +41,7 @@ class AppState extends ChangeNotifier {
     themeId = prefs.getString(themeStorageKey) ?? defaultThemeId;
     if (!dukaanThemes.containsKey(themeId)) themeId = defaultThemeId;
     lang = prefs.getString('dukaan-ai-lang') ?? 'ur';
+    if (!kLangs.contains(lang)) lang = 'ur';
     await S.load(lang);
     await _loadPin();
     _idleTimer = Timer.periodic(const Duration(seconds: 20), (_) => _checkIdle());
@@ -49,6 +62,7 @@ class AppState extends ChangeNotifier {
   }
 
   Future<void> setLang(String l) async {
+    if (!kLangs.contains(l)) return;
     lang = l;
     await S.load(l);
     final prefs = await SharedPreferences.getInstance();
