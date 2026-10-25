@@ -144,6 +144,12 @@ jobs:
             Write-Host "::warning::FIREBASE_OPTIONS_DART not set — placeholder build."
           }
 
+      # app-release #1: CMake failed with "Visual Studio 16 2019 ...
+      # could not find any instance of Visual Studio" — the runner
+      # had no usable VS C++ toolchain. Install it explicitly.
+      - name: Set up Visual Studio (C++ workload)
+        run: choco install visualstudio2022-workload-vc-tools -y --no-progress
+
       - name: Build Windows release
         working-directory: flutter-app
         # §7.4: +N build number CI-stamped from the run number.

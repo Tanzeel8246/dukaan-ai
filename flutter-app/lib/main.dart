@@ -75,6 +75,33 @@ String fmtRs(num v) {
   return 'Rs ${n.format(v)}';
 }
 
+/// Nastaliq text theme (fix round 2026-10-25): the bundled
+/// NotoNastaliqUrdu face on every style. Nastaliq glyphs are tall,
+/// so body/display/title styles get the print-proven 1.9 line
+/// height and compact label styles 1.6 — otherwise tall glyphs
+/// clip in buttons and nav labels.
+TextTheme _nastaliqTheme(TextTheme t) {
+  TextStyle? body(TextStyle? s) => s?.copyWith(fontFamily: 'NotoNastaliqUrdu', height: 1.9);
+  TextStyle? label(TextStyle? s) => s?.copyWith(fontFamily: 'NotoNastaliqUrdu', height: 1.6);
+  return t.copyWith(
+    displayLarge: body(t.displayLarge),
+    displayMedium: body(t.displayMedium),
+    displaySmall: body(t.displaySmall),
+    headlineLarge: body(t.headlineLarge),
+    headlineMedium: body(t.headlineMedium),
+    headlineSmall: body(t.headlineSmall),
+    titleLarge: body(t.titleLarge),
+    titleMedium: body(t.titleMedium),
+    titleSmall: body(t.titleSmall),
+    bodyLarge: body(t.bodyLarge),
+    bodyMedium: body(t.bodyMedium),
+    bodySmall: body(t.bodySmall),
+    labelLarge: label(t.labelLarge),
+    labelMedium: label(t.labelMedium),
+    labelSmall: label(t.labelSmall),
+  );
+}
+
 class DukaanApp extends StatelessWidget {
   const DukaanApp({super.key});
 
@@ -85,16 +112,23 @@ class DukaanApp extends StatelessWidget {
     return MaterialApp(
       title: 'Dukaan AI',
       debugShowCheckedModeBanner: false,
-      // PS/FA render in the bundled Naskh face (§4.5: one Naskh asset so
-      // the counter renders correctly offline); UR keeps the platform
-      // behaviour it has always had, EN the platform default.
+      // Script faces (§4.5): PS/FA render in the bundled Naskh face
+      // (one Naskh asset so the counter renders correctly offline);
+      // UR renders in the bundled Nastaliq face (fix round
+      // 2026-10-25 — previously the platform default, which is why
+      // Urdu never looked Nastaliq); EN the platform default.
       theme: app.isNaskh
           ? baseTheme.copyWith(
               textTheme: baseTheme.textTheme.apply(fontFamily: 'NotoNaskhArabic'),
               primaryTextTheme:
                   baseTheme.primaryTextTheme.apply(fontFamily: 'NotoNaskhArabic'),
             )
-          : baseTheme,
+          : app.isNastaliq
+              ? baseTheme.copyWith(
+                  textTheme: _nastaliqTheme(baseTheme.textTheme),
+                  primaryTextTheme: _nastaliqTheme(baseTheme.primaryTextTheme),
+                )
+              : baseTheme,
       locale: Locale(app.lang),
       builder: (context, child) => Directionality(
         textDirection: app.isRtl ? TextDirection.rtl : TextDirection.ltr,
@@ -452,6 +486,19 @@ class _AppShellState extends State<AppShell> {
       (icon: Icons.sync_outlined, label: app.isUrdu ? 'ہم وقتی مرکز' : 'Sync Centre', page: const SyncScreen(), planModule: null), // app-only surface (§3.5): no web dictionary key yet
       (icon: Icons.settings_outlined, label: s.navSettings, page: const SettingsScreen(), planModule: null),
     ];
+    // Dashboard quick actions need the finished list to resolve a
+    // plan-module id to its tab index (gated modules shift indices
+    // by role, so never hard-code). Wired here — a closure inside
+    // the literal above cannot reference the list being declared.
+    modules[0] = (
+      icon: modules[0].icon,
+      label: modules[0].label,
+      page: DashboardScreen(onOpenModule: (m) {
+        final i = modules.indexWhere((x) => x.planModule == m);
+        if (i >= 0) setState(() { _index = i; _showMore = false; });
+      }),
+      planModule: modules[0].planModule,
+    );
     final sel = _index < modules.length ? _index : 0;
     final planView = store.planView;
     bool locked(String? planModule) =>

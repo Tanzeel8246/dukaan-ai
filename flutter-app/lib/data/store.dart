@@ -344,6 +344,12 @@ class ShopStore extends ChangeNotifier {
   Future<void> init() async {
     final prefs = await SharedPreferences.getInstance();
     originDevice = prefs.getString('dukaan-ai-device-label') ?? 'App device';
+    // Cache-first identity (fix round 2026-10-25): the last-known
+    // business list + role paint instantly on cold start, so the
+    // shell never shows the empty/placeholder state while the
+    // network resolution runs; _applyResolution overwrites them
+    // with fresh values when it lands.
+    _loadCachedIdentity(prefs);
     await _loadTray();
     auth.authStateChanges().listen((u) async {
       user = u;
@@ -355,6 +361,9 @@ class ShopStore extends ChangeNotifier {
         ownerUid = null;
         businesses = [];
         activeBusinessId = null;
+        // Signed out: the cached identity must not leak into the
+        // next sign-in on this device.
+        await _clearCachedIdentity();
         noAccess = false;
         planRegistry = null;
         planCounters = null;
@@ -370,6 +379,80 @@ class ShopStore extends ChangeNotifier {
       await _resolveSession(u, initial: true);
       notifyListeners();
     });
+  }
+
+  /* ---------------- cache-first identity (fix round 2026-10-25) ---- */
+
+  /// Keys for the last-known business identity. Only identity
+  /// (ids, names, roles) is cached — never figures: money values
+  /// are always live from the subscriptions, never stale paint.
+  static const _cachedBusinessesKey = 'dukaan-ai-cached-businesses';
+  static const _cachedActiveKey = 'dukaan-ai-cached-active';
+
+  /// Hydrate the shell identity from the last resolution, before
+  /// any network call. Never throws: a corrupt cache degrades to
+  /// today's empty state, never to a crash.
+  void _loadCachedIdentity(SharedPreferences prefs) {
+    try {
+      final raw = prefs.getString(_cachedBusinessesKey);
+      if (raw == null || raw.isEmpty) return;
+      final decoded = jsonDecode(raw);
+      if (decoded is! List) return;
+      final cached = <BusinessSummary>[];
+      for (final e in decoded) {
+        if (e is! Map) continue;
+        final bid = e['businessId']?.toString() ?? '';
+        final name = e['name']?.toString() ?? '';
+        final role = e['role']?.toString() ?? '';
+        if (bid.isEmpty || role.isEmpty) continue;
+        cached.add(BusinessSummary(
+          businessId: bid,
+          name: name,
+          role: role,
+          own: e['own'] == true,
+        ));
+      }
+      if (cached.isEmpty) return;
+      businesses = cached;
+      final activeId = prefs.getString(_cachedActiveKey);
+      final match = cached.where((b) => b.businessId == activeId).toList();
+      final active = match.isNotEmpty ? match.first : cached.first;
+      activeBusinessId = active.businessId;
+      ownerUid = active.businessId;
+      role = active.role;
+    } catch (_) {
+      // Corrupt cache: ignore, resolution will overwrite.
+    }
+  }
+
+  Future<void> _persistCachedIdentity() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final list = businesses
+          .map((b) => {
+                'businessId': b.businessId,
+                'name': b.name,
+                'role': b.role,
+                'own': b.own,
+              })
+          .toList();
+      await prefs.setString(_cachedBusinessesKey, jsonEncode(list));
+      if (activeBusinessId != null) {
+        await prefs.setString(_cachedActiveKey, activeBusinessId!);
+      }
+    } catch (_) {
+      // Cache persistence must never break resolution.
+    }
+  }
+
+  Future<void> _clearCachedIdentity() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.remove(_cachedBusinessesKey);
+      await prefs.remove(_cachedActiveKey);
+    } catch (_) {
+      // Best effort only.
+    }
   }
 
   /* ---------------- G5 session resolution (web AuthProvider) -------- */
@@ -661,6 +744,9 @@ class ShopStore extends ChangeNotifier {
       noAccess = false;
       ownerUid = active.businessId;
       role = active.role;
+      // Cache-first identity: persist the resolved list + active
+      // pick so the next cold start paints them instantly.
+      await _persistCachedIdentity();
     }
     planRegistry = null;
     planCounters = null;
@@ -687,6 +773,8 @@ class ShopStore extends ChangeNotifier {
     if (target == null || bid == activeBusinessId) return;
     final prefs = await SharedPreferences.getInstance();
     await prefs.setString('dukaan-ai-active-business', bid);
+    // Keep the cache-first pick consistent with the switch.
+    await prefs.setString(_cachedActiveKey, bid);
     activeBusinessId = bid;
     role = target.role;
     ownerUid = bid;

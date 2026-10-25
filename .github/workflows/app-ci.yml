@@ -67,6 +67,10 @@ jobs:
       # before capture; h6 is literal data only), and the H6
       # release audit records the two one-time re-baselines
       # (g6's current assemble shape; h2's single stamped id).
+      - name: Install web dependencies
+        working-directory: web
+        run: npm ci
+
       - name: Fixture freshness (web ≡ Dart contract)
         working-directory: web
         run: |

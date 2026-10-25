@@ -31,14 +31,14 @@ void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
 
   group('four-locale parity (§4.4)', () {
-    test('all four dictionaries: same key set, no empties, 3,077 keys', () async {
+    test('all four dictionaries: same key set, no empties, 3,137 keys', () async {
       final en = await loadDict('en');
       final ur = await loadDict('ur');
       final ps = await loadDict('ps');
       final fa = await loadDict('fa');
-      expect(en.length, 3136);
+      expect(en.length, 3137);
       for (final d in [ur, ps, fa]) {
-        expect(d.length, 3136);
+        expect(d.length, 3137);
         expect(d.keys.toSet(), en.keys.toSet());
       }
       for (final d in [en, ur, ps, fa]) {

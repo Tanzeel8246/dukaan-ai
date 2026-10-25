@@ -297,6 +297,7 @@
  "backup.ownerOnly": "Only the business owner can back up or restore.",
  "dash.eyebrow": "Shop overview",
  "dash.greeting": "Assalam-o-Alaikum, Shopkeeper!",
+ "dash.greetingNamed": "Assalam-o-Alaikum, {name}!",
  "dash.lead": "Your dukaan at a glance — stock health, today's counter, and what the AI thinks you should do next.",
  "dash.loading": "Loading shop data…",
  "dash.kpi.todaySales": "Today's sales",

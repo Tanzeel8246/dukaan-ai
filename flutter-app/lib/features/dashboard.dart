@@ -1,8 +1,12 @@
-/// Dashboard (design §5, F1 row): today's counter picture from the
-/// journal + operational docs — KPI cards (today sales, receivables,
-/// payables, stock value, till cash) and the attention list (low
-/// stock, negative stock, duplicate bill numbers, rejected writes).
-/// Everything derives live from the subscriptions; nothing cached.
+/// Dashboard (design §5, F1 row — redesigned 2026-10-25 on the MC
+/// Billing pattern): today's counter picture from the journal +
+/// operational docs. Dense 2-column KPI cards with colour meaning
+/// (green = money in, amber = due from customers, purple = dues to
+/// suppliers), a quick-actions row, the 14-day chart, and the
+/// attention list (low stock, negative stock, duplicate bill
+/// numbers, rejected writes). Figures derive live from the
+/// subscriptions; only the shell identity (business name/role) is
+/// cache-first — figures are never painted stale.
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -67,7 +71,11 @@ Widget _salesChart(BuildContext context, Strings s, DukaanTokens tokens) {
 }
 
 class DashboardScreen extends StatelessWidget {
-  const DashboardScreen({super.key});
+  /// Jump to another shell module by its plan-module id (the
+  /// AppShell resolves it to the current tab index); null renders
+  /// the quick actions inert (e.g. standalone use).
+  final void Function(String planModule)? onOpenModule;
+  const DashboardScreen({super.key, this.onOpenModule});
 
   @override
   Widget build(BuildContext context) {
@@ -86,27 +94,100 @@ class DashboardScreen extends StatelessWidget {
     final negative = store.products.where((p) => p.stockQty < 0).toList();
     final dupes = duplicateBillNumbers(store.bills.map((b) => (id: b.id, billNo: b.billNo)).toList());
 
-    Widget kpi(String label, String value, {Color? color}) => Card(
+    // Personalised greeting: the cached/live shop name when known,
+    // the static dictionary greeting otherwise (and in locales
+    // whose dictionary has no named key yet — never a raw key).
+    final activeBid = store.activeBusinessId;
+    final shopName = activeBid == null ? '' : store.businessNameFor(activeBid);
+    final namedRaw = s.raw('dash.greetingNamed');
+    final greeting = shopName.isNotEmpty && namedRaw != 'dash.greetingNamed'
+        ? namedRaw.replaceAll('{name}', shopName)
+        : s.raw('dash.greeting');
+
+    Widget kpi(String label, String value, IconData icon, {Color? color, Color? soft}) => Card(
           child: Padding(
-            padding: const EdgeInsets.all(16),
+            padding: const EdgeInsets.all(14),
             child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-              Text(label, style: TextStyle(color: tokens.muted)),
-              const SizedBox(height: 6),
-              Text(value, style: Theme.of(context).textTheme.headlineSmall?.copyWith(color: color)),
+              Row(children: [
+                Container(
+                  width: 36,
+                  height: 36,
+                  decoration: BoxDecoration(color: soft ?? tokens.card2, shape: BoxShape.circle),
+                  child: Icon(icon, size: 20, color: color ?? tokens.muted),
+                ),
+                const SizedBox(width: 8),
+                Expanded(child: Text(label, style: TextStyle(color: tokens.muted, fontSize: 13))),
+              ]),
+              const SizedBox(height: 10),
+              Text(value, style: Theme.of(context).textTheme.titleLarge?.copyWith(color: color)),
             ]),
           ),
         );
 
+    Widget actionTile(IconData icon, String label, String planModule) => Expanded(
+          child: InkWell(
+            onTap: onOpenModule == null ? null : () => onOpenModule!(planModule),
+            borderRadius: BorderRadius.circular(12),
+            child: Padding(
+              padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 4),
+              child: Column(children: [
+                Icon(icon, size: 26, color: tokens.accentText),
+                const SizedBox(height: 6),
+                Text(label, textAlign: TextAlign.center, style: const TextStyle(fontSize: 12)),
+              ]),
+            ),
+          ),
+        );
+
     return ListView(padding: const EdgeInsets.all(16), children: [
-      Text(s.raw('dash.greeting'), style: Theme.of(context).textTheme.headlineSmall),
+      Text(s.raw('dash.eyebrow'), style: TextStyle(color: tokens.muted, fontSize: 12)),
+      const SizedBox(height: 4),
+      Text(greeting, style: Theme.of(context).textTheme.headlineSmall),
       const SizedBox(height: 12),
-      Wrap(spacing: 12, runSpacing: 12, children: [
-        SizedBox(width: 220, child: kpi(s.raw('dash.kpi.todaySales'), fmtRs(todaySales))),
-        SizedBox(width: 220, child: kpi(s.raw('credit.sum.totalOutstanding'), fmtRs(receivables), color: receivables > 0 ? tokens.amberText : null)),
-        SizedBox(width: 220, child: kpi(s.raw('fin.payables'), fmtRs(payables))),
-        SizedBox(width: 220, child: kpi(s.raw('dash.kpi.stockValue'), fmtRs(stockValue))),
-        SizedBox(width: 220, child: kpi(s.raw('dc.stat.expected'), fmtRs(tillBalance))),
-      ]),
+      // Honest loading state: while the session is still resolving,
+      // say so — never paint zeros as if they were figures.
+      if (!store.ready)
+        Card(
+          color: tokens.infoSoft,
+          child: ListTile(
+            leading: Icon(Icons.sync_outlined, color: tokens.infoText),
+            title: Text(s.raw('dash.loading'), style: TextStyle(color: tokens.infoText)),
+          ),
+        ),
+      if (!store.ready) const SizedBox(height: 12),
+      LayoutBuilder(builder: (ctx, constraints) {
+        final cols = constraints.maxWidth >= 900 ? 4 : 2;
+        return GridView.count(
+          crossAxisCount: cols,
+          shrinkWrap: true,
+          physics: const NeverScrollableScrollPhysics(),
+          crossAxisSpacing: 12,
+          mainAxisSpacing: 12,
+          childAspectRatio: 1.55,
+          children: [
+            kpi(s.raw('dash.kpi.todaySales'), fmtRs(todaySales), Icons.calendar_today_outlined,
+                color: tokens.accentText, soft: tokens.accentSoft),
+            kpi(s.raw('credit.sum.totalOutstanding'), fmtRs(receivables), Icons.people_outline,
+                color: receivables > 0 ? tokens.amberText : null, soft: tokens.amberSoft),
+            kpi(s.raw('dash.money.payable'), fmtRs(payables), Icons.business_outlined,
+                color: tokens.infoText, soft: tokens.infoSoft),
+            kpi(s.raw('dash.kpi.stockValue'), fmtRs(stockValue), Icons.inventory_2_outlined),
+            kpi(s.raw('dc.stat.expected'), fmtRs(tillBalance), Icons.account_balance_wallet_outlined),
+          ],
+        );
+      }),
+      const SizedBox(height: 12),
+      Card(
+        child: Padding(
+          padding: const EdgeInsets.all(8),
+          child: Row(children: [
+            actionTile(Icons.receipt_long_outlined, s.raw('nav.billing'), 'billing'),
+            actionTile(Icons.point_of_sale_outlined, s.raw('nav.sales'), 'salesCounter'),
+            actionTile(Icons.inventory_2_outlined, s.raw('nav.inventory'), 'inventoryView'),
+            actionTile(Icons.people_outline, s.raw('nav.customers'), 'customersManage'),
+          ]),
+        ),
+      ),
       const SizedBox(height: 20),
       _salesChart(context, s, tokens),
       const SizedBox(height: 20),

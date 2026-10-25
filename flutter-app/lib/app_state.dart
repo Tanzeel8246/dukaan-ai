@@ -25,6 +25,10 @@ bool langIsRtl(String l) => l == 'ur' || l == 'ps' || l == 'fa';
 /// PS/FA are Naskh-script locales (Nastaliq is never forced on them).
 bool langIsNaskh(String l) => l == 'ps' || l == 'fa';
 
+/// UR is the Nastaliq locale (fix round 2026-10-25): the bundled
+/// NotoNastaliqUrdu face renders the Urdu UI, not just print.
+bool langIsNastaliq(String l) => l == 'ur';
+
 class AppState extends ChangeNotifier {
   final _secure = const FlutterSecureStorage();
   String themeId = defaultThemeId;
@@ -34,6 +38,7 @@ class AppState extends ChangeNotifier {
   bool get isUrdu => lang == 'ur';
   bool get isRtl => langIsRtl(lang);
   bool get isNaskh => langIsNaskh(lang);
+  bool get isNastaliq => langIsNastaliq(lang);
   DukaanTokens get tokens => dukaanThemes[themeId] ?? dukaanThemes[defaultThemeId]!;
 
   Future<void> init() async {
