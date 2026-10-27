@@ -17,6 +17,7 @@ import '../core/loans.dart';
 import '../core/payroll.dart';
 import '../core/permissions.dart';
 import '../core/periods.dart';
+import '../core/mc_workflow.dart' show tieOutReport;
 import '../core/reports.dart';
 import '../core/tally.dart';
 import '../core/tax.dart' show taxPosition;
@@ -84,6 +85,25 @@ class _FinanceScreenState extends State<FinanceScreen> with SingleTickerProvider
         StatCard(label: s.raw('fin.pl.netProfit'), value: fmtRs(pl.net)),
         StatCard(label: s.raw('fin.tax.netDue'), value: fmtRs(tax.netPayable)),
       ]),
+      const SizedBox(height: 16),
+      // MC workflow §12 — tie-out discipline, per check with its
+      // difference. NEVER a blanket "100% balanced" claim: a failing
+      // check shows its gap plainly (the Rs 290 plug lesson — a plug
+      // would appear here as a valuation/TB difference, documented
+      // rather than hidden).
+      Text(s.raw('mc.fin.tieouts'), style: Theme.of(context).textTheme.titleMedium),
+      Builder(builder: (ctx) {
+        final rep = tieOutReport(
+          journal: j, products: store.products, purchases: store.purchases,
+          supplierPayments: store.supplierPayments, purchaseReturns: store.purchaseReturns,
+          credits: store.credits,
+        );
+        return Column(children: [
+          for (final c in rep.checks)
+            _plRow('${c.id.toUpperCase()} · ${c.pass ? s.raw('mc.fin.tieoutPass') : s.raw('mc.fin.tieoutFail')}',
+                c.diff),
+        ]);
+      }),
       const SizedBox(height: 16),
       Text(s.raw('fin.pl.title'), style: Theme.of(context).textTheme.titleMedium),
       const SizedBox(height: 6),

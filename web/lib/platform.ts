@@ -788,7 +788,18 @@ export function platformAggregates(
   nowISO: string
 ): PlatformAggregates {
   const byPlan: Record<string, number> = {};
-  const byState: Record<string, number> = {};
+  /* MC Billing workflow adoption 2026-10-27 (WEB, plan §18) —
+   * NaN fix: every state starts at 0, so a state with no
+   * business can never surface as `undefined` and poison a
+   * summary card into NaN (the live "Active/Grace: NaN" defect). */
+  const byState: Record<string, number> = {
+    trial: 0,
+    active: 0,
+    grace: 0,
+    readonly: 0,
+    suspended: 0,
+    founding: 0,
+  };
   let suspended = 0;
   let enforced = 0;
   let invoicesThisMonth = 0;

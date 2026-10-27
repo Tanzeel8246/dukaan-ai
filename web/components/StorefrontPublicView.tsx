@@ -188,7 +188,7 @@ export default function StorefrontPublicView({ slug }: { slug: string }) {
     setCart((prev) => {
       const next = new Map(prev);
       if (qty <= 0) next.delete(productId);
-      else next.set(productId, Math.min(999, qty));
+      else next.set(productId, Math.min(999, qty)); // absolute cap only; the +/- buttons below clamp to the card's real stock
       return next;
     });
   };
@@ -319,6 +319,9 @@ export default function StorefrontPublicView({ slug }: { slug: string }) {
                       }}
                     >
                       <strong>{fmtPKR(card.price)}</strong>
+                      {card.stockQty !== undefined && (
+                        <span style={{ fontSize: "0.9rem" }}>اسٹاک: <b>{card.stockQty}</b> {card.unit}</span>
+                      )}
                       {card.stockState === "in" && (
                         <span className="badge green">{t("shop.available")}</span>
                       )}
@@ -351,7 +354,7 @@ export default function StorefrontPublicView({ slug }: { slug: string }) {
                           <button
                             type="button"
                             className="btn btn-ghost btn-sm"
-                            onClick={() => setQty(card.productId, qty + 1)}
+                            onClick={() => setQty(card.productId, card.stockQty !== undefined ? Math.min(card.stockQty, qty + 1) : qty + 1)}
                           >
                             +
                           </button>

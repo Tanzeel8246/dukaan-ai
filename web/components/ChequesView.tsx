@@ -211,6 +211,14 @@ export default function ChequesView() {
           <span className="eyebrow">{t("nav.cheques")}</span>
           <h1 className="h2">{t("chq.title")}</h1>
           <p className="lead">{t("chq.subtitle")}</p>
+          {/* MC Billing workflow adoption 2026-10-27 (WEB, plan §15):
+              status flow — pending (received/issued) → deposited →
+              cleared (money lands) or bounced (everything reverses
+              through the choke point). Invalid transitions write
+              nothing (lib/cheques.canChequeTransition). */}
+          <div className="note-box" style={{ marginTop: 12 }}>
+            چیک کی حیثیت کا فلو: pending → deposited → cleared (رقم پہنچی) یا bounced (سب کچھ reversing انٹری سے واپس)۔ غلط حیثیت تبدیلی کچھ نہیں لکھتی۔
+          </div>
         </div>
 
         {notice && (

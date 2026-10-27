@@ -13,6 +13,8 @@ import {
   IconSearch,
   IconTrash, SearchClear } from "./ui";
 import { fmtDate, fmtNum, fmtPKR, fmtUnit } from "@/lib/format";
+import { stockValuation } from "@/lib/workflow";
+import { accountNormalBalance } from "@/lib/ledger";
 import type { I18nKey } from "@/lib/i18n";
 import type { AdjustmentReason, Product } from "@/lib/types";
 import {
@@ -115,6 +117,7 @@ export default function InventoryManager() {
     deliveryChallans,
     bills,
     warehouses,
+    journal,
     role,
     addProduct,
     updateProduct,
@@ -429,6 +432,25 @@ export default function InventoryManager() {
           </div>
         </div>
 
+        {(() => {
+          const val = stockValuation(products);
+          const gl = accountNormalBalance(journal, "inventory") + accountNormalBalance(journal, "inventory_raw");
+          const gap = Math.round(val.total - gl);
+          return (
+            <section className="card" aria-label="Stock valuation vs GL" style={{ marginBottom: 22 }}>
+              <h3 style={{ margin: "0 0 4px", fontSize: "1.1rem" }}>ویلیوایشن رپورٹ — اسٹاک بمقابلہ GL</h3>
+              <p style={{ margin: 0 }}>
+                اسٹاک کی قیمت (cost پر): <b>{fmtPKR(val.total)}</b> (عام مال {fmtPKR(val.goods)} + خام مال {fmtPKR(val.raw)})
+                {" · "}GL انوینٹری: <b>{fmtPKR(gl)}</b> {" · "}فرق: <b>{fmtPKR(gap)}</b>
+                {gap === 0 ? " (برابر ✓)" : " — فرق کی وجہ درج کریں؛ کوئی پلگ چھپایا نہیں جائے گا۔"}
+              </p>
+              <p className="hint" style={{ margin: "8px 0 0" }}>
+                دونوں اسٹاک کالم ایک ساتھ اپڈیٹ ہوتے ہیں (موبائل سیل کے بعد بھی) — ویلیوایشن اسی ایک سچائی سے نکلتی ہے۔
+              </p>
+            </section>
+          );
+        })()}
+
         <div className="toolbar">
           <div className="search-box">
             <IconSearch />
@@ -547,6 +569,7 @@ export default function InventoryManager() {
             <table className="data">
               <thead>
                 <tr>
+                  <th>ID</th>
                   <th>{t("inv.th.product")}</th>
                   <th>{t("inv.th.sku")}</th>
                   <th>{t("inv.th.stock")}</th>
@@ -567,6 +590,7 @@ export default function InventoryManager() {
                   const lastSale = view === "dead" ? lastSaleOffset(sales, p.id) : null;
                   return (
                     <tr key={p.id} className={critical ? "row-critical" : low ? "row-low" : ""}>
+                      <td style={{ whiteSpace: "nowrap", color: "var(--muted)", fontSize: "0.85rem" }}>{p.id}</td>
                       <td>
                         <b>{p.name}</b>
                         <div className="ur" style={{ fontSize: "0.9rem", color: "var(--muted)" }}>

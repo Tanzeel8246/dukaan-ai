@@ -3,9 +3,11 @@
 /// The single authoritative table of journal account codes, accounting
 /// types and normal balances. v1 codes are FROZEN in name and meaning;
 /// Phase A added 10 codes additively; Phase D added `loans_receivable`;
-/// Phase H · H1 added the loyalty pair. 30 codes. If this table and
-/// the web registry ever disagree, that is a finance bug — the
-/// fixture suite pins behaviour derived from it.
+/// Phase H · H1 added the loyalty pair. 31 codes since 2026-10-27
+/// (`customer_advances` — owner decision: the web convention on
+/// both platforms). If this table and the web registry ever
+/// disagree, that is a finance bug — the fixture suite pins
+/// behaviour derived from it.
 
 enum AccountType { asset, liability, equity, contraEquity, income, contraIncome, expense, clearing }
 
@@ -56,6 +58,11 @@ const Map<String, AccountMeta> chartOfAccounts = {
   // released at expiry — never revenue).
   'loyalty_payable': AccountMeta(AccountType.liability, NormalBalance.credit, 'H'),
   'expense_loyalty': AccountMeta(AccountType.expense, NormalBalance.debit, 'H'),
+  // 2026-10-27 workflow adoption — owner decision: the WEB
+  // convention on both platforms (a dedicated unearned account,
+  // mirroring web/lib/coa.ts `customer_advances`). Advances no
+  // longer sit in `payables` under `cust:` refs.
+  'customer_advances': AccountMeta(AccountType.liability, NormalBalance.credit, 'W'),
 };
 
 /// Every valid account code, in registry order.

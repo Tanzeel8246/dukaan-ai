@@ -81,7 +81,8 @@ export default function WarehousesView() {
         units += q;
         value += q * p.costPrice;
       }
-      return { units, value };
+      const items = products.filter((pp) => qtyAtWarehouse(pp, stockLevels, warehouses, whId) > 0).length;
+      return { units, value, items };
     };
   }, [products, stockLevels, warehouses]);
 
@@ -299,6 +300,10 @@ export default function WarehousesView() {
                     {t("wh.unitsHere", { qty: fmtQty(pos.units) })}
                     {" · "}
                     {t("wh.valueHere", { amount: fmtPKR(pos.value) })}
+                    {" · "}آئٹمز: <b>{pos.items}</b>
+                  </p>
+                  <p style={{ margin: "4px 0 0", fontSize: "0.85rem", color: "var(--muted)" }}>
+                    یہ اصل گنتی ہے — اسٹاک موجود ہو تو کارڈ کبھی 0 نہیں دکھاتا۔
                   </p>
                   {canWrite && (
                     <div style={{ display: "flex", gap: 8, marginTop: 12, flexWrap: "wrap" }}>

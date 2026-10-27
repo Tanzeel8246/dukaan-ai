@@ -138,11 +138,16 @@ function ConsoleInner() {
         </div>
       </header>
 
+      {/* MC Billing workflow adoption 2026-10-27 (WEB, plan §18):
+          the super-admin gate above (gate !== "admin" → Denied)
+          is the ONLY entry — a tenant Owner sees Access Denied,
+          never shop data. Summary cards are NaN-proofed at the
+          source (lib/platform) and again here with ?? 0. */}
       <div className="agg-grid">
         <AggCard label={t("platform.agg.total")} value={fmtNum(agg.totalBusinesses)} />
-        <AggCard label={t("plan.state.active")} value={fmtNum(agg.byState.active + agg.byState.founding)} />
-        <AggCard label={t("plan.state.trial")} value={fmtNum(agg.byState.trial)} />
-        <AggCard label={t("plan.state.grace")} value={fmtNum(agg.byState.grace)} />
+        <AggCard label={t("plan.state.active")} value={fmtNum((agg.byState.active ?? 0) + (agg.byState.founding ?? 0))} />
+        <AggCard label={t("plan.state.trial")} value={fmtNum(agg.byState.trial ?? 0)} />
+        <AggCard label={t("plan.state.grace")} value={fmtNum(agg.byState.grace ?? 0)} />
         <AggCard label={t("platform.agg.suspended")} value={fmtNum(agg.suspended)} />
         <AggCard label={t("platform.agg.enforced")} value={fmtNum(agg.enforced)} />
         <AggCard label={t("platform.agg.invoicesMonth")} value={fmtNum(agg.invoicesThisMonth)} soft />

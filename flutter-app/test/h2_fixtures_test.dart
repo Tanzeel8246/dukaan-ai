@@ -150,7 +150,7 @@ void main() {
 
   group('COA / registry facts', () {
     final c = mm(fx['coaCase']);
-    test('30 codes in web order; loyalty pair last with H1 metadata', () {
+    test('31 codes in web order; customer_advances last (owner decision 2026-10-27: web convention)', () {
       expect(accountCodes, ll(c['codes']).map((e) => e as String).toList());
       final lp = mm(c['loyalty_payable']);
       expect(accountMeta('loyalty_payable').type.name, lp['type']);

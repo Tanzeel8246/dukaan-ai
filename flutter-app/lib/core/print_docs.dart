@@ -15,6 +15,7 @@
 /// values exactly as the web slip does.
 import 'documents.dart';
 import 'jobs.dart';
+import 'mc_workflow.dart' show formatDdMmYyyy;
 import 'print.dart';
 import 'types.dart';
 
@@ -62,7 +63,46 @@ class DocPageData {
       design: resolvePrintDesign(ownerDoc),
     );
 
-String _dateOf(String ts) => ts.length >= 10 ? ts.substring(0, 10) : ts;
+/// MC workflow adoption: document dates print DD/MM/YYYY, never ISO.
+String _dateOf(String ts) => formatDdMmYyyy(ts);
+
+/* ---------------- delivery challan ---------------- */
+
+/// MC workflow §3 — challan print page: the shop's OWN branding
+/// (via [_shop], never another tenant's stored image), quantities
+/// only (a challan carries no prices), date DD/MM/YYYY.
+DocPageData challanDocPage({
+  required DeliveryChallan challan,
+  required Map<String, dynamic> ownerDoc,
+  required String title,
+  required String dateLabel,
+  required String vehicleLabel,
+  required String driverLabel,
+  required String receivedByLabel,
+  required String Function(double) qty,
+}) {
+  final shop = _shop(ownerDoc);
+  return DocPageData(
+    shopName: shop.name, shopAddress: shop.address, shopPhone: shop.phone,
+    design: shop.design,
+    title: title,
+    titleRight: challan.number ?? '',
+    partyLine: challan.customerName.isNotEmpty ? challan.customerName : null,
+    meta: [
+      DocRow([dateLabel, _dateOf(challan.ts)]),
+      if (challan.orderId != null) DocRow(['SO', challan.orderId!]),
+      if (challan.vehicleNo.isNotEmpty) DocRow([vehicleLabel, challan.vehicleNo]),
+      if (challan.driverName.isNotEmpty) DocRow([driverLabel, challan.driverName]),
+    ],
+    sections: [
+      DocSection(rows: [
+        for (final l in challan.lines) DocRow([l.name, qty(l.qty)]),
+      ]),
+    ],
+    note: challan.note.isNotEmpty ? challan.note : null,
+    signatureLabel: receivedByLabel,
+  );
+}
 
 /* ---------------- vouchers (RV / PV) ---------------- */
 

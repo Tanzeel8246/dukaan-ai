@@ -12,6 +12,7 @@ import '../core/ledger.dart';
 import '../core/periods.dart';
 import '../core/types.dart';
 import '../data/store.dart';
+import 'f2_common.dart';
 import '../l10n/app_strings.dart';
 import '../main.dart' show fmtRs;
 import 'pin_gate.dart';
@@ -75,6 +76,16 @@ class _DayCloseScreenState extends State<DayCloseScreen> {
     return ListView(padding: const EdgeInsets.all(16), children: [
       Text(s.raw('dc.title'), style: Theme.of(context).textTheme.headlineSmall),
       Text(s.raw('dc.subtitle'), style: TextStyle(color: tokens.muted)),
+      // MC workflow §14 — the lock, stated plainly: when a period
+      // lock covers past days, backdated entries into those days
+      // are REFUSED by the posting guard (period-locked), so the
+      // close summary below is final for locked days.
+      if (store.lockedThrough.isNotEmpty)
+        Padding(
+          padding: const EdgeInsets.only(top: 8),
+          child: Text('${s.raw('settings.per.closed')}: ${fmtDate(store.lockedThrough)}',
+              style: TextStyle(color: tokens.amberText, fontWeight: FontWeight.w600)),
+        ),
       const SizedBox(height: 16),
       DropdownButtonFormField<String>(
         initialValue: account.id,

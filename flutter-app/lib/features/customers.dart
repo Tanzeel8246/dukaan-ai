@@ -9,6 +9,7 @@ import 'package:share_plus/share_plus.dart';
 import '../app_state.dart';
 import '../core/ledger.dart';
 import '../core/loyalty.dart';
+import '../core/mc_workflow.dart' show customerLedgerRunningBalance;
 import '../core/permissions.dart';
 import '../core/search.dart';
 import '../core/types.dart';
@@ -21,6 +22,8 @@ import 'f2_common.dart';
 /// Outstanding for a directory customer: rows keyed by their id
 /// PLUS legacy rows keyed by name|phone (the web groups both ways;
 /// the directory joins them — see _CustomerDetail's filter).
+/// MC workflow §6: udhaar given adds, repayments AND advance rows
+/// subtract (an advance is money the shop owes back).
 double _dueFor(ShopStore store, Customer c) {
   var due = 0.0;
   for (final e in store.credits) {
@@ -208,6 +211,14 @@ class _CustomerDetail extends StatelessWidget {
         Expanded(child: Text(customer.name, style: Theme.of(context).textTheme.titleLarge)),
         Text(fmtRs(due), style: Theme.of(context).textTheme.titleLarge?.copyWith(color: due > 0 ? tokens.amberText : null)),
       ]),
+      // MC workflow §6 — «مجھے ملے / میں نے دیے» money language:
+      // a positive balance is money due TO the shop, a negative
+      // balance is advance money the shop owes back.
+      if (due != 0)
+        Text(
+          due > 0 ? s.raw('mc.cust.toReceive') : s.raw('mc.cust.toGive'),
+          style: TextStyle(color: tokens.muted, fontWeight: FontWeight.w600),
+        ),
       Text(customer.phone, style: TextStyle(color: tokens.muted)),
       // H5: the WhatsApp consent state on the profile, with its
       // moment + source and the one-tap toggle (web parity). The
@@ -230,7 +241,7 @@ class _CustomerDetail extends StatelessWidget {
                   Text(
                     s
                         .raw('wa.consent.since')
-                        .replaceAll('{date}', customer.waOptInAt!.substring(0, 10))
+                        .replaceAll('{date}', fmtDate(customer.waOptInAt!))
                         .replaceAll(
                             '{source}',
                             s.raw(customer.waOptInSource == 'storefront'
@@ -286,7 +297,7 @@ class _CustomerDetail extends StatelessWidget {
           onPressed: () {
             final body = StringBuffer('${customer.name}\n');
             for (final e in entries) {
-              body.writeln('${e.ts.substring(0, 10)} · ${e.kind} · ${fmtRs(e.amount)}');
+              body.writeln('${fmtDate(e.ts)} · ${e.kind} · ${fmtRs(e.amount)}');
             }
             body.writeln('${s.raw('credit.sum.totalOutstanding')}: ${fmtRs(due)}');
             Share.share(body.toString());
@@ -296,12 +307,27 @@ class _CustomerDetail extends StatelessWidget {
         ),
       ]),
       const SizedBox(height: 12),
-      for (final e in entries.reversed)
-        ListTile(
-          dense: true,
-          title: Text('${e.kind == 'credit' ? s.raw('credit.given') : s.raw('credit.repayment')} · ${fmtRs(e.amount)}'),
-          subtitle: Text('${e.ts.substring(0, 10)}${e.voucherNo != null ? ' · ${e.voucherNo}' : ''}${e.note.isNotEmpty ? ' · ${e.note}' : ''}'),
-        ),
+      // MC workflow §6 — ledger with a RUNNING balance per row
+      // (chronological, so the balance after each entry is visible)
+      // and receipts + advances both listed, dates DD/MM/YYYY.
+      Builder(builder: (ctx) {
+        final rows = <Widget>[];
+        for (var i = 0; i < entries.length; i++) {
+          final e = entries[i];
+          final kindLabel = e.kind == 'credit'
+              ? s.raw('credit.given')
+              : e.kind == 'advance'
+                  ? s.raw('mc.cust.advance')
+                  : s.raw('credit.repayment');
+          rows.add(ListTile(
+            dense: true,
+            title: Text('$kindLabel · ${fmtRs(e.amount)}'),
+            subtitle: Text('${fmtDate(e.ts)}${e.voucherNo != null ? ' · ${e.voucherNo}' : ''}${e.note.isNotEmpty ? ' · ${e.note}' : ''}'),
+            trailing: Text('${s.raw('mc.cust.runningBalance')}: ${fmtRs(customerLedgerRunningBalance(entries.sublist(0, i + 1)))}'),
+          ));
+        }
+        return Column(children: rows.reversed.toList());
+      }),
     ]);
   }
 
@@ -335,6 +361,7 @@ class _CustomerDetail extends StatelessWidget {
     final store = context.read<ShopStore>();
     final s = S.current;
     final amount = TextEditingController();
+    final advanceCtl = TextEditingController();
     var method = 'cash';
     var isCheque = false;
     final chqNo = TextEditingController();
@@ -346,7 +373,13 @@ class _CustomerDetail extends StatelessWidget {
       builder: (ctx) => StatefulBuilder(builder: (ctx, setLocal) => AlertDialog(
         title: Text(s.raw('credit.repay.title')),
         content: SingleChildScrollView(child: Column(mainAxisSize: MainAxisSize.min, children: [
-          TextField(controller: amount, keyboardType: TextInputType.number, decoration: InputDecoration(labelText: s.raw('common.amount'))),
+          TextField(controller: amount, keyboardType: TextInputType.number, decoration: InputDecoration(labelText: s.raw('mc.receipt.billPart'))),
+          // MC workflow §5 — split at entry: the bill part reduces
+          // receivables, the advance part goes to the unearned
+          // equivalent. Cheque receipts stay bill-only (old path).
+          if (!isCheque) ...[
+            TextField(controller: advanceCtl, keyboardType: TextInputType.number, decoration: InputDecoration(labelText: s.raw('mc.receipt.advancePart'), helperText: s.raw('mc.receipt.splitHelp'))),
+          ],
           DropdownButtonFormField<String>(
             initialValue: method,
             items: const [
@@ -372,14 +405,26 @@ class _CustomerDetail extends StatelessWidget {
     );
     if (go != true) return;
     final v = double.tryParse(amount.text.trim()) ?? 0;
-    if (v > 0) {
-      await store.addRepayment(
+    final adv = double.tryParse(advanceCtl.text.trim()) ?? 0;
+    if (isCheque) {
+      if (v > 0) {
+        await store.addRepayment(
+          customerId: customer.id,
+          customerName: customer.name,
+          customerPhone: customer.phone,
+          amount: v,
+          method: method,
+          chequeDraft: ChequeDraftFields.draftOf(chqNo, chqBank, chqIssue, chqDue),
+        );
+      }
+    } else if (v > 0 || adv > 0) {
+      await store.recordCustomerReceipt(
         customerId: customer.id,
         customerName: customer.name,
         customerPhone: customer.phone,
-        amount: v,
+        billPayment: v,
+        advance: adv,
         method: method,
-        chequeDraft: isCheque ? ChequeDraftFields.draftOf(chqNo, chqBank, chqIssue, chqDue) : null,
       );
     }
   }

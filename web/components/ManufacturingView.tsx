@@ -227,6 +227,13 @@ export default function ManufacturingView() {
         <div className="note-box" style={{ marginTop: 0, marginBottom: 22 }}>
           {t("mfg.immutableNote")}
         </div>
+        {/* MC Billing workflow adoption 2026-10-27 (WEB, plan §10):
+            BOM cost is DERIVED from its components' costs at
+            issue/completion — a finished good's cost is the sum
+            of its components, never a typed-in figure. */}
+        <p className="hint" style={{ marginBottom: 22 }}>
+          تیار مال کی لاگت اجزاء کی لاگت سے بنتی ہے (ہر جزو × اس کی cost) — یہاں کوئی ہاتھ سے لکھی لاگت نہیں آتی۔
+        </p>
 
         {canWrite && (
           <div

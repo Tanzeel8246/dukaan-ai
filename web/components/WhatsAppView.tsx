@@ -341,6 +341,14 @@ export default function WhatsAppView() {
           <p className="lead">{t("wa.subtitle")}</p>
         </div>
 
+        {/* MC Billing workflow adoption 2026-10-27 (WEB, plan §19):
+            WhatsApp is consent-first and uses the TENANT's own
+            number from settings — never a dummy number. Only
+            opted-in customers enter a campaign audience. */}
+        <div className="note-box" style={{ marginBottom: 16 }}>
+          WhatsApp مارکیٹنگ consent-first ہے: صرف وہ کسٹمر جنہوں نے اجازت دی ہو، مہم میں آتے ہیں — اور نمبر ہمیشہ اسی دکان کا اپنا ہوتا ہے، کوئی dummy نمبر نہیں۔
+        </div>
+
         {notice && (
           <div
             className={notice.ok ? "notice ok" : "notice err"}

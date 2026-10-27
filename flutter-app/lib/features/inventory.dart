@@ -65,7 +65,7 @@ class _InventoryScreenState extends State<InventoryScreen> {
                   Chip(label: Text(s.raw('inv.rawBadge')), visualDensity: VisualDensity.compact),
                 ],
               ]),
-              subtitle: Text('${p.sku} · ${p.category} · ${fmtRs(p.costPrice)} / ${fmtRs(p.salePrice)}'),
+              subtitle: Text('${p.id} · ${p.sku} · ${p.category} · ${fmtRs(p.costPrice)} / ${fmtRs(p.salePrice)}'),
               trailing: Row(mainAxisSize: MainAxisSize.min, children: [
                 Text('${p.stockQty}', style: TextStyle(fontWeight: FontWeight.w600, color: low ? tokens.danger : null)),
                 IconButton(icon: const Icon(Icons.tune_outlined, size: 19), tooltip: s.raw('inv.adjustTitle'), onPressed: () => _adjust(context, p)),

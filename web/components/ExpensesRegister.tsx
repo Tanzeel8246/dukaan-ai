@@ -8,6 +8,8 @@ import PermDenied from "./PermDenied";
 import { can } from "@/lib/permissions";
 import { IconCash, IconChart, IconClose, IconEdit, IconPlus, IconTrash } from "./ui";
 import { fmtDate, fmtPKR } from "@/lib/format";
+import { EXPENSE_ACCOUNT_LABEL } from "@/lib/workflow";
+import { accountNormalBalance } from "@/lib/ledger";
 import { addDaysISO, businessDateISO, isPeriodLockedError, todayPktISO } from "@/lib/periods";
 import { revenueOnDay } from "@/lib/selectors";
 import {
@@ -356,6 +358,20 @@ export default function ExpensesRegister() {
           </button>
         </div>
 
+        {(() => {
+          const listTotal = rows.reduce((a, e) => a + e.amount, 0);
+          const glTotal = (["expense_rent", "expense_electricity", "expense_salary", "expense_transport", "expense_other"] as const)
+            .reduce((a, code) => a + accountNormalBalance(journal, code), 0);
+          return (
+            <section className="card" aria-label="Expense list total vs GL" style={{ marginBottom: 22 }}>
+              <p style={{ margin: 0 }}>
+                خرچ لسٹ کا مجموعہ: <b>{fmtPKR(listTotal)}</b> · GL اخراجات کا مجموعہ: <b>{fmtPKR(glTotal)}</b>
+                {" · "}فرق: <b>{fmtPKR(Math.round(listTotal - glTotal))}</b>
+                {Math.round(listTotal - glTotal) === 0 ? " (برابر ✓)" : " — نوٹ: لسٹ میں صرف دکھائے گئے اخراجات ہیں (فلٹر/تاریخ کے مطابق)، GL میں سب ہیں؛ فرق کی وجہ یہیں لکھی جائے۔"}
+              </p>
+            </section>
+          );
+        })()}
         <div className="table-wrap">
           <table className="data">
             <thead>
@@ -474,6 +490,12 @@ export default function ExpensesRegister() {
                         </option>
                       ))}
                     </select>
+                  </div>
+                  <div className="field" style={{ gridColumn: "1 / -1" }}>
+                    <p className="hint" style={{ margin: 0 }}>
+                      کیٹیگری → کھاتہ میپنگ: Rent {EXPENSE_ACCOUNT_LABEL.rent} میں جاتا ہے، کبھی متفرق (misc) میں نہیں — ہر کیٹیگری کا اپنا کھاتہ ہے۔
+                      چنی ہوئی کیٹیگری کا کھاتہ: <b>{EXPENSE_ACCOUNT_LABEL[category]}</b>
+                    </p>
                   </div>
                   <div className="field">
                     <label htmlFor="exp-amount">{t("exp.field.amount")}</label>

@@ -150,7 +150,8 @@
       "retained_earnings",
       "loans_receivable",
       "loyalty_payable",
-      "expense_loyalty"
+      "expense_loyalty",
+      "customer_advances"
     ],
     "loyalty_payable": {
       "type": "liability",

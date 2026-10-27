@@ -8,6 +8,7 @@ import 'package:provider/provider.dart';
 
 import '../app_state.dart';
 import '../core/permissions.dart';
+import '../core/mc_workflow.dart' show warehouseCardCounts;
 import '../core/stock.dart' as stock_core;
 import '../core/transfers.dart' as tr_core;
 import '../core/types.dart';
@@ -99,7 +100,14 @@ class _WarehousesScreenState extends State<WarehousesScreen> {
                       if (w.archived)
                         Chip(label: Text(s.raw('wh.archivedBadge')), visualDensity: VisualDensity.compact),
                     ]),
-                    subtitle: Text(w.note.isEmpty ? f3('wh.valueHere', {'amount': fmtRs(value)}) : w.note),
+                    subtitle: Text([
+                      w.note.isEmpty ? f3('wh.valueHere', {'amount': fmtRs(value)}) : w.note,
+                      // MC workflow §9 — REAL item/unit counts, never
+                      // 0 while stock exists (derived, not cached).
+                      s.raw('mc.wh.itemsUnits')
+                          .replaceAll('{items}', '${warehouseCardCounts(store.products, store.stockLevels, store.warehouses, w.id).items}')
+                          .replaceAll('{units}', '${warehouseCardCounts(store.products, store.stockLevels, store.warehouses, w.id).units}'),
+                    ].join(' · ')),
                     selected: sel?.id == w.id,
                     onTap: () => setState(() => _selected = w),
                     trailing: canWrite

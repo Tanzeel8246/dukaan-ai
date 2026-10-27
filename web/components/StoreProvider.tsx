@@ -1067,6 +1067,22 @@ interface StoreValue extends Collections {
     instrument?: "cheque";
     cheque?: ChequeDraft | null;
   }) => void;
+  /** MC Billing workflow adoption 2026-10-27 (WEB) — receipt
+   *  split at entry, advance half: Dr money / Cr
+   *  `customer_advances` (unearned), one balanced entry through
+   *  the guarded choke point, journal-only (the customer ledger
+   *  reads advances from the journal by ref, so the receivables
+   *  subledger is never polluted). Old advances are never
+   *  restated — this posts a new entry, never edits an old one. */
+  addCustomerAdvance: (c: {
+    customerId: string;
+    customerName: string;
+    customerPhone: string;
+    amount: number;
+    method: "cash" | "jazzcash" | "easypaisa" | "bank";
+    accountId?: string | null;
+    note: string;
+  }) => void;
   // cheques (Phase B · B5) — the registry lifecycle. Every action
   // gates on the `cheques` matrix row (owner/manager/accountant;
   // the cashier captures cheques inside their host flows but never
@@ -5353,7 +5369,10 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
    * (§2.5 decision, model 1); a challan carries a derived
    * reservation only (lib/documents `availabilityByProduct`).
    * Conversions to a bill prepare desk drafts, like B1; the bill
-   * posts through `postBill` alone, exactly once. */
+   * posts through `postBill` alone, exactly once.
+   * MC Billing workflow adoption 2026-10-27 (WEB) — STOCK
+   * DEDUCTION POINT = "bill" (see lib/workflow.ts): the challan
+   * never deducts, the invoice deducts exactly once. */
 
   const createChallan = useCallback(
     (input: NewChallanInput): string | null => {
@@ -6483,6 +6502,58 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
       }
       putDoc("credits", row);
       if (chequeDoc) putDoc("cheques", chequeDoc);
+      appendJournalDemo(entry);
+    },
+    [cloudCtx, putDoc, appendJournalDemo, resolveAccountId]
+  );
+
+  /* MC Billing workflow adoption 2026-10-27 (WEB) — customer
+   * advance receipt (the receipt-split advance half). ONE
+   * balanced entry, Dr money / Cr `customer_advances` with
+   * ref = customerId, through the guarded choke point in the
+   * same batch as nothing else (journal-only: no credits row,
+   * so `customerOutstanding` — which treats every non-credit
+   * row as a repayment — can never misread an advance as
+   * udhaar repaid). Corrections only by reversing entry. */
+  const addCustomerAdvance = useCallback(
+    (c: {
+      customerId: string;
+      customerName: string;
+      customerPhone: string;
+      amount: number;
+      method: "cash" | "jazzcash" | "easypaisa" | "bank";
+      accountId?: string | null;
+      note: string;
+    }) => {
+      if (!can(roleRef.current, "creditRepayment", "write")) return; // A3 guard (all counter roles pass)
+      if (!c.customerId || !(c.amount > 0)) return;
+      const entry = makeEntry(
+        `Customer advance — ${c.customerName}${c.note ? ` — ${c.note}` : ""}`,
+        "customer_advance",
+        `adv-${Date.now().toString(36)}`,
+        [
+          {
+            account: accountForMethod(c.method),
+            debit: Math.round(c.amount),
+            credit: 0,
+            ref: resolveAccountId(c.method, c.accountId),
+          },
+          {
+            account: "customer_advances",
+            debit: 0,
+            credit: Math.round(c.amount),
+            ref: c.customerId,
+          },
+        ]
+      );
+      guardPostings(entry); // A5 choke point (before any write)
+      const ctx = cloudCtx();
+      if (ctx) {
+        const batch = writeBatch(ctx.db);
+        postEntry(batch, entry);
+        void batch.commit();
+        return;
+      }
       appendJournalDemo(entry);
     },
     [cloudCtx, putDoc, appendJournalDemo, resolveAccountId]
@@ -10553,6 +10624,7 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
       deleteCustomer,
       addCredit,
       addRepayment,
+      addCustomerAdvance,
       depositCheque,
       clearCheque,
       bounceCheque,
@@ -10664,7 +10736,7 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
       addSupplier, updateSupplier, deleteSupplier, recordPurchase, recordPurchaseReturn, recordSupplierPayment,
       createPurchaseOrder, updatePurchaseOrder, deletePurchaseOrder,
       issuePurchaseOrder, cancelPurchaseOrder, receiveAgainstPo,
-      addCustomer, updateCustomer, deleteCustomer, addCredit, addRepayment,
+      addCustomer, updateCustomer, deleteCustomer, addCredit, addRepayment, addCustomerAdvance,
       depositCheque, clearCheque, bounceCheque, returnCheque,
       addExpense, updateExpense, deleteExpense, addCashEntry,
       addMoneyAccount, renameMoneyAccount, archiveMoneyAccount,

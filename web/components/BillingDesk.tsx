@@ -21,7 +21,8 @@ import {
 } from "./ui";
 import { brandingDataUrls } from "@/lib/branding";
 import { groupIban, validatePkIban } from "@/lib/raast";
-import { fmtDate, fmtNum, fmtPKR, fmtUnit } from "@/lib/format";
+import { fmtDate, fmtDateShort, fmtNum, fmtPKR, fmtUnit } from "@/lib/format";
+import { STOCK_DEDUCTION_NOTE } from "@/lib/workflow";
 import { billTaxLines, computeBillTaxes, resolveTaxSlab } from "@/lib/tax";
 import { billMatches, filterProducts, findProductBySku } from "@/lib/search";
 import {
@@ -158,6 +159,7 @@ export default function BillingDesk() {
     returnItems,
     returnItemsWithNote,
     addCustomer,
+    addCustomerAdvance,
     saleOrders,
     deliveryChallans,
     quotations,
@@ -206,6 +208,19 @@ export default function BillingDesk() {
    *  sticky cart bar; on desktop this state is inert. */
   const [cartOpen, setCartOpen] = useState(false);
   const searchRef = useRef<HTMLInputElement | null>(null);
+  const skuRef = useRef<HTMLInputElement | null>(null);
+  /* MC Billing workflow adoption 2026-10-27 (WEB): camera scan +
+   * billing-time customer advance. The camera uses the device
+   * camera + BarcodeDetector when the browser offers it; without
+   * a detector the preview still aims the code and the cashier
+   * types it — no silent fake scan. */
+  const [showCamera, setShowCamera] = useState(false);
+  const [cameraMsg, setCameraMsg] = useState("");
+  const videoRef = useRef<HTMLVideoElement | null>(null);
+  const streamRef = useRef<MediaStream | null>(null);
+  const [advAmount, setAdvAmount] = useState("");
+  const [advMethod, setAdvMethod] = useState<"cash" | "jazzcash" | "easypaisa" | "bank">("cash");
+  const [advNote, setAdvNote] = useState("");
   const [cart, setCart] = useState<CartLine[]>([]);
   const [customerId, setCustomerId] = useState("");
   const [customerName, setCustomerName] = useState("");
@@ -850,6 +865,97 @@ export default function BillingDesk() {
     succeed(t("billing.successHeld"));
   };
 
+  /* MC Billing workflow adoption 2026-10-27 (WEB): real keyboard
+   * shortcuts — F2 focuses the barcode box, Ctrl+H holds the
+   * current bill. (Enter already adds the scanned code.) */
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      const tag = (e.target as HTMLElement | null)?.tagName;
+      if (e.key === "F2") {
+        e.preventDefault();
+        skuRef.current?.focus();
+      } else if (e.key.toLowerCase() === "h" && e.ctrlKey && tag !== "INPUT" && tag !== "TEXTAREA" && tag !== "SELECT") {
+        e.preventDefault();
+        holdCurrent();
+      }
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [cart, payments, customerId, customerName, customerPhone, discountType, discountValue, billWarehouseId]);
+
+  const stopCamera = () => {
+    streamRef.current?.getTracks().forEach((tr) => tr.stop());
+    streamRef.current = null;
+    setShowCamera(false);
+  };
+  const startCamera = async () => {
+    setCameraMsg("");
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({
+        video: { facingMode: "environment" },
+      });
+      streamRef.current = stream;
+      setShowCamera(true);
+      setTimeout(() => {
+        if (videoRef.current) videoRef.current.srcObject = stream;
+      }, 0);
+      const Detector = (window as unknown as { BarcodeDetector?: new () => { detect: (v: HTMLVideoElement) => Promise<Array<{ rawValue: string }>> } }).BarcodeDetector;
+      if (Detector) {
+        const detector = new Detector();
+        const tick = async () => {
+          if (!streamRef.current) return;
+          try {
+            const codes = await detector.detect(videoRef.current!);
+            const code = codes[0]?.rawValue?.trim().toLowerCase();
+            if (code) {
+              const prod = findProductBySku(products, code);
+              if (prod) {
+                addLine(prod.id);
+                setCameraMsg(`اسکین ہوا: ${prod.name}`);
+                stopCamera();
+                return;
+              }
+              setCameraMsg("بارکوڈ ملا مگر یہ آئٹم دکان میں نہیں ہے۔");
+            }
+          } catch {
+            /* detector hiccup — keep previewing */
+          }
+          if (streamRef.current) setTimeout(tick, 600);
+        };
+        setTimeout(tick, 600);
+      } else {
+        setCameraMsg("اس براؤزر میں خودکار بارکوڈ پڑھنا دستیاب نہیں — کوڈ دیکھ کر نیچے بارکوڈ باکس میں لکھیں۔");
+      }
+    } catch {
+      setCameraMsg("کیمرہ نہیں کھلا — براؤزر کی کیمرہ اجازت چیک کریں، یا بارکوڈ باکس استعمال کریں۔");
+    }
+  };
+
+  const submitAdvance = () => {
+    if (!customerId) {
+      fail("ایڈوانس کے لیے پہلے کسٹمر منتخب کریں (نیا کسٹمر بنائیں یا فہرست سے چنیں)۔");
+      return;
+    }
+    const amt = Math.round(parseFloat(advAmount) || 0);
+    if (!(amt > 0)) {
+      fail("ایڈوانس کی رقم صفر سے زیادہ ہونی چاہیے۔");
+      return;
+    }
+    const cust = customers.find((c) => c.id === customerId);
+    addCustomerAdvance({
+      customerId,
+      customerName: cust?.name ?? customerName,
+      customerPhone: cust?.phone ?? customerPhone,
+      amount: amt,
+      method: advMethod,
+      note: advNote.trim(),
+    });
+    setAdvAmount("");
+    setAdvNote("");
+    succeed(`ایڈوانس درج ہو گیا: ${fmtPKR(amt)} — یہ رقم unearned کھاتے میں گئی ہے، وصولیوں (receivables) میں نہیں۔`);
+  };
+
   const resumeHeld = (bill: Bill) => {
     setNotice(null);
     setCart(
@@ -1089,6 +1195,68 @@ export default function BillingDesk() {
           <p className="lead">{t("billing.subtitle")}</p>
         </div>
 
+        {/* MC Billing workflow adoption 2026-10-27 (WEB) — POS polish:
+            keyboard shortcuts that actually work, camera scan,
+            DD/MM/YYYY date, billing-time advance, own-letterhead
+            receipt (the print sheet uses THIS business's branding
+            from settings, never another tenant's stored image). */}
+        <section className="card" aria-label="POS shortcuts and date" style={{ marginBottom: 18 }}>
+          <p style={{ margin: 0 }}>
+            <b>کی بورڈ شارٹ کٹس:</b> F2 = بارکوڈ باکس پر جائیں · Enter = اسکین شدہ آئٹم بل میں ڈالیں · Ctrl+H = بل ہولڈ کریں
+            {" · "}آج کی تاریخ: <b>{fmtDateShort(new Date())}</b> (DD/MM/YYYY)
+          </p>
+          <p style={{ margin: "8px 0 0", color: "var(--muted)", fontSize: "0.92rem" }}>
+            {STOCK_DEDUCTION_NOTE} رسید اسی دکان کے اپنے لیٹرہیڈ کے ساتھ پرنٹ ہوتی ہے۔
+          </p>
+          <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginTop: 12 }}>
+            <button type="button" className="btn btn-ghost btn-sm" onClick={() => (showCamera ? stopCamera() : void startCamera())}>
+              {showCamera ? "کیمرہ بند کریں" : "📷 کیمرہ اسکین"}
+            </button>
+          </div>
+          {showCamera && (
+            <div style={{ marginTop: 12 }}>
+              <video ref={videoRef} autoPlay playsInline muted style={{ width: "100%", maxWidth: 420, borderRadius: 12, background: "#000" }} />
+              {cameraMsg && <p style={{ margin: "8px 0 0" }}>{cameraMsg}</p>}
+              <p className="hint">کیمرہ صرف بارکوڈ پڑھنے کے لیے کھلتا ہے؛ کوئی تصویر محفوظ نہیں ہوتی۔</p>
+            </div>
+          )}
+          {!showCamera && cameraMsg && <p style={{ margin: "8px 0 0" }}>{cameraMsg}</p>}
+        </section>
+
+        {/* MC Billing workflow adoption 2026-10-27 (WEB) — billing-time
+            customer advance: its own balanced entry (Dr money /
+            Cr customer_advances, unearned), separate from the bill
+            itself, so a bill's own entry stays one event = one entry. */}
+        <section className="card" aria-label="Customer advance at billing" style={{ marginBottom: 18 }}>
+          <h3 style={{ margin: "0 0 4px" }}>کسٹمر ایڈوانس (بلنگ کے وقت)</h3>
+          <p className="hint" style={{ margin: "0 0 12px" }}>
+            کسٹمر سے پیشگی رقم لیں — یہ بل کی ادائیگی نہیں ہے۔ بل کی ادائیگی وصولیاں کم کرتی ہے؛ ایڈوانس unearned کھاتے میں جاتا ہے اور کسٹمر لیجر میں الگ نظر آتا ہے۔ پرانے ایڈوانس کی تاریخ کبھی بدلی نہیں جاتی۔
+          </p>
+          <div style={{ display: "flex", gap: 10, flexWrap: "wrap", alignItems: "end" }}>
+            <label className="field" style={{ minWidth: 160 }}>
+              <span>رقم</span>
+              <input type="number" min="0" value={advAmount} onChange={(e) => setAdvAmount(e.target.value)} placeholder="0" />
+            </label>
+            <label className="field" style={{ minWidth: 140 }}>
+              <span>طریقہ</span>
+              <select value={advMethod} onChange={(e) => setAdvMethod(e.target.value as typeof advMethod)}>
+                <option value="cash">کیش</option>
+                <option value="jazzcash">JazzCash</option>
+                <option value="easypaisa">EasyPaisa</option>
+                <option value="bank">بینک</option>
+              </select>
+            </label>
+            <label className="field" style={{ flex: "1 1 180px" }}>
+              <span>نوٹ (اختیاری)</span>
+              <input type="text" value={advNote} onChange={(e) => setAdvNote(e.target.value)} placeholder="کس چیز کے لیے پیشگی؟" />
+            </label>
+            <button type="button" className="btn btn-primary btn-sm" onClick={submitAdvance} disabled={!customerId}>
+              ایڈوانس درج کریں
+            </button>
+          </div>
+          {!customerId && <p className="hint" style={{ margin: "8px 0 0" }}>پہلے بل کے کسٹمر باکس میں کسٹمر منتخب کریں، پھر ایڈوانس درج ہو گا۔</p>}
+        </section>
+
         {/* ================= A) Bill builder — POS two-pane =================
             LEFT: product find (SKU + instant-add search) and held
             bills. RIGHT: the sticky cart — customer, lines, totals
@@ -1131,6 +1299,7 @@ export default function BillingDesk() {
               <label htmlFor="bill-sku">{t("billing.skuLabel")}</label>
               <input
                 id="bill-sku"
+                ref={skuRef}
                 type="text"
                 autoFocus
                 placeholder={t("billing.skuPlaceholder")}

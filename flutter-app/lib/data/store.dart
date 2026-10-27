@@ -36,6 +36,7 @@ import '../core/composers_f2.dart';
 import '../core/documents.dart';
 import '../core/ledger.dart';
 import '../core/loyalty.dart';
+import '../core/mc_workflow.dart' as mc;
 import '../core/periods.dart';
 import '../core/permissions.dart';
 import '../core/plans.dart';
@@ -1832,6 +1833,21 @@ class ShopStore extends ChangeNotifier {
     batch.set(_col('journal').doc(entry.id), entry.toMap());
   }
 
+  /// MC Billing workflow adoption (mobile): EVERY product-stock
+  /// write moves BOTH stock columns in the same update — the
+  /// mobile `stockQty` plus the web parity pair `current_stock` /
+  /// `current_qty`. A sale that moves only one column was the
+  /// known mobile parity gap; the offline-bill sync parity test
+  /// (mc.offlineBillParity) pins all three equal after a sale.
+  void _stockIncrement(WriteBatch batch, String productId, double delta) {
+    if (delta == 0) return;
+    batch.update(_col('products').doc(productId), {
+      'stockQty': FieldValue.increment(delta),
+      'current_stock': FieldValue.increment(delta),
+      'current_qty': FieldValue.increment(delta),
+    });
+  }
+
   void _levelDelta(WriteBatch batch, String warehouseId, String productId, double delta) {
     final id = '${warehouseId}__$productId';
     batch.set(
@@ -2049,8 +2065,13 @@ class ShopStore extends ChangeNotifier {
     for (final s in composed.saleRows) {
       batch.set(_col('sales').doc(s.id), s.toMap());
     }
+    // MC workflow §3 — STOCK DEDUCTS EXACTLY ONCE, AT THE INVOICE:
+    // the bill posting here is the one deduction for these goods.
+    // A challan citing the same order deducts NOTHING (dispatch
+    // writes status + number only), so SO → challan → invoice
+    // can never double-deduct. Both stock columns move together.
     for (final it in priced.items) {
-      batch.update(_col('products').doc(it.productId), {'stockQty': FieldValue.increment(-it.qty)});
+      _stockIncrement(batch, it.productId, -it.qty);
       _levelDelta(batch, billWh, it.productId, -it.qty);
     }
     if (composed.creditRow != null) {
@@ -2166,7 +2187,7 @@ class ShopStore extends ChangeNotifier {
     }
     final batch = db.batch();
     batch.set(_col('sales').doc(sale.id), sale.toMap());
-    batch.update(_col('products').doc(product.id), {'stockQty': FieldValue.increment(-qty)});
+    _stockIncrement(batch, product.id, -qty);
     _levelDelta(batch, defWh, product.id, -qty);
     _postEntry(batch, guarded.single);
     _rideInvoiceCounter(batch);
@@ -2226,7 +2247,7 @@ class ShopStore extends ChangeNotifier {
       'status': allReturned ? 'returned' : 'partially_returned',
     });
     for (final it in composed.saleReturn.items) {
-      batch.update(_col('products').doc(it.productId), {'stockQty': FieldValue.increment(it.qty)});
+      _stockIncrement(batch, it.productId, it.qty);
       _levelDelta(batch, billWh, it.productId, it.qty);
     }
     for (final s in composed.negSales) {
@@ -2279,7 +2300,7 @@ class ShopStore extends ChangeNotifier {
       'status': 'voided',
     });
     for (final it in bill.items) {
-      batch.update(_col('products').doc(it.productId), {'stockQty': FieldValue.increment(it.qty)});
+      _stockIncrement(batch, it.productId, it.qty);
       _levelDelta(batch, billWh, it.productId, it.qty);
     }
     for (final s in composed.negSales) {
@@ -2341,7 +2362,12 @@ class ShopStore extends ChangeNotifier {
     if (!can(role, 'inventoryManage', 'write')) return;
     final batch = db.batch();
     if (isNew) {
-      batch.set(_col('products').doc(p.id), p.toMap());
+      // Both web stock columns start equal to stockQty, so a new
+      // product is in parity from birth (never 0 in one column
+      // while the other carries stock).
+      batch.set(_col('products').doc(p.id), {
+        ...p.toMap(), 'current_stock': p.stockQty, 'current_qty': p.stockQty,
+      });
     } else {
       batch.update(_col('products').doc(p.id), p.toMap());
     }
@@ -2371,7 +2397,7 @@ class ShopStore extends ChangeNotifier {
       'ts': DateTime.now().toUtc().toIso8601String(),
       if (originDevice.isNotEmpty) 'originDevice': originDevice,
     });
-    batch.update(_col('products').doc(product.id), {'stockQty': composed.newQty});
+    batch.update(_col('products').doc(product.id), {'stockQty': composed.newQty, 'current_stock': composed.newQty, 'current_qty': composed.newQty});
     _levelDelta(batch, wh, product.id, composed.delta);
     _postEntry(batch, guarded.single);
     await _commit(batch, () => []);
@@ -2470,6 +2496,75 @@ class ShopStore extends ChangeNotifier {
     return true;
   }
 
+  /// MC workflow §5 — a customer receipt SPLIT AT ENTRY: the
+  /// caller states the bill-payment part and the advance part of
+  /// one cash receipt. ONE atomic balanced entry posts (Dr money
+  /// for the total; Cr receivables for the bill part; Cr
+  /// `customer_advances` for the advance — the dedicated unearned
+  /// account, see mc_workflow.dart), plus one credit row per part (the
+  /// advance row carries kind 'advance' so the customer ledger
+  /// shows it). Old advances are never restated: this only posts
+  /// the new receipt. A cheque receipt is a bill payment only and
+  /// keeps the existing addRepayment path.
+  Future<bool> recordCustomerReceipt({
+    required String? customerId,
+    required String customerName,
+    required String customerPhone,
+    required double billPayment,
+    required double advance,
+    required String method,
+    String? accountId,
+    String? billId,
+    String note = '',
+  }) async {
+    if (!can(role, 'creditRepayment', 'write')) return false;
+    final split = mc.normalizeReceiptSplit(
+      total: billPayment + advance, billPayment: billPayment, advance: advance,
+    );
+    if (split == null) return false;
+    final ts = _now();
+    final entry = mc.composeReceiptSplitEntry(
+      receiptId: newId('rcpt'), customerId: customerId, customerName: customerName,
+      method: method, accountId: resolveAccountId(accounts, method, accountId),
+      billPayment: split.billPayment, advance: split.advance, ts: ts,
+    );
+    final List<JournalEntry> guarded;
+    try {
+      guarded = guardPostings([entry]);
+    } on PeriodLockedError {
+      lastError = 'period-locked';
+      notifyListeners();
+      return false;
+    }
+    final batch = db.batch();
+    if (split.billPayment > 0) {
+      final billRowId = newId('cr');
+      batch.set(_col('credits').doc(billRowId), CreditEntry(
+        id: billRowId, customerId: customerId, customerName: customerName,
+        customerPhone: customerPhone, kind: 'repayment', amount: split.billPayment,
+        method: method, accountId: resolveAccountId(accounts, method, accountId),
+        voucherNo: nextDocNumber('receiptVoucher',
+            credits.where((e) => e.kind == 'repayment').map((e) => e.voucherNo).toList(),
+            settings.docSeries),
+        note: note, billId: billId, dayOffset: 0, ts: ts, originDevice: originDevice,
+      ).toMap());
+    }
+    if (split.advance > 0) {
+      final advRowId = newId('cr');
+      batch.set(_col('credits').doc(advRowId), CreditEntry(
+        id: advRowId, customerId: customerId, customerName: customerName,
+        customerPhone: customerPhone, kind: 'advance', amount: split.advance,
+        method: method, accountId: resolveAccountId(accounts, method, accountId),
+        voucherNo: nextDocNumber('receiptVoucher',
+            credits.map((e) => e.voucherNo).toList(), settings.docSeries),
+        note: note, billId: billId, dayOffset: 0, ts: ts, originDevice: originDevice,
+      ).toMap());
+    }
+    _postEntry(batch, guarded.single);
+    await _commit(batch, () => [guarded.single.toMap()]);
+    return true;
+  }
+
   /* ---------------- day close ---------------- */
 
   /// Journal-derived expected cash for the default till account:
@@ -2554,6 +2649,8 @@ class ShopStore extends ChangeNotifier {
     for (final it in purchase.items) {
       batch.update(_col('products').doc(it.productId), {
         'stockQty': FieldValue.increment(it.qty),
+        'current_stock': FieldValue.increment(it.qty),
+        'current_qty': FieldValue.increment(it.qty),
         'costPrice': it.unitCost,
       });
       _levelDelta(batch, wh, it.productId, it.qty);
@@ -2626,7 +2723,7 @@ class ShopStore extends ChangeNotifier {
     batch.set(_col('purchaseReturns').doc(composed.ret.id), composed.ret.toMap());
     batch.set(_col('notes').doc(composed.note.id), composed.note.toMap());
     for (final it in composed.ret.items) {
-      batch.update(_col('products').doc(it.productId), {'stockQty': FieldValue.increment(-it.qty)});
+      _stockIncrement(batch, it.productId, -it.qty);
       _levelDelta(batch, wh, it.productId, -it.qty);
     }
     _postEntry(batch, guarded.single);
@@ -3036,6 +3133,12 @@ class ShopStore extends ChangeNotifier {
     if (!can(role, 'quotations', 'view')) return null;
     final q = quotations.where((x) => x.id == quotationId).firstOrNull;
     if (q == null || (q.status != 'issued' && q.status != 'accepted')) return null;
+    // MC workflow §2 — converted quotations are LOCKED: a quotation
+    // whose derived status is already `converted` (fully converted
+    // via orders and/or bills) refuses any further conversion, even
+    // if its stored status still reads issued/accepted. The
+    // remaining-qty clamp below is the second line of defence.
+    if (mc.quotationLockedForConversion(q, saleOrders, bills)) return null;
     final converted = quotationConvertedTotalQty(q, saleOrders, bills);
     final lines = <DocLine>[];
     for (final p in picks) {
@@ -3215,6 +3318,9 @@ class ShopStore extends ChangeNotifier {
     return true;
   }
 
+  /// MC workflow §3 — dispatching a challan deducts NOTHING.
+  /// The stock deduction happens exactly once, at the invoice
+  /// (see postBill). This update writes status + number only.
   Future<bool> dispatchChallan(String id) async {
     if (!can(role, 'saleOrders', 'write')) return false;
     final c = deliveryChallans.where((x) => x.id == id).firstOrNull;
@@ -3402,8 +3508,7 @@ class ShopStore extends ChangeNotifier {
   int _todayOffset() => 0;
 
   void _productDelta(WriteBatch batch, String productId, double delta) {
-    if (delta == 0) return;
-    batch.update(_col('products').doc(productId), {'stockQty': FieldValue.increment(delta)});
+    _stockIncrement(batch, productId, delta);
   }
 
   /* ---------------- warehouses (§1) ---------------- */

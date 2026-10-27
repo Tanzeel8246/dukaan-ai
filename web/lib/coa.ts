@@ -20,7 +20,8 @@
  * existing code changes name, type or meaning.
  * Phase H · H1 adds the registry's TWO Phase H codes additively —
  * `loyalty_payable` + `expense_loyalty` (Phase H design §1.2) —
- * under the same discipline. Registry count: 28 → 30.
+ * under the same discipline. Registry count: 28 → 30, then 31
+ * with the 2026-10-27 workflow adoption's `customer_advances`.
  */
 import type { AccountCode } from "./types";
 
@@ -85,6 +86,10 @@ export const CHART_OF_ACCOUNTS: Record<AccountCode, AccountMeta> = {
   /* ---- Phase H · H1 — additive (Phase H design §1.2) ---- */
   loyalty_payable: { type: "liability", normalBalance: "credit", since: "H" },
   expense_loyalty: { type: "expense", normalBalance: "debit", since: "H" },
+  /* MC Billing workflow adoption 2026-10-27 (WEB): customer
+   * advances, unearned — additive only, no existing code changes
+   * name, type or meaning. */
+  customer_advances: { type: "liability", normalBalance: "credit", since: "H" },
 };
 
 /** Every valid account code, in registry order. */

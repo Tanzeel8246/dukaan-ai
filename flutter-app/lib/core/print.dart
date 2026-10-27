@@ -4,6 +4,7 @@
 /// redesigns a receipt; it renders the owner's saved
 /// settings.printDesign on the device's paper. Print output NEVER
 /// follows the app theme (E1): the palette is fixed light.
+import 'mc_workflow.dart' show formatDdMmYyyy;
 import 'types.dart';
 
 class PrintDesignView {
@@ -105,7 +106,7 @@ ReceiptData receiptForBill({
     shopAddress: ownerDoc['shopAddress']?.toString() ?? '',
     logoDataUrl: design.showLogo ? ownerDoc['brandLogo']?.toString() : null,
     billNoLabel: '$billNoText ${bill.billNo}',
-    dateLabel: bill.ts.length >= 10 ? bill.ts.substring(0, 10) : bill.ts,
+    dateLabel: formatDdMmYyyy(bill.ts),
     customerLabel: bill.customerName.isNotEmpty ? bill.customerName : walkInLabel,
     customerPhone: bill.customerPhone.isNotEmpty ? bill.customerPhone : null,
     lines: bill.items

@@ -28,6 +28,8 @@ import {
   supplierReturned,
 } from "@/lib/ledger";
 import { paymentVoucherData, purchaseReturnedQty } from "@/lib/documents";
+import { purchasePipelineCounters } from "@/lib/workflow";
+import { accountNormalBalance } from "@/lib/ledger";
 import { VoucherPrintSheet } from "./DocPrintSheet";
 import type { Purchase, Supplier, SupplierPayment } from "@/lib/types";
 import { AccountPicker, NegativeBalanceWarning } from "./MoneyAccounts";
@@ -179,6 +181,27 @@ export default function SuppliersManager() {
       .reduce((a, p) => a + p.amount, 0);
     return { totalPayable, count: suppliers.length, purchasedThisMonth, paidThisMonth };
   }, [suppliers, purchases, supplierPayments, purchaseReturns]);
+
+  /* MC Billing workflow adoption 2026-10-27 (WEB) — pipeline
+   * counters with a CORRECT Received count: Received derives
+   * from goods actually received against each PO (lib/documents),
+   * never from a cached status label; Unpaid counts received
+   * POs whose supplier still carries an open ledger balance.
+   * AP tie-out: Σ supplier balances must equal payables GL. */
+  const pipeline = useMemo(
+    () =>
+      purchasePipelineCounters(purchaseOrders, purchases, (sid) =>
+        supplierBalance(purchases, supplierPayments, sid, purchaseReturns)
+      ),
+    [purchaseOrders, purchases, supplierPayments, purchaseReturns]
+  );
+  const apTieOut = useMemo(
+    () => ({
+      subledger: summary.totalPayable,
+      gl: accountNormalBalance(journal, "payables"),
+    }),
+    [summary.totalPayable, journal]
+  );
 
   /* ---------------- supplier form ---------------- */
 
@@ -541,6 +564,21 @@ export default function SuppliersManager() {
             </div>
           </div>
         </div>
+
+        <section className="card" aria-label="Purchase pipeline and AP tie-out" style={{ marginBottom: 22 }}>
+          <h3 style={{ margin: "0 0 4px", fontSize: "1.1rem" }}>پرچیز پائپ لائن — Draft / Confirmed / Received / Unpaid</h3>
+          <p style={{ margin: "0 0 12px" }}>
+            Draft: <b>{pipeline.draft}</b> · Confirmed (جاری): <b>{pipeline.confirmed}</b> · Received (مال واقعی موصول): <b>{pipeline.received}</b> · Unpaid (موصول مگر ادائیگی باقی): <b>{pipeline.unpaid}</b>
+          </p>
+          <p style={{ margin: 0, color: "var(--muted)", fontSize: "0.92rem" }}>
+            Received کی گنتی محض حیثیت کے لیبل سے نہیں، موصول شدہ مال کی مقدار سے نکلتی ہے — اس لیے غلط "Confirmed" گنتی یہاں نہیں بن سکتی۔
+            AP tie-out: سپلائر بیلنس کا مجموعہ {fmtPKR(apTieOut.subledger)} بمقابلہ payables GL {fmtPKR(apTieOut.gl)} — فرق {fmtPKR(apTieOut.subledger - apTieOut.gl)}
+            {apTieOut.subledger - apTieOut.gl === 0 ? " (برابر ✓)" : " — فرق کی وجہ چیک کریں، دعویٰ نہیں کیا جا رہا۔"}
+          </p>
+          <p style={{ margin: "8px 0 0" }}>
+            <a className="btn btn-ghost btn-sm" href="/purchase-orders">پرچیز آرڈر → بل (کنورژن) کھولیں</a>
+          </p>
+        </section>
 
         {notice && (
           <div

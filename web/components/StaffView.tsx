@@ -145,6 +145,17 @@ export default function StaffView() {
           <p className="lead">{t("staff.subtitle")}</p>
         </div>
 
+        {/* MC Billing workflow adoption 2026-10-27 (WEB, plan §16) —
+            least-privilege cashier defaults (lib/permissions matrix):
+            a new cashier CANNOT delete (billingVoid/inventoryManage/
+            staffManage all N), CANNOT see P&L/margins/export
+            (finance N, inventoryCost N, trialBalanceExports N), and
+            every role change is logged by the store's audit trail.
+            This is the opposite of MC Billing's permissive default. */}
+        <div className="note-box" style={{ marginBottom: 22 }}>
+          کیشیئر کا ڈیفالٹ رول least-privilege ہے: کیشیئر ڈیلیٹ نہیں کر سکتا، P&amp;L / مارجن / ایکسپورٹ نہیں دیکھ سکتا۔ رول میں تبدیلی لاگ ہوتی ہے۔
+        </div>
+
         <div className="rep-chips" role="tablist" aria-label={t("staff.tabsAria")} style={{ marginBottom: 22 }}>
           <button
             type="button"

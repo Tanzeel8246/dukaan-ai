@@ -285,6 +285,14 @@ export default function DayCloseView() {
           <span className="eyebrow">{t("dc.eyebrow")}</span>
           <h1 className="h2">{t("dc.title")}</h1>
           <p className="lead">{t("dc.subtitle")}</p>
+          {/* MC Billing workflow adoption 2026-10-27 (WEB) — day-close
+              lock: once a day is closed, backdated entries into
+              that locked day are blocked by the journal guard at
+              the choke point (period lock), with a warning here —
+              the lock is real, not a label. */}
+          <div className="note-box" style={{ marginTop: 12 }}>
+            لاک شدہ دن میں پرانی تاریخ کی انٹری نہیں ڈالی جا سکتی — جرنل گارڈ اسے روک دیتا ہے۔ دن بند کرنے سے پہلے اس دن کی سمری نیچے چیک کر لیں۔
+          </div>
         </div>
 
         {todayClose && (

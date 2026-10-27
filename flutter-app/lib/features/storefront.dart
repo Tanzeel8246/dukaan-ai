@@ -239,7 +239,7 @@ class _StorefrontScreenState extends State<StorefrontScreen> {
                           }),
                   title: Text(p.name),
                   subtitle: Text(
-                      '${fmtRs(p.salePrice)} · ${s.raw('store.band.${shown.contains(p.id) ? stockBandFor(p.stockQty, p.reorderLevel) : 'hidden'}')}'),
+                      '${fmtRs(p.salePrice)} · ${s.raw('mc.store.stockQty').replaceAll('{qty}', '${p.stockQty}')} · ${s.raw('store.band.${shown.contains(p.id) ? stockBandFor(p.stockQty, p.reorderLevel) : 'hidden'}')}'),
                 ),
               if (isOwner) ...[
                 const SizedBox(height: 6),

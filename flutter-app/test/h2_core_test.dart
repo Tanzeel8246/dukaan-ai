@@ -85,9 +85,10 @@ void expectIdentities(List<JournalEntry> journal, String nowIso, String what) {
 
 void main() {
   group('registry + gating', () {
-    test('COA: 30 codes, the loyalty pair last', () {
-      expect(accountCodes.length, 30);
-      expect(accountCodes.sublist(28), ['loyalty_payable', 'expense_loyalty']);
+    test('COA: 31 codes, customer_advances last (owner decision 2026-10-27: web convention)', () {
+      expect(accountCodes.length, 31);
+      expect(accountCodes.sublist(28),
+          ['loyalty_payable', 'expense_loyalty', 'customer_advances']);
     });
     test('plan gating: loyalty is a Standard (Growth) module', () {
       expect(moduleMinTier('loyalty'), 'standard');

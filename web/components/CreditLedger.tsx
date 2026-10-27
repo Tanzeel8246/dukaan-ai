@@ -8,6 +8,7 @@ import { useLang } from "./LangProvider";
 import { can } from "@/lib/permissions";
 import { IconCash, IconClose, IconPlus, IconSearch, SearchClear } from "./ui";
 import { fmtDate, fmtPKR } from "@/lib/format";
+import { splitReceipt } from "@/lib/workflow";
 import {
   creditKey,
   customerOutstanding,
@@ -53,7 +54,7 @@ interface Group {
 const WALKIN = "__walkin";
 
 export default function CreditLedger() {
-  const { ready, customers, credits, accounts, cheques, settings, branding, addCredit, addRepayment } = useStore();
+  const { ready, customers, credits, accounts, cheques, settings, branding, addCredit, addRepayment, addCustomerAdvance } = useStore();
   const { role } = useAuth();
   /* A3: giving standalone udhaar is owner/manager; recording a
    * repayment is open to every role (separate matrix rows). */
@@ -238,10 +239,20 @@ export default function CreditLedger() {
       setRepayError(t("credit.repay.err.amount"));
       return;
     }
-    if (amount > repayTarget.outstanding) {
-      setRepayError(
-        t("credit.repay.err.exceeds", { amount: fmtPKR(repayTarget.outstanding) })
-      );
+    /* MC Billing workflow adoption 2026-10-27 (WEB) — receipt
+     * split AT ENTRY: the part up to the outstanding bill amount
+     * settles receivables; anything above it is NOT forced into a
+     * repayment — it posts as a customer advance (unearned).
+     * Cheque receipts cannot carry an advance part (a cheque
+     * settles a bill, it does not prepay one), and advances need
+     * a directory customer to attach to. */
+    const split = splitReceipt(amount, Math.max(0, repayTarget.outstanding));
+    if (split.advance > 0 && repayMethod === "cheque") {
+      setRepayError("چیک سے ایڈوانس نہیں لیا جا سکتا — چیک صرف بقایا بل تک ہو، یا نقد/والٹ/بینک سے لیں۔");
+      return;
+    }
+    if (split.advance > 0 && !repayTarget.customerId) {
+      setRepayError("ایڈوانس صرف ڈائریکٹری کے کسٹمر کے نام درج ہو سکتا ہے — پہلے کسٹمر ڈائریکٹری میں شامل کریں۔");
       return;
     }
     // B5: a cheque repayment must carry its captured instrument.
@@ -250,11 +261,11 @@ export default function CreditLedger() {
       setRepayError(t("chq.err.capture"));
       return;
     }
-    addRepayment({
+    if (split.billPayment > 0) addRepayment({
       customerId: repayTarget.customerId,
       customerName: repayTarget.name,
       customerPhone: repayTarget.phone,
-      amount,
+      amount: split.billPayment,
       method: repayMethod === "cheque" ? "bank" : repayMethod,
       accountId: repayMethod === "cheque" ? null : repayAccountId || null,
       note: repayNote.trim(),
@@ -262,9 +273,22 @@ export default function CreditLedger() {
         ? { instrument: "cheque" as const, cheque: draft }
         : {}),
     });
+    if (split.advance > 0 && repayTarget.customerId) {
+      addCustomerAdvance({
+        customerId: repayTarget.customerId,
+        customerName: repayTarget.name,
+        customerPhone: repayTarget.phone,
+        amount: split.advance,
+        method: repayMethod as "cash" | "jazzcash" | "easypaisa" | "bank",
+        accountId: repayAccountId || null,
+        note: repayNote.trim(),
+      });
+    }
     setNotice({
       ok: true,
-      text: t("credit.notice.repaid", { amount: fmtPKR(amount), name: repayTarget.name }),
+      text: split.advance > 0
+        ? `رسید تقسیم ہو کر درج ہوئی: بل کی ادائیگی ${fmtPKR(split.billPayment)} (وصولیاں کم ہوئیں) + ایڈوانس ${fmtPKR(split.advance)} (unearned کھاتے میں) — ${repayTarget.name}`
+        : t("credit.notice.repaid", { amount: fmtPKR(amount), name: repayTarget.name }),
     });
     setRepayTarget(null);
   };
@@ -665,6 +689,16 @@ export default function CreditLedger() {
                     <div className="hint">
                       {t("credit.repay.maxHint", { amount: fmtPKR(repayTarget.outstanding) })}
                     </div>
+                    {(() => {
+                      const sp = splitReceipt(Number(repayAmount) || 0, Math.max(0, repayTarget.outstanding));
+                      return (
+                        <div className="note-box" style={{ marginTop: 8 }}>
+                          <b>اندراج کے وقت تقسیم (live سمری):</b> بل کی ادائیگی {fmtPKR(sp.billPayment)} — وصولیاں اتنی کم ہوں گی
+                          {sp.advance > 0 ? ` · ایڈوانس ${fmtPKR(sp.advance)} — unearned کھاتے میں جائے گا، وصولیوں میں نہیں` : " · کوئی ایڈوانس نہیں"}۔
+                          رسید پرنٹ اسی تقسیم کے ساتھ ہو گی۔
+                        </div>
+                      );
+                    })()}
                   </div>
                   <div className="field">
                     <label htmlFor="rp-method">{t("credit.field.method")}</label>

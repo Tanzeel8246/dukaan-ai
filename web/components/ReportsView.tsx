@@ -1251,6 +1251,29 @@ export default function ReportsView() {
           <p className="lead">{t("rep.subtitle")}</p>
         </div>
 
+        {/* MC Billing workflow adoption 2026-10-27 (WEB) — Reports Hub:
+            MC Billing has NO central hub; Dukaan does better. Every
+            report below is one click away — the same catalogue the
+            chips select, listed as a hub index. */}
+        <section className="card" aria-label="Reports hub" style={{ marginBottom: 18 }}>
+          <h3 style={{ margin: "0 0 4px" }}>رپورٹس ہب — تمام رپورٹس ایک جگہ سے</h3>
+          <p className="hint" style={{ margin: "0 0 12px" }}>
+            کسی بھی رپورٹ پر کلک کریں — وہی رپورٹ نیچے کھل جائے گی۔ MC Billing میں سینٹرل ہب غائب تھا؛ یہاں ہب پہلے ہے۔
+          </p>
+          <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+            {CATALOGUE.map((r) => (
+              <button
+                key={r.id}
+                type="button"
+                className={"btn " + (reportId === r.id ? "btn-primary" : "btn-ghost") + " btn-sm"}
+                onClick={() => setReportId(r.id)}
+              >
+                {t(r.title)}
+              </button>
+            ))}
+          </div>
+        </section>
+
         {/* Compact sticky toolbar (UX overhaul): the fourteen
             reports are chips on one scrollable row, range presets
             beside them, output language + per-report filters +

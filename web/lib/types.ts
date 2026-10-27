@@ -509,7 +509,13 @@ export type AccountCode =
    * cost at earn (Dr expense_loyalty), redemptions settle the
    * liability inside the bill entry itself. */
   | "loyalty_payable" // customer loyalty points owed (used Phase H)
-  | "expense_loyalty"; // loyalty programme cost (used Phase H)
+  | "expense_loyalty" // loyalty programme cost (used Phase H)
+  /* MC Billing workflow adoption 2026-10-27 (WEB): customer
+   * advances held unearned — the [2200] equivalent. Receipt
+   * splits post bill payments to `receivables` and advances
+   * here; advances are NEVER netted into receivables, and old
+   * advances are never restated. */
+  | "customer_advances"; // customer advances, unearned (liability)
 
 export interface JournalLine {
   account: AccountCode;
@@ -530,6 +536,9 @@ export type JournalRefType =
   | "expense_reversal"
   | "credit"
   | "repayment"
+  /* MC Billing workflow adoption 2026-10-27 (WEB): a customer
+   * advance receipt — Dr money / Cr customer_advances. */
+  | "customer_advance"
   | "adjustment"
   | "cashbook"
   | "seed"
@@ -820,6 +829,15 @@ export interface StorefrontProduct {
   category?: string;
   stockState: StoreStockState;
   sort: number;
+  /** MC Billing workflow adoption 2026-10-27 (WEB, plan §17):
+   *  the REAL on-hand quantity at publish time, shown numerically
+   *  on the storefront. Optional so older snapshots (bands only)
+   *  keep rendering; a missing count renders no qty label rather
+   *  than a fake number. NOTE: this supersedes the older
+   *  "bands, never counts" snapshot rule — the harness deep-scan
+   *  assertion for that rule was NOT touched (out of scope) and
+   *  must be updated by its owner to match this plan decision. */
+  stockQty?: number;
 }
 
 /** The published snapshot — `storefronts/{slug}`. A publishing

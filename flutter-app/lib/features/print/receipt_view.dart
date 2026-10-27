@@ -94,6 +94,18 @@ class ReceiptView extends StatelessWidget {
     if (data.raastIban != null && data.raastIban!.isNotEmpty) {
       rows.add(_line('Raast IBAN: ${data.raastIban}'));
     }
+    // MC workflow §4 — Raast QR SLOT: the box the owner's
+    // bank-issued QR image occupies. A generated QR is only ever
+    // provisional (see core/raast.dart) and is never printed as
+    // if it were the bank's own code.
+    if (d.showRaastQr) {
+      rows.add(Container(
+        margin: const EdgeInsets.symmetric(vertical: 6),
+        padding: const EdgeInsets.all(10),
+        decoration: BoxDecoration(border: Border.all(color: const Color(0xFF999999))),
+        child: _line('Raast QR'),
+      ));
+    }
     if (d.showThanks) {
       rows.add(_line(d.thanksText.isNotEmpty ? d.thanksText : thanksFallback));
     }

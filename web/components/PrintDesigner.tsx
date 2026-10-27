@@ -318,6 +318,16 @@ export default function PrintDesignerSection() {
           immediately (they are documents, not design); its
           design-side toggles ride the same draft + Save above. */}
       <BrandAssetsGroup resolved={resolved} edit={edit} disabled={isStaff} />
+      {/* MC Billing workflow adoption 2026-10-27 (WEB, plan §4):
+          print uses ONLY this business's own branding/letterhead
+          from its own settings — never another tenant's stored
+          image. Tax-invoice format comes from the sheet's tax
+          columns; the Raast QR slot shows the bank-issued image
+          when one is saved, and a generated QR stays labelled
+          provisional in the sheet itself. */}
+      <p className="hint" style={{ marginTop: 10 }}>
+        پرنٹ پر صرف اسی دکان کا اپنا لیٹرہیڈ/لوگو آتا ہے — کسی دوسری دکان کا stored امیج کبھی نہیں۔ Raast QR سلاٹ میں بینک کا جاری کردہ امیج لگتا ہے؛ خود بنایا ہوا QR provisional رہتا ہے۔
+      </p>
 
       <h3 style={{ ...groupTitle, marginTop: 26 }}>{t("print.previewTitle")}</h3>
       <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginBottom: 12 }}>

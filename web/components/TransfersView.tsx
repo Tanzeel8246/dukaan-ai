@@ -555,6 +555,9 @@ export default function TransfersView() {
                     </select>
                   </div>
                 </div>
+                <p className="hint" style={{ margin: "0 0 12px" }}>
+                  ٹرانسفر کے لیے ماخذ اور منزل دو مختلف وئیرہاؤسز ہونے چاہئیں — ایک ہی وئیرہاؤس چننے پر فارم روک دیا جاتا ہے۔ مکمل ہونے پر ماخذ کا اسٹاک کم اور منزل کا بڑھ جاتا ہے، دونوں طرف ایک ساتھ۔
+                </p>
                 <div className="field">
                   <label htmlFor="tr-search">{t("tr.lines.product")}</label>
                   <div className="search-box" style={{ maxWidth: "none" }}>

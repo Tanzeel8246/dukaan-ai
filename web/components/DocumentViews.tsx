@@ -19,7 +19,8 @@ import DocPrintSheet, { ChallanPrintSheet, PoPrintSheet } from "./DocPrintSheet"
 import { useLang } from "./LangProvider";
 import type { I18nKey } from "@/lib/i18n";
 import { IconPlus, IconSearch, IconSend, SearchClear } from "./ui";
-import { fmtDate, fmtPKR } from "@/lib/format";
+import { fmtDate, fmtDateShort, fmtPKR } from "@/lib/format";
+import { STOCK_DEDUCTION_NOTE } from "@/lib/workflow";
 import { brandingDataUrls } from "@/lib/branding";
 import { matchesAny } from "@/lib/search";
 import { can } from "@/lib/permissions";
@@ -549,6 +550,7 @@ export function QuotationsManager() {
   const [confirming, setConfirming] = useState<"cancel" | "delete" | null>(null);
   const [showConvert, setShowConvert] = useState(false);
   const [showConvertBill, setShowConvertBill] = useState(false);
+  const [confirmBillConvert, setConfirmBillConvert] = useState(false);
   const [picks, setPicks] = useState<Record<string, string>>({});
   const [notice, setNotice] = useState<{ ok: boolean; text: string } | null>(null);
   const [printDoc, setPrintDoc] = useState<Quotation | null>(null);
@@ -974,12 +976,35 @@ export function QuotationsManager() {
                 picks={picks}
                 setPicks={setPicks}
                 actionLabel="quote.convertToBill"
-                onConvert={() => doConvertBill(selected)}
+                onConvert={() => setConfirmBillConvert(true)}
               />
             )}
           </div>
         )}
       </div>
+      {confirmBillConvert && selected && (
+        <div role="dialog" aria-modal="true" aria-label="Confirm quotation to invoice" style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.45)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 60, padding: 16 }}>
+          <div className="card" style={{ maxWidth: 520, width: "100%" }}>
+            <h3 style={{ marginTop: 0 }}>کوٹیشن سے انوائس بنانے کی تصدیق</h3>
+            <p>
+              کوٹیشن <b>{selected.number ?? ""}</b> سے بل بن رہا ہے۔ انوائس کی تاریخ <b>آج کی تاریخ {fmtDateShort(new Date())}</b> (DD/MM/YYYY) ہو گی —
+              کوٹیشن کی تاریخ انوائس پر نہیں لگے گی۔
+            </p>
+            <p style={{ color: "var(--muted)", fontSize: "0.92rem" }}>
+              بل مکمل ہونے پر ایک متوازن انٹری پوسٹ ہو گی: آمدنی + COGS + اسٹاک میں کمی، اسی انٹری سے۔ {STOCK_DEDUCTION_NOTE} مکمل کنورٹ شدہ کوٹیشن دوبارہ کنورٹ نہیں ہو سکے گی (حیثیت لاک)۔
+            </p>
+            <p className="hint">ابھی صرف بل کا مسودہ بلنگ ڈیسک پر کھلے گا؛ پوسٹنگ وہیں بل مکمل کرنے پر ہو گی۔</p>
+            <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+              <button type="button" className="btn btn-primary" onClick={() => { setConfirmBillConvert(false); setShowConvertBill(false); doConvertBill(selected); }}>
+                جی ہاں، بلنگ ڈیسک پر لے جائیں
+              </button>
+              <button type="button" className="btn btn-ghost" onClick={() => setConfirmBillConvert(false)}>
+                منسوخ کریں
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
       {printDoc && <DocPrintSheet doc={printDoc} kind="quotation" settings={settings} products={products} assets={brandingDataUrls(store.branding)} />}
     </div>
   );
@@ -1834,6 +1859,12 @@ export function DeliveryChallansManager() {
                 ? `${t("challan.sourceOrder")} ${selOrder.number ?? t("doc.draftLabel")}`
                 : t("challan.standalone")}
             </p>
+
+            {/* MC Billing workflow adoption 2026-10-27 (WEB): the chain
+                rule, stated on the challan itself — delivered and
+                invoiced quantities are tracked above; stock moves
+                only when the invoice posts. */}
+            <p style={{ fontSize: "0.9rem", color: "var(--muted)" }}>{STOCK_DEDUCTION_NOTE} آرڈر → چالان → انوائس: ہر مرحلے پر مقداریں اوپر والی ٹیبل سے ملتی ہیں۔</p>
 
             {/* Quantities only — a challan carries no prices (§2.3). */}
             <div className="table-wrap" style={{ marginBottom: 14 }}>

@@ -36,9 +36,9 @@ void main() {
       final ur = await loadDict('ur');
       final ps = await loadDict('ps');
       final fa = await loadDict('fa');
-      expect(en.length, 3137);
+      expect(en.length, 3160);
       for (final d in [ur, ps, fa]) {
-        expect(d.length, 3137);
+        expect(d.length, 3160);
         expect(d.keys.toSet(), en.keys.toSet());
       }
       for (final d in [en, ur, ps, fa]) {

@@ -158,6 +158,13 @@ export default function LoansView() {
                 <p style={{ color: "var(--muted)", maxWidth: 640 }}>
                   {t("loan.subtitle")}
                 </p>
+                {/* MC Billing workflow adoption 2026-10-27 (WEB, plan §15):
+                    loans carry pending/active/repaid status flows;
+                    every drawdown, charge and repayment posts its
+                    own balanced entry through the choke point. */}
+                <p className="hint" style={{ marginTop: 8 }}>
+                  قرض کی ہر حیثیت تبدیلی (drawdown، چارج، ادائیگی) اپنی متوازن انٹری کے ساتھ پوسٹ ہوتی ہے — حیثیت کا لیبل کبھی پیسے کی جگہ نہیں لیتا۔
+                </p>
               </div>
               {canWrite && (
                 <button

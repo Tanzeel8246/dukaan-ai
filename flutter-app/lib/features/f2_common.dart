@@ -3,10 +3,14 @@
 /// dictionary already carries every label these surfaces need.
 import 'package:flutter/material.dart';
 
+import '../core/mc_workflow.dart' show formatDdMmYyyy;
 import '../core/types.dart';
 import '../l10n/app_strings.dart';
 
-String fmtDate(String ts) => ts.length >= 10 ? ts.substring(0, 10) : ts;
+/// MC workflow adoption: dates are ALWAYS DD/MM/YYYY on every
+/// surface that uses this helper (US/ISO dates are a defect, not
+/// a display choice). The pure formatter lives in mc_workflow.
+String fmtDate(String ts) => formatDdMmYyyy(ts);
 
 /// Localized chart-of-accounts label: fin.acct.<code> where the
 /// dictionary carries one, the code itself otherwise (the web's
@@ -119,9 +123,9 @@ class _ChequeDraftFieldsState extends State<ChequeDraftFields> {
         Expanded(child: TextField(controller: widget.bankName, decoration: InputDecoration(labelText: s.raw('chq.field.bank'), isDense: true))),
       ]),
       Row(children: [
-        Expanded(child: TextField(controller: widget.issueDate, decoration: InputDecoration(labelText: s.raw('chq.field.issueDate'), isDense: true, hintText: 'YYYY-MM-DD'))),
+        Expanded(child: TextField(controller: widget.issueDate, decoration: InputDecoration(labelText: s.raw('chq.field.issueDate'), isDense: true, hintText: 'DD/MM/YYYY'))),
         const SizedBox(width: 8),
-        Expanded(child: TextField(controller: widget.dueDate, decoration: InputDecoration(labelText: s.raw('chq.field.dueDate'), isDense: true, hintText: 'YYYY-MM-DD'))),
+        Expanded(child: TextField(controller: widget.dueDate, decoration: InputDecoration(labelText: s.raw('chq.field.dueDate'), isDense: true, hintText: 'DD/MM/YYYY'))),
       ]),
     ]);
   }

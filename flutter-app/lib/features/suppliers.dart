@@ -9,6 +9,7 @@ import 'package:share_plus/share_plus.dart';
 
 import '../app_state.dart';
 import '../core/ledger.dart';
+import '../core/mc_workflow.dart' show poPipelineCounters;
 import '../core/permissions.dart';
 import '../core/reports.dart';
 import '../core/search.dart';
@@ -60,6 +61,18 @@ class _SuppliersScreenState extends State<SuppliersScreen> {
           child: Text('${s.raw('sup.kpi.payableLabel')}: ${fmtRs(payablesTotal(store.journal))}'),
         ),
       ),
+      // MC workflow §7 — pipeline counters from LIVE derived
+      // statuses: Received counts ONLY fully-received POs (the
+      // MC Billing "Confirmed 7" lesson — never a cached label).
+      Builder(builder: (ctx) {
+        final c = poPipelineCounters(store.purchaseOrders, store.purchases, store.supplierPayments, store.purchaseReturns);
+        return Padding(
+          padding: const EdgeInsets.fromLTRB(12, 6, 12, 0),
+          child: Wrap(spacing: 6, runSpacing: 6, children: [
+            Chip(label: Text('${s.raw('mc.po.pipeline')}: ${s.raw('mc.po.draft')} ${c.draft} · ${s.raw('mc.po.confirmed')} ${c.confirmed} · ${s.raw('mc.po.received')} ${c.received} · ${s.raw('mc.po.unpaid')} ${c.unpaid}')),
+          ]),
+        );
+      }),
       Expanded(
         child: ListView.separated(
           itemCount: list.length,

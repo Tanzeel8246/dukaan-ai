@@ -129,9 +129,12 @@ void main() {
       expect(bs.contains('purchases'), isTrue); // clearing carries forward
       expect(bs.contains('sales_revenue'), isFalse);
       // 28 at F4; H1/H2 added the loyalty pair (loyalty_payable to
-      // the balance sheet, expense_loyalty to the P&L set) => 30.
-      expect(bs.length + plAccountCodes().length, 30);
+      // the balance sheet, expense_loyalty to the P&L set) => 30;
+      // 2026-10-27 added customer_advances (liability, balance
+      // sheet) => 31 (owner decision: web convention).
+      expect(bs.length + plAccountCodes().length, 31);
       expect(bs.contains('loyalty_payable'), isTrue);
+      expect(bs.contains('customer_advances'), isTrue);
       expect(plAccountCodes().contains('expense_loyalty'), isTrue);
     });
     test('close state: never closed reads open', () {

@@ -102,6 +102,9 @@ export const TALLY_LEDGER_MAP: Record<AccountCode, TallyLedgerDef> = {
    * groups like every row; the NAMES stay owner-overridable. */
   loyalty_payable: { name: "Customer Loyalty Payable", group: "Current Liabilities" },
   expense_loyalty: { name: "Loyalty Programme Cost", group: "Indirect Expenses" },
+  /* MC Billing workflow adoption 2026-10-27 (WEB): customer
+   * advances, unearned — a current liability, beside loyalty. */
+  customer_advances: { name: "Customer Advances", group: "Current Liabilities" },
 };
 
 type TallySettings =
@@ -146,6 +149,7 @@ export const TALLY_VOUCHER_TYPE_BY_REFTYPE: Record<JournalRefType, TallyVoucherT
   expense_reversal: "Payment",
   credit: "Receipt",
   repayment: "Receipt",
+  customer_advance: "Receipt",
   adjustment: "Journal",
   cashbook: "Journal",
   seed: "Journal",

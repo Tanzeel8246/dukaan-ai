@@ -65,6 +65,7 @@ class _BillingScreenState extends State<BillingScreen> {
   String _discountType = 'flat';
   double _discountValue = 0;
   Customer? _customer;
+  final _advanceCtl = TextEditingController();
   bool _busy = false;
   String? _sourceType;
   String? _sourceId;
@@ -309,6 +310,18 @@ class _BillingScreenState extends State<BillingScreen> {
             ),
           if (creditPart > 0.005)
             Text('${s.raw('bill.creditPart')}: ${fmtRs(creditPart)}', style: TextStyle(color: tokens.amberText)),
+          // MC workflow §1 — advance taken AT BILLING time, for a
+          // named customer: separate from the bill total, it posts
+          // to the customer's advance account after the bill posts.
+          if (_customer != null)
+            Padding(
+              padding: const EdgeInsets.only(top: 6),
+              child: TextField(
+                controller: _advanceCtl,
+                keyboardType: TextInputType.number,
+                decoration: InputDecoration(labelText: s.raw('mc.bill.advance'), helperText: s.raw('mc.bill.advanceHelp'), isDense: true),
+              ),
+            ),
           // H2: the earn preview — what this bill will grant.
           // Walk-in bills say plainly that they earn nothing.
           if (loyaltySt.enabled && _cart.isNotEmpty) ...[
@@ -520,6 +533,15 @@ class _BillingScreenState extends State<BillingScreen> {
       );
     }
     final ok = await store.postBill(bill);
+    // Advance-at-billing: a separate split receipt (bill part 0)
+    // in the same completion flow, after the bill itself posts.
+    final advAtBilling = double.tryParse(_advanceCtl.text.trim()) ?? 0;
+    if (ok && advAtBilling > 0 && _customer != null) {
+      await store.recordCustomerReceipt(
+        customerId: _customer!.id, customerName: _customer!.name, customerPhone: _customer!.phone,
+        billPayment: 0, advance: advAtBilling, method: 'cash', billId: bill.id,
+      );
+    }
     setState(() => _busy = false);
     if (!ok) {
       if (context.mounted) {
@@ -529,6 +551,7 @@ class _BillingScreenState extends State<BillingScreen> {
     }
     setState(() {
       _cart.clear();
+      _advanceCtl.clear();
       _payments
         ..clear()
         ..add(_PayRow('cash', 0));

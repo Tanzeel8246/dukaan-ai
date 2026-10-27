@@ -11,6 +11,7 @@ import ExportsPanel from "./ExportsPanel";
 import { can } from "@/lib/permissions";
 import { IconCash, IconChart, IconTruck } from "./ui";
 import { fmtDate, fmtPKR } from "@/lib/format";
+import { tieOutChecks, allTieOutsPass } from "@/lib/workflow";
 import type { I18nKey } from "@/lib/i18n";
 import type { AccountCode, JournalEntry } from "@/lib/types";
 import {
@@ -26,6 +27,7 @@ import {
   profitAndLoss,
   profitAndLossInRange,
   receivablesAging,
+  supplierBalance,
   receivablesTotal,
   walletBalance,
 } from "@/lib/ledger";
@@ -941,6 +943,37 @@ export default function FinanceView() {
             </div>
           </section>
 
+          {(() => {
+            const apSub = suppliers.reduce((a, sp) => a + supplierBalance(purchases, supplierPayments, sp.id, purchaseReturns), 0);
+            const checks = tieOutChecks({ journal, credits, products, apSubledger: apSub });
+            const allPass = allTieOutsPass(checks);
+            return (
+              <section className="card" aria-label="Finance tie-outs" style={{ marginBottom: 20 }}>
+                <h2 style={{ fontSize: "1.2rem", marginBottom: 4 }}>Tie-Out چیکس — TB، AR، ویلیوایشن، AP</h2>
+                <p style={{ color: "var(--muted)", fontSize: "0.92rem", margin: "0 0 12px" }}>
+                  {allPass
+                    ? "تمام tie-outs برابر ہیں — اس لیے یہ صفحہ متوازن ہونے کا دعویٰ کر سکتا ہے۔"
+                    : "کچھ tie-outs میں فرق ہے — فرق نیچے لکھا ہے، اسے چھپا کر \"100% balanced\" کا دعویٰ نہیں کیا جا رہا۔ دستی پلگ ہو تو وہ بھی یہیں دستاویز کے ساتھ نظر آئے گا۔"}
+                </p>
+                <div className="table-wrap" style={{ boxShadow: "none" }}>
+                  <table className="data" style={{ minWidth: 0 }}>
+                    <thead><tr><th>چیک</th><th>بائیں</th><th>دائیں</th><th>فرق</th><th>نتیجہ</th></tr></thead>
+                    <tbody>
+                      {checks.map((c) => (
+                        <tr key={c.id}>
+                          <td>{c.label}</td>
+                          <td>{fmtPKR(c.left)}</td>
+                          <td>{fmtPKR(c.right)}</td>
+                          <td><b>{fmtPKR(c.gap)}</b></td>
+                          <td>{c.pass ? "✓ برابر" : "✗ فرق"}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </section>
+            );
+          })()}
           <div style={{ display: "grid", gap: 20 }}>
             <AgingTable title={t("fin.aging.receivablesTitle")} buckets={data.recAging} />
             <AgingTable title={t("fin.aging.payablesTitle")} buckets={data.payAging} />

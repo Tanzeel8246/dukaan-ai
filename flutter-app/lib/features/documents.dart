@@ -10,6 +10,7 @@ import 'package:provider/provider.dart';
 import 'package:share_plus/share_plus.dart';
 
 import '../core/documents.dart';
+import '../core/mc_workflow.dart' show formatDdMmYyyy;
 import '../core/ledger.dart' show fmtQty;
 import '../core/print_docs.dart';
 import '../core/permissions.dart';
@@ -254,6 +255,23 @@ class _QuotationsTab extends StatelessWidget {
                 quotationConvertedTotalQty(q, store.saleOrders, store.bills),
                 title: s.raw('nav.billing'));
             if (picks == null || picks.isEmpty) break;
+            // MC workflow §2 — one-click conversion WITH a real
+            // confirmation: the invoice date is the CONVERSION
+            // date (today), never the quotation's date, and a
+            // converted quotation is locked against re-conversion.
+            final confirmed = await showDialog<bool>(
+              context: context,
+              builder: (ctx) => AlertDialog(
+                title: Text(s.raw('mc.doc.convertConfirm')),
+                content: Text(s.raw('mc.doc.convertConfirmBody').replaceAll(
+                    '{date}', formatDdMmYyyy(DateTime.now().toUtc().toIso8601String()))),
+                actions: [
+                  TextButton(onPressed: () => Navigator.pop(ctx, false), child: Text(s.actionCancel)),
+                  ElevatedButton(onPressed: () => Navigator.pop(ctx, true), child: Text(s.actionConfirm)),
+                ],
+              ),
+            );
+            if (confirmed != true) break;
             final prefill = await store.convertQuotationToBill(q.id, picks);
             if (prefill != null) onOpenBilling();
           case 'share':
@@ -507,6 +525,24 @@ class _ChallansTab extends StatelessWidget {
             if (picks == null || picks.isEmpty) break;
             final prefill = await store.convertChallanToBill(d.id, picks);
             if (prefill != null) onOpenBilling();
+          case 'print':
+            // MC workflow §3 — challan print (own letterhead,
+            // quantities only, DD/MM/YYYY).
+            showDocPrintSheet(
+              context,
+              challanDocPage(
+                challan: d,
+                ownerDoc: store.ownerDoc,
+                title: s.raw('nav.deliveryChallans'),
+                dateLabel: s.raw('common.date'),
+                vehicleLabel: s.raw('challan.vehicleNo'),
+                driverLabel: s.raw('challan.driverName'),
+                receivedByLabel: s.raw('voucher.signature'),
+                qty: (q) => fmtQty(q),
+              ),
+              jobName: 'challan-${d.id}',
+              width: 700,
+            );
         }
         if (store.lastError != null && context.mounted) {
           ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(store.lastError!)));
@@ -515,6 +551,7 @@ class _ChallansTab extends StatelessWidget {
       itemBuilder: (ctx) => [
         if (d.status == 'draft') PopupMenuItem(value: 'dispatch', child: Text(s.raw('doc.status.dispatched'))),
         if (d.status == 'dispatched' || d.status == 'partially_billed') PopupMenuItem(value: 'toBill', child: Text(s.raw('nav.billing'))),
+        PopupMenuItem(value: 'print', child: Text(s.actionPrint)),
         if (d.status != 'cancelled') PopupMenuItem(value: 'cancel', child: Text(s.raw('doc.status.cancelled'))),
         if (d.status == 'draft') PopupMenuItem(value: 'delete', child: Text(s.actionDelete)),
       ],

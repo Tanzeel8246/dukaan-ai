@@ -54,6 +54,10 @@ class ReportsScreen extends StatefulWidget {
 }
 
 class _ReportsScreenState extends State<ReportsScreen> {
+  // MC workflow §13 — the Reports HUB is the landing view (MC
+  // Billing has no hub; Dukaan does better): one card per report,
+  // one tap to open it. The picker view remains for browsing.
+  bool _hub = true;
   String _report = 'sales';
   String _preset = 'month';
   String? _customerKey;
@@ -63,6 +67,49 @@ class _ReportsScreenState extends State<ReportsScreen> {
   Widget build(BuildContext context) {
     final s = S.current;
     final store = context.watch<ShopStore>();
+    if (_hub) {
+      return Column(children: [
+        Padding(
+          padding: const EdgeInsets.all(16),
+          child: Align(
+            alignment: AlignmentDirectional.centerStart,
+            child: Text(s.raw('mc.rep.hubHelp'), style: Theme.of(context).textTheme.bodySmall),
+          ),
+        ),
+        Expanded(
+          child: GridView.count(
+            crossAxisCount: 2,
+            padding: const EdgeInsets.all(12),
+            mainAxisSpacing: 12,
+            crossAxisSpacing: 12,
+            childAspectRatio: 1.6,
+            children: [
+              for (final r in _reports)
+                Card(
+                  child: InkWell(
+                    onTap: () => setState(() {
+                      _report = r.id;
+                      _hub = false;
+                    }),
+                    child: Padding(
+                      padding: const EdgeInsets.all(12),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          const Icon(Icons.assessment_outlined),
+                          const SizedBox(height: 6),
+                          Text(s.raw(r.titleKey), style: const TextStyle(fontWeight: FontWeight.w600)),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+            ],
+          ),
+        ),
+      ]);
+    }
     final range = resolveReportRange(_preset, settings: store.settings);
     final def = _reports.firstWhere((r) => r.id == _report);
     final built = _buildReport(store, range);
@@ -73,6 +120,11 @@ class _ReportsScreenState extends State<ReportsScreen> {
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
           child: Row(children: [
+            IconButton(
+              icon: const Icon(Icons.grid_view_outlined),
+              tooltip: s.raw('mc.rep.hub'),
+              onPressed: () => setState(() => _hub = true),
+            ),
             Expanded(
               child: DropdownButton<String>(
                 value: _report,

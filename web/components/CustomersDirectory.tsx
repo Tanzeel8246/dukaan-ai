@@ -6,7 +6,8 @@ import { useAuth } from "./AuthProvider";
 import { useLang } from "./LangProvider";
 import { can } from "@/lib/permissions";
 import { IconClose, IconEdit, IconPlus, IconSearch, IconTrash, SearchClear } from "./ui";
-import { fmtDate, fmtNum, fmtPKR } from "@/lib/format";
+import { fmtDate, fmtDateShort, fmtNum, fmtPKR } from "@/lib/format";
+import { customerAdvanceBalance, customerAdvancePostings, customerMoneyLanguage } from "@/lib/workflow";
 import { customerOptedIn, waConsentPatch } from "@/lib/whatsapp";
 import { creditKey, customerOutstanding } from "@/lib/ledger";
 import { customerMatches } from "@/lib/search";
@@ -183,6 +184,36 @@ export default function CustomersDirectory() {
         .sort((a, b) => b.ts.localeCompare(a.ts))
     : [];
   const profileOutstanding = profile ? customerOutstanding(credits, profile.id) : 0;
+  /* MC Billing workflow adoption 2026-10-27 (WEB) — money
+   * language + running balance + advances in the ledger. */
+  const profileMoney = profile ? customerMoneyLanguage(credits, journal, profile.id) : null;
+  const profileAdvances = profile ? customerAdvancePostings(journal, profile.id) : [];
+  const profileAdvanceBalance = profile ? customerAdvanceBalance(journal, profile.id) : 0;
+  const profileLedgerRows = (() => {
+    if (!profile) return [] as Array<{ ts: string; label: string; change: string; advance: number; running: number }>;
+    type Row = { ts: string; label: string; delta: number; advance: number };
+    const rows: Row[] = [];
+    for (const c of profileCredits) {
+      rows.push({
+        ts: c.ts,
+        label: c.kind === "credit" ? "ادھار دیا گیا" : "وصولی (بل کی ادائیگی)",
+        delta: c.kind === "credit" ? c.amount : -c.amount,
+        advance: 0,
+      });
+    }
+    for (const e of profileAdvances) {
+      const amt = e.lines
+        .filter((l) => l.account === "customer_advances" && l.ref === profile.id)
+        .reduce((a, l) => a + (l.credit - l.debit), 0);
+      rows.push({ ts: e.ts, label: "ایڈوانس موصول (unearned)", delta: 0, advance: amt });
+    }
+    rows.sort((a, b) => a.ts.localeCompare(b.ts));
+    let running = 0;
+    return rows.map((r) => {
+      running += r.delta;
+      return { ts: r.ts, label: r.label, change: r.delta === 0 ? "—" : `${r.delta > 0 ? "+" : "−"} ${fmtPKR(Math.abs(r.delta))}`, advance: r.advance, running };
+    });
+  })();
 
   return (
     <div className="section-sm">
@@ -518,6 +549,55 @@ export default function CustomersDirectory() {
                   </div>
                 </div>
               </div>
+
+              {profileMoney && (
+                <div className="card" style={{ marginBottom: 22 }}>
+                  <h3 style={{ margin: "0 0 8px", fontSize: "1.1rem" }}>رقم کی زبان — مجھے ملے / میں نے دیے</h3>
+                  <div style={{ display: "flex", gap: 24, flexWrap: "wrap" }}>
+                    <div><div style={{ color: "var(--muted)", fontSize: "0.9rem" }}>مجھے ملے (کسٹمر کا ادھار)</div><b>{fmtPKR(profileMoney.toReceive)}</b></div>
+                    <div><div style={{ color: "var(--muted)", fontSize: "0.9rem" }}>میں نے دیے (ایڈوانس — دکان پر واجب)</div><b>{fmtPKR(profileMoney.toPay)}</b></div>
+                    <div><div style={{ color: "var(--muted)", fontSize: "0.9rem" }}>چلتا بیلنس (ادھار − ایڈوانس)</div><b>{fmtPKR(profileMoney.running)}</b></div>
+                  </div>
+                  <p className="hint" style={{ margin: "10px 0 0" }}>
+                    ایڈوانس وصولیوں میں شامل نہیں — وہ الگ unearned کھاتے میں ہے۔ نیچے لیجر میں ہر اندراج کے بعد چلتا بیلنس نظر آتا ہے۔
+                  </p>
+                  <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginTop: 12 }}>
+                    <a className="btn btn-primary btn-sm" href="/billing">رسید بنائیں (بلنگ)</a>
+                    <a className="btn btn-ghost btn-sm" href="/credit">ادھار / وصولی کھولیں</a>
+                  </div>
+                </div>
+              )}
+
+              {profileLedgerRows.length > 0 && (
+                <div style={{ marginBottom: 22 }}>
+                  <h3 style={{ fontSize: "1.1rem", marginBottom: 10 }}>لیجر — رسیدیں + ایڈوانس (چلتا بیلنس کے ساتھ)</h3>
+                  <div className="table-wrap">
+                    <table className="data" style={{ minWidth: 0 }}>
+                      <thead>
+                        <tr>
+                          <th>تاریخ (DD/MM/YYYY)</th>
+                          <th>تفصیل</th>
+                          <th>ادھار میں تبدیلی</th>
+                          <th>ایڈوانس</th>
+                          <th>چلتا بیلنس</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {profileLedgerRows.map((r, i) => (
+                          <tr key={i}>
+                            <td style={{ whiteSpace: "nowrap" }}>{fmtDateShort(r.ts)}</td>
+                            <td>{r.label}</td>
+                            <td>{r.change}</td>
+                            <td>{r.advance ? fmtPKR(r.advance) : "—"}</td>
+                            <td><b>{fmtPKR(r.running)}</b></td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                  <p className="hint">ایڈوانس کا کل بیلنس: {fmtPKR(profileAdvanceBalance)} — یہ رقم دکان کے ذمے ہے، کسٹمر کے ادھار میں سے کٹی ہوئی نہیں۔</p>
+                </div>
+              )}
 
               {(() => {
                 const lp = loyaltyByCustomer.get(profile.id);

@@ -212,6 +212,10 @@ export function assembleStorefrontSnapshot(input: PublishInput): StorefrontDoc {
         unit: p.unit,
         stockState: hidden.has(p.id) ? "hidden" : stockBandFor(p),
         sort: i,
+        // Plan §17 (2026-10-27): the real on-hand count travels
+        // with the snapshot so the public page shows a number,
+        // never a capped "999" and never an empty qty label.
+        stockQty: Math.max(0, Math.floor(p.stockQty)),
       };
       if (p.urduName && p.urduName.trim() !== "") entry.nameUr = p.urduName;
       if (p.category && p.category.trim() !== "") entry.category = p.category;
@@ -312,6 +316,8 @@ export interface StorefrontCard {
   stockState: Exclude<StoreStockState, "hidden">;
   /** `out` goods display but cannot be ordered. */
   orderable: boolean;
+  /** Real on-hand count at publish time (plan §17); absent on old snapshots. */
+  stockQty?: number;
 }
 
 export interface StorefrontPageModel {
@@ -346,6 +352,7 @@ export function storefrontPageModel(doc: StorefrontDoc): StorefrontPageModel {
         category: p.category ?? "",
         stockState: p.stockState as Exclude<StoreStockState, "hidden">,
         orderable: p.stockState !== "out",
+        ...(p.stockQty !== undefined ? { stockQty: p.stockQty } : {}),
       };
       if (p.nameUr) card.nameUr = p.nameUr;
       return card;
