@@ -140,8 +140,32 @@ const rowBetween: React.CSSProperties = {
   justifyContent: "space-between",
   alignItems: "center",
   gap: 12,
-  padding: "3px 0",
+  padding: "4px 0",
 };
+
+/** High-speed POS scan beep feedback (Web Audio API) */
+function playScanBeep() {
+  if (typeof window === "undefined") return;
+  try {
+    const AudioContextClass =
+      window.AudioContext ||
+      (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext;
+    if (!AudioContextClass) return;
+    const ctx = new AudioContextClass();
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.type = "sine";
+    osc.frequency.setValueAtTime(1400, ctx.currentTime);
+    gain.gain.setValueAtTime(0.09, ctx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.08);
+    osc.connect(gain);
+    gain.connect(ctx.destination);
+    osc.start();
+    osc.stop(ctx.currentTime + 0.08);
+  } catch {
+    /* browser audio restrictions ignore */
+  }
+}
 
 export default function BillingDesk() {
   const {
@@ -174,20 +198,11 @@ export default function BillingDesk() {
   } = useStore();
   const { role } = useAuth();
   const { requirePin } = usePinGate();
-  /** A3: voiding a posted bill is owner/manager only (matrix row
-   *  billingVoid); create/finalize/returns stay open to cashiers. */
   const canVoid = can(role, "billingVoid", "write");
-  /** Phase B · B4 (G-2): note issuance gates on `creditDebitNotes`,
-   *  not `returns` — roles with that row post desk returns through
-   *  the FORMAL flow (a credit note mints with the return); roles
-   *  without it keep the plain return exactly as before. */
   const canNote = can(role, "creditDebitNotes", "write");
   const { t } = useLang();
   const payLabel = (m: PayMethod) => t(PAY_KEY[m]);
-  /** B5: a cheque part displays as the instrument it is (with its
-   *  leaf number from the registry), never as a bank payment.
-   *  H1: a points part displays as points (count + settled value),
-   *  never as the cash method its row rides on. */
+
   const payDisplay = (p: BillPayment): string => {
     if (p.instrument === "cheque") {
       const c = p.chequeId ? cheques.find((x) => x.id === p.chequeId) : undefined;
@@ -200,27 +215,29 @@ export default function BillingDesk() {
   };
 
   /* ---------------- bill builder state ---------------- */
-  const [sku, setSku] = useState("");
   const [pickerSearch, setPickerSearch] = useState("");
-  /** POS picker: the keyboard-highlighted result row. */
   const [pickIdx, setPickIdx] = useState(0);
-  /** Mobile: the cart lives in a bottom sheet, opened from the
-   *  sticky cart bar; on desktop this state is inert. */
   const [cartOpen, setCartOpen] = useState(false);
   const searchRef = useRef<HTMLInputElement | null>(null);
-  const skuRef = useRef<HTMLInputElement | null>(null);
-  /* MC Billing workflow adoption 2026-10-27 (WEB): camera scan +
-   * billing-time customer advance. The camera uses the device
-   * camera + BarcodeDetector when the browser offers it; without
-   * a detector the preview still aims the code and the cashier
-   * types it — no silent fake scan. */
+
+  /* Camera barcode scan modal */
   const [showCamera, setShowCamera] = useState(false);
   const [cameraMsg, setCameraMsg] = useState("");
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const streamRef = useRef<MediaStream | null>(null);
+
+  /* Billing-time customer advance modal */
+  const [showAdvanceModal, setShowAdvanceModal] = useState(false);
   const [advAmount, setAdvAmount] = useState("");
   const [advMethod, setAdvMethod] = useState<"cash" | "jazzcash" | "easypaisa" | "bank">("cash");
   const [advNote, setAdvNote] = useState("");
+
+  /* Held bills modal / drawer */
+  const [showHeldModal, setShowHeldModal] = useState(false);
+
+  /* Quick Cash Tender state */
+  const [cashTendered, setCashTendered] = useState<string>("");
+
   const [cart, setCart] = useState<CartLine[]>([]);
   const [customerId, setCustomerId] = useState("");
   const [customerName, setCustomerName] = useState("");
@@ -232,22 +249,13 @@ export default function BillingDesk() {
   const [discountValue, setDiscountValue] = useState("");
   const [payments, setPayments] = useState<PayRow[]>([blankPayRow()]);
   const [heldId, setHeldId] = useState<string | null>(null);
-  /** Phase B: the source document of a conversion draft (its
-   *  citation is stamped onto the bill this desk posts). B2 widens
-   *  the sources beyond the order: a delivery challan or a
-   *  quotation can hand the desk a draft too. */
   const [billSource, setBillSource] = useState<{
     type: "order" | "challan" | "quotation" | "job";
     id: string;
     label: string;
   } | null>(null);
-  /* Phase C · C1 (§1.6): the ONE warehouse this bill's stock
-   * leaves from; "" = the shop default. The pick rides the desk's
-   * own billing gate (G-C1 — the cashier picks for EVERY bill even
-   * though the `warehouses` matrix row grants them no view). */
   const [billWarehouseId, setBillWarehouseId] = useState("");
   const billWhId = resolveWarehouseId(warehouses, billWarehouseId || null);
-  /** A product's quantity AT the bill's warehouse (resolution rule). */
   const whQty = (p: (typeof products)[number]): number =>
     qtyAtWarehouse(p, stockLevels, warehouses, billWhId);
   const [notice, setNotice] = useState<{ ok: boolean; text: string } | null>(null);
@@ -258,11 +266,8 @@ export default function BillingDesk() {
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [thermal, setThermal] = useState(false);
   const [returnQty, setReturnQty] = useState<Record<string, string>>({});
-  const [refundMethod, setRefundMethod] =
-    useState<Exclude<PayMethod, "credit">>("cash");
-  /** A2: money account the refund leaves from; "" = method default. */
+  const [refundMethod, setRefundMethod] = useState<Exclude<PayMethod, "credit">>("cash");
   const [refundAccountId, setRefundAccountId] = useState("");
-  /** B4: the reason printed on the credit note (formal flow). */
   const [returnReason, setReturnReason] = useState("");
   const [confirmVoid, setConfirmVoid] = useState(false);
 
@@ -270,17 +275,12 @@ export default function BillingDesk() {
 
   const pickable = useMemo(() => {
     const list = [...products].sort((a, b) => a.name.localeCompare(b.name));
-    // lib/search: null-safe — a legacy product missing urduName/sku
-    // must never throw here (it used to kill the whole page).
     return filterProducts(list, pickerSearch);
   }, [products, pickerSearch]);
 
-  /* POS picker: results exist only while the desk is searching;
-   * a click (or Enter) adds straight to the cart — no separate
-   * select-then-Add step. */
   const searching = pickerSearch.trim().length > 0;
   const pickResults = useMemo(
-    () => (searching ? pickable.slice(0, 12) : []),
+    () => (searching ? pickable.slice(0, 10) : []),
     [pickable, searching]
   );
   const cartQtyById = useMemo(
@@ -302,10 +302,7 @@ export default function BillingDesk() {
     discountType === "percent"
       ? Math.min(subtotal, Math.round((subtotal * discountVal) / 100))
       : Math.min(subtotal, discountVal);
-  // A4 (design §2.7): live tax preview of the cart — the same
-  // resolver + calculator the store stamps at checkout, so the desk
-  // total IS the posted total. All zeros when the shop has no
-  // slabs/defaults (discount mirrors discountOf in the store).
+
   const cartTax = useMemo(
     () =>
       computeBillTaxes(
@@ -322,12 +319,7 @@ export default function BillingDesk() {
     [cart, byId, taxSlabs, settings, subtotal, discountAmount]
   );
   const total = cartTax.total;
-  // Phase H · H1: the selected customer's derived loyalty
-  // position and this cart's earn preview — folded from the
-  // journal by lib/loyalty on every render, never stored. The
-  // points tender quotes from the same fold the store validates
-  // against, so desk and posting can only disagree when the
-  // journal moved in between (and then the store refuses).
+
   const loyaltySt = useMemo(() => resolveLoyaltySettings(settings), [settings]);
   const loyaltyPos = useMemo(
     () =>
@@ -343,8 +335,7 @@ export default function BillingDesk() {
         : null,
     [journal, customerId, total, loyaltySt]
   );
-  /** One points quote for the whole bill: every points row's
-   *  typed count aggregates into a single tender part. */
+
   const pointsQuote = useMemo(() => {
     const wanted = payments
       .filter((r) => r.instrument === "points")
@@ -358,9 +349,7 @@ export default function BillingDesk() {
       loyaltyRedeemCapRs(target, loyaltySt)
     );
   }, [payments, customerId, heldId, bills, total, journal, loyaltySt]);
-  // Receipt-style grouping of the preview: exclusive slabs add on
-  // top; inclusive slabs are shown as information (already inside
-  // the prices), mirroring lib/tax.billTaxLines for posted bills.
+
   const cartTaxGroups = useMemo(() => {
     const groups = new Map<string, { name: string; rate: number; kind: "percent" | "fixed"; inclusive: boolean; amount: number }>();
     for (const l of cartTax.lines) {
@@ -384,9 +373,6 @@ export default function BillingDesk() {
     return payments
       .map((r) => {
         if (r.instrument === "points") {
-          // H1: the points part's amount is the fold's quote (the
-          // aggregate of every points row), emitted once — extra
-          // points rows fold into it above.
           if (pointsPartEmitted) {
             return { method: "cash" as PayMethod, amount: 0, accountId: null };
           }
@@ -406,8 +392,6 @@ export default function BillingDesk() {
             r.method === "credit" || r.instrument === "cheque"
               ? null
               : r.accountId || null,
-          // B5: a cheque part carries its capture draft (input
-          // only — the store consumes it into the registry doc).
           ...(r.instrument === "cheque"
             ? { instrument: "cheque" as const, cheque: chequeDraftOf(r.cheque) }
             : {}),
@@ -417,10 +401,6 @@ export default function BillingDesk() {
   }, [payments, pointsQuote]);
   const paidSum = parsedPayments.reduce((a, p) => a + p.amount, 0);
 
-  /* Phase C · C5 (R-C7): when this bill cites a JOB, the
-   * materials already issued to it (net of returns) — listed in
-   * the desk so they are never billed a second time (§5.3's
-   * desk discipline, surfaced). */
   const sourceJob = useMemo(
     () =>
       billSource?.type === "job"
@@ -440,7 +420,12 @@ export default function BillingDesk() {
     }
     return [...net.values()].filter((r) => r.qty > 0);
   }, [sourceJob]);
+
   const remaining = total - paidSum;
+
+  /* Quick Cash calculations */
+  const tenderedNum = parseFloat(cashTendered) || 0;
+  const changeDue = tenderedNum > total ? tenderedNum - total : 0;
 
   const heldBills = useMemo(
     () =>
@@ -457,10 +442,6 @@ export default function BillingDesk() {
       .filter((b) => {
         if (range === "today" && b.dayOffset !== 0) return false;
         if (range === "week" && b.dayOffset > 6) return false;
-        // lib/search: null-safe — a legacy bill missing customerName/
-        // customerPhone must never throw here. Fix 5: the walk-in
-        // label the desk displays for a nameless bill is itself a
-        // search field, so "walk-in" / "عام گاہک" finds those bills.
         return billMatches(b, histSearch, t("billing.walkInCustomer"));
       })
       .slice()
@@ -469,19 +450,8 @@ export default function BillingDesk() {
 
   const selected = selectedId ? bills.find((b) => b.id === selectedId) ?? null : null;
 
-  /* Phase B · B2 (§2.5): the derived-availability soft warning.
-   * available = on-hand − promised (open orders + dispatched
-   * challans, unbilled) is a REPORT: a cart line beyond it earns a
-   * warning below, never a block — posting stays governed by the
-   * store's on-hand validation at postBill, exactly as before.
-   * When this cart IS a conversion draft, the source document's own
-   * promise is added back for its lines: billing precisely what an
-   * order/challan promised must not warn against itself. */
   const availabilityWarnings = useMemo(() => {
     if (cart.length === 0) return [] as string[];
-    // Phase C · C1 (§1.7): the availability report is read AT the
-    // bill's warehouse now — on-hand and promised are both
-    // per-location figures.
     const avail = availabilityByProductAtWarehouse(
       products,
       stockLevels,
@@ -496,9 +466,6 @@ export default function BillingDesk() {
     const addOrderPromise = (orderId: string) => {
       const o = saleOrders.find((x) => x.id === orderId);
       if (!o) return;
-      // The source's own promise is added back ONLY when the
-      // source promises at THIS bill's warehouse — a promise held
-      // at another building is not stock here.
       if (effectiveWarehouseId(o, defWhId) !== billWhId) return;
       const billed = orderBilledQty(o, bills, deliveryChallans);
       for (const l of o.lines) {
@@ -512,18 +479,13 @@ export default function BillingDesk() {
     if (billSource?.type === "challan") {
       const c = deliveryChallans.find((x) => x.id === billSource.id);
       if (c?.orderId) addOrderPromise(c.orderId);
-      else if (c) {
-        if (effectiveWarehouseId(c, defWhId) !== billWhId) {
-          // The challan promises at another warehouse — nothing to
-          // add back here.
-        } else {
-          const billed = challanBilledQty(c, bills);
-          for (const l of c.lines) {
-            own.set(
-              l.productId,
-              (own.get(l.productId) ?? 0) + remainingQty(l.qty, billed, l.productId)
-            );
-          }
+      else if (c && effectiveWarehouseId(c, defWhId) === billWhId) {
+        const billed = challanBilledQty(c, bills);
+        for (const l of c.lines) {
+          own.set(
+            l.productId,
+            (own.get(l.productId) ?? 0) + remainingQty(l.qty, billed, l.productId)
+          );
         }
       }
     }
@@ -563,8 +525,6 @@ export default function BillingDesk() {
     if (!p) return;
     const existing = cart.find((l) => l.productId === productId);
     const nextQty = (existing?.qty ?? 0) + 1;
-    // C1: the desk sells from the bill's warehouse — the row's
-    // quantity is the shelf it can actually reach.
     const atWh = whQty(p);
     if (atWh <= 0 || nextQty > atWh) {
       fail(
@@ -577,6 +537,7 @@ export default function BillingDesk() {
       return;
     }
     setNotice(null);
+    playScanBeep();
     setCart((prev) =>
       existing
         ? prev.map((l) => (l.productId === productId ? { ...l, qty: nextQty } : l))
@@ -584,24 +545,39 @@ export default function BillingDesk() {
     );
   };
 
-  const onSkuEnter = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key !== "Enter") return;
-    e.preventDefault();
-    const code = sku.trim().toLowerCase();
-    if (!code) return;
-    // lib/search: null-safe — one sku-less legacy product must not
-    // make every SKU lookup throw.
-    const p = findProductBySku(products, code);
-    if (!p) {
-      fail(t("billing.errSkuNotFound", { sku: sku.trim() }));
+  /* Unified Omni-Search & Barcode key handler */
+  const onOmniKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === "Enter") {
+      e.preventDefault();
+      const code = pickerSearch.trim().toLowerCase();
+      if (!code) return;
+      // 1. Direct SKU / Barcode lookup
+      const p = findProductBySku(products, code);
+      if (p) {
+        addLine(p.id);
+        setPickerSearch("");
+        setPickIdx(0);
+        return;
+      }
+      // 2. Pick highlighted item from result list
+      if (pickResults.length > 0) {
+        const item = pickResults[pickIdx] ?? pickResults[0];
+        if (item && whQty(item) > 0) {
+          addFromPicker(item.id);
+          return;
+        }
+      }
+      fail(t("billing.errSkuNotFound", { sku: pickerSearch.trim() }));
       return;
     }
-    addLine(p.id);
-    setSku("");
+
+    // Arrow navigation
+    pickerKeyDown(e, pickResults.length, pickIdx, setPickIdx, () => {
+      const p = pickResults[pickIdx] ?? pickResults[0];
+      if (p && whQty(p) > 0) addFromPicker(p.id);
+    });
   };
 
-  /* POS picker: one click / one Enter and the product is IN the
-   * cart; the search clears and focus returns for the next item. */
   const addFromPicker = (productId: string) => {
     const p = byId.get(productId);
     if (!p) return;
@@ -612,13 +588,6 @@ export default function BillingDesk() {
       setPickIdx(0);
     }
     searchRef.current?.focus();
-  };
-
-  const onPickerKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    pickerKeyDown(e, pickResults.length, pickIdx, setPickIdx, () => {
-      const p = pickResults[pickIdx] ?? pickResults[0];
-      if (p && whQty(p) > 0) addFromPicker(p.id);
-    });
   };
 
   const setLineQty = (productId: string, qty: number) => {
@@ -640,11 +609,7 @@ export default function BillingDesk() {
   const removeLine = (productId: string) =>
     setCart((prev) => prev.filter((l) => l.productId !== productId));
 
-  /* Phase B: consume a conversion draft handed over by the Sale
-   * Orders screen — prefill the cart (agreed prices), the customer
-   * and the discount, and remember the source citation so the bill
-   * this desk posts cites its order. Runs once on mount; the draft
-   * itself posts nothing. */
+  /* Phase B: conversion draft prefill */
   const draftAppliedRef = useRef(false);
   useEffect(() => {
     if (draftAppliedRef.current || !billDraft) return;
@@ -662,9 +627,6 @@ export default function BillingDesk() {
     setCustomerPhone(billDraft.customerPhone);
     setDiscountType(billDraft.discountType);
     setDiscountValue(billDraft.discountValue ? String(billDraft.discountValue) : "");
-    // C1 (§1.6): the conversion hands the desk its document's
-    // warehouse preference (order/challan); a quotation draft has
-    // none (location-free) and the picker stays on the default.
     setBillWarehouseId(billDraft.warehouseId ?? "");
     setPayments([blankPayRow()]);
     setHeldId(null);
@@ -720,10 +682,25 @@ export default function BillingDesk() {
     succeed(t("billing.successCustomerAdded", { name: ncName.trim() }));
   };
 
+  /* ---------------- Quick Cash helper ---------------- */
+  const applyQuickCash = (val: number) => {
+    setCashTendered(String(val));
+    setPayments((prev) => {
+      const cashIdx = prev.findIndex(
+        (r) => r.method === "cash" && r.instrument !== "cheque" && r.instrument !== "points"
+      );
+      // When tendered >= total, we post exact total to balance entry; change is calculated and shown live
+      const amtToPost = val >= total ? total : val;
+      if (cashIdx === -1) {
+        return [{ ...blankPayRow(), amount: String(amtToPost) }, ...prev];
+      }
+      return prev.map((r, i) => (i === cashIdx ? { ...r, amount: String(amtToPost) } : r));
+    });
+  };
+
   /* ---------------- submit helpers ---------------- */
   const resetForm = () => {
     setCart([]);
-    setSku("");
     setPickIdx(0);
     setPickerSearch("");
     setCustomerId("");
@@ -735,20 +712,14 @@ export default function BillingDesk() {
     setHeldId(null);
     setBillSource(null);
     setBillWarehouseId("");
+    setCashTendered("");
   };
 
-  /* Live-audit fix D: leaving held mode must never leave stale
-   * payment rows or the "complete held bill" state behind. Discarding
-   * the bill currently loaded on the desk resets the desk with it… */
   const discardHeld = (b: Bill) => {
     discardHeldBill(b.id);
     if (heldId === b.id) resetForm();
   };
 
-  /* …and emptying the cart of a resumed held bill detaches the desk
-   * from it (the held bill itself stays in the strip, resumable):
-   * payments blank and the primary action reads "complete bill"
-   * again, never a stale held total. */
   useEffect(() => {
     if (heldId && cart.length === 0) resetForm();
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -761,29 +732,22 @@ export default function BillingDesk() {
     lines: cart.map((l) => ({
       productId: l.productId,
       qty: l.qty,
-      // §2.4: only conversion-prefilled lines carry an override.
       ...(l.unitPrice != null ? { unitPrice: l.unitPrice } : {}),
       ...(l.sourceProductId ? { sourceProductId: l.sourceProductId } : {}),
     })),
     discountType,
     discountValue: discountVal,
     payments: pays,
-    // C1: the bill's warehouse — the resolved pick (§1.6).
     warehouseId: billWhId,
-    ...(billSource
-      ? { sourceType: billSource.type, sourceId: billSource.id }
-      : {}),
+    ...(billSource ? { sourceType: billSource.type, sourceId: billSource.id } : {}),
   });
 
-  /** Shared cart validation for new bills; returns an error or null. */
   const validateCart = (): string | null => {
     if (cart.length === 0) return t("billing.errNoItems");
     for (const l of cart) {
       const p = byId.get(l.productId);
       if (!p) return t("billing.errItemGone");
       if (l.qty <= 0) return t("billing.errQtyZero", { name: p.name });
-      // C1: validated against the bill warehouse's row, matching
-      // postBill's posting validation exactly (§1.6).
       const atWh = whQty(p);
       if (l.qty > atWh)
         return t("billing.errStockFor", {
@@ -801,9 +765,6 @@ export default function BillingDesk() {
         paid: fmtPKR(paidSum),
         total: fmtPKR(against),
       });
-    // B5: a cheque part is only a payment once its instrument is
-    // captured — the store refuses an incomplete draft as well,
-    // but the desk says so in words first.
     for (const r of payments) {
       if (
         r.instrument === "cheque" &&
@@ -816,9 +777,6 @@ export default function BillingDesk() {
     const hasCredit = parsedPayments.some((p) => p.method === "credit");
     if (hasCredit && !customerName.trim())
       return t("billing.errCreditNeedsName");
-    // H1: points belong to a named customer — a points row on a
-    // walk-in bill can never quote, so say so in words here (the
-    // store refuses it too).
     if (payments.some((r) => r.instrument === "points") && !customerId)
       return t("bill.pointsNeedsCustomer");
     return null;
@@ -847,6 +805,14 @@ export default function BillingDesk() {
     if (cartErr) return fail(cartErr);
     const payErr = validatePayments(total);
     if (payErr) return fail(payErr);
+
+    // Strict Udhaar lock: block credit sale to nameless walk-in customer
+    const hasCredit = parsedPayments.some((p) => p.method === "credit") || total > paidSum;
+    if (hasCredit && !customerId && !customerName.trim()) {
+      fail(t("billing.errCreditNeedsName"));
+      return;
+    }
+
     const id = createBill(buildInput(parsedPayments));
     if (!id) return fail(t("billing.errBillFailed"));
     resetForm();
@@ -865,30 +831,42 @@ export default function BillingDesk() {
     succeed(t("billing.successHeld"));
   };
 
-  /* MC Billing workflow adoption 2026-10-27 (WEB): real keyboard
-   * shortcuts — F2 focuses the barcode box, Ctrl+H holds the
-   * current bill. (Enter already adds the scanned code.) */
+  /* POS Global Hotkeys: F2 (Omni Search), F4 (Complete), F8 (Hold), F9 (Reset), Esc (Close modals) */
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
       const tag = (e.target as HTMLElement | null)?.tagName;
       if (e.key === "F2") {
         e.preventDefault();
-        skuRef.current?.focus();
-      } else if (e.key.toLowerCase() === "h" && e.ctrlKey && tag !== "INPUT" && tag !== "TEXTAREA" && tag !== "SELECT") {
+        searchRef.current?.focus();
+        searchRef.current?.select();
+      } else if (e.key === "F4") {
+        e.preventDefault();
+        completeBill();
+      } else if (e.key === "F8" || (e.key.toLowerCase() === "h" && e.ctrlKey && tag !== "INPUT" && tag !== "TEXTAREA" && tag !== "SELECT")) {
         e.preventDefault();
         holdCurrent();
+      } else if (e.key === "F9") {
+        e.preventDefault();
+        resetForm();
+      } else if (e.key === "Escape") {
+        setShowCamera(false);
+        setShowAdvanceModal(false);
+        setShowHeldModal(false);
+        setShowNewCustomer(false);
       }
     };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [cart, payments, customerId, customerName, customerPhone, discountType, discountValue, billWarehouseId]);
+  }, [cart, payments, customerId, customerName, customerPhone, discountType, discountValue, billWarehouseId, total, heldId, heldBill]);
 
+  /* Camera controls */
   const stopCamera = () => {
     streamRef.current?.getTracks().forEach((tr) => tr.stop());
     streamRef.current = null;
     setShowCamera(false);
   };
+
   const startCamera = async () => {
     setCameraMsg("");
     try {
@@ -919,19 +897,20 @@ export default function BillingDesk() {
               setCameraMsg("بارکوڈ ملا مگر یہ آئٹم دکان میں نہیں ہے۔");
             }
           } catch {
-            /* detector hiccup — keep previewing */
+            /* retry next tick */
           }
           if (streamRef.current) setTimeout(tick, 600);
         };
         setTimeout(tick, 600);
       } else {
-        setCameraMsg("اس براؤزر میں خودکار بارکوڈ پڑھنا دستیاب نہیں — کوڈ دیکھ کر نیچے بارکوڈ باکس میں لکھیں۔");
+        setCameraMsg("اس براؤزر میں خودکار بارکوڈ پڑھنا دستیاب نہیں — کوڈ دیکھ کر اوپر بارکوڈ باکس میں لکھیں۔");
       }
     } catch {
       setCameraMsg("کیمرہ نہیں کھلا — براؤزر کی کیمرہ اجازت چیک کریں، یا بارکوڈ باکس استعمال کریں۔");
     }
   };
 
+  /* Billing-time customer advance submission */
   const submitAdvance = () => {
     if (!customerId) {
       fail("ایڈوانس کے لیے پہلے کسٹمر منتخب کریں (نیا کسٹمر بنائیں یا فہرست سے چنیں)۔");
@@ -953,6 +932,7 @@ export default function BillingDesk() {
     });
     setAdvAmount("");
     setAdvNote("");
+    setShowAdvanceModal(false);
     succeed(`ایڈوانس درج ہو گیا: ${fmtPKR(amt)} — یہ رقم unearned کھاتے میں گئی ہے، وصولیوں (receivables) میں نہیں۔`);
   };
 
@@ -962,18 +942,10 @@ export default function BillingDesk() {
       bill.items.map((it) => ({
         productId: it.productId,
         qty: it.qty,
-        // Only a CONVERSION bill's lines keep their agreed price in
-        // the resumed cart (§2.4) — an ordinary held bill re-prices
-        // from the shelf exactly as before Phase B.
         ...(bill.sourceType ? { unitPrice: it.unitPrice } : {}),
         ...(it.sourceProductId ? { sourceProductId: it.sourceProductId } : {}),
       }))
     );
-    // Phase B: a held CONVERSION bill keeps its citation — resuming
-    // it restores the source so the completed bill still cites its
-    // document (finalizeBill posts the held doc, which carries it
-    // too). B2: the source may be an order, a challan or a
-    // quotation; the label is looked up on the citing document.
     setBillSource(
       bill.sourceType && bill.sourceId
         ? {
@@ -994,7 +966,6 @@ export default function BillingDesk() {
     setCustomerId(bill.customerId ?? "");
     setCustomerName(bill.customerName);
     setCustomerPhone(bill.customerPhone);
-    // C1: a held bill resumes at ITS warehouse (§1.6).
     setBillWarehouseId(bill.warehouseId ?? "");
     setDiscountType(bill.discountType);
     setDiscountValue(bill.discountValue ? String(bill.discountValue) : "");
@@ -1030,6 +1001,7 @@ export default function BillingDesk() {
         : [{ ...blankPayRow(), amount: String(bill.total) }]
     );
     setHeldId(bill.id);
+    setShowHeldModal(false);
     setCartOpen(true);
     succeed(t("billing.successResumed", { no: bill.billNo }));
     window.scrollTo({ top: 0, behavior: "smooth" });
@@ -1046,8 +1018,6 @@ export default function BillingDesk() {
           ...prev,
         ];
       }
-      // H1: points rows contribute their (single, aggregate)
-      // quoted value once, not their (empty) amount text.
       const hasPointsRow = prev.some((r, i) => i !== cashIdx && r.instrument === "points");
       const otherSum =
         prev.reduce(
@@ -1085,8 +1055,6 @@ export default function BillingDesk() {
       if (l.qty > max)
         return fail(t("billing.errReturnMax", { qty: fmtQty(max), name: it.name }));
     }
-    // B4: roles that may issue notes post the FORMAL return — same
-    // engine, same figures, plus the credit note in the same batch.
     if (canNote) {
       const box: { number: string | null } = { number: null };
       const ok = returnItemsWithNote(
@@ -1115,9 +1083,6 @@ export default function BillingDesk() {
   };
 
   const doVoid = async (bill: Bill) => {
-    /* E5 (design §4.6): voiding a posted bill is a gated action —
-     * the PIN challenge is a view-layer precondition; a cancelled
-     * or failed challenge composes nothing. */
     if (!(await requirePin("pin.gate.actVoid"))) {
       setConfirmVoid(false);
       return;
@@ -1161,10 +1126,6 @@ export default function BillingDesk() {
           : t("billing.wa.tax", { label, amount: fmtPKR(g.amount) });
       }),
       t("billing.wa.total", { amount: fmtPKR(bill.total) }),
-      /* Phase E · E3 (§1.9): one Raast line when the shop has a
-       * validated IBAN on record — a customer who cannot scan
-       * can still transfer. Text only: wa.me cannot attach the
-       * printed bill (§12.3). */
       ...(settings.raastIban && validatePkIban(settings.raastIban).ok
         ? [
             t("billing.wa.raastLine", {
@@ -1189,531 +1150,474 @@ export default function BillingDesk() {
   return (
     <div className="section-sm">
       <div className="container">
-        <div className="section-head">
-          <span className="eyebrow">{t("billing.eyebrow")}</span>
-          <h1 className="h2">{t("billing.title")}</h1>
-          <p className="lead">{t("billing.subtitle")}</p>
-        </div>
+        {/* ================= OPTION 1: CLASSIC HIGH-SPEED COUNTER POS ================= */}
 
-        {/* MC Billing workflow adoption 2026-10-27 (WEB) — POS polish:
-            keyboard shortcuts that actually work, camera scan,
-            DD/MM/YYYY date, billing-time advance, own-letterhead
-            receipt (the print sheet uses THIS business's branding
-            from settings, never another tenant's stored image). */}
-        <section className="card" aria-label="POS shortcuts and date" style={{ marginBottom: 18 }}>
-          <p style={{ margin: 0 }}>
-            <b>کی بورڈ شارٹ کٹس:</b> F2 = بارکوڈ باکس پر جائیں · Enter = اسکین شدہ آئٹم بل میں ڈالیں · Ctrl+H = بل ہولڈ کریں
-            {" · "}آج کی تاریخ: <b>{fmtDateShort(new Date())}</b> (DD/MM/YYYY)
-          </p>
-          <p style={{ margin: "8px 0 0", color: "var(--muted)", fontSize: "0.92rem" }}>
-            {STOCK_DEDUCTION_NOTE} رسید اسی دکان کے اپنے لیٹرہیڈ کے ساتھ پرنٹ ہوتی ہے۔
-          </p>
-          <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginTop: 12 }}>
-            <button type="button" className="btn btn-ghost btn-sm" onClick={() => (showCamera ? stopCamera() : void startCamera())}>
-              {showCamera ? "کیمرہ بند کریں" : "📷 کیمرہ اسکین"}
-            </button>
-          </div>
-          {showCamera && (
-            <div style={{ marginTop: 12 }}>
-              <video ref={videoRef} autoPlay playsInline muted style={{ width: "100%", maxWidth: 420, borderRadius: 12, background: "#000" }} />
-              {cameraMsg && <p style={{ margin: "8px 0 0" }}>{cameraMsg}</p>}
-              <p className="hint">کیمرہ صرف بارکوڈ پڑھنے کے لیے کھلتا ہے؛ کوئی تصویر محفوظ نہیں ہوتی۔</p>
+        {/* 1. Header Toolbar: Omni-Search + Camera + Customer + Warehouse + Hotkeys HUD */}
+        <section className="pos-counter-topbar" aria-label="POS Counter Command Strip">
+          {/* Omni Barcode & Product Search */}
+          <div className="pos-omni-wrap">
+            <input
+              id="pos-omni-search"
+              ref={searchRef}
+              type="search"
+              className="pos-omni-input"
+              autoFocus
+              placeholder="بارکوڈ اسکین کریں یا پروڈکٹ کا نام لکھیں... [F2]"
+              value={pickerSearch}
+              onChange={(e) => {
+                setPickerSearch(e.target.value);
+                setPickIdx(0);
+              }}
+              onKeyDown={onOmniKeyDown}
+              aria-label="بارکوڈ اور پروڈکٹ تلاش"
+            />
+            <div className="pos-omni-actions">
+              {pickerSearch && (
+                <SearchClear
+                  onClear={() => {
+                    setPickerSearch("");
+                    setPickIdx(0);
+                    searchRef.current?.focus();
+                  }}
+                  label={t("action.clearSearch")}
+                />
+              )}
+              <button
+                type="button"
+                className="btn btn-ghost btn-sm"
+                onClick={() => (showCamera ? stopCamera() : void startCamera())}
+                title="کیمرہ بارکوڈ اسکین"
+                style={{ padding: "6px 8px" }}
+              >
+                📷
+              </button>
             </div>
-          )}
-          {!showCamera && cameraMsg && <p style={{ margin: "8px 0 0" }}>{cameraMsg}</p>}
-        </section>
 
-        {/* MC Billing workflow adoption 2026-10-27 (WEB) — billing-time
-            customer advance: its own balanced entry (Dr money /
-            Cr customer_advances, unearned), separate from the bill
-            itself, so a bill's own entry stays one event = one entry. */}
-        <section className="card" aria-label="Customer advance at billing" style={{ marginBottom: 18 }}>
-          <h3 style={{ margin: "0 0 4px" }}>کسٹمر ایڈوانس (بلنگ کے وقت)</h3>
-          <p className="hint" style={{ margin: "0 0 12px" }}>
-            کسٹمر سے پیشگی رقم لیں — یہ بل کی ادائیگی نہیں ہے۔ بل کی ادائیگی وصولیاں کم کرتی ہے؛ ایڈوانس unearned کھاتے میں جاتا ہے اور کسٹمر لیجر میں الگ نظر آتا ہے۔ پرانے ایڈوانس کی تاریخ کبھی بدلی نہیں جاتی۔
-          </p>
-          <div style={{ display: "flex", gap: 10, flexWrap: "wrap", alignItems: "end" }}>
-            <label className="field" style={{ minWidth: 160 }}>
-              <span>رقم</span>
-              <input type="number" min="0" value={advAmount} onChange={(e) => setAdvAmount(e.target.value)} placeholder="0" />
-            </label>
-            <label className="field" style={{ minWidth: 140 }}>
-              <span>طریقہ</span>
-              <select value={advMethod} onChange={(e) => setAdvMethod(e.target.value as typeof advMethod)}>
-                <option value="cash">کیش</option>
-                <option value="jazzcash">JazzCash</option>
-                <option value="easypaisa">EasyPaisa</option>
-                <option value="bank">بینک</option>
-              </select>
-            </label>
-            <label className="field" style={{ flex: "1 1 180px" }}>
-              <span>نوٹ (اختیاری)</span>
-              <input type="text" value={advNote} onChange={(e) => setAdvNote(e.target.value)} placeholder="کس چیز کے لیے پیشگی؟" />
-            </label>
-            <button type="button" className="btn btn-primary btn-sm" onClick={submitAdvance} disabled={!customerId}>
-              ایڈوانس درج کریں
-            </button>
+            {/* Instant drop-down picker results */}
+            {searching && (
+              <div
+                style={{
+                  position: "absolute",
+                  top: "calc(100% + 6px)",
+                  insetInline: 0,
+                  zIndex: 45,
+                  boxShadow: "0 10px 30px rgba(0,0,0,0.25)",
+                }}
+              >
+                <ProductResultList
+                  items={pickResults.map((p) => ({
+                    id: p.id,
+                    name: p.name,
+                    meta: t("billing.lineMeta", {
+                      price: fmtPKR(p.salePrice),
+                      unit: fmtUnit(p.unit),
+                      qty: fmtQty(whQty(p)),
+                    }),
+                    price: fmtPKR(p.salePrice),
+                    badge: p.stockClass === "raw" ? t("inv.rawBadge") : null,
+                    disabled: whQty(p) <= 0,
+                    inCartQty: cartQtyById.get(p.id),
+                    inCartLabel: t("billing.inCart", {
+                      qty: fmtQty(cartQtyById.get(p.id) ?? 0),
+                    }),
+                  }))}
+                  activeIndex={pickIdx}
+                  onPick={addFromPicker}
+                  emptyText={t("billing.noResults", { query: pickerSearch.trim() })}
+                  listLabel={t("billing.resultsLabel")}
+                />
+              </div>
+            )}
           </div>
-          {!customerId && <p className="hint" style={{ margin: "8px 0 0" }}>پہلے بل کے کسٹمر باکس میں کسٹمر منتخب کریں، پھر ایڈوانس درج ہو گا۔</p>}
-        </section>
 
-        {/* ================= A) Bill builder — POS two-pane =================
-            LEFT: product find (SKU + instant-add search) and held
-            bills. RIGHT: the sticky cart — customer, lines, totals
-            and the complete action never need scrolling to reach. */}
-        <div className="pos-grid">
-          <div className="pos-left">
-        <section className="card" aria-label={t("billing.newBillAria")} style={{ marginBottom: 24 }}>
-          <h2 style={{ fontSize: "1.3rem", marginBottom: 4 }}>
-            {heldBill ? t("billing.resumingHeld", { no: heldBill.billNo }) : t("billing.newBill")}
-          </h2>
-          <p style={{ color: "var(--muted)", fontSize: "0.92rem", marginBottom: 20 }}>
-            {t("billing.builderHint")}
-          </p>
+          {/* Customer Selection & Quick Actions */}
+          <div style={{ display: "flex", gap: 8, alignItems: "center", flexWrap: "wrap" }}>
+            <select
+              id="bill-customer-select"
+              value={customerId}
+              onChange={(e) => onCustomerSelect(e.target.value)}
+              style={{
+                padding: "10px 14px",
+                borderRadius: 12,
+                border: "1px solid var(--line)",
+                background: "var(--bg)",
+                color: "var(--text)",
+                fontWeight: 600,
+                fontSize: "0.92rem",
+                maxWidth: 200,
+              }}
+              aria-label="کسٹمر منتخب کریں"
+            >
+              <option value="">{t("billing.walkInOption")}</option>
+              {customers.map((c) => (
+                <option key={c.id} value={c.id}>
+                  {c.name}
+                  {c.phone ? ` — ${c.phone}` : ""}
+                </option>
+              ))}
+            </select>
 
-          <div className="form">
-            {/* Phase C · C1 (§1.6): the bill's ONE warehouse — every
-                line on this bill leaves from here. */}
-            <div className="field">
-              <label htmlFor="bill-warehouse">{t("wh.pickerLabel")}</label>
+            <button
+              type="button"
+              className="btn btn-ghost btn-sm"
+              onClick={() => setShowNewCustomer((s) => !s)}
+              title="نیا گاہک درج کریں"
+            >
+              <IconPlus /> نیا گاہک
+            </button>
+
+            <button
+              type="button"
+              className="btn btn-ghost btn-sm"
+              onClick={() => setShowAdvanceModal(true)}
+              title="کسٹمر ایڈوانس درج کریں"
+            >
+              💰 پیشگی رقم
+            </button>
+
+            {/* Warehouse select */}
+            {warehouses.length > 0 && (
               <select
-                id="bill-warehouse"
                 value={billWarehouseId}
                 onChange={(e) => setBillWarehouseId(e.target.value)}
+                style={{
+                  padding: "10px 12px",
+                  borderRadius: 12,
+                  border: "1px solid var(--line)",
+                  background: "var(--bg)",
+                  color: "var(--text)",
+                  fontSize: "0.85rem",
+                  fontWeight: 600,
+                }}
+                aria-label={t("wh.pickerLabel")}
               >
                 {warehouses
                   .filter((w) => !w.archived)
                   .map((w) => (
                     <option key={w.id} value={w.id}>
                       {w.name}
-                      {w.isDefault ? ` ${t("wh.pickerDefaultSuffix")}` : ""}
+                      {w.isDefault ? ` (${t("wh.pickerDefaultSuffix")})` : ""}
                     </option>
                   ))}
-                {warehouses.length === 0 && (
-                  <option value="">{t("wh.pickerNone")}</option>
-                )}
               </select>
-            </div>
+            )}
 
-            <div className="field">
-              <label htmlFor="bill-sku">{t("billing.skuLabel")}</label>
-              <input
-                id="bill-sku"
-                ref={skuRef}
-                type="text"
-                autoFocus
-                placeholder={t("billing.skuPlaceholder")}
-                value={sku}
-                onChange={(e) => setSku(e.target.value)}
-                onKeyDown={onSkuEnter}
-              />
-              <div className="hint">{t("billing.skuHint")}</div>
-            </div>
+            {/* Held bills pill */}
+            {heldBills.length > 0 && (
+              <button
+                type="button"
+                className="btn btn-amber btn-sm"
+                onClick={() => setShowHeldModal((s) => !s)}
+              >
+                ⏸ ہولڈ بلز ({heldBills.length})
+              </button>
+            )}
+          </div>
 
-            <div className="field">
-              <label htmlFor="bill-search">{t("billing.findProduct")}</label>
-              <div className="search-box" style={{ maxWidth: "none" }}>
-                <IconSearch />
-                <input
-                  id="bill-search"
-                  ref={searchRef}
-                  type="search"
-                  placeholder={t("billing.searchPlaceholder")}
-                  value={pickerSearch}
-                  onChange={(e) => {
-                    setPickerSearch(e.target.value);
-                    setPickIdx(0);
-                  }}
-                  onKeyDown={onPickerKeyDown}
-                />
-                {pickerSearch && (
-                  <SearchClear
-                    onClear={() => {
-                      setPickerSearch("");
-                      setPickIdx(0);
-                      searchRef.current?.focus();
-                    }}
-                    label={t("action.clearSearch")}
-                  />
-                )}
-              </div>
-              {searching ? (
-                <div style={{ marginTop: 10 }}>
-                  <ProductResultList
-                    items={pickResults.map((p) => ({
-                      id: p.id,
-                      name: p.name,
-                      meta: t("billing.lineMeta", {
-                        price: fmtPKR(p.salePrice),
-                        unit: fmtUnit(p.unit),
-                        qty: fmtQty(whQty(p)),
-                      }),
-                      price: fmtPKR(p.salePrice),
-                      // C3: raw materials stay sellable (§4.1) —
-                      // the picker marks them, never hides them.
-                      badge: p.stockClass === "raw" ? t("inv.rawBadge") : null,
-                      disabled: whQty(p) <= 0,
-                      inCartQty: cartQtyById.get(p.id),
-                      inCartLabel: t("billing.inCart", {
-                        qty: fmtQty(cartQtyById.get(p.id) ?? 0),
-                      }),
-                    }))}
-                    activeIndex={pickIdx}
-                    onPick={addFromPicker}
-                    emptyText={t("billing.noResults", { query: pickerSearch.trim() })}
-                    listLabel={t("billing.resultsLabel")}
-                  />
-                </div>
-              ) : (
-                <p className="pick-hint">{t("billing.resultsHint")}</p>
-              )}
-            </div>
+          {/* Hotkeys HUD */}
+          <div style={{ display: "flex", gap: 6, alignItems: "center", flexWrap: "wrap" }}>
+            <span className="pos-hotkey-badge"><b>F2</b> سرچ</span>
+            <span className="pos-hotkey-badge"><b>F4</b> مکمل بل</span>
+            <span className="pos-hotkey-badge"><b>F8</b> ہولڈ</span>
+            <span className="pos-hotkey-badge"><b>F9</b> نیا بل</span>
+            <span style={{ fontSize: "0.82rem", color: "var(--muted)", marginInlineStart: 4 }}>
+              {fmtDateShort(new Date())}
+            </span>
           </div>
         </section>
 
-        {/* held bills strip */}
-        {heldBills.length > 0 && (
-          <section className="card" aria-label={t("billing.heldAria")} style={{ marginBottom: 24 }}>
-            <h2 style={{ fontSize: "1.15rem", marginBottom: 14 }}>
-              {t("billing.heldTitle", { count: heldBills.length })}
-            </h2>
-            <div style={{ display: "grid", gap: 10 }}>
-              {heldBills.map((b) => (
-                <div
-                  key={b.id}
-                  style={{
-                    display: "flex",
-                    alignItems: "center",
-                    gap: 14,
-                    flexWrap: "wrap",
-                    padding: "10px 14px",
-                    border: "1px solid var(--line)",
-                    borderRadius: 12,
-                    background: "var(--bg)",
-                  }}
-                >
-                  <b>#{b.billNo}</b>
-                  <span style={{ flex: "1 1 160px" }}>
-                    {b.customerName || t("billing.walkInCustomer")}
-                    <span style={{ color: "var(--muted)", fontSize: "0.85rem" }}>
-                      {" "}
-                      · {fmtTime(b.ts)}
-                    </span>
-                  </span>
-                  <b style={{ fontFamily: "var(--font-display)" }}>{fmtPKR(b.total)}</b>
-                  <button
-                    type="button"
-                    className="btn btn-ghost btn-sm"
-                    onClick={() => resumeHeld(b)}
-                  >
-                    <IconEdit /> {t("billing.resume")}
-                  </button>
-                  <button
-                    type="button"
-                    className="icon-btn danger"
-                    onClick={() => discardHeld(b)}
-                    aria-label={t("billing.discardHeldAria", { no: b.billNo })}
-                  >
-                    <IconTrash />
-                  </button>
-                </div>
-              ))}
+        {/* Inline New Customer Strip (when toggled) */}
+        {showNewCustomer && (
+          <section className="card" style={{ marginBottom: 16, background: "var(--card-2)" }}>
+            <div style={{ display: "flex", gap: 12, alignItems: "end", flexWrap: "wrap" }}>
+              <div className="field" style={{ flex: "1 1 200px" }}>
+                <label htmlFor="nc-name">{t("billing.ncName")}</label>
+                <input
+                  id="nc-name"
+                  value={ncName}
+                  onChange={(e) => setNcName(e.target.value)}
+                  placeholder={t("billing.ncNamePlaceholder")}
+                />
+              </div>
+              <div className="field" style={{ flex: "1 1 200px" }}>
+                <label htmlFor="nc-phone">{t("billing.ncPhone")}</label>
+                <input
+                  id="nc-phone"
+                  value={ncPhone}
+                  onChange={(e) => setNcPhone(e.target.value)}
+                  placeholder={t("billing.ncPhonePlaceholder")}
+                />
+              </div>
+              <button type="button" className="btn btn-primary btn-sm" onClick={saveNewCustomer}>
+                {t("billing.addAndSelect")}
+              </button>
+              <button type="button" className="btn btn-ghost btn-sm" onClick={() => setShowNewCustomer(false)}>
+                منسوخ
+              </button>
             </div>
           </section>
         )}
-          </div>{/* /pos-left */}
 
-          <aside className={"pos-cart" + (cartOpen ? " open" : "")}>
-            <div className="card pos-cart-card">
-              <div className="pos-cart-head">
-                <div
-                  style={{
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "space-between",
-                    gap: 12,
-                  }}
-                >
-                  <h2 style={{ fontSize: "1.15rem" }}>
-                    {heldBill
-                      ? t("billing.resumingHeld", { no: heldBill.billNo })
-                      : t("billing.newBill")}
-                  </h2>
-                  <button
-                    type="button"
-                    className="icon-btn pos-cart-close"
-                    onClick={() => setCartOpen(false)}
-                    aria-label={t("action.close")}
-                  >
-                    <IconClose />
-                  </button>
-                </div>
-              </div>
-              <div className="pos-cart-scroll">
-                <div className="form">
+        {/* Document Conversion Pipeline Stepper */}
+        {billSource && (
+          <div className="pos-pipeline-stepper" role="status">
+            <span className={"pos-pipeline-step " + (billSource.type === "quotation" ? "past" : "")}>
+              کوٹیشن (Quotation)
+            </span>
+            <span className="pos-pipeline-sep">➔</span>
+            <span className={"pos-pipeline-step " + (billSource.type === "order" ? "past" : "")}>
+              سیل آرڈر (Sale Order)
+            </span>
+            <span className="pos-pipeline-sep">➔</span>
+            <span className={"pos-pipeline-step " + (billSource.type === "challan" ? "past" : "")}>
+              ڈلیوری چالان (Challan)
+            </span>
+            <span className="pos-pipeline-sep">➔</span>
+            <span className="pos-pipeline-step active">
+              بلنگ ڈیسک (#{billSource.label})
+            </span>
+            <span style={{ marginInlineStart: "auto", fontSize: "0.82rem", color: "var(--accent-text)" }}>
+              {t(billSource.type === "challan" ? "challan.deskNote" : "doc.agreedPrices")}
+            </span>
+          </div>
+        )}
 
-            {/* cart lines */}
-            {billSource && billSource.type !== "job" && (
-              <div
-                className="note-box"
-                role="status"
-                style={{ marginBottom: 12, borderStyle: "solid", borderColor: "var(--accent)" }}
-              >
-                {t(
-                  billSource.type === "challan"
-                    ? "doc.fromChallan"
-                    : billSource.type === "quotation"
-                      ? "doc.fromQuotation"
-                      : "doc.fromOrder",
-                  { number: billSource.label }
-                )}{" "}
-                ·{" "}
-                {t(billSource.type === "challan" ? "challan.deskNote" : "doc.agreedPrices")}
-              </div>
-            )}
-            {/* Phase C · C5 (R-C7): billing a job — the materials
-             * already issued to it, listed so the desk never
-             * bills them twice (§5.3). */}
-            {billSource?.type === "job" && sourceJobMaterials.length > 0 && (
-              <div
-                className="note-box"
-                role="status"
-                style={{ marginBottom: 12, borderStyle: "solid", borderColor: "var(--amber, #b45309)" }}
-              >
-                <strong>
-                  {t("job.bill.materialsTitle", { number: billSource.label })}
-                </strong>
-                <div>{t("job.bill.materialsSub")}</div>
-                <ul style={{ margin: "6px 0 0", paddingInlineStart: 18 }}>
-                  {sourceJobMaterials.map((r) => (
-                    <li key={r.name}>
-                      {r.name} · {fmtQty(r.qty)} · {fmtPKR(r.value)}
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            )}
-            {cart.length === 0 ? (
-              <div className="empty" style={{ padding: "28px 20px" }}>
-                {t("billing.cartEmpty")}
-              </div>
-            ) : (
-              <div style={{ display: "grid", gap: 10 }}>
-                {cart.map((line, lineIdx) => {
-                  const p = byId.get(line.productId);
-                  if (!p) return null;
-                  const lineTax = cartTax.lines[lineIdx]?.taxAmount ?? 0;
-                  const lineTaxIncl = cartTax.lines[lineIdx]?.slab?.inclusive === true;
-                  const step = isFractional(p.unit) ? 0.5 : 1;
-                  return (
-                    <div
-                      key={line.productId}
-                      style={{
-                        display: "flex",
-                        alignItems: "center",
-                        gap: 14,
-                        flexWrap: "wrap",
-                        padding: "10px 14px",
-                        border: "1px solid var(--line)",
-                        borderRadius: 12,
-                        background: "var(--bg)",
-                      }}
-                    >
-                      <div style={{ flex: "1 1 180px", minWidth: 140 }}>
-                        <b style={{ fontSize: "0.95rem" }}>{p.name}</b>
-                        {p.stockClass === "raw" && (
-                          <span className="badge amber" style={{ marginInlineStart: 8 }}>
-                            {t("inv.rawBadge")}
-                          </span>
-                        )}
-                        <div style={{ fontSize: "0.82rem", color: "var(--muted)" }}>
-                          {t("billing.lineMeta", {
-                            price: fmtPKR(line.unitPrice ?? p.salePrice),
-                            unit: fmtUnit(p.unit),
-                            qty: fmtQty(whQty(p)),
-                          })}
-                        </div>
-                      </div>
-                      <div className="stepper">
-                        <button
-                          type="button"
-                          onClick={() => bumpLine(line.productId, -step)}
-                          aria-label={t("billing.decreaseQtyOf", { name: p.name })}
-                        >
-                          −
-                        </button>
-                        <input
-                          className="val"
-                          type="number"
-                          step="any"
-                          min={0}
-                          value={line.qty || ""}
-                          placeholder="0"
-                          onChange={(e) => setLineQty(line.productId, parseFloat(e.target.value))}
-                          aria-label={t("billing.qtyFor", { name: p.name })}
-                          style={{
-                            border: "none",
-                            background: "transparent",
-                            outline: "none",
-                            width: 64,
-                            font: "inherit",
-                          }}
-                        />
-                        <button
-                          type="button"
-                          onClick={() => bumpLine(line.productId, step)}
-                          aria-label={t("billing.increaseQtyOf", { name: p.name })}
-                        >
-                          +
-                        </button>
-                      </div>
-                      <div style={{ textAlign: "right" }}>
-                        <b
-                          style={{
-                            fontFamily: "var(--font-display)",
-                            minWidth: 96,
-                            display: "block",
-                          }}
-                        >
-                          {fmtPKR(line.qty * (line.unitPrice ?? p.salePrice))}
-                        </b>
-                        {lineTax > 0 && (
-                          <span style={{ fontSize: "0.78rem", color: "var(--muted)" }}>
-                            {t(lineTaxIncl ? "billing.tax.lineAmountIncl" : "billing.tax.lineAmount", {
-                              amount: fmtPKR(lineTax),
-                            })}
-                          </span>
-                        )}
-                      </div>
-                      <button
-                        type="button"
-                        className="icon-btn danger"
-                        onClick={() => removeLine(line.productId)}
-                        aria-label={t("billing.removeFromBill", { name: p.name })}
-                      >
-                        <IconTrash />
-                      </button>
-                    </div>
-                  );
-                })}
-              </div>
-            )}
+        {/* Phase C · C5: Job materials banner */}
+        {billSource?.type === "job" && sourceJobMaterials.length > 0 && (
+          <div
+            className="note-box"
+            role="status"
+            style={{ marginBottom: 14, borderStyle: "solid", borderColor: "var(--amber, #b45309)" }}
+          >
+            <strong>{t("job.bill.materialsTitle", { number: billSource.label })}</strong>
+            <div>{t("job.bill.materialsSub")}</div>
+            <ul style={{ margin: "6px 0 0", paddingInlineStart: 18 }}>
+              {sourceJobMaterials.map((r) => (
+                <li key={r.name}>
+                  {r.name} · {fmtQty(r.qty)} · {fmtPKR(r.value)}
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
 
-            {/* §2.5: soft availability warning — a report, never a block */}
-            {availabilityWarnings.length > 0 && (
-              <div
-                className="note-box"
-                role="status"
-                style={{
-                  marginTop: 12,
-                  borderStyle: "solid",
-                  borderColor: "var(--amber)",
-                  color: "var(--amber-text)",
-                }}
-              >
-                {availabilityWarnings.map((w, i) => (
-                  <div key={i}>{w}</div>
-                ))}
-              </div>
-            )}
+        {/* Notice alert */}
+        {notice && (
+          <div
+            className={notice.ok ? "note-box" : "form-error"}
+            style={
+              notice.ok
+                ? { marginBottom: 14, borderStyle: "solid", borderColor: "var(--accent)" }
+                : { marginBottom: 14 }
+            }
+          >
+            {notice.text}
+          </div>
+        )}
 
-            {/* customer */}
-            <div className="form-grid">
-              <div className="field">
-                <label htmlFor="bill-customer">{t("billing.customerSaved")}</label>
-                <select
-                  id="bill-customer"
-                  value={customerId}
-                  onChange={(e) => onCustomerSelect(e.target.value)}
-                >
-                  <option value="">{t("billing.walkInOption")}</option>
-                  {customers.map((c) => (
-                    <option key={c.id} value={c.id}>
-                      {c.name}
-                      {c.phone ? ` — ${c.phone}` : ""}
-                    </option>
-                  ))}
-                </select>
-              </div>
-              <div className="field">
-                <label>&nbsp;</label>
+        {/* 2. Central Live POS Cart Table */}
+        <section className="pos-table-card" aria-label="POS Cart Table">
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+              padding: "14px 18px",
+              background: "var(--card-2)",
+              borderBottom: "1px solid var(--line)",
+            }}
+          >
+            <h2 style={{ fontSize: "1.15rem", margin: 0 }}>
+              {heldBill
+                ? t("billing.resumingHeld", { no: heldBill.billNo })
+                : `کاؤنٹر بل (${cart.length} آئٹمز)`}
+            </h2>
+            <div style={{ display: "flex", gap: 12, alignItems: "center" }}>
+              {customerId && loyaltyPos && (
+                <span className="badge green" style={{ fontSize: "0.8rem" }}>
+                  پوائنٹس: {loyaltyPos.redeemablePoints.toLocaleString()}
+                </span>
+              )}
+              {cart.length > 0 && (
                 <button
                   type="button"
                   className="btn btn-ghost btn-sm"
-                  onClick={() => setShowNewCustomer((s) => !s)}
+                  onClick={resetForm}
+                  style={{ color: "var(--danger)" }}
                 >
-                  <IconPlus /> {t("billing.newCustomer")}
+                  <IconTrash /> خالی کریں
                 </button>
-              </div>
+              )}
             </div>
-            {showNewCustomer && (
-              <div className="form-grid">
-                <div className="field">
-                  <label htmlFor="nc-name">{t("billing.ncName")}</label>
-                  <input
-                    id="nc-name"
-                    value={ncName}
-                    onChange={(e) => setNcName(e.target.value)}
-                    placeholder={t("billing.ncNamePlaceholder")}
-                  />
-                </div>
-                <div className="field">
-                  <label htmlFor="nc-phone">{t("billing.ncPhone")}</label>
-                  <div style={{ display: "flex", gap: 10 }}>
-                    <input
-                      id="nc-phone"
-                      value={ncPhone}
-                      onChange={(e) => setNcPhone(e.target.value)}
-                      placeholder={t("billing.ncPhonePlaceholder")}
-                      style={{ flex: 1 }}
-                    />
-                    <button type="button" className="btn btn-primary btn-sm" onClick={saveNewCustomer}>
-                      {t("billing.addAndSelect")}
-                    </button>
-                  </div>
-                </div>
-              </div>
-            )}
-            <div className="form-grid">
-              <div className="field">
-                <label htmlFor="bill-cust-name">{t("billing.customerName")}</label>
-                <input
-                  id="bill-cust-name"
-                  value={customerName}
-                  onChange={(e) => {
-                    setCustomerName(e.target.value);
-                    setCustomerId("");
-                  }}
-                  placeholder={t("billing.customerNamePlaceholder")}
-                />
-              </div>
-              <div className="field">
-                <label htmlFor="bill-cust-phone">{t("billing.customerPhone")}</label>
-                <input
-                  id="bill-cust-phone"
-                  value={customerPhone}
-                  onChange={(e) => {
-                    setCustomerPhone(e.target.value);
-                    setCustomerId("");
-                  }}
-                  placeholder={t("billing.customerPhonePlaceholder")}
-                />
-              </div>
-            </div>
+          </div>
 
-            {/* discount (the totals themselves live in the pinned
-                cart foot — always visible, never scrolled to) */}
-            <div className="field">
-              <label htmlFor="bill-discount-type">{t("billing.discount")}</label>
-              <div style={{ display: "flex", gap: 10 }}>
+          <div className="pos-table-scroll">
+            {cart.length === 0 ? (
+              <div className="empty" style={{ padding: "48px 20px" }}>
+                <p style={{ fontSize: "1.15rem", fontWeight: 700, margin: "0 0 6px" }}>
+                  کاؤنٹر بل خالی ہے
+                </p>
+                <p style={{ color: "var(--muted)", margin: 0 }}>
+                  بارکوڈ اسکین کریں یا اوپر پروڈکٹ کا نام لکھ کر انٹر دبائیں [F2]
+                </p>
+              </div>
+            ) : (
+              <table className="pos-counter-table">
+                <thead>
+                  <tr>
+                    <th style={{ width: 40 }}>#</th>
+                    <th>پروڈکٹ / آئٹم</th>
+                    <th style={{ width: 140 }}>قیمت فی یونٹ</th>
+                    <th style={{ width: 170, textAlign: "center" }}>مقدار (Qty)</th>
+                    <th style={{ width: 110, textAlign: "end" }}>ٹیکس</th>
+                    <th style={{ width: 140, textAlign: "end" }}>کل رقم</th>
+                    <th style={{ width: 50, textAlign: "center" }}>عمل</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {cart.map((line, idx) => {
+                    const p = byId.get(line.productId);
+                    if (!p) return null;
+                    const lineTax = cartTax.lines[idx]?.taxAmount ?? 0;
+                    const lineTaxIncl = cartTax.lines[idx]?.slab?.inclusive === true;
+                    const step = isFractional(p.unit) ? 0.5 : 1;
+                    const lineTotal = line.qty * (line.unitPrice ?? p.salePrice);
+
+                    return (
+                      <tr key={line.productId}>
+                        <td style={{ color: "var(--muted)", fontWeight: 700 }}>{idx + 1}</td>
+                        <td>
+                          <div style={{ fontWeight: 700, fontSize: "1rem" }}>{p.name}</div>
+                          <div style={{ fontSize: "0.8rem", color: "var(--muted)" }}>
+                            اسٹاک: {fmtQty(whQty(p))} {fmtUnit(p.unit)}
+                            {p.stockClass === "raw" && (
+                              <span className="badge amber" style={{ marginInlineStart: 8, padding: "1px 6px" }}>
+                                {t("inv.rawBadge")}
+                              </span>
+                            )}
+                          </div>
+                        </td>
+                        <td>
+                          <b style={{ fontFamily: "var(--font-display)" }}>
+                            {fmtPKR(line.unitPrice ?? p.salePrice)}
+                          </b>
+                        </td>
+                        <td style={{ textAlign: "center" }}>
+                          <div style={{ display: "inline-flex", alignItems: "center", gap: 6 }}>
+                            <button
+                              type="button"
+                              className="pos-stepper-btn"
+                              onClick={() => bumpLine(line.productId, -step)}
+                              aria-label="مقدار کم کریں"
+                            >
+                              −
+                            </button>
+                            <input
+                              type="number"
+                              step="any"
+                              min={0}
+                              value={line.qty || ""}
+                              onChange={(e) => setLineQty(line.productId, parseFloat(e.target.value))}
+                              style={{
+                                width: 62,
+                                textAlign: "center",
+                                fontWeight: 800,
+                                fontFamily: "var(--font-display)",
+                                fontSize: "1.05rem",
+                                padding: "4px 6px",
+                                border: "1px solid var(--line)",
+                                borderRadius: 8,
+                                background: "var(--bg)",
+                                color: "var(--text)",
+                              }}
+                            />
+                            <button
+                              type="button"
+                              className="pos-stepper-btn"
+                              onClick={() => bumpLine(line.productId, step)}
+                              aria-label="مقدار بڑھائیں"
+                            >
+                              +
+                            </button>
+                          </div>
+                        </td>
+                        <td style={{ textAlign: "end", fontSize: "0.86rem", color: "var(--muted)" }}>
+                          {lineTax > 0 ? (
+                            <span>
+                              {fmtPKR(lineTax)}
+                              <br />
+                              <small>{lineTaxIncl ? "(شامل)" : "(الگ)"}</small>
+                            </span>
+                          ) : (
+                            "—"
+                          )}
+                        </td>
+                        <td style={{ textAlign: "end" }}>
+                          <b style={{ fontFamily: "var(--font-display)", fontSize: "1.08rem" }}>
+                            {fmtPKR(lineTotal)}
+                          </b>
+                        </td>
+                        <td style={{ textAlign: "center" }}>
+                          <button
+                            type="button"
+                            className="icon-btn danger"
+                            onClick={() => removeLine(line.productId)}
+                            aria-label="حذف کریں"
+                          >
+                            <IconTrash />
+                          </button>
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            )}
+          </div>
+
+          {/* Availability report note */}
+          {availabilityWarnings.length > 0 && (
+            <div
+              className="note-box"
+              role="status"
+              style={{
+                margin: 12,
+                borderStyle: "solid",
+                borderColor: "var(--amber)",
+                color: "var(--amber-text)",
+              }}
+            >
+              {availabilityWarnings.map((w, i) => (
+                <div key={i}>{w}</div>
+              ))}
+            </div>
+          )}
+        </section>
+
+        {/* 3. Bottom POS Command Deck (Discounts/Payments + Quick Cash + Grand Totals & Complete) */}
+        <section className="pos-deck" aria-label="POS Command Deck">
+          {/* Deck Column 1: Payments & Tender methods */}
+          <div className="pos-deck-col">
+            <div>
+              <h3 style={{ fontSize: "1.05rem", margin: "0 0 12px" }}>ڈسکاؤنٹ و طریقہ ادائیگی</h3>
+
+              {/* Discount inputs */}
+              <div style={{ display: "flex", gap: 8, marginBottom: 14 }}>
                 <select
-                  id="bill-discount-type"
                   value={discountType}
                   onChange={(e) => setDiscountType(e.target.value as "flat" | "percent")}
-                  style={{ flex: "0 0 130px" }}
+                  style={{
+                    flex: "0 0 110px",
+                    padding: "8px 10px",
+                    borderRadius: 10,
+                    border: "1px solid var(--line)",
+                    background: "var(--bg)",
+                    color: "var(--text)",
+                  }}
+                  aria-label="ڈسکاؤنٹ کی قسم"
                 >
-                  <option value="flat">{t("billing.discountFlat")}</option>
-                  <option value="percent">{t("billing.discountPercent")}</option>
+                  <option value="flat">روپے (Flat)</option>
+                  <option value="percent">فیصد (%)</option>
                 </select>
                 <input
                   type="number"
@@ -1721,97 +1625,95 @@ export default function BillingDesk() {
                   step="any"
                   value={discountValue}
                   onChange={(e) => setDiscountValue(e.target.value)}
-                  placeholder="0"
-                  aria-label={t("billing.discountValueAria")}
-                  style={{ flex: 1 }}
+                  placeholder="ڈسکاؤنٹ رعایت"
+                  style={{
+                    flex: 1,
+                    padding: "8px 12px",
+                    borderRadius: 10,
+                    border: "1px solid var(--line)",
+                    background: "var(--bg)",
+                    color: "var(--text)",
+                  }}
                 />
               </div>
-            </div>
 
-            {/* payments */}
-            <div className="field">
-              <label>{t("billing.payments")}</label>
-              <div style={{ display: "grid", gap: 10 }}>
+              {/* Multi-payment rows */}
+              <div style={{ display: "grid", gap: 8 }}>
                 {payments.map((row, i) => (
-                  <div key={i} style={{ display: "grid", gap: 8 }}>
-                    <div style={{ display: "flex", gap: 10, alignItems: "center" }}>
-                      <div className="field" style={{ flex: "0 0 170px" }}>
-                        <select
-                          value={
-                            row.instrument === "cheque"
-                              ? "cheque"
-                              : row.instrument === "points"
-                                ? "points"
-                                : row.method
-                          }
-                          onChange={(e) =>
-                            setPayments((prev) =>
-                              prev.map((r, j) => {
-                                if (j !== i) return r;
-                                // B5: "cheque" is the picker's sixth
-                                // choice — an instrument on the row,
-                                // not a method; the row's method rides
-                                // as "bank" and its account clears.
-                                if (e.target.value === "cheque") {
-                                  return {
-                                    ...r,
-                                    instrument: "cheque" as const,
-                                    method: "bank" as PayMethod,
-                                    accountId: "",
-                                  };
-                                }
-                                // H1: "points" is the seventh choice
-                                // — the second instrument; the row's
-                                // method rides as "cash" and the
-                                // amount is the fold's quote.
-                                if (e.target.value === "points") {
-                                  return {
-                                    ...r,
-                                    instrument: "points" as const,
-                                    method: "cash" as PayMethod,
-                                    accountId: "",
-                                  };
-                                }
+                  <div key={i} style={{ display: "grid", gap: 6 }}>
+                    <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
+                      <select
+                        value={
+                          row.instrument === "cheque"
+                            ? "cheque"
+                            : row.instrument === "points"
+                              ? "points"
+                              : row.method
+                        }
+                        onChange={(e) =>
+                          setPayments((prev) =>
+                            prev.map((r, j) => {
+                              if (j !== i) return r;
+                              if (e.target.value === "cheque") {
                                 return {
                                   ...r,
-                                  instrument: null,
-                                  method: e.target.value as PayMethod,
-                                  // A2: an account belongs to one method
-                                  // bucket — reset the choice on switch.
+                                  instrument: "cheque" as const,
+                                  method: "bank" as PayMethod,
                                   accountId: "",
                                 };
-                              })
-                            )
-                          }
-                          aria-label={t("billing.payMethodAria")}
-                        >
-                          {PAY_METHODS.map((m) => (
-                            <option key={m} value={m}>
-                              {payLabel(m)}
-                            </option>
-                          ))}
-                          <option value="cheque">{t("chq.payOption")}</option>
-                          {customerId && (
-                            <option value="points">{t("bill.payPoints")}</option>
-                          )}
-                        </select>
-                      </div>
+                              }
+                              if (e.target.value === "points") {
+                                return {
+                                  ...r,
+                                  instrument: "points" as const,
+                                  method: "cash" as PayMethod,
+                                  accountId: "",
+                                };
+                              }
+                              return {
+                                ...r,
+                                instrument: null,
+                                method: e.target.value as PayMethod,
+                                accountId: "",
+                              };
+                            })
+                          )
+                        }
+                        style={{
+                          flex: "0 0 120px",
+                          padding: "8px 10px",
+                          borderRadius: 10,
+                          border: "1px solid var(--line)",
+                          background: "var(--bg)",
+                          color: "var(--text)",
+                        }}
+                      >
+                        {PAY_METHODS.map((m) => (
+                          <option key={m} value={m}>
+                            {payLabel(m)}
+                          </option>
+                        ))}
+                        <option value="cheque">{t("chq.payOption")}</option>
+                        {customerId && <option value="points">{t("bill.payPoints")}</option>}
+                      </select>
+
                       {row.method !== "credit" &&
                         row.instrument !== "cheque" &&
                         row.instrument !== "points" && (
-                        <div style={{ flex: "0 0 170px" }}>
-                          <AccountPicker
-                            method={row.method}
-                            value={row.accountId}
-                            onChange={(accountId) =>
-                              setPayments((prev) =>
-                                prev.map((r, j) => (j === i ? { ...r, accountId } : r))
-                              )
-                            }
-                          />
-                        </div>
-                      )}
-                      <div className="field" style={{ flex: 1 }}>
+                          <div style={{ flex: "0 0 130px" }}>
+                            <AccountPicker
+                              method={row.method}
+                              value={row.accountId}
+                              onChange={(accountId) =>
+                                setPayments((prev) =>
+                                  prev.map((r, j) => (j === i ? { ...r, accountId } : r))
+                                )
+                              }
+                            />
+                          </div>
+                        )}
+
+                      <div style={{ flex: 1 }}>
                         {row.instrument === "points" ? (
                           <input
                             type="number"
@@ -1823,8 +1725,15 @@ export default function BillingDesk() {
                                 prev.map((r, j) => (j === i ? { ...r, points: e.target.value } : r))
                               )
                             }
-                            placeholder={t("bill.pointsUsePh")}
-                            aria-label={t("bill.pointsUsePh")}
+                            placeholder="پوائنٹس تعداد"
+                            style={{
+                              width: "100%",
+                              padding: "8px 10px",
+                              borderRadius: 10,
+                              border: "1px solid var(--line)",
+                              background: "var(--bg)",
+                              color: "var(--text)",
+                            }}
                           />
                         ) : (
                           <input
@@ -1837,29 +1746,33 @@ export default function BillingDesk() {
                                 prev.map((r, j) => (j === i ? { ...r, amount: e.target.value } : r))
                               )
                             }
-                            placeholder={t("billing.payAmountPlaceholder")}
-                            aria-label={t("billing.payAmountAria")}
+                            placeholder="رقم"
+                            style={{
+                              width: "100%",
+                              padding: "8px 10px",
+                              borderRadius: 10,
+                              border: "1px solid var(--line)",
+                              background: "var(--bg)",
+                              color: "var(--text)",
+                            }}
                           />
                         )}
                       </div>
+
                       <button
                         type="button"
                         className="icon-btn danger"
                         disabled={payments.length <= 1}
                         onClick={() => setPayments((prev) => prev.filter((_, j) => j !== i))}
-                        aria-label={t("billing.removePayRowAria")}
+                        aria-label="قطار حذف کریں"
+                        style={{ width: 32, height: 32 }}
                       >
                         <IconTrash />
                       </button>
                     </div>
+
                     {row.instrument === "cheque" && (
-                      <div
-                        style={{
-                          display: "grid",
-                          gap: 10,
-                          gridTemplateColumns: "repeat(auto-fit, minmax(140px, 1fr))",
-                        }}
-                      >
+                      <div style={{ display: "grid", gap: 8, gridTemplateColumns: "1fr 1fr" }}>
                         <ChequeFields
                           idPrefix={`bill-chq-${i}`}
                           value={row.cheque}
@@ -1871,162 +1784,388 @@ export default function BillingDesk() {
                         />
                       </div>
                     )}
-                    {row.instrument === "points" && (
-                      <div className="hint">
-                        {t("bill.pointsBalance")}:{" "}
-                        {(loyaltyPos?.redeemablePoints ?? 0).toLocaleString()}
-                        {pointsQuote.points > 0 &&
-                          ` · ${pointsQuote.points.toLocaleString()} = ${fmtPKR(pointsQuote.rs)}`}{" "}
-                        · {t("bill.pointsMaxNote", { cap: loyaltySt.redeemCapPct })}
-                      </div>
-                    )}
                   </div>
                 ))}
               </div>
-              <div
-                style={{
-                  display: "flex",
-                  gap: 12,
-                  alignItems: "center",
-                  flexWrap: "wrap",
-                  marginTop: 12,
-                }}
+            </div>
+
+            <div style={{ display: "flex", gap: 10, alignItems: "center", marginTop: 14 }}>
+              <button
+                type="button"
+                className="btn btn-ghost btn-sm"
+                onClick={() => setPayments((prev) => [...prev, blankPayRow()])}
               >
+                <IconPlus /> مزید طریقہ
+              </button>
+              <button type="button" className="btn btn-ghost btn-sm" onClick={fillRemaining}>
+                باقی رقم کیش میں بھریں
+              </button>
+            </div>
+          </div>
+
+          {/* Deck Column 2: Quick Cash Tender & Change Due */}
+          <div className="pos-deck-col">
+            <div>
+              <h3 style={{ fontSize: "1.05rem", margin: "0 0 10px" }}>
+                فوری نقد ادائیگی (Quick Cash)
+              </h3>
+              <p style={{ margin: "0 0 10px", fontSize: "0.85rem", color: "var(--muted)" }}>
+                نوٹ پر کلک کریں — سسٹم خود بخود گاہک کو واپس کی جانے والی رقم شمار کر لے گا۔
+              </p>
+
+              <div className="pos-quick-cash-grid">
                 <button
                   type="button"
-                  className="btn btn-ghost btn-sm"
-                  onClick={() => setPayments((prev) => [...prev, blankPayRow()])}
+                  className="pos-cash-btn"
+                  onClick={() => applyQuickCash(total)}
                 >
-                  <IconPlus /> {t("billing.addPayment")}
+                  برابر رقم ({fmtPKR(total)})
                 </button>
-                <button type="button" className="btn btn-ghost btn-sm" onClick={fillRemaining}>
-                  {t("billing.fillCash")}
-                </button>
-                <b
-                  style={{
-                    marginLeft: "auto",
-                    color:
-                      Math.abs(remaining) <= 1 ? "var(--accent-text)" : "var(--danger)",
-                  }}
+                <button
+                  type="button"
+                  className="pos-cash-btn"
+                  onClick={() => applyQuickCash(100)}
                 >
-                  {t("billing.remaining", { amount: fmtPKR(remaining) })}
-                </b>
-              </div>
-              <div className="hint">
-                {t("billing.creditNote", { amount: fmtPKR(Math.max(0, remaining)) })}
+                  Rs 100
+                </button>
+                <button
+                  type="button"
+                  className="pos-cash-btn"
+                  onClick={() => applyQuickCash(500)}
+                >
+                  Rs 500
+                </button>
+                <button
+                  type="button"
+                  className="pos-cash-btn"
+                  onClick={() => applyQuickCash(1000)}
+                >
+                  Rs 1,000
+                </button>
+                <button
+                  type="button"
+                  className="pos-cash-btn"
+                  onClick={() => applyQuickCash(5000)}
+                >
+                  Rs 5,000
+                </button>
+                <div style={{ display: "flex", gap: 4 }}>
+                  <input
+                    type="number"
+                    min={0}
+                    value={cashTendered}
+                    onChange={(e) => applyQuickCash(parseFloat(e.target.value) || 0)}
+                    placeholder="دیگر کیش..."
+                    style={{
+                      width: "100%",
+                      padding: "8px 10px",
+                      borderRadius: 10,
+                      border: "1px solid var(--line)",
+                      background: "var(--bg)",
+                      color: "var(--text)",
+                      fontFamily: "var(--font-display)",
+                      fontWeight: 700,
+                    }}
+                  />
+                </div>
               </div>
             </div>
 
-            {/* H1: the earn preview — what this bill will grant,
-                folded from the same settings + journal the store
-                posts against. Walk-in bills say plainly that they
-                earn nothing (design §1.4). */}
-            {loyaltySt.enabled && !heldId && cart.length > 0 &&
-              (customerId ? (
-                earnQuote && (
-                  <div className="hint">
-                    {t("bill.earnPreview", { points: earnQuote.points })}
-                    {loyaltyPos && loyaltyPos.tier !== "standard"
-                      ? ` · ${t(`loyalty.tier.${loyaltyPos.tier}` as I18nKey)}`
-                      : ""}
-                  </div>
-                )
+            {/* Change due / Remaining display */}
+            <div>
+              {changeDue > 0 ? (
+                <div className="pos-change-box">
+                  <span style={{ fontSize: "0.88rem", color: "var(--accent-text)", fontWeight: 700 }}>
+                    گاہک کو واپسی (Change Due):
+                  </span>
+                  <span className="pos-change-val">{fmtPKR(changeDue)}</span>
+                </div>
+              ) : remaining > 0 ? (
+                <div className="pos-change-box due">
+                  <span style={{ fontSize: "0.88rem", color: "var(--amber-text)", fontWeight: 700 }}>
+                    بقایا واجب الادا (Remaining):
+                  </span>
+                  <span className="pos-change-val" style={{ color: "var(--amber-text)" }}>
+                    {fmtPKR(remaining)}
+                  </span>
+                </div>
               ) : (
-                <div className="hint">{t("bill.walkinNoEarn")}</div>
-              ))}
-
-            {heldBill && (
-              <div className="note-box" style={{ marginTop: 0 }}>
-                {t("billing.heldNote", { no: heldBill.billNo, total: fmtPKR(heldBill.total) })}
-              </div>
-            )}
-
-            {notice && (
-              <div
-                className={notice.ok ? "note-box" : "form-error"}
-                style={
-                  notice.ok
-                    ? { marginTop: 0, borderStyle: "solid", borderColor: "var(--accent)" }
-                    : undefined
-                }
-              >
-                {notice.text}
-              </div>
-            )}
-
+                <div className="pos-change-box">
+                  <span style={{ fontSize: "0.88rem", color: "var(--accent-text)", fontWeight: 700 }}>
+                    ادائیگی مکمل ہے ✓
+                  </span>
                 </div>
+              )}
+            </div>
+          </div>
+
+          {/* Deck Column 3: Totals & Complete Bill Action */}
+          <div className="pos-deck-col" style={{ background: "var(--card-2)" }}>
+            <div>
+              <div style={rowBetween}>
+                <span style={{ color: "var(--muted)" }}>{t("billing.subtotal")}</span>
+                <b>{fmtPKR(subtotal)}</b>
               </div>
-              <div className="pos-cart-foot">
-                <div style={rowBetween}>
-                  <span style={{ color: "var(--muted)" }}>{t("billing.subtotal")}</span>
-                  <b>{fmtPKR(subtotal)}</b>
-                </div>
+              {discountAmount > 0 && (
                 <div style={rowBetween}>
                   <span style={{ color: "var(--muted)" }}>{t("billing.discount")}</span>
-                  <b>− {fmtPKR(discountAmount)}</b>
+                  <b style={{ color: "var(--danger)" }}>− {fmtPKR(discountAmount)}</b>
                 </div>
-                {cartTaxGroups
-                  .filter((g) => !g.inclusive)
-                  .map((g) => (
-                    <div style={rowBetween} key={`${g.name}|ex`}>
-                      <span style={{ color: "var(--muted)" }}>
-                        {g.name}
-                        {g.kind === "percent" ? ` ${g.rate}%` : ""}
-                      </span>
-                      <b>+ {fmtPKR(g.amount)}</b>
-                    </div>
-                  ))}
-                {cartTaxGroups
-                  .filter((g) => g.inclusive)
-                  .map((g) => (
-                    <div style={rowBetween} key={`${g.name}|in`}>
-                      <span style={{ color: "var(--muted)" }}>
-                        {g.name}
-                        {g.kind === "percent" ? ` ${g.rate}%` : ""} ·{" "}
-                        {t("billing.tax.includedNote")}
-                      </span>
-                      <b>{fmtPKR(g.amount)}</b>
-                    </div>
-                  ))}
-                <div
-                  style={{
-                    ...rowBetween,
-                    borderTop: "1px solid var(--line)",
-                    marginTop: 6,
-                    paddingTop: 10,
-                    fontSize: "1.2rem",
-                  }}
+              )}
+              {cartTaxGroups.map((g) => (
+                <div style={rowBetween} key={`${g.name}|${g.inclusive ? "in" : "ex"}`}>
+                  <span style={{ color: "var(--muted)" }}>
+                    {g.name} {g.kind === "percent" ? `${g.rate}%` : ""} {g.inclusive ? "(شامل)" : ""}
+                  </span>
+                  <b>{g.inclusive ? "" : "+ "}{fmtPKR(g.amount)}</b>
+                </div>
+              ))}
+              <div
+                style={{
+                  ...rowBetween,
+                  borderTop: "2px solid var(--line)",
+                  marginTop: 8,
+                  paddingTop: 12,
+                }}
+              >
+                <span style={{ fontWeight: 800, fontSize: "1.15rem" }}>{t("billing.grandTotal")}</span>
+                <b style={{ fontFamily: "var(--font-display)", fontSize: "1.5rem", color: "var(--accent-text)" }}>
+                  {fmtPKR(total)}
+                </b>
+              </div>
+            </div>
+
+            {/* Action buttons */}
+            <div style={{ display: "grid", gap: 10, marginTop: 16 }}>
+              <button
+                type="button"
+                className="btn btn-primary btn-lg"
+                onClick={completeBill}
+                disabled={cart.length === 0}
+                style={{
+                  padding: "16px",
+                  fontSize: "1.1rem",
+                  fontWeight: 800,
+                  justifyContent: "center",
+                }}
+              >
+                <IconCash /> [F4] {heldId ? t("billing.completeHeldBill") : "بل مکمل کریں"}
+              </button>
+              <div style={{ display: "flex", gap: 10 }}>
+                <button
+                  type="button"
+                  className="btn btn-amber"
+                  onClick={holdCurrent}
+                  disabled={cart.length === 0 || !!heldId}
+                  style={{ flex: 1, justifyContent: "center" }}
                 >
-                  <span style={{ fontWeight: 700 }}>{t("billing.grandTotal")}</span>
-                  <b style={{ fontFamily: "var(--font-display)" }}>{fmtPKR(total)}</b>
+                  [F8] {t("billing.holdBill")}
+                </button>
+                <button
+                  type="button"
+                  className="btn btn-ghost"
+                  onClick={resetForm}
+                  style={{ flex: 1, justifyContent: "center" }}
+                >
+                  [F9] نیا بل
+                </button>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* ================= MODALS & DRAWERS ================= */}
+
+        {/* 1. Customer Advance Modal */}
+        {showAdvanceModal && (
+          <div
+            className="modal-backdrop"
+            onClick={() => setShowAdvanceModal(false)}
+            role="dialog"
+            aria-modal="true"
+          >
+            <div className="modal" onClick={(e) => e.stopPropagation()}>
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 14 }}>
+                <h2 style={{ fontSize: "1.3rem", margin: 0 }}>کسٹمر پیشگی رقم (Advance)</h2>
+                <button
+                  type="button"
+                  className="icon-btn"
+                  onClick={() => setShowAdvanceModal(false)}
+                  aria-label="بند کریں"
+                >
+                  <IconClose />
+                </button>
+              </div>
+              <p className="hint" style={{ margin: "0 0 16px" }}>
+                کسٹمر سے پیشگی رقم لیں — یہ رقم unearned کھاتے میں جاتی ہے اور کسٹمر لیجر میں محفوظ رہتی ہے۔
+              </p>
+              <div className="form">
+                <div className="field">
+                  <label>کسٹمر</label>
+                  <b>{customerName || "پہلے اوپر کسٹمر منتخب کریں"}</b>
+                  {!customerId && (
+                    <div style={{ color: "var(--danger)", fontSize: "0.85rem", marginTop: 4 }}>
+                      ایڈوانس درج کرنے کے لیے کسٹمر کا انتخاب لازمی ہے۔
+                    </div>
+                  )}
                 </div>
-                <div style={{ display: "flex", gap: 12, flexWrap: "wrap", marginTop: 12 }}>
-                  <button type="button" className="btn btn-primary btn-lg" onClick={completeBill}>
-                    <IconCash /> {heldId ? t("billing.completeHeldBill") : t("billing.completeBill")}
+                <div className="field">
+                  <label htmlFor="adv-amt">رقم</label>
+                  <input
+                    id="adv-amt"
+                    type="number"
+                    min="0"
+                    value={advAmount}
+                    onChange={(e) => setAdvAmount(e.target.value)}
+                    placeholder="0"
+                    autoFocus
+                  />
+                </div>
+                <div className="field">
+                  <label htmlFor="adv-method">طریقہ ادائیگی</label>
+                  <select
+                    id="adv-method"
+                    value={advMethod}
+                    onChange={(e) => setAdvMethod(e.target.value as typeof advMethod)}
+                  >
+                    <option value="cash">کیش (Cash)</option>
+                    <option value="jazzcash">JazzCash</option>
+                    <option value="easypaisa">EasyPaisa</option>
+                    <option value="bank">بینک (Bank)</option>
+                  </select>
+                </div>
+                <div className="field">
+                  <label htmlFor="adv-note">تفصیل / نوٹ</label>
+                  <input
+                    id="adv-note"
+                    type="text"
+                    value={advNote}
+                    onChange={(e) => setAdvNote(e.target.value)}
+                    placeholder="پیشگی کس چیز کے لیے ہے؟"
+                  />
+                </div>
+                <div className="modal-actions">
+                  <button type="button" className="btn btn-ghost" onClick={() => setShowAdvanceModal(false)}>
+                    منسوخ
                   </button>
                   <button
                     type="button"
-                    className="btn btn-amber"
-                    onClick={holdCurrent}
-                    disabled={!!heldId}
+                    className="btn btn-primary"
+                    onClick={submitAdvance}
+                    disabled={!customerId}
                   >
-                    {t("billing.holdBill")}
+                    ایڈوانس محفوظ کریں
                   </button>
-                  {heldId && (
-                    <button type="button" className="btn btn-ghost" onClick={resetForm}>
-                      {t("billing.newBill")}
-                    </button>
-                  )}
                 </div>
               </div>
             </div>
-          </aside>
-        </div>{/* /pos-grid */}
+          </div>
+        )}
 
-        {/* ================= C) Bill detail — the receipt modal.
-            Opens the moment a bill completes (and from history):
-            the receipt is on screen immediately, never below a
-            scroll. Print output is the same .receipt-sheet. */}
+        {/* 2. Camera Barcode Scanner Modal */}
+        {showCamera && (
+          <div
+            className="modal-backdrop"
+            onClick={stopCamera}
+            role="dialog"
+            aria-modal="true"
+          >
+            <div className="modal" onClick={(e) => e.stopPropagation()} style={{ textAlign: "center" }}>
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 14 }}>
+                <h2 style={{ fontSize: "1.2rem", margin: 0 }}>📷 کیمرہ بارکوڈ اسکینر</h2>
+                <button type="button" className="icon-btn" onClick={stopCamera} aria-label="بند کریں">
+                  <IconClose />
+                </button>
+              </div>
+              <video
+                ref={videoRef}
+                autoPlay
+                playsInline
+                muted
+                style={{ width: "100%", maxWidth: 400, borderRadius: 12, background: "#000" }}
+              />
+              {cameraMsg && (
+                <p style={{ margin: "10px 0 0", fontWeight: 600, color: "var(--accent-text)" }}>
+                  {cameraMsg}
+                </p>
+              )}
+              <p className="hint" style={{ marginTop: 8 }}>
+                بارکوڈ کو کیمرے کے سامنے لائیں، اسکین ہوتے ہی بیپ کے ساتھ آئٹم بل میں شامل ہو جائے گا۔
+              </p>
+              <div className="modal-actions" style={{ justifyContent: "center" }}>
+                <button type="button" className="btn btn-ghost" onClick={stopCamera}>
+                  کیمرہ بند کریں
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* 3. Held Bills Modal */}
+        {showHeldModal && (
+          <div
+            className="modal-backdrop"
+            onClick={() => setShowHeldModal(false)}
+            role="dialog"
+            aria-modal="true"
+          >
+            <div className="modal modal-wide" onClick={(e) => e.stopPropagation()}>
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 14 }}>
+                <h2 style={{ fontSize: "1.25rem", margin: 0 }}>
+                  ہولڈ کیے گئے بلز ({heldBills.length})
+                </h2>
+                <button type="button" className="icon-btn" onClick={() => setShowHeldModal(false)}>
+                  <IconClose />
+                </button>
+              </div>
+              <div style={{ display: "grid", gap: 10 }}>
+                {heldBills.map((b) => (
+                  <div
+                    key={b.id}
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      gap: 14,
+                      flexWrap: "wrap",
+                      padding: "12px 16px",
+                      border: "1px solid var(--line)",
+                      borderRadius: 12,
+                      background: "var(--card-2)",
+                    }}
+                  >
+                    <b>#{b.billNo}</b>
+                    <span style={{ flex: "1 1 180px" }}>
+                      {b.customerName || t("billing.walkInCustomer")}
+                      <span style={{ color: "var(--muted)", fontSize: "0.85rem" }}>
+                        {" "}· {fmtTime(b.ts)} ({b.items.length} آئٹمز)
+                      </span>
+                    </span>
+                    <b style={{ fontFamily: "var(--font-display)", fontSize: "1.1rem" }}>
+                      {fmtPKR(b.total)}
+                    </b>
+                    <button
+                      type="button"
+                      className="btn btn-primary btn-sm"
+                      onClick={() => resumeHeld(b)}
+                    >
+                      <IconEdit /> بل بحال کریں
+                    </button>
+                    <button
+                      type="button"
+                      className="icon-btn danger"
+                      onClick={() => discardHeld(b)}
+                      aria-label="ہولڈ بل خارج کریں"
+                    >
+                      <IconTrash />
+                    </button>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* 4. Bill Receipt Modal */}
         {selected && (
           <div
             className="modal-backdrop"
@@ -2046,7 +2185,7 @@ export default function BillingDesk() {
                   marginBottom: 18,
                 }}
               >
-                <h2 style={{ fontSize: "1.3rem" }}>
+                <h2 style={{ fontSize: "1.3rem", margin: 0 }}>
                   {t("billing.billNoTitle", { no: selected.billNo })}{" "}
                   <span className={STATUS_BADGE[selected.status].cls}>
                     {t(STATUS_BADGE[selected.status].key)}
@@ -2071,14 +2210,14 @@ export default function BillingDesk() {
                   className="btn btn-primary btn-sm"
                   onClick={() => printBill(false)}
                 >
-                  {t("action.print")}
+                  {t("action.print")} A4 / رسیپٹ
                 </button>
                 <button
                   type="button"
                   className="btn btn-ghost btn-sm"
                   onClick={() => printBill(true)}
                 >
-                  {t("action.print")} 80mm
+                  {t("action.print")} 80mm تھرمل
                 </button>
                 <a
                   className="btn btn-ghost btn-sm"
@@ -2097,7 +2236,7 @@ export default function BillingDesk() {
                     searchRef.current?.focus();
                   }}
                 >
-                  <IconPlus /> {t("billing.newBill")}
+                  <IconPlus /> نیا بل بنائیں
                 </button>
               </div>
 
@@ -2128,7 +2267,9 @@ export default function BillingDesk() {
 
                   {(selected.status === "paid" || selected.status === "partially_returned") && (
                     <>
-                      <h3 style={{ fontSize: "1.05rem", marginBottom: 12 }}>{t("billing.returnItems")}</h3>
+                      <h3 style={{ fontSize: "1.05rem", marginBottom: 12 }}>
+                        {t("billing.returnItems")}
+                      </h3>
                       <div style={{ display: "grid", gap: 10, marginBottom: 14 }}>
                         {selected.items.map((it) => {
                           const already = selected.returnedQty?.[it.productId] ?? 0;
@@ -2229,10 +2370,44 @@ export default function BillingDesk() {
           </div>
         )}
 
-        {/* ================= B) Bills history ================= */}
-        <section aria-label={t("billing.historyAria")}>
+        {/* 5. Void confirmation modal */}
+        {confirmVoid && selected && (
+          <div
+            className="modal-backdrop"
+            onClick={() => setConfirmVoid(false)}
+            role="dialog"
+            aria-modal="true"
+            aria-label={t("billing.voidModalAria")}
+          >
+            <div className="modal" onClick={(e) => e.stopPropagation()}>
+              <h2>{t("billing.voidTitle", { no: selected.billNo })}</h2>
+              <p className="modal-sub">
+                {t("billing.voidBody", { total: fmtPKR(selected.total) })}
+              </p>
+              <div className="modal-actions">
+                <button
+                  type="button"
+                  className="btn btn-ghost"
+                  onClick={() => setConfirmVoid(false)}
+                >
+                  {t("billing.keepBill")}
+                </button>
+                <button
+                  type="button"
+                  className="btn btn-danger"
+                  onClick={() => doVoid(selected)}
+                >
+                  <IconTrash /> {t("billing.voidBill")}
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* ================= BILLS HISTORY ================= */}
+        <section aria-label={t("billing.historyAria")} style={{ marginTop: 32 }}>
           <div className="toolbar">
-            <h2 style={{ fontSize: "1.3rem" }}>{t("billing.historyTitle")}</h2>
+            <h2 style={{ fontSize: "1.25rem", margin: 0 }}>{t("billing.historyTitle")}</h2>
             <div style={{ display: "flex", gap: 12, flexWrap: "wrap", alignItems: "center" }}>
               <div className="search-box">
                 <IconSearch />
@@ -2255,12 +2430,12 @@ export default function BillingDesk() {
                 onChange={(e) => setRange(e.target.value as "all" | "today" | "week")}
                 aria-label={t("billing.rangeAria")}
                 style={{
-                  padding: "12px 16px",
+                  padding: "10px 14px",
                   borderRadius: 999,
                   border: "1px solid var(--line)",
                   background: "var(--card)",
                   color: "var(--text)",
-                  fontSize: "0.95rem",
+                  fontSize: "0.92rem",
                   fontFamily: "var(--font-body)",
                   outline: "none",
                 }}
@@ -2332,8 +2507,7 @@ export default function BillingDesk() {
           )}
         </section>
 
-        {/* mobile: sticky cart bar + the sheet's scrim (desktop
-            hides both — the cart is the sticky right pane there) */}
+        {/* Mobile: sticky cart bottom pill */}
         {cartOpen && (
           <div className="pos-sheet-scrim" onClick={() => setCartOpen(false)} />
         )}
@@ -2347,45 +2521,13 @@ export default function BillingDesk() {
           <button
             type="button"
             className="btn btn-primary btn-sm"
-            onClick={() => setCartOpen(true)}
+            onClick={() => {
+              window.scrollTo({ top: document.body.scrollHeight, behavior: "smooth" });
+            }}
           >
-            {t("billing.viewCart")}
+            ادائیگی کریں [F4]
           </button>
         </div>
-
-        {/* void confirmation */}
-        {confirmVoid && selected && (
-          <div
-            className="modal-backdrop"
-            onClick={() => setConfirmVoid(false)}
-            role="dialog"
-            aria-modal="true"
-            aria-label={t("billing.voidModalAria")}
-          >
-            <div className="modal" onClick={(e) => e.stopPropagation()}>
-              <h2>{t("billing.voidTitle", { no: selected.billNo })}</h2>
-              <p className="modal-sub">
-                {t("billing.voidBody", { total: fmtPKR(selected.total) })}
-              </p>
-              <div className="modal-actions">
-                <button
-                  type="button"
-                  className="btn btn-ghost"
-                  onClick={() => setConfirmVoid(false)}
-                >
-                  {t("billing.keepBill")}
-                </button>
-                <button
-                  type="button"
-                  className="btn btn-danger"
-                  onClick={() => doVoid(selected)}
-                >
-                  <IconTrash /> {t("billing.voidBill")}
-                </button>
-              </div>
-            </div>
-          </div>
-        )}
       </div>
     </div>
   );

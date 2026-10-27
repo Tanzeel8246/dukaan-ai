@@ -70,6 +70,20 @@ class _BillingScreenState extends State<BillingScreen> {
   String? _sourceType;
   String? _sourceId;
   String? _warehouseId;
+  double _cashTendered = 0;
+
+  void _applyQuickCash(double amount, double total) {
+    setState(() {
+      _cashTendered = amount;
+      final cashRow = _payments.where((p) => p.method == 'cash' && !p.isCheque && !p.isPoints).firstOrNull;
+      final amtToPost = amount >= total ? total : amount;
+      if (cashRow != null) {
+        cashRow.amount = amtToPost;
+      } else {
+        _payments.insert(0, _PayRow('cash', amtToPost));
+      }
+    });
+  }
 
   @override
   void initState() {
@@ -163,6 +177,7 @@ class _BillingScreenState extends State<BillingScreen> {
     final paidSum = _payments.fold<double>(0, (a, p) => a + (p.isPoints ? 0 : p.amount)) +
         (hasPointsRow ? pointsQuote.rs : 0);
     final creditPart = (total - paidSum).clamp(0, double.infinity).toDouble();
+    final changeDue = _cashTendered > total ? _cashTendered - total : 0.0;
 
     // F3 (§5.4, R-C7): billing a job shows its issued materials
     // up top — they already left the shelf at job cost and must
@@ -310,6 +325,48 @@ class _BillingScreenState extends State<BillingScreen> {
             ),
           if (creditPart > 0.005)
             Text('${s.raw('bill.creditPart')}: ${fmtRs(creditPart)}', style: TextStyle(color: tokens.amberText)),
+          if (changeDue > 0.005)
+            Container(
+              margin: const EdgeInsets.symmetric(vertical: 4),
+              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+              decoration: BoxDecoration(
+                color: tokens.accentSoft,
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: Text(
+                'واپسی (Change Due): ${fmtRs(changeDue)}',
+                style: TextStyle(color: tokens.accentText, fontWeight: FontWeight.bold),
+              ),
+            ),
+          Padding(
+            padding: const EdgeInsets.only(top: 6, bottom: 4),
+            child: Wrap(
+              spacing: 6,
+              runSpacing: 4,
+              children: [
+                ActionChip(
+                  label: Text(s.billingGrandTotal),
+                  onPressed: total > 0 ? () => _applyQuickCash(total, total) : null,
+                ),
+                ActionChip(
+                  label: const Text('Rs 100'),
+                  onPressed: total > 0 ? () => _applyQuickCash(100, total) : null,
+                ),
+                ActionChip(
+                  label: const Text('Rs 500'),
+                  onPressed: total > 0 ? () => _applyQuickCash(500, total) : null,
+                ),
+                ActionChip(
+                  label: const Text('Rs 1,000'),
+                  onPressed: total > 0 ? () => _applyQuickCash(1000, total) : null,
+                ),
+                ActionChip(
+                  label: const Text('Rs 5,000'),
+                  onPressed: total > 0 ? () => _applyQuickCash(5000, total) : null,
+                ),
+              ],
+            ),
+          ),
           // MC workflow §1 — advance taken AT BILLING time, for a
           // named customer: separate from the bill total, it posts
           // to the customer's advance account after the bill posts.
@@ -491,6 +548,7 @@ class _BillingScreenState extends State<BillingScreen> {
       _cart.clear();
       _sourceType = null;
       _sourceId = null;
+      _cashTendered = 0;
       _payments
         ..clear()
         ..add(_PayRow('cash', 0));
@@ -552,6 +610,7 @@ class _BillingScreenState extends State<BillingScreen> {
     setState(() {
       _cart.clear();
       _advanceCtl.clear();
+      _cashTendered = 0;
       _payments
         ..clear()
         ..add(_PayRow('cash', 0));

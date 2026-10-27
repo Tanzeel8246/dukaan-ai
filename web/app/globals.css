@@ -855,7 +855,7 @@ table.table th.num, table.table td.num { text-align: end; }
 .pick-empty { padding: 18px 14px; text-align: center; color: var(--muted); font-size: 0.92rem; }
 .pick-hint { font-size: 0.85rem; color: var(--muted); margin-top: 10px; }
 
-/* ---------- POS billing layout ---------- */
+/* ---------- POS billing layout (Option 1: Classic High-Speed Counter POS) ---------- */
 .pos-grid { display: grid; grid-template-columns: minmax(0, 7fr) minmax(340px, 5fr); gap: 24px; align-items: start; }
 .pos-cart { position: sticky; top: var(--stick-top); }
 .pos-cart-card {
@@ -872,6 +872,103 @@ table.table th.num, table.table td.num { text-align: end; }
 .pos-cart-close { display: none; }
 .pos-cartbar { display: none; }
 .pos-sheet-scrim { display: none; }
+
+/* Counter POS v2 additions */
+.pos-counter-topbar {
+  display: flex; gap: 12px; align-items: center; justify-content: space-between; flex-wrap: wrap;
+  background: var(--card); border: 1px solid var(--line); border-radius: 16px;
+  padding: 12px 16px; margin-bottom: 16px; box-shadow: var(--card-shadow);
+}
+.pos-omni-wrap { position: relative; flex: 1 1 360px; min-width: 260px; }
+.pos-omni-input {
+  width: 100%; padding: 12px 42px 12px 16px; border-radius: 12px;
+  border: 2px solid var(--line); background: var(--bg); color: var(--text);
+  font-size: 1.05rem; font-family: var(--font-body); font-weight: 600; outline: none;
+  transition: all 0.2s;
+}
+[dir="rtl"] .pos-omni-input { padding: 12px 16px 12px 42px; }
+.pos-omni-input:focus { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-soft); }
+.pos-omni-actions {
+  position: absolute; inset-inline-end: 8px; top: 50%; transform: translateY(-50%);
+  display: flex; align-items: center; gap: 6px;
+}
+.pos-table-card {
+  background: var(--card); border: 1px solid var(--line); border-radius: 16px;
+  overflow: hidden; margin-bottom: 18px; box-shadow: var(--card-shadow);
+}
+.pos-table-scroll { max-height: 480px; overflow-y: auto; overflow-x: auto; }
+.pos-counter-table { width: 100%; border-collapse: collapse; text-align: start; min-width: 600px; }
+.pos-counter-table th {
+  background: var(--card-2); color: var(--muted-2); font-size: 0.82rem;
+  font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em;
+  padding: 12px 14px; border-bottom: 1px solid var(--line); position: sticky; top: 0; z-index: 2;
+}
+.pos-counter-table td {
+  padding: 12px 14px; border-bottom: 1px solid var(--line);
+  font-size: 0.95rem; vertical-align: middle;
+}
+.pos-counter-table tr:last-child td { border-bottom: none; }
+.pos-counter-table tr:hover { background: color-mix(in srgb, var(--accent) 3%, transparent); }
+.pos-stepper-btn {
+  width: 32px; height: 32px; border-radius: 8px; border: 1px solid var(--line);
+  background: var(--chip-bg); color: var(--text); font-weight: 700; font-size: 1.1rem;
+  display: inline-flex; align-items: center; justify-content: center; cursor: pointer;
+  transition: all 0.15s;
+}
+.pos-stepper-btn:hover { background: var(--accent); color: var(--on-accent); border-color: var(--accent); }
+.pos-deck {
+  display: grid; grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr) minmax(320px, 1fr);
+  gap: 16px; align-items: stretch; margin-bottom: 24px;
+}
+@media (max-width: 1100px) {
+  .pos-deck { grid-template-columns: 1fr; }
+}
+.pos-deck-col {
+  background: var(--card); border: 1px solid var(--line); border-radius: 16px;
+  padding: 18px; display: flex; flex-direction: column; justify-content: space-between;
+  box-shadow: var(--card-shadow);
+}
+.pos-quick-cash-grid {
+  display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-top: 10px;
+}
+.pos-cash-btn {
+  padding: 12px 10px; border-radius: 12px; border: 1px solid var(--line);
+  background: var(--card-2); color: var(--text); font-family: var(--font-display);
+  font-weight: 700; font-size: 1.05rem; cursor: pointer; text-align: center;
+  transition: all 0.15s;
+}
+.pos-cash-btn:hover { background: var(--accent-soft); border-color: var(--accent); color: var(--accent-text); }
+.pos-change-box {
+  background: var(--accent-soft); border: 1px solid color-mix(in srgb, var(--accent) 40%, transparent);
+  border-radius: 12px; padding: 12px 16px; margin-top: 12px; text-align: center;
+}
+.pos-change-box.due {
+  background: var(--amber-soft); border-color: var(--amber);
+}
+.pos-change-val {
+  font-family: var(--font-display); font-size: 1.35rem; font-weight: 800;
+  color: var(--accent-text); display: block;
+}
+.pos-pipeline-stepper {
+  display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
+  padding: 10px 14px; background: var(--accent-soft); border: 1px solid color-mix(in srgb, var(--accent) 30%, transparent);
+  border-radius: 12px; margin-bottom: 14px; font-size: 0.88rem; font-weight: 600;
+}
+.pos-pipeline-step {
+  display: inline-flex; align-items: center; gap: 6px; padding: 3px 8px; border-radius: 6px;
+}
+.pos-pipeline-step.active {
+  background: var(--accent); color: var(--on-accent); font-weight: 700;
+}
+.pos-pipeline-step.past {
+  color: var(--accent-text);
+}
+.pos-pipeline-sep { color: var(--muted); }
+.pos-hotkey-badge {
+  display: inline-flex; align-items: center; gap: 4px; font-size: 0.74rem;
+  font-weight: 700; background: var(--chip-bg); border: 1px solid var(--line);
+  padding: 2px 8px; border-radius: 6px; color: var(--muted);
+}
 
 /* ---------- reports toolbar ---------- */
 .rep-toolbar {
