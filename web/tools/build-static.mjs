@@ -30,6 +30,15 @@ try {
 }
 
 const deployDir = join(webDir, "..", "web-deploy");
+const zipFile = join(webDir, "..", "web-deploy.zip");
 rmSync(deployDir, { recursive: true, force: true });
 cpSync(join(webDir, "out"), deployDir, { recursive: true });
 console.log("Static demo bundle refreshed at ../web-deploy");
+
+try {
+  rmSync(zipFile, { force: true });
+  execSync(`tar.exe -a -c -f "${zipFile}" *`, { cwd: deployDir });
+  console.log("Standard POSIX web-deploy.zip generated at ../web-deploy.zip");
+} catch (e) {
+  console.warn("tar.exe zip archive creation skipped:", e.message);
+}
