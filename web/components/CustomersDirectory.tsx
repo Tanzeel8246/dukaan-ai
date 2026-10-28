@@ -9,7 +9,7 @@ import { IconClose, IconEdit, IconPlus, IconSearch, IconTrash, SearchClear } fro
 import { fmtDate, fmtDateShort, fmtNum, fmtPKR } from "@/lib/format";
 import { customerAdvanceBalance, customerAdvancePostings, customerMoneyLanguage } from "@/lib/workflow";
 import { customerOptedIn, waConsentPatch } from "@/lib/whatsapp";
-import { creditKey, customerOutstanding } from "@/lib/ledger";
+import { creditKey, customerOutstanding, effectiveBillStatus } from "@/lib/ledger";
 import { customerMatches } from "@/lib/search";
 import {
   customerLoyalty,
@@ -32,6 +32,8 @@ const BILL_STATUS_KEY = {
   voided: "cust.billStatus.voided",
   partially_returned: "cust.billStatus.partiallyReturned",
   returned: "cust.billStatus.returned",
+  unpaid: "cust.billStatus.unpaid",
+  partial: "cust.billStatus.partial",
 } as const satisfies Record<BillStatus, string>;
 
 const EMPTY_FORM = { name: "", phone: "", address: "", note: "", waOptIn: false };
@@ -678,15 +680,17 @@ export default function CustomersDirectory() {
                           <td style={{ whiteSpace: "nowrap" }}>{fmtDate(b.ts)}</td>
                           <td><b>{fmtPKR(b.total)}</b></td>
                           <td>
-                            {b.status === "paid" ? (
-                              <span className="badge green">{t(BILL_STATUS_KEY[b.status])}</span>
-                            ) : b.status === "held" ? (
-                              <span className="badge amber">{t(BILL_STATUS_KEY[b.status])}</span>
-                            ) : b.status === "voided" ? (
-                              <span className="badge red">{t(BILL_STATUS_KEY[b.status])}</span>
-                            ) : (
-                              <span className="badge amber">{t(BILL_STATUS_KEY[b.status])}</span>
-                            )}
+                            {(() => {
+                              const st = effectiveBillStatus(b, credits);
+                              const key = (BILL_STATUS_KEY[st] ?? BILL_STATUS_KEY.paid) as I18nKey;
+                              const cls =
+                                st === "paid"
+                                  ? "badge green"
+                                  : st === "voided" || st === "returned" || st === "unpaid"
+                                    ? "badge red"
+                                    : "badge amber";
+                              return <span className={cls}>{t(key)}</span>;
+                            })()}
                           </td>
                         </tr>
                       ))}

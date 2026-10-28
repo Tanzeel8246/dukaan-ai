@@ -96,6 +96,8 @@ export const psBilling: Record<keyof typeof enBilling, string> = {
   "billing.status.voided": "باطل شو",
   "billing.status.partially_returned": "په جزوي ډول بېرته راوړل شو",
   "billing.status.returned": "بېرته راوړل شو",
+  "billing.status.unpaid": "نه ورکړل شوی (پور)",
+  "billing.status.partial": "جزوي ورکړل شوی",
   "billing.actions": "کړنې",
   "billing.voidBill": "بل باطل کړئ",
   "billing.returnItems": "توکي بېرته راوړئ",

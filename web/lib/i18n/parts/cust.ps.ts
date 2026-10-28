@@ -69,6 +69,8 @@ export const psCust: Record<keyof typeof enCust, string> = {
   "cust.billStatus.voided": "لغوه شوی",
   "cust.billStatus.partiallyReturned": "په جزوي ډول بېرته راغلی",
   "cust.billStatus.returned": "بېرته راغلی",
+  "cust.billStatus.unpaid": "نه ورکړل شوی (پور)",
+  "cust.billStatus.partial": "جزوي ورکړل شوی",
   "cust.profile.creditLedger": "د پور حساب",
   "cust.profile.noCredit": "د دې پېرودونکي لپاره د پور ثبتونه نشته.",
   "cust.credit.given": "پور",

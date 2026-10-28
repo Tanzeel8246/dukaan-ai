@@ -45,6 +45,7 @@
 import type {
   AccountCode,
   Bill,
+  BillStatus,
   CreditEntry,
   Expense,
   JournalEntry,
@@ -245,6 +246,34 @@ export function billCreditOutstanding(
     repaidAllocated,
     outstanding: Math.max(0, given - reversed - repaidAllocated),
   };
+}
+
+/**
+ * Live payment status of a bill: accounts for outstanding credit balance.
+ * Returns "paid", "partial", "unpaid", "held", "voided", "returned", or "partially_returned".
+ */
+export function effectiveBillStatus(
+  bill: Bill,
+  credits?: CreditEntry[]
+): BillStatus {
+  if (
+    bill.status === "held" ||
+    bill.status === "voided" ||
+    bill.status === "returned" ||
+    bill.status === "partially_returned"
+  ) {
+    return bill.status;
+  }
+  const creditPart = bill.payments.find((p) => p.method === "credit")?.amount ?? 0;
+  if (creditPart <= 0) return "paid";
+  if (credits && credits.length > 0) {
+    const pos = billCreditOutstanding(credits, bill);
+    if (pos.outstanding <= 0.01) return "paid";
+    if (pos.outstanding < bill.total - 0.01) return "partial";
+    return "unpaid";
+  }
+  if (creditPart >= bill.total - 0.01) return "unpaid";
+  return "partial";
 }
 
 /** Settlement account for a payment method (credit → receivables). */
@@ -879,13 +908,14 @@ export interface DayCloseSummary {
   expensesCash: number;
   creditGiven: number;
   creditReceived: number;
+  customerAdvancesCash?: number;
   supplierPaidCash: number;
   refundsCash: number;
   expectedCash: number;
 }
 
 /** Auto totals for today's close. Cash expectation:
- *  opening + cash sales + cash repayments + cash-in
+ *  opening + cash sales + cash repayments + customer advance cash + cash-in
  *  − cash expenses − cash supplier payments − cash refunds − cash-out. */
 export function dayCloseSummary(args: {
   sales: Sale[];
@@ -897,6 +927,7 @@ export function dayCloseSummary(args: {
   cashIn: number;
   cashOut: number;
   openingCash: number;
+  customerAdvancesCash?: number;
 }): DayCloseSummary {
   const byMethod: Record<PayMethod, number> = {
     cash: 0,
@@ -962,10 +993,12 @@ export function dayCloseSummary(args: {
     )
     .reduce((a, p) => a + p.amount, 0);
 
+  const customerAdvancesCash = args.customerAdvancesCash ?? 0;
   const expectedCash =
     args.openingCash +
     byMethod.cash +
     creditReceivedCash +
+    customerAdvancesCash +
     args.cashIn -
     expCash -
     supplierPaidCash -
@@ -979,6 +1012,7 @@ export function dayCloseSummary(args: {
     expensesCash: expCash,
     creditGiven,
     creditReceived,
+    customerAdvancesCash,
     supplierPaidCash,
     refundsCash: args.returnsRefundCash,
     expectedCash,

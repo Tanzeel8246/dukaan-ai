@@ -119,13 +119,6 @@ class SalesReport {
     required this.byProduct, required this.byCustomer});
 }
 
-/// Per-row gross profit — the `profitOnDay` formula verbatim.
-double _saleRowProfit(Sale s, Map<String, double> costOf) {
-  final cost = s.unitCost ?? costOf[s.productId];
-  final margin = cost != null ? s.unitPrice - cost : 0.0;
-  return margin * s.qty;
-}
-
 /// The sales report (web salesReport). ctx mirrors the web's
 /// SalesReportContext: returns documents, journal (for the
 /// otherRevenue reconciliation), tax slabs + settings (counter-row
@@ -231,10 +224,11 @@ SalesReport salesReport(List<Sale> sales, List<Product> products, List<Bill> bil
   var grossSales = 0.0;
   var returnsTotal = 0.0;
   var netUnits = 0.0;
-  var grossProfit = 0.0;
+  var totalCogs = 0.0;
   var revenue = 0.0;
   var netted = 0.0;
   final prodMap = <String, SalesReportProductRow>{};
+  final prodCogs = <String, double>{};
   final custMap = <String, SalesReportCustomerRow>{};
   String custKeyOf(Bill? bill) => bill != null
       ? (bill.customerId ?? 'name:${bill.customerName.trim().toLowerCase()}|${bill.customerPhone.trim()}')
@@ -247,8 +241,10 @@ SalesReport salesReport(List<Sale> sales, List<Product> products, List<Bill> bil
       grossSales += s.total;
     }
     netUnits += s.qty;
-    final profit = _saleRowProfit(s, costOf);
-    grossProfit += profit;
+    final cost = s.unitCost ?? costOf[s.productId] ?? 0.0;
+    final lineCogs = cost * s.qty;
+    totalCogs += lineCogs;
+    prodCogs[s.productId] = (prodCogs[s.productId] ?? 0.0) + lineCogs;
     if (s.kind != 'return') {
       revenue += s.total - (inclOfRow[s.id] ?? 0);
       netted += netOfRow[s.id] ?? s.total;
@@ -262,7 +258,6 @@ SalesReport salesReport(List<Sale> sales, List<Product> products, List<Bill> bil
         () => SalesReportProductRow(
             s.productId, nameOf[s.productId] ?? s.productId));
     pr.qty += s.qty;
-    pr.profit += profit;
     if (s.kind != 'return') {
       pr.amount += netOfRow[s.id] ?? s.total;
     } else if (!hasReturnDocs) {
@@ -303,6 +298,10 @@ SalesReport salesReport(List<Sale> sales, List<Product> products, List<Bill> bil
   final revenueR = round2(revenue);
   final netSales = round2(netted);
   final discounts = round2(revenueR - netSales);
+  final grossProfit = round2(netSales - totalCogs);
+  for (final entry in prodMap.entries) {
+    entry.value.profit = round2(entry.value.amount - (prodCogs[entry.key] ?? 0.0));
+  }
   final pl = journal != null ? profitAndLossInRange(journal, range.fromTs, range.toTs) : null;
   final otherRevenue = pl != null ? round2(pl.netRevenue - netSales) : 0.0;
 

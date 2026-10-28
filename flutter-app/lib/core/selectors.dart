@@ -17,8 +17,27 @@ double revenueOnDay(List<Sale> sales, int dayOffset) =>
 double cogsOnDay(List<Sale> sales, int dayOffset) =>
     salesOnDay(sales, dayOffset).fold(0.0, (a, s) => a + s.qty * (s.unitCost ?? 0));
 
-double profitOnDay(List<Sale> sales, int dayOffset) =>
-    revenueOnDay(sales, dayOffset) - cogsOnDay(sales, dayOffset);
+/// Gross profit (Net Revenue − COGS) on a given day.
+/// When bills are provided, bill-level discounts are deducted so gross profit
+/// matches the Finance/P&L definition (Net Revenue − COGS) exactly.
+double profitOnDay(List<Sale> sales, int dayOffset, [List<Product>? products, List<Bill>? bills]) {
+  final byId = products != null ? {for (final p in products) p.id: p} : <String, Product>{};
+  final daySales = salesOnDay(sales, dayOffset);
+  final cogs = daySales.fold(0.0, (sum, s) {
+    final cost = s.unitCost ?? byId[s.productId]?.costPrice ?? 0.0;
+    return sum + cost * s.qty;
+  });
+  final grossRev = daySales.fold(0.0, (sum, s) => sum + s.total);
+  final discounts = bills != null
+      ? bills
+          .where((b) => b.dayOffset == dayOffset && b.status != 'held' && b.status != 'voided')
+          .fold(0.0, (sum, b) {
+            final paid = b.payments.fold(0.0, (a, p) => a + p.amount);
+            return sum + b.discountAmount + (b.total > paid ? b.total - paid : 0.0);
+          })
+      : 0.0;
+  return round2(grossRev - discounts - cogs);
+}
 
 /// Products at or below their reorder level, worst stock ratio first.
 List<Product> lowStockProducts(List<Product> products) {

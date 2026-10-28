@@ -145,7 +145,7 @@ export interface BillPayment {
   loyaltyPoints?: number | null;
 }
 
-export type BillStatus = "paid" | "held" | "voided" | "partially_returned" | "returned";
+export type BillStatus = "paid" | "held" | "voided" | "partially_returned" | "returned" | "unpaid" | "partial";
 
 export interface Bill {
   id: string;

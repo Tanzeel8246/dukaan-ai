@@ -341,10 +341,11 @@ export function salesReport(
   let grossSales = 0;
   let returnsTotal = 0;
   let netUnits = 0;
-  let grossProfit = 0;
+  let totalCogs = 0;
   let revenue = 0;
   let netted = 0;
   const prodMap = new Map<string, SalesReport["byProduct"][number]>();
+  const prodCogs = new Map<string, number>();
   const custMap = new Map<string, SalesReport["byCustomer"][number]>();
   const custKeyOf = (bill: Bill | undefined): string =>
     bill
@@ -355,8 +356,10 @@ export function salesReport(
     if (s.kind === "return") returnsTotal += s.total;
     else grossSales += s.total;
     netUnits += s.qty;
-    const profit = saleRowProfit(s, costOf);
-    grossProfit += profit;
+    const cost = s.unitCost ?? costOf.get(s.productId) ?? 0;
+    const lineCogs = cost * s.qty;
+    totalCogs += lineCogs;
+    prodCogs.set(s.productId, (prodCogs.get(s.productId) ?? 0) + lineCogs);
     if (s.kind !== "return") {
       // Revenue side: net of inclusive tax only (discounts are the
       // P&L's separate line). Net side: net of both.
@@ -375,7 +378,6 @@ export function salesReport(
       profit: 0,
     };
     pr.qty += s.qty;
-    pr.profit += profit;
     // Amounts are NET (journal view) for sale rows; return rows are
     // folded from their documents below when documents are
     // available, else they keep the legacy gross row totals.
@@ -427,6 +429,10 @@ export function salesReport(
   const revenueR = round2(revenue);
   const netSales = round2(netted);
   const discounts = round2(revenueR - netSales);
+  const grossProfit = round2(netSales - totalCogs);
+  for (const [pid, pr] of prodMap) {
+    pr.profit = round2(pr.amount - (prodCogs.get(pid) ?? 0));
+  }
   const pl = ctx?.journal
     ? profitAndLossInRange(ctx.journal, range.fromTs, range.toTs)
     : null;

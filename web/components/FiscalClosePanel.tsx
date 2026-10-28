@@ -26,6 +26,7 @@ import { fmtDate, fmtPKR } from "@/lib/format";
 import type { I18nKey } from "@/lib/i18n";
 import type { AccountCode } from "@/lib/types";
 import {
+  currentFiscalYear,
   fiscalStartDateInYear,
   fiscalStartOf,
   fiscalYearRange,
@@ -103,12 +104,15 @@ export default function FiscalClosePanel() {
     return out;
   }, [settings, journal]);
 
+  const curFy = useMemo(() => currentFiscalYear(settings), [settings]);
   const prevFy = useMemo(() => previousFiscalYear(settings), [settings]);
   const [selected, setSelected] = useState<string>("");
   const range =
     ranges.find((r) => r.startDate === selected) ??
+    ranges.find((r) => r.startDate === curFy.startDate) ??
     ranges.find((r) => r.startDate === prevFy.startDate) ??
     ranges[0];
+  const isCurrentFy = range ? range.startDate === curFy.startDate : false;
 
   const [note, setNote] = useState("");
   const [ack, setAck] = useState(false);
@@ -282,6 +286,16 @@ export default function FiscalClosePanel() {
         >
           {state.closed ? t("fin.fy.statusClosed") : t("fin.fy.statusOpen")}
         </span>
+        <span
+          className="badge"
+          style={{
+            marginBottom: 10,
+            background: isCurrentFy ? "var(--accent-soft)" : "var(--bg-muted)",
+            color: isCurrentFy ? "var(--accent-text)" : "var(--muted)",
+          }}
+        >
+          {isCurrentFy ? "Active Fiscal Year" : `Historical (${dateLabel(range.endDate)})`}
+        </span>
       </div>
 
       {notice && (
@@ -436,11 +450,11 @@ export default function FiscalClosePanel() {
               "i",
               "var(--muted)",
               t("fin.fy.check.stock"),
-              t("fin.fy.check.stockDetail", {
+              `${t("fin.fy.check.stockDetail", {
                 gl: fmtPKR(checklist.stockGl),
                 shelf: fmtPKR(checklist.stockShelf),
                 diff: fmtPKR(checklist.stockDivergence),
-              })
+              })} · (${dateLabel(range.endDate)} پر GL پوزیشن)`
             )}
             {checkRow(
               "i",

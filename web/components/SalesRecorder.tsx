@@ -18,7 +18,7 @@ import { filterProducts } from "@/lib/search";
 import { profitOnDay, revenueOnDay, salesOnDay, unitsOnDay } from "@/lib/selectors";
 
 export default function SalesRecorder() {
-  const { ready, products, sales, recordSale } = useStore();
+  const { ready, products, sales, bills, recordSale } = useStore();
   const { role } = useAuth();
   const { t } = useLang();
   const [productId, setProductId] = useState("");
@@ -62,9 +62,9 @@ export default function SalesRecorder() {
       list,
       revenue: revenueOnDay(sales, 0),
       units: unitsOnDay(sales, 0),
-      profit: profitOnDay(sales, 0, products),
+      profit: profitOnDay(sales, 0, products, bills),
     };
-  }, [ready, sales, products]);
+  }, [ready, sales, products, bills]);
 
   const submit = (e: React.FormEvent) => {
     e.preventDefault();

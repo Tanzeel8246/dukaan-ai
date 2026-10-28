@@ -13,6 +13,7 @@ import 'package:share_plus/share_plus.dart';
 import '../app_state.dart';
 import '../core/composers.dart';
 import '../core/jobs.dart' show jobMaterialNetQty;
+import '../core/ledger.dart' show effectiveBillStatus;
 import '../core/loyalty.dart';
 import '../core/permissions.dart';
 import '../core/print.dart';
@@ -259,8 +260,8 @@ class _BillingScreenState extends State<BillingScreen> {
                   DropdownButton<String>(
                     value: _payments[i].isPoints ? 'points' : _payments[i].method,
                     items: [
-                      for (final m in ['cash', 'bank', 'wallet', 'card'])
-                        DropdownMenuItem(value: m, child: Text(m)),
+                      for (final m in ['cash', 'bank', 'wallet', 'card', 'credit'])
+                        DropdownMenuItem(value: m, child: Text(m == 'credit' ? 'Credit (Udhaar)' : m)),
                       // H2: the points tender is offered only on a
                       // named customer's bill (web parity).
                       if (customerId != null || _payments[i].isPoints)
@@ -274,6 +275,15 @@ class _BillingScreenState extends State<BillingScreen> {
                       } else {
                         _payments[i].isPoints = false;
                         _payments[i].method = v ?? 'cash';
+                        if (v == 'credit') {
+                          final otherPaid = _payments
+                              .asMap()
+                              .entries
+                              .where((e) => e.key != i)
+                              .fold<double>(0, (a, e) => a + (e.value.isPoints ? 0 : e.value.amount));
+                          final rem = (total - otherPaid).clamp(0, double.infinity).toDouble();
+                          if (rem > 0) _payments[i].amount = rem;
+                        }
                       }
                     }),
                   ),
@@ -570,7 +580,8 @@ class _BillingScreenState extends State<BillingScreen> {
     }
     setState(() => _busy = true);
     final billNo = await store.mintBillNo();
-    var bill = _buildBill(store, status: 'paid', billNo: billNo, deskTotal: total);
+    final initialStatus = creditPart >= total - 0.01 ? 'unpaid' : (creditPart > 0.005 ? 'partial' : 'paid');
+    var bill = _buildBill(store, status: initialStatus, billNo: billNo, deskTotal: total);
     if (bill == null) {
       setState(() => _busy = false);
       return;
@@ -585,7 +596,7 @@ class _BillingScreenState extends State<BillingScreen> {
         discountValue: bill.discountValue, discountAmount: bill.discountAmount,
         taxAmount: bill.taxAmount, total: bill.total,
         payments: [...bill.payments, BillPayment(method: 'credit', amount: creditPart)],
-        status: 'paid', warehouseId: bill.warehouseId, dayOffset: 0, ts: bill.ts,
+        status: initialStatus, warehouseId: bill.warehouseId, dayOffset: 0, ts: bill.ts,
         sourceType: bill.sourceType, sourceId: bill.sourceId,
         originDevice: bill.originDevice,
       );
@@ -637,24 +648,27 @@ class _BillingScreenState extends State<BillingScreen> {
               ? Text(s.billingHistoryEmpty)
               : ListView(children: [
                   for (final b in bills.take(60))
-                    ListTile(
-                      title: Text('#${b.billNo} · ${b.customerName.isEmpty ? s.raw('billing.walkIn') : b.customerName} · ${fmtRs(b.total)}'),
-                      subtitle: Text('${b.ts.substring(0, 10)} · ${b.status}'),
-                      trailing: Wrap(spacing: 2, children: [
-                        IconButton(icon: const Icon(Icons.print_outlined, size: 19), onPressed: () => showReceiptModal(ctx, b)),
-                        if (b.status == 'paid' || b.status == 'partially_returned')
-                          IconButton(icon: const Icon(Icons.undo_outlined, size: 19), onPressed: () => _returnFlow(ctx, b)),
-                        if (b.status == 'paid')
-                          IconButton(
-                            icon: const Icon(Icons.block_outlined, size: 19),
-                            onPressed: () async {
-                              if (!await runSensitiveGate(ctx, 'voidBill')) return;
-                              await store.voidBill(b);
-                              if (ctx.mounted) Navigator.pop(ctx);
-                            },
-                          ),
-                      ]),
-                    ),
+                    Builder(builder: (context) {
+                      final effStatus = effectiveBillStatus(b, store.credits);
+                      return ListTile(
+                        title: Text('#${b.billNo} · ${b.customerName.isEmpty ? s.raw('billing.walkIn') : b.customerName} · ${fmtRs(b.total)}'),
+                        subtitle: Text('${b.ts.substring(0, 10)} · $effStatus'),
+                        trailing: Wrap(spacing: 2, children: [
+                          IconButton(icon: const Icon(Icons.print_outlined, size: 19), onPressed: () => showReceiptModal(ctx, b)),
+                          if (b.status == 'paid' || b.status == 'partially_returned' || effStatus == 'paid' || effStatus == 'partial' || effStatus == 'unpaid')
+                            IconButton(icon: const Icon(Icons.undo_outlined, size: 19), onPressed: () => _returnFlow(ctx, b)),
+                          if (b.status == 'paid' || effStatus == 'paid' || effStatus == 'partial' || effStatus == 'unpaid')
+                            IconButton(
+                              icon: const Icon(Icons.block_outlined, size: 19),
+                              onPressed: () async {
+                                if (!await runSensitiveGate(ctx, 'voidBill')) return;
+                                await store.voidBill(b);
+                                if (ctx.mounted) Navigator.pop(ctx);
+                              },
+                            ),
+                        ]),
+                      );
+                    }),
                 ]),
         ),
         actions: [TextButton(onPressed: () => Navigator.pop(ctx), child: Text(s.actionClose))],

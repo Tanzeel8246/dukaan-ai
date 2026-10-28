@@ -27,6 +27,7 @@ import {
   totalOutstandingCredit,
 } from "../ledger";
 import type {
+  Bill,
   CreditEntry,
   Expense,
   JournalEntry,
@@ -49,6 +50,7 @@ export interface AssistantReply {
 export interface AssistantCtx {
   products: Product[];
   sales: Sale[];
+  bills?: Bill[];
   suppliers: Supplier[];
   purchases: Purchase[];
   purchaseReturns: PurchaseReturn[];
@@ -147,7 +149,7 @@ function lowStockReply(ctx: Ctx, lang: "ur" | "en"): AssistantReply {
 function salesTodayReply(ctx: Ctx, lang: "ur" | "en"): AssistantReply {
   const revenue = revenueOnDay(ctx.sales, 0);
   const units = unitsOnDay(ctx.sales, 0);
-  const profit = profitOnDay(ctx.sales, 0, ctx.products);
+  const profit = profitOnDay(ctx.sales, 0, ctx.products, ctx.bills);
   const avg7 = [1, 2, 3, 4, 5, 6, 7].reduce((a, d) => a + revenueOnDay(ctx.sales, d), 0) / 7;
   const trend =
     avg7 > 0

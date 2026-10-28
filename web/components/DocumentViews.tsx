@@ -1448,6 +1448,7 @@ export function SaleOrdersManager() {
  * challan (§2.1) — never stored counters.
  */
 interface ChallanFormValues {
+  orderId: string;
   customerId: string;
   customerName: string;
   customerPhone: string;
@@ -1461,6 +1462,7 @@ interface ChallanFormValues {
 
 function emptyChallanForm(): ChallanFormValues {
   return {
+    orderId: "",
     customerId: "",
     customerName: "",
     customerPhone: "",
@@ -1530,6 +1532,7 @@ export function DeliveryChallansManager() {
   const openEdit = (c: DeliveryChallan) => {
     setEditing(c);
     setValues({
+      orderId: c.orderId ?? "",
       customerId: c.customerId ?? "",
       customerName: c.customerName,
       customerPhone: c.customerPhone,
@@ -1546,7 +1549,7 @@ export function DeliveryChallansManager() {
     setFormOpen(true);
     setNotice(null);
   };
-  const submitForm = () => {
+  const submitForm = (dispatchImmediately = false) => {
     if (values.lines.length === 0) {
       setNotice({ ok: false, text: t("doc.errNoLines") });
       return;
@@ -1556,6 +1559,7 @@ export function DeliveryChallansManager() {
       return;
     }
     const input = {
+      orderId: values.orderId || null,
       customerId: values.customerId || null,
       customerName: values.customerName,
       customerPhone: values.customerPhone,
@@ -1571,14 +1575,24 @@ export function DeliveryChallansManager() {
         setNotice({ ok: false, text: t("doc.errNotEditable") });
         return;
       }
-      setNotice({ ok: true, text: t("challan.notice.updated") });
+      if (dispatchImmediately) {
+        store.dispatchChallan(editing.id);
+        setNotice({ ok: true, text: "چالان اپ ڈیٹ اور ڈسپیچ ہو گیا — DC نمبر جاری ہو گیا۔" });
+      } else {
+        setNotice({ ok: true, text: t("challan.notice.updated") });
+      }
     } else {
       const id = store.createChallan(input);
       if (!id) {
         setNotice({ ok: false, text: t("doc.errNoLines") });
         return;
       }
-      setNotice({ ok: true, text: t("challan.notice.created") });
+      if (dispatchImmediately) {
+        store.dispatchChallan(id);
+        setNotice({ ok: true, text: "چالان بن گیا اور ڈسپیچ ہو گیا — DC نمبر جاری ہو گیا۔" });
+      } else {
+        setNotice({ ok: true, text: t("challan.notice.created") });
+      }
     }
     setFormOpen(false);
     setEditing(null);
@@ -1628,6 +1642,36 @@ export function DeliveryChallansManager() {
       customerName: c ? c.name : values.customerName,
       customerPhone: c ? c.phone : values.customerPhone,
     });
+  };
+
+  const onOrderSelect = (ordId: string) => {
+    if (!ordId) {
+      set({ orderId: "" });
+      return;
+    }
+    const ord = saleOrders.find((o) => o.id === ordId);
+    if (ord) {
+      const delivered = orderDeliveredQty(ord, deliveryChallans);
+      const remainingLines: DocLineInput[] = [];
+      for (const l of ord.lines) {
+        const d = delivered.get(l.productId) ?? 0;
+        const rem = Math.max(0, l.qty - d);
+        if (rem > 0) {
+          remainingLines.push({
+            productId: l.productId,
+            qty: rem,
+            unitPrice: l.unitPrice,
+          });
+        }
+      }
+      set({
+        orderId: ordId,
+        customerId: ord.customerId ?? values.customerId,
+        customerName: ord.customerName || values.customerName,
+        customerPhone: ord.customerPhone || values.customerPhone,
+        lines: remainingLines.length > 0 ? remainingLines : (ord.lines.length > 0 ? ord.lines : values.lines),
+      });
+    }
   };
 
   return (
@@ -1683,6 +1727,23 @@ export function DeliveryChallansManager() {
               {t("challan.form.sub")}
             </p>
             <div className="form-grid">
+              <div className="field">
+                <label htmlFor="dc-order">لنک سیل آرڈر (اختیاری)</label>
+                <select
+                  id="dc-order"
+                  value={values.orderId}
+                  onChange={(e) => onOrderSelect(e.target.value)}
+                >
+                  <option value="">— براہ راست چالان (بغیر آرڈر) —</option>
+                  {saleOrders
+                    .filter((o) => o.status !== "cancelled")
+                    .map((o) => (
+                      <option key={o.id} value={o.id}>
+                        {o.number ?? o.id} — {o.customerName || "Walk-in"} ({fmtDateShort(o.ts)})
+                      </option>
+                    ))}
+                </select>
+              </div>
               <div className="field">
                 <label htmlFor="dc-customer">{t("doc.customer")}</label>
                 <select
@@ -1772,8 +1833,16 @@ export function DeliveryChallansManager() {
             </div>
 
             <div style={{ display: "flex", gap: 10, marginTop: 16, flexWrap: "wrap" }}>
-              <button type="button" className="btn btn-primary" onClick={submitForm}>
-                {t("action.save")}
+              <button type="button" className="btn btn-primary" onClick={() => submitForm(false)}>
+                {t("action.save")} (مسودہ)
+              </button>
+              <button
+                type="button"
+                className="btn btn-primary"
+                style={{ background: "var(--success, #16a34a)", borderColor: "var(--success, #16a34a)", color: "#fff" }}
+                onClick={() => submitForm(true)}
+              >
+                محفوظ کریں اور فوراً ڈسپیچ کریں (DC نمبر)
               </button>
               <button
                 type="button"

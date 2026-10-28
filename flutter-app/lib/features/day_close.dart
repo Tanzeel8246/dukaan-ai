@@ -152,6 +152,16 @@ class _DayCloseScreenState extends State<DayCloseScreen> {
                   if (c.kind == 'in') cashInTotal += c.amount;
                   if (c.kind == 'out') cashOutTotal += c.amount;
                 }
+                var customerAdvancesCash = 0.0;
+                for (final e in store.journal) {
+                  if (e.dayOffset == 0 && e.refType == 'customer_advance') {
+                    for (final l in e.lines) {
+                      if (l.account == 'cash' && l.debit > 0) {
+                        customerAdvancesCash += l.debit;
+                      }
+                    }
+                  }
+                }
                 final summary = dayCloseSummary(
                   sales: store.sales,
                   bills: store.bills,
@@ -162,6 +172,7 @@ class _DayCloseScreenState extends State<DayCloseScreen> {
                   cashIn: cashInTotal,
                   cashOut: cashOutTotal,
                   openingCash: opening,
+                  customerAdvancesCash: customerAdvancesCash,
                 );
                 final row = DayClose(
                   id: newId('dc'),

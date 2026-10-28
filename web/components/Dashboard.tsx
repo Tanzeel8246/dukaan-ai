@@ -132,8 +132,8 @@ export default function Dashboard() {
     /* ---- KPI numbers ---- */
     const todayRevenue = revenueOnDay(sales, 0);
     const yesterdayRevenue = revenueOnDay(sales, 1);
-    const todayProfit = profitOnDay(sales, 0, products);
-    const yesterdayProfit = profitOnDay(sales, 1, products);
+    const todayProfit = profitOnDay(sales, 0, products, bills);
+    const yesterdayProfit = profitOnDay(sales, 1, products, bills);
     const pl = profitAndLoss(journal, now);
     const prevMonthRef = new Date(now.getFullYear(), now.getMonth() - 1, 1);
     const plPrev = profitAndLoss(journal, prevMonthRef);

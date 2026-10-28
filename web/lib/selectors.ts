@@ -3,7 +3,7 @@
  * and AI assistant compute comes from these functions, so the web app,
  * the Flutter app and the AI engine all agree on the same numbers.
  */
-import type { ForecastRow, Product, Sale } from "./types";
+import type { Bill, ForecastRow, Product, Sale } from "./types";
 
 /** Sales recorded `dayOffset` days ago (0 = today). */
 export function salesOnDay(sales: Sale[], dayOffset: number): Sale[] {
@@ -20,18 +20,32 @@ export function unitsOnDay(sales: Sale[], dayOffset: number): number {
   return salesOnDay(sales, dayOffset).reduce((sum, s) => sum + s.qty, 0);
 }
 
-/** Gross profit (sale - cost) of sales on a given day.
- *  F-9: cost is each sale's own `unitCost` snapshot (the same basis the
- *  journal/P&L uses) — never the product's CURRENT cost, which would
- *  let a later reprice rewrite today's profit. Seed rows predate the
- *  snapshot field, so they fall back to the product cost. */
-export function profitOnDay(sales: Sale[], dayOffset: number, products: Product[]): number {
+/** Gross profit (Net Revenue − COGS) on a given day.
+ *  COGS is computed from each sale's unitCost snapshot (fallback: costPrice).
+ *  When bills are provided, bill-level discounts are deducted so gross profit
+ *  matches the Finance/P&L definition (Net Revenue − COGS) exactly. */
+export function profitOnDay(
+  sales: Sale[],
+  dayOffset: number,
+  products: Product[],
+  bills?: Bill[]
+): number {
   const byId = new Map(products.map((p) => [p.id, p]));
-  return salesOnDay(sales, dayOffset).reduce((sum, s) => {
-    const cost = s.unitCost ?? byId.get(s.productId)?.costPrice;
-    const margin = cost != null ? s.unitPrice - cost : 0;
-    return sum + margin * s.qty;
+  const daySales = salesOnDay(sales, dayOffset);
+  const cogs = daySales.reduce((sum, s) => {
+    const cost = s.unitCost ?? byId.get(s.productId)?.costPrice ?? 0;
+    return sum + cost * s.qty;
   }, 0);
+  const grossRev = daySales.reduce((sum, s) => sum + s.total, 0);
+  const discounts = bills
+    ? bills
+        .filter((b) => b.dayOffset === dayOffset && b.status !== "held" && b.status !== "voided")
+        .reduce((sum, b) => {
+          const paid = b.payments.reduce((a, p) => a + p.amount, 0);
+          return sum + b.discountAmount + Math.max(0, b.total - paid);
+        }, 0)
+    : 0;
+  return Math.round((grossRev - discounts - cogs) * 100) / 100;
 }
 
 /** Products at or below their reorder level, worst first. */

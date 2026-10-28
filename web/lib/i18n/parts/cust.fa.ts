@@ -69,6 +69,8 @@ export const faCust: Record<keyof typeof enCust, string> = {
   "cust.billStatus.voided": "باطل شده",
   "cust.billStatus.partiallyReturned": "قسماً برگردانده شده",
   "cust.billStatus.returned": "برگردانده شده",
+  "cust.billStatus.unpaid": "پرداخت‌نشده (قرض)",
+  "cust.billStatus.partial": "جزئی پرداخت‌شده",
   "cust.profile.creditLedger": "دفتر قرض",
   "cust.profile.noCredit": "ثبت قرضی برای این مشتری نیست.",
   "cust.credit.given": "قرض",

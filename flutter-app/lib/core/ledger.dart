@@ -298,6 +298,7 @@ class DayCloseSummary {
   final double creditReceived;
   final double supplierPaidCash;
   final double refundsCash;
+  final double customerAdvancesCash;
   final double expectedCash;
   const DayCloseSummary({
     required this.salesByMethod,
@@ -308,6 +309,7 @@ class DayCloseSummary {
     required this.creditReceived,
     required this.supplierPaidCash,
     required this.refundsCash,
+    this.customerAdvancesCash = 0,
     required this.expectedCash,
   });
 }
@@ -322,6 +324,7 @@ DayCloseSummary dayCloseSummary({
   required double cashIn,
   required double cashOut,
   required double openingCash,
+  double customerAdvancesCash = 0,
 }) {
   final byMethod = <String, double>{
     'cash': 0,
@@ -379,6 +382,7 @@ DayCloseSummary dayCloseSummary({
   final expectedCash = openingCash +
       byMethod['cash']! +
       creditReceivedCash +
+      customerAdvancesCash +
       cashIn -
       expCash -
       supplierPaidCash -
@@ -393,6 +397,7 @@ DayCloseSummary dayCloseSummary({
     creditReceived: creditReceived,
     supplierPaidCash: supplierPaidCash,
     refundsCash: returnsRefundCash,
+    customerAdvancesCash: customerAdvancesCash,
     expectedCash: expectedCash,
   );
 }
@@ -478,6 +483,29 @@ BillCreditPosition billCreditOutstanding(List<CreditEntry> credits, Bill bill) {
     given: given, reversed: reversed, repaidAllocated: repaidAllocated,
     outstanding: outstanding > 0 ? outstanding : 0,
   );
+}
+
+/// Live payment status of a bill: accounts for outstanding credit balance.
+/// Returns 'paid', 'partial', 'unpaid', 'held', 'voided', 'returned', or 'partially_returned'.
+String effectiveBillStatus(Bill bill, [List<CreditEntry>? credits]) {
+  if (bill.status == 'held' ||
+      bill.status == 'voided' ||
+      bill.status == 'returned' ||
+      bill.status == 'partially_returned') {
+    return bill.status;
+  }
+  final creditPart = bill.payments
+      .where((p) => p.method == 'credit')
+      .fold(0.0, (a, p) => a + p.amount);
+  if (creditPart <= 0) return 'paid';
+  if (credits != null && credits.isNotEmpty) {
+    final pos = billCreditOutstanding(credits, bill);
+    if (pos.outstanding <= 0.01) return 'paid';
+    if (pos.outstanding < bill.total - 0.01) return 'partial';
+    return 'unpaid';
+  }
+  if (creditPart >= bill.total - 0.01) return 'unpaid';
+  return 'partial';
 }
 
 class CreditLotRemaining {

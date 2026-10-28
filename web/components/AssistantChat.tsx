@@ -73,6 +73,7 @@ export default function AssistantChat() {
   const ctx: AssistantCtx = {
     products: store.products,
     sales: store.sales,
+    bills: store.bills,
     suppliers: store.suppliers,
     purchases: store.purchases,
     purchaseReturns: store.purchaseReturns,

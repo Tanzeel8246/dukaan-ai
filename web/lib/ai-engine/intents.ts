@@ -41,11 +41,11 @@ function normalize(text: string): string {
 
 const GREETING = [/\b(hello|hi|hey|salam|assalam|aoa|good\s?(morning|evening|afternoon))\b/, /سلام|السلام|آداب/];
 const HELP = [/\b(help|guide|commands|what can you)\b/, /مدد|رہنمائی|ہدایت|کیا کر سکتے/];
-const LOW_STOCK = [/\b(low stock|running out|out of stock|shortage|reorder alert|almost (gone|finished))\b/, /ختم|کم اسٹاک|کم سٹاک|قلیل|نایاب/];
-const SALES_TODAY = [/\b(sales?|revenue|turnover|earned|sold today|today'?s sale)\b/, /فروخت|بکری|کمائی|سیل|آمدنی/];
-const FORECAST = [/\b(forecast|predict|reorder|suggest|how much.*order|demand|stock up)\b/, /پیش.?گوئی|آرڈر|منگوانا|کتنا منگواؤ|ڈیمانڈ/];
+const LOW_STOCK = [/\b(low stock|running (out|low)|out of stock|shortage|reorder alert|almost (gone|finished)|which items are running low)\b/, /ختم|کم اسٹاک|کم سٹاک|قلیل|نایاب|کون سی چیز ختم/];
+const SALES_TODAY = [/\b(sales?|sell|selling|revenue|turnover|earned|sold today|today'?s sale|how much did i sell today)\b/, /فروخت|بکری|کمائی|سیل|آمدنی|آج کی فروخت/];
+const FORECAST = [/\b(forecast|predict|reorder|suggest|how much.*order|demand|stock up|what should i reorder)\b/, /پیش.?گوئی|آرڈر|منگوانا|کتنا منگواؤ|ڈیمانڈ|کیا آرڈر/];
 const STOCK = [/\b(stock|inventory|available|quantity|how many|left)\b/, /اسٹاک|سٹاک|موجود|کتنا ہے|کتنی ہے|بچا/];
-const EXPENSES = [/\b(expense|expenses|spending|spent)\b/, /خرچ|اخراجات|خرچہ/];
+const EXPENSES = [/\b(expense|expenses|spending|spent|what are today'?s expenses)\b/, /خرچ|اخراجات|خرچہ|آج کے اخراجات/];
 const MONTH_NET = [/\b(net profit|monthly profit|profit this month|this month.*(profit|net)|munafa)\b/, /منافع|خالص نفع|مہینے کا نفع|بچت/];
 const SUPPLIER = [/\b(supplier|payable|payables|owe|dues)\b/, /سپلائر|بقایا|دینا ہے|قرض/];
 const CREDIT = [/\b(udhaar|credit outstanding|receivable|receivables|outstanding|who owes)\b/, /ادھار|وصولی|لینا ہے|کس نے دینا/];

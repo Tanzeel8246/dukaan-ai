@@ -183,6 +183,12 @@ export default function DayCloseView() {
     const cashOut = cashEntries
       .filter((c) => c.dayOffset === 0 && c.kind === "out" && c.method === "cash")
       .reduce((a, c) => a + c.amount, 0);
+    const customerAdvancesCash = journal
+      .filter((e) => e.dayOffset === 0 && e.refType === "customer_advance")
+      .reduce((sum, e) => {
+        const cashLine = e.lines.find((l) => l.account === "cash" && l.debit > 0);
+        return sum + (cashLine ? cashLine.debit : 0);
+      }, 0);
     return dayCloseSummary({
       sales,
       bills,
@@ -193,8 +199,9 @@ export default function DayCloseView() {
       cashIn,
       cashOut,
       openingCash,
+      customerAdvancesCash,
     });
-  }, [ready, sales, bills, expenses, credits, supplierPayments, returns, cashEntries, openingCash]);
+  }, [ready, sales, bills, expenses, credits, supplierPayments, returns, cashEntries, journal, openingCash]);
 
   // A close belongs to the business day its `dateISO` names — the
   // stored dayOffset is a frozen creation-day stamp and would
@@ -274,6 +281,12 @@ export default function DayCloseView() {
   const cashInToday = cashEntries
     .filter((c) => c.dayOffset === 0 && c.kind === "in" && c.method === "cash")
     .reduce((a, c) => a + c.amount, 0);
+  const advancesCashToday = journal
+    .filter((e) => e.dayOffset === 0 && e.refType === "customer_advance")
+    .reduce((sum, e) => {
+      const cashLine = e.lines.find((l) => l.account === "cash" && l.debit > 0);
+      return sum + (cashLine ? cashLine.debit : 0);
+    }, 0);
   const cashOutToday = cashEntries
     .filter((c) => c.dayOffset === 0 && c.kind === "out" && c.method === "cash")
     .reduce((a, c) => a + c.amount, 0);
@@ -416,6 +429,12 @@ export default function DayCloseView() {
                   <span>{t("dc.totals.refunds")}</span>
                   <b>{fmtPKR(summary.refundsCash)}</b>
                 </div>
+                {advancesCashToday > 0 && (
+                  <div style={{ display: "flex", justifyContent: "space-between", gap: 12 }}>
+                    <span>کسٹمر ایڈوانس (نقد)</span>
+                    <b>{fmtPKR(advancesCashToday)}</b>
+                  </div>
+                )}
                 <div style={{ display: "flex", justifyContent: "space-between", gap: 12 }}>
                   <span>{t("dc.totals.cashIn")}</span>
                   <b>{fmtPKR(cashInToday)}</b>

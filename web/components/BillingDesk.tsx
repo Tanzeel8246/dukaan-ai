@@ -47,6 +47,7 @@ import {
 } from "@/lib/loyalty";
 import type { Bill, BillPayment, PayMethod } from "@/lib/types";
 import { AccountPicker } from "./MoneyAccounts";
+import { effectiveBillStatus } from "@/lib/ledger";
 import {
   ChequeFields,
   chequeDraftOf,
@@ -118,6 +119,8 @@ const STATUS_BADGE: Record<Bill["status"], { cls: string; key: I18nKey }> = {
   voided: { cls: "badge red", key: "billing.status.voided" },
   partially_returned: { cls: "badge amber", key: "billing.status.partially_returned" },
   returned: { cls: "badge red", key: "billing.status.returned" },
+  unpaid: { cls: "badge red", key: "billing.status.unpaid" },
+  partial: { cls: "badge amber", key: "billing.status.partial" },
 };
 
 /** Quantities can be fractional (kg / L) — never round them away. */
@@ -172,6 +175,7 @@ export default function BillingDesk() {
     ready,
     products,
     bills,
+    credits,
     customers,
     taxSlabs,
     settings,
@@ -1670,6 +1674,21 @@ export default function BillingDesk() {
                                   accountId: "",
                                 };
                               }
+                              if (e.target.value === "credit") {
+                                const otherSum = prev.reduce((a, it, idx) => {
+                                  if (idx === i) return a;
+                                  if (it.instrument === "points") return a + (pointsQuote.rs || 0);
+                                  return a + (parseFloat(it.amount) || 0);
+                                }, 0);
+                                const remDue = Math.max(0, total - otherSum);
+                                return {
+                                  ...r,
+                                  instrument: null,
+                                  method: "credit" as PayMethod,
+                                  amount: remDue > 0 ? String(remDue) : r.amount,
+                                  accountId: "",
+                                };
+                              }
                               return {
                                 ...r,
                                 instrument: null,
@@ -2187,9 +2206,15 @@ export default function BillingDesk() {
               >
                 <h2 style={{ fontSize: "1.3rem", margin: 0 }}>
                   {t("billing.billNoTitle", { no: selected.billNo })}{" "}
-                  <span className={STATUS_BADGE[selected.status].cls}>
-                    {t(STATUS_BADGE[selected.status].key)}
-                  </span>
+                  {(() => {
+                    const st = effectiveBillStatus(selected, credits);
+                    const badge = STATUS_BADGE[st] ?? STATUS_BADGE.paid;
+                    return (
+                      <span className={badge.cls}>
+                        {t(badge.key)}
+                      </span>
+                    );
+                  })()}
                 </h2>
                 <button
                   type="button"
@@ -2488,9 +2513,15 @@ export default function BillingDesk() {
                         <b style={{ fontFamily: "var(--font-display)" }}>{fmtPKR(b.total)}</b>
                       </td>
                       <td>
-                        <span className={STATUS_BADGE[b.status].cls}>
-                          {t(STATUS_BADGE[b.status].key)}
-                        </span>
+                        {(() => {
+                          const st = effectiveBillStatus(b, credits);
+                          const badge = STATUS_BADGE[st] ?? STATUS_BADGE.paid;
+                          return (
+                            <span className={badge.cls}>
+                              {t(badge.key)}
+                            </span>
+                          );
+                        })()}
                       </td>
                       <td style={{ fontSize: "0.88rem" }}>
                         {b.payments.length > 0

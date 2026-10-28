@@ -58,6 +58,7 @@ import type {
   AttendanceMonth,
   Bill,
   BillPayment,
+  BillStatus,
   Bom,
   BrandingAsset,
   BrandingAssetKind,
@@ -529,6 +530,7 @@ export interface NewChallanInput {
   /** Phase C · C1 (§1.6): the warehouse the goods physically leave
    *  from (optional stamp; null/absent ⇒ the default warehouse). */
   warehouseId?: string | null;
+  orderId?: string | null;
 }
 
 /** Phase B · B3: a purchase order as the form composes it. Lines
@@ -4249,7 +4251,9 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
     (input: NewBillInput): string | null => {
       if (!can(roleRef.current, "billing", "write")) return null; // A3 guard
       const paid = input.payments.reduce((a, p) => a + p.amount, 0);
-      const bill = buildBill(input, "paid");
+      const creditPart = input.payments.find((p) => p.method === "credit")?.amount ?? 0;
+      const status: BillStatus = creditPart >= paid - 1 ? "unpaid" : creditPart > 0 ? "partial" : "paid";
+      const bill = buildBill(input, status);
       if (!bill) return null;
       if (Math.abs(paid - bill.total) > 1) return null;
       const priced = priceLines(input.lines);
@@ -4318,7 +4322,9 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
         if (!p || p.stockQty < q) return false;
       }
       const costTotal = held.items.reduce((a, i) => a + i.qty * i.unitCost, 0);
-      const bill: Bill = { ...held, status: "paid", payments };
+      const creditPart = payments.find((p) => p.method === "credit")?.amount ?? 0;
+      const status: BillStatus = creditPart >= paid - 1 ? "unpaid" : creditPart > 0 ? "partial" : "paid";
+      const bill: Bill = { ...held, status, payments };
       return postBill(bill, { items: held.items, costTotal });
     },
     [postBill]
@@ -5392,7 +5398,7 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
       const challan: DeliveryChallan = {
         id: newId("dc"),
         number: null, // minted on dispatch (§1.3)
-        orderId: null, // standalone delivery
+        orderId: input.orderId ?? null,
         customerId: input.customerId,
         customerName: input.customerName.trim(),
         customerPhone: input.customerPhone.trim(),

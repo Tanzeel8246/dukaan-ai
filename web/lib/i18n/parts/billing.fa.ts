@@ -96,6 +96,8 @@ export const faBilling: Record<keyof typeof enBilling, string> = {
   "billing.status.voided": "باطل‌شده",
   "billing.status.partially_returned": "جزئي برگشته",
   "billing.status.returned": "برگشته",
+  "billing.status.unpaid": "پرداخت‌نشده (قرض)",
+  "billing.status.partial": "جزئی پرداخت‌شده",
   "billing.actions": "اقدامات",
   "billing.voidBill": "بل را باطل كنيد",
   "billing.returnItems": "كالاها را برگردانيد",
