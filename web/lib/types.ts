@@ -1363,6 +1363,7 @@ export interface DeliveryChallan {
   id: string;
   number: string | null; // "DC-21" once dispatched
   orderId: string | null; // source sale order; null = standalone delivery
+  billId?: string | null; // source sale bill when delivered against a bill
   customerId: string | null;
   customerName: string;
   customerPhone: string;

@@ -15,6 +15,7 @@ import {
   IconSearch,
   IconSend,
   IconTrash,
+  IconTruck,
   ProductResultList,
   SearchClear,
   pickerKeyDown,
@@ -2252,6 +2253,12 @@ export default function BillingDesk() {
                 >
                   <IconSend /> {t("action.whatsapp")}
                 </a>
+                <a
+                  className="btn btn-ghost btn-sm"
+                  href="/challans"
+                >
+                  <IconTruck /> ڈیلیوری چالان بنائیں
+                </a>
                 <span style={{ flex: 1 }} />
                 <button
                   type="button"
@@ -2264,6 +2271,26 @@ export default function BillingDesk() {
                   <IconPlus /> نیا بل بنائیں
                 </button>
               </div>
+
+              {(() => {
+                const linkedChallans = deliveryChallans.filter(
+                  (dc) => dc.billId === selected.id && dc.status !== "cancelled"
+                );
+                if (linkedChallans.length === 0) return null;
+                return (
+                  <div className="note-box" style={{ marginBottom: 16 }}>
+                    <b>ڈیلیوری چالان جاری شدہ:</b>{" "}
+                    {linkedChallans.map((dc) => (
+                      <span key={dc.id} className="badge outline" style={{ marginInline: 4 }}>
+                        {dc.number ?? "مسودہ"} ({dc.lines.reduce((s, l) => s + l.qty, 0)} آئٹمز)
+                      </span>
+                    ))}
+                    <a href="/challans" style={{ marginInlineStart: 8, fontSize: "0.85rem", textDecoration: "underline" }}>
+                      چالان دیکھیں
+                    </a>
+                  </div>
+                );
+              })()}
 
               <div className="grid-2" style={{ alignItems: "start" }}>
                 <BillPrintSheet
@@ -2516,10 +2543,20 @@ export default function BillingDesk() {
                         {(() => {
                           const st = effectiveBillStatus(b, credits);
                           const badge = STATUS_BADGE[st] ?? STATUS_BADGE.paid;
+                          const linked = deliveryChallans.filter(
+                            (dc) => dc.billId === b.id && dc.status !== "cancelled"
+                          );
                           return (
-                            <span className={badge.cls}>
-                              {t(badge.key)}
-                            </span>
+                            <div style={{ display: "flex", gap: 6, alignItems: "center", flexWrap: "wrap" }}>
+                              <span className={badge.cls}>
+                                {t(badge.key)}
+                              </span>
+                              {linked.length > 0 && (
+                                <span className="badge outline" title="ڈیلیوری چالان جاری شدہ">
+                                  {linked.map((l) => l.number ?? "DC").join(", ")}
+                                </span>
+                              )}
+                            </div>
                           );
                         })()}
                       </td>

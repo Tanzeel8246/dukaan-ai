@@ -342,7 +342,9 @@ export default function ReportsView() {
               trL("fin.pl.expenseRow", { category: catL(cat) }),
               `− ${money(v)}`,
             ]),
-          [trL("fin.pl.stockLoss"), `− ${money(m.stockLoss)}`],
+          m.stockLoss < 0
+            ? [outLang === "ur" ? "اسٹاک اضافہ (سرپلس)" : "Stock gain (surplus)", `+ ${money(Math.abs(m.stockLoss))}`]
+            : [trL("fin.pl.stockLoss"), `− ${money(m.stockLoss)}`],
         ];
         sec(undefined, [trL("rep.col.description"), trL("rep.col.amount")], rows);
         totals.push([trL("fin.pl.netProfit"), money(m.net)]);

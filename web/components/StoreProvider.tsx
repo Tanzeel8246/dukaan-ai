@@ -531,6 +531,8 @@ export interface NewChallanInput {
    *  from (optional stamp; null/absent ⇒ the default warehouse). */
   warehouseId?: string | null;
   orderId?: string | null;
+  billId?: string | null;
+  dispatchImmediately?: boolean;
 }
 
 /** Phase B · B3: a purchase order as the form composes it. Lines
@@ -5395,10 +5397,18 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
       if (!can(roleRef.current, "saleOrders", "write")) return null; // G-1
       const lines = composeDocLines(input.lines);
       if (!lines) return null;
+      const number = input.dispatchImmediately
+        ? nextDocNumber(
+            "challan",
+            colsRef.current.deliveryChallans.map((c) => c.number),
+            settingsRef.current
+          )
+        : null;
       const challan: DeliveryChallan = {
         id: newId("dc"),
-        number: null, // minted on dispatch (§1.3)
+        number, // minted immediately on dispatch (§1.3)
         orderId: input.orderId ?? null,
+        billId: input.billId ?? null,
         customerId: input.customerId,
         customerName: input.customerName.trim(),
         customerPhone: input.customerPhone.trim(),
@@ -5408,7 +5418,7 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
         // Phase C · C1: where the goods physically leave from (§1.6).
         warehouseId: input.warehouseId ?? null,
         note: input.note.trim(),
-        status: "draft",
+        status: input.dispatchImmediately ? "dispatched" : "draft",
         dayOffset: 0,
         ts: new Date().toISOString(),
       };
@@ -5449,8 +5459,17 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
         const order = colsRef.current.saleOrders.find((o) => o.id === cur.orderId);
         if (!order || !challanLinesFitOrder(order, lines)) return false;
       }
+      const dispatching = !!input.dispatchImmediately;
+      const number = dispatching
+        ? (cur.number ?? nextDocNumber(
+            "challan",
+            colsRef.current.deliveryChallans.map((c) => c.number),
+            settingsRef.current
+          ))
+        : cur.number;
       const nextChallan: DeliveryChallan = {
         ...cur,
+        billId: input.billId ?? cur.billId ?? null,
         customerId: input.customerId,
         customerName: input.customerName.trim(),
         customerPhone: input.customerPhone.trim(),
@@ -5461,6 +5480,8 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
         driverName: input.driverName.trim(),
         warehouseId: input.warehouseId ?? null,
         note: input.note.trim(),
+        number,
+        status: dispatching ? "dispatched" : cur.status,
       };
       putDoc("deliveryChallans", nextChallan);
       return true;

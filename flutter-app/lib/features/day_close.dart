@@ -73,6 +73,18 @@ class _DayCloseScreenState extends State<DayCloseScreen> {
     final counted = double.tryParse(_counted.text.trim()) ?? 0;
     final difference = counted - expected;
 
+    var cashInToday = 0.0;
+    var cashOutToday = 0.0;
+    for (final e in store.journal) {
+      if (e.dayOffset != 0) continue;
+      for (final l in e.lines) {
+        if (lineResolvesTo(l, account)) {
+          cashInToday += l.debit;
+          cashOutToday += l.credit;
+        }
+      }
+    }
+
     return ListView(padding: const EdgeInsets.all(16), children: [
       Text(s.raw('dc.title'), style: Theme.of(context).textTheme.headlineSmall),
       Text(s.raw('dc.subtitle'), style: TextStyle(color: tokens.muted)),
@@ -96,6 +108,8 @@ class _DayCloseScreenState extends State<DayCloseScreen> {
       const SizedBox(height: 12),
       Card(child: Padding(padding: const EdgeInsets.all(16), child: Column(children: [
         _row(s.raw('dc.stat.opening'), fmtRs(opening)),
+        _row(s.raw('dc.totals.cashIn'), fmtRs(cashInToday)),
+        _row(s.raw('dc.totals.cashOut'), fmtRs(cashOutToday)),
         _row(s.raw('dc.stat.expected'), fmtRs(expected)),
         if (_counted.text.isNotEmpty) _row(s.raw('dc.stat.difference'), fmtRs(difference)),
       ]))),

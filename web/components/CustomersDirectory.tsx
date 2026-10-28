@@ -207,7 +207,7 @@ export default function CustomersDirectory() {
       const amt = e.lines
         .filter((l) => l.account === "customer_advances" && l.ref === profile.id)
         .reduce((a, l) => a + (l.credit - l.debit), 0);
-      rows.push({ ts: e.ts, label: "ایڈوانس موصول (unearned)", delta: 0, advance: amt });
+      rows.push({ ts: e.ts, label: "ایڈوانس موصول (unearned)", delta: -amt, advance: amt });
     }
     rows.sort((a, b) => a.ts.localeCompare(b.ts));
     let running = 0;

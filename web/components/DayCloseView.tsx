@@ -278,18 +278,44 @@ export default function DayCloseView() {
     (a, m) => a + (summary.salesByMethod[m] ?? 0),
     0
   );
-  const cashInToday = cashEntries
+  const manualCashIn = cashEntries
     .filter((c) => c.dayOffset === 0 && c.kind === "in" && c.method === "cash")
     .reduce((a, c) => a + c.amount, 0);
   const advancesCashToday = journal
     .filter((e) => e.dayOffset === 0 && e.refType === "customer_advance")
     .reduce((sum, e) => {
-      const cashLine = e.lines.find((l) => l.account === "cash" && l.debit > 0);
+      const cashLine = e.lines.find((l) => (tillAccount ? lineResolvesTo(l, tillAccount) : l.account === "cash") && l.debit > 0);
       return sum + (cashLine ? cashLine.debit : 0);
     }, 0);
-  const cashOutToday = cashEntries
+  const manualCashOut = cashEntries
     .filter((c) => c.dayOffset === 0 && c.kind === "out" && c.method === "cash")
     .reduce((a, c) => a + c.amount, 0);
+
+  // Actual cash movements into and out of the till drawer today (journal authoritative with operational fallback):
+  const journalCashToday = useMemo(() => {
+    let debits = 0;
+    let credits = 0;
+    for (const e of journal) {
+      if (e.dayOffset !== 0) continue;
+      for (const l of e.lines) {
+        if (tillAccount ? lineResolvesTo(l, tillAccount) : l.account === "cash") {
+          debits += l.debit || 0;
+          credits += l.credit || 0;
+        }
+      }
+    }
+    return { in: debits, out: credits };
+  }, [journal, tillAccount]);
+
+  const cashInToday =
+    journalCashToday.in > 0 || journalCashToday.out > 0
+      ? journalCashToday.in
+      : (summary.salesByMethod.cash || 0) + summary.creditReceived + advancesCashToday + manualCashIn;
+
+  const cashOutToday =
+    journalCashToday.in > 0 || journalCashToday.out > 0
+      ? journalCashToday.out
+      : summary.expensesTotal + summary.supplierPaidCash + summary.refundsCash + manualCashOut;
 
   return (
     <div className="section-sm">

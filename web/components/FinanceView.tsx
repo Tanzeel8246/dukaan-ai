@@ -56,7 +56,7 @@ function AgingTable({
   title: string;
   buckets: { current: number; mid: number; old: number; total: number };
 }) {
-  const { t } = useLang();
+  const { t, lang } = useLang();
   return (
     <section className="card" aria-label={title}>
       <h2 style={{ fontSize: "1.2rem", marginBottom: 14 }}>{title}</h2>
@@ -114,7 +114,7 @@ export default function FinanceView() {
     recordTaxPayment,
   } = useStore();
   const { role } = useAuth();
-  const { t } = useLang();
+  const { t, lang } = useLang();
 
   const [kind, setKind] = useState<"in" | "out">("in");
   const [amount, setAmount] = useState("");
@@ -924,8 +924,8 @@ export default function FinanceView() {
                 </div>
               ))}
               <div style={{ display: "flex", justifyContent: "space-between", gap: 12, color: "var(--muted)" }}>
-                <span>{t("fin.pl.stockLoss")}</span>
-                <span>− {fmtPKR(pl.stockLoss)}</span>
+                <span>{pl.stockLoss < 0 ? (lang === "ur" ? "اسٹاک اضافہ (سرپلس)" : "Stock gain (surplus)") : t("fin.pl.stockLoss")}</span>
+                <span>{pl.stockLoss < 0 ? `+ ${fmtPKR(Math.abs(pl.stockLoss))}` : `− ${fmtPKR(pl.stockLoss)}`}</span>
               </div>
               <div
                 style={{

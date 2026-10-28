@@ -430,6 +430,12 @@ export function deriveChallanStatus(
   if (challan.status === "draft" || challan.status === "cancelled") {
     return challan.status;
   }
+  if (challan.billId) {
+    const bill = bills.find((b) => b.id === challan.billId);
+    if (bill && bill.status !== "voided") {
+      return "dispatched";
+    }
+  }
   const billed = challanBilledQty(challan, bills);
   if (challan.lines.length > 0 && allCovered(challan.lines, billed)) return "billed";
   if (anyCovered(billed)) return "partially_billed";

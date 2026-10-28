@@ -924,6 +924,7 @@ class DeliveryChallan {
   final String id;
   final String? number; // DC-n once dispatched; null while draft
   final String? orderId;
+  final String? billId;
   final String? customerId;
   final String customerName;
   final String customerPhone;
@@ -936,11 +937,11 @@ class DeliveryChallan {
   final int dayOffset;
   final String ts;
   final String? originDevice;
-  const DeliveryChallan({required this.id, this.number, this.orderId, this.customerId, this.customerName = '',
+  const DeliveryChallan({required this.id, this.number, this.orderId, this.billId, this.customerId, this.customerName = '',
     this.customerPhone = '', this.lines = const [], this.vehicleNo = '', this.driverName = '',
     this.warehouseId, this.note = '', this.status = 'draft', this.dayOffset = 0, this.ts = '', this.originDevice});
   factory DeliveryChallan.fromMap(String id, Map<String, dynamic> m) => DeliveryChallan(
-        id: id, number: _sn(m['number']), orderId: _sn(m['orderId']), customerId: _sn(m['customerId']),
+        id: id, number: _sn(m['number']), orderId: _sn(m['orderId']), billId: _sn(m['billId']), customerId: _sn(m['customerId']),
         customerName: _s(m['customerName']), customerPhone: _s(m['customerPhone']),
         lines: (m['lines'] is List) ? (m['lines'] as List).whereType<Map>().map((e) => DocLine.fromMap(Map<String, dynamic>.from(e))).toList() : const [],
         vehicleNo: _s(m['vehicleNo']), driverName: _s(m['driverName']), warehouseId: _sn(m['warehouseId']),
@@ -948,14 +949,14 @@ class DeliveryChallan {
         dayOffset: _i(m['dayOffset']), ts: _s(m['ts']), originDevice: _sn(m['originDevice']),
       );
   Map<String, dynamic> toMap() => {
-        'number': number, 'orderId': orderId, 'customerId': customerId, 'customerName': customerName,
+        'number': number, 'orderId': orderId, if (billId != null) 'billId': billId, 'customerId': customerId, 'customerName': customerName,
         'customerPhone': customerPhone, 'lines': lines.map((e) => e.toMap()).toList(),
         'vehicleNo': vehicleNo, 'driverName': driverName, 'warehouseId': warehouseId, 'note': note,
         'status': status, 'dayOffset': dayOffset, 'ts': ts,
         if (originDevice != null) 'originDevice': originDevice,
       };
   DeliveryChallan copyWith({String? number, String? status}) => DeliveryChallan(
-        id: id, number: number ?? this.number, orderId: orderId, customerId: customerId,
+        id: id, number: number ?? this.number, orderId: orderId, billId: billId, customerId: customerId,
         customerName: customerName, customerPhone: customerPhone, lines: lines, vehicleNo: vehicleNo,
         driverName: driverName, warehouseId: warehouseId, note: note, status: status ?? this.status,
         dayOffset: dayOffset, ts: ts, originDevice: originDevice);

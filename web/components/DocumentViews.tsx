@@ -1449,6 +1449,7 @@ export function SaleOrdersManager() {
  */
 interface ChallanFormValues {
   orderId: string;
+  billId: string;
   customerId: string;
   customerName: string;
   customerPhone: string;
@@ -1463,6 +1464,7 @@ interface ChallanFormValues {
 function emptyChallanForm(): ChallanFormValues {
   return {
     orderId: "",
+    billId: "",
     customerId: "",
     customerName: "",
     customerPhone: "",
@@ -1522,6 +1524,8 @@ export function DeliveryChallansManager() {
 
   const sourceOrderFor = (c: DeliveryChallan): SaleOrder | undefined =>
     c.orderId ? saleOrders.find((o) => o.id === c.orderId) : undefined;
+  const sourceBillFor = (c: DeliveryChallan) =>
+    c.billId ? bills.find((b) => b.id === c.billId) : undefined;
 
   const openCreate = () => {
     setEditing(null);
@@ -1533,6 +1537,7 @@ export function DeliveryChallansManager() {
     setEditing(c);
     setValues({
       orderId: c.orderId ?? "",
+      billId: c.billId ?? "",
       customerId: c.customerId ?? "",
       customerName: c.customerName,
       customerPhone: c.customerPhone,
@@ -1560,6 +1565,7 @@ export function DeliveryChallansManager() {
     }
     const input = {
       orderId: values.orderId || null,
+      billId: values.billId || null,
       customerId: values.customerId || null,
       customerName: values.customerName,
       customerPhone: values.customerPhone,
@@ -1569,15 +1575,16 @@ export function DeliveryChallansManager() {
       note: values.note,
       // Phase C · C1: the challan's dispatch warehouse (§1.6).
       warehouseId: values.warehouseId || null,
+      dispatchImmediately,
     };
     if (editing) {
       if (!store.updateChallan(editing.id, input)) {
         setNotice({ ok: false, text: t("doc.errNotEditable") });
         return;
       }
+      setSelectedId(editing.id);
       if (dispatchImmediately) {
-        store.dispatchChallan(editing.id);
-        setNotice({ ok: true, text: "چالان اپ ڈیٹ اور ڈسپیچ ہو گیا — DC نمبر جاری ہو گیا۔" });
+        setNotice({ ok: true, text: "چالان اپ ڈیٹ اور فوراً ڈسپیچ ہو گیا — DC نمبر جاری ہو گیا۔" });
       } else {
         setNotice({ ok: true, text: t("challan.notice.updated") });
       }
@@ -1587,9 +1594,9 @@ export function DeliveryChallansManager() {
         setNotice({ ok: false, text: t("doc.errNoLines") });
         return;
       }
+      setSelectedId(id);
       if (dispatchImmediately) {
-        store.dispatchChallan(id);
-        setNotice({ ok: true, text: "چالان بن گیا اور ڈسپیچ ہو گیا — DC نمبر جاری ہو گیا۔" });
+        setNotice({ ok: true, text: "چالان بن گیا اور فوراً ڈسپیچ ہو گیا — DC نمبر جاری ہو گیا۔" });
       } else {
         setNotice({ ok: true, text: t("challan.notice.created") });
       }
@@ -1633,6 +1640,7 @@ export function DeliveryChallansManager() {
     : new Map<string, number>();
   const selLabel = selected ? (selected.number ?? t("doc.draftLabel")) : "";
   const selOrder = selected ? sourceOrderFor(selected) : undefined;
+  const selBill = selected ? sourceBillFor(selected) : undefined;
 
   const set = (patch: Partial<ChallanFormValues>) => setValues({ ...values, ...patch });
   const onCustomer = (id: string) => {
@@ -1642,6 +1650,45 @@ export function DeliveryChallansManager() {
       customerName: c ? c.name : values.customerName,
       customerPhone: c ? c.phone : values.customerPhone,
     });
+  };
+
+  const onBillSelect = (billId: string) => {
+    if (!billId) {
+      set({ billId: "" });
+      return;
+    }
+    const b = bills.find((x) => x.id === billId);
+    if (b) {
+      const otherChallans = deliveryChallans.filter(
+        (dc) => dc.billId === billId && dc.status !== "cancelled" && (!editing || dc.id !== editing.id)
+      );
+      const deliveredMap = new Map<string, number>();
+      for (const dc of otherChallans) {
+        for (const l of dc.lines) {
+          deliveredMap.set(l.productId, (deliveredMap.get(l.productId) ?? 0) + l.qty);
+        }
+      }
+      const remainingLines: DocLineInput[] = [];
+      for (const it of b.items) {
+        const d = deliveredMap.get(it.productId) ?? 0;
+        const rem = Math.max(0, it.qty - d);
+        if (rem > 0) {
+          remainingLines.push({
+            productId: it.productId,
+            qty: rem,
+            unitPrice: it.unitPrice,
+          });
+        }
+      }
+      set({
+        billId,
+        orderId: "",
+        customerId: b.customerId ?? values.customerId,
+        customerName: b.customerName || values.customerName,
+        customerPhone: b.customerPhone || values.customerPhone,
+        lines: remainingLines.length > 0 ? remainingLines : b.items.map((it) => ({ productId: it.productId, qty: it.qty, unitPrice: it.unitPrice })),
+      });
+    }
   };
 
   const onOrderSelect = (ordId: string) => {
@@ -1666,6 +1713,7 @@ export function DeliveryChallansManager() {
       }
       set({
         orderId: ordId,
+        billId: "",
         customerId: ord.customerId ?? values.customerId,
         customerName: ord.customerName || values.customerName,
         customerPhone: ord.customerPhone || values.customerPhone,
@@ -1727,6 +1775,23 @@ export function DeliveryChallansManager() {
               {t("challan.form.sub")}
             </p>
             <div className="form-grid">
+              <div className="field">
+                <label htmlFor="dc-bill">لنک سیل بل (اختیاری)</label>
+                <select
+                  id="dc-bill"
+                  value={values.billId}
+                  onChange={(e) => onBillSelect(e.target.value)}
+                >
+                  <option value="">— براہ راست چالان (بغیر سیل بل) —</option>
+                  {bills
+                    .filter((b) => b.status !== "voided")
+                    .map((b) => (
+                      <option key={b.id} value={b.id}>
+                        بل #{b.billNo} — {b.customerName || "Walk-in"} ({fmtPKR(b.total)})
+                      </option>
+                    ))}
+                </select>
+              </div>
               <div className="field">
                 <label htmlFor="dc-order">لنک سیل آرڈر (اختیاری)</label>
                 <select
@@ -1873,14 +1938,22 @@ export function DeliveryChallansManager() {
                     <th>{t("doc.th.customer")}</th>
                     <th>{t("doc.sourceLabel")}</th>
                     <th>{t("doc.th.status")}</th>
+                    <th style={{ textAlign: "end" }}>ایکشن</th>
                   </tr>
                 </thead>
                 <tbody>
                   {filtered.map((c) => {
                     const o = sourceOrderFor(c);
+                    const b = sourceBillFor(c);
+                    const sourceText = b
+                      ? `بل #${b.billNo}`
+                      : o
+                      ? (o.number ?? t("doc.draftLabel"))
+                      : t("challan.standalone");
                     return (
                       <tr
                         key={c.id}
+                        id={`challan-row-${c.id}`}
                         onClick={() => setSelectedId(c.id)}
                         style={{
                           cursor: "pointer",
@@ -1892,9 +1965,26 @@ export function DeliveryChallansManager() {
                         </td>
                         <td>{fmtDate(c.ts)}</td>
                         <td>{c.customerName || t("doc.walkIn")}</td>
-                        <td>{o ? (o.number ?? t("doc.draftLabel")) : t("challan.standalone")}</td>
+                        <td>
+                          <span className={b ? "badge outline" : ""}>{sourceText}</span>
+                        </td>
                         <td>
                           <Badge status={deriveChallanStatus(c, bills)} />
+                        </td>
+                        <td style={{ textAlign: "end" }}>
+                          <button
+                            type="button"
+                            className="btn btn-ghost btn-sm"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setSelectedId(c.id);
+                              setTimeout(() => {
+                                document.getElementById("dc-detail")?.scrollIntoView({ behavior: "smooth" });
+                              }, 50);
+                            }}
+                          >
+                            تفصیل / پرنٹ
+                          </button>
                         </td>
                       </tr>
                     );
@@ -1906,7 +1996,7 @@ export function DeliveryChallansManager() {
         </div>
 
         {selected && selStatus && (
-          <div className="card">
+          <div id="dc-detail" className="card">
             <div
               style={{
                 display: "flex",
@@ -1924,7 +2014,9 @@ export function DeliveryChallansManager() {
             </div>
             <p style={{ fontSize: "0.85rem", color: "var(--muted)", marginTop: 0 }}>
               {t("doc.sourceLabel")}:{" "}
-              {selOrder
+              {selBill
+                ? `سیل بل #${selBill.billNo} (${fmtPKR(selBill.total)})`
+                : selOrder
                 ? `${t("challan.sourceOrder")} ${selOrder.number ?? t("doc.draftLabel")}`
                 : t("challan.standalone")}
             </p>

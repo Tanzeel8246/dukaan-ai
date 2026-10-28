@@ -3270,6 +3270,7 @@ class ShopStore extends ChangeNotifier {
   Future<String?> saveChallan({
     String? id,
     String? orderId,
+    String? billId,
     String? customerId,
     String customerName = '',
     String customerPhone = '',
@@ -3278,6 +3279,7 @@ class ShopStore extends ChangeNotifier {
     String driverName = '',
     String? warehouseId,
     String note = '',
+    bool dispatchImmediately = false,
   }) async {
     if (!can(role, 'saleOrders', 'write')) return null;
     final lines = _composeDocLines(picks);
@@ -3288,23 +3290,27 @@ class ShopStore extends ChangeNotifier {
       if (order == null) return null;
       if (!_challanLinesFitOrder(order, lines, excludeChallanId: id)) return null;
     }
+    final nextNumber = dispatchImmediately
+        ? nextDocNumber('challan', deliveryChallans.map((x) => x.number).toList(), settings.docSeries)
+        : null;
+    final status = dispatchImmediately ? 'dispatched' : 'draft';
     if (id != null) {
       final existing = deliveryChallans.where((c) => c.id == id).firstOrNull;
       if (existing == null || existing.status != 'draft') return null;
       final updated = DeliveryChallan(
-        id: id, number: existing.number, orderId: orderId, customerId: customerId,
+        id: id, number: existing.number ?? nextNumber, orderId: orderId, billId: billId, customerId: customerId,
         customerName: customerName, customerPhone: customerPhone, lines: lines,
         vehicleNo: vehicleNo, driverName: driverName, warehouseId: warehouseId,
-        note: note, status: 'draft', dayOffset: 0, ts: existing.ts, originDevice: originDevice,
+        note: note, status: status, dayOffset: 0, ts: existing.ts, originDevice: originDevice,
       );
       await _col('deliveryChallans').doc(id).set(updated.toMap());
       return id;
     }
     final c = DeliveryChallan(
-      id: newId('dc'), orderId: orderId, customerId: customerId,
+      id: newId('dc'), number: nextNumber, orderId: orderId, billId: billId, customerId: customerId,
       customerName: customerName, customerPhone: customerPhone, lines: lines,
       vehicleNo: vehicleNo, driverName: driverName, warehouseId: warehouseId,
-      note: note, status: 'draft', dayOffset: 0, ts: _now(), originDevice: originDevice,
+      note: note, status: status, dayOffset: 0, ts: _now(), originDevice: originDevice,
     );
     await _col('deliveryChallans').doc(c.id).set(c.toMap());
     return c.id;

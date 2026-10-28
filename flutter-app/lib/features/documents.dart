@@ -498,7 +498,7 @@ class _ChallansTab extends StatelessWidget {
             final status = d.status == 'draft' ? 'draft' : deriveChallanStatus(d, store.bills);
             return ListTile(
               title: Text('${d.number ?? s.raw('doc.status.draft')} · ${d.customerName} · ${d.lines.map((it) => '${it.name} ×${it.qty}').join(', ')}'),
-              subtitle: Text('${fmtDate(d.ts)} · ${_status(context, status)}${d.orderId != null ? ' · SO' : ''}'),
+              subtitle: Text('${fmtDate(d.ts)} · ${_status(context, status)}${d.billId != null ? ' · بل' : d.orderId != null ? ' · SO' : ''}'),
               trailing: canWrite ? _actions(context, store, d) : null,
             );
           },
@@ -561,9 +561,63 @@ class _ChallansTab extends StatelessWidget {
   Future<void> _create(BuildContext context) async {
     final store = context.read<ShopStore>();
     final s = S.current;
-    final result = await _editLines(context, const [], partyLabel: s.raw('credit.give.namePlaceholder'));
+    String? selectedBillId;
+    List<({Product product, double qty, double price})> defaultPicks = const [];
+    String defaultCustomerName = '';
+
+    if (store.bills.isNotEmpty) {
+      final bills = store.bills.where((b) => b.status != 'voided').take(10).toList();
+      final choice = await showDialog<String?>(
+        context: context,
+        builder: (ctx) => SimpleDialog(
+          title: const Text('سیل بل لنک کریں یا نیا چالان بنائیں'),
+          children: [
+            SimpleDialogOption(
+              onPressed: () => Navigator.pop(ctx, ''),
+              child: const Text('— بغیر سیل بل کے (براہ راست چالان) —'),
+            ),
+            for (final b in bills)
+              SimpleDialogOption(
+                onPressed: () => Navigator.pop(ctx, b.id),
+                child: Text('بل #${b.billNo} — ${b.customerName.isEmpty ? "Walk-in" : b.customerName} (${fmtRs(b.total)})'),
+              ),
+          ],
+        ),
+      );
+      if (choice == null) return;
+      if (choice.isNotEmpty) {
+        selectedBillId = choice;
+        final bill = store.bills.firstWhere((b) => b.id == choice);
+        defaultCustomerName = bill.customerName;
+        defaultPicks = [
+          for (final it in bill.items)
+            if (store.productsById[it.productId] != null)
+              (product: store.productsById[it.productId]!, qty: it.qty, price: it.unitPrice),
+        ];
+      }
+    }
+
+    final result = await _editLines(context, defaultPicks, partyLabel: s.raw('credit.give.namePlaceholder'));
     if (result == null || result.$2.isEmpty) return;
-    await store.saveChallan(customerName: result.$1, picks: result.$2);
+
+    final dispatchImmediately = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('چالان کی حیثیت'),
+        content: const Text('کیا آپ چالان کو فوراً ڈسپیچ کر کے DC نمبر جاری کرنا چاہتے ہیں؟'),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(ctx, false), child: const Text('مسودہ (Draft)')),
+          ElevatedButton(onPressed: () => Navigator.pop(ctx, true), child: const Text('ڈسپیچ (DC#)')),
+        ],
+      ),
+    ) ?? false;
+
+    await store.saveChallan(
+      customerName: result.$1.isEmpty ? defaultCustomerName : result.$1,
+      billId: selectedBillId,
+      picks: result.$2,
+      dispatchImmediately: dispatchImmediately,
+    );
   }
 }
 

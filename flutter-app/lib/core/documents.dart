@@ -322,6 +322,12 @@ String displayQuotationStatus(
 
 String deriveChallanStatus(DeliveryChallan c, Iterable<Bill> bills) {
   if (c.status == 'draft' || c.status == 'cancelled') return c.status;
+  if (c.billId != null) {
+    final b = bills.where((x) => x.id == c.billId).firstOrNull;
+    if (b != null && b.status != 'voided') {
+      return 'dispatched';
+    }
+  }
   final billed = challanBilledQty(c, bills);
   if (c.lines.isNotEmpty && _covers(billed, c.lines)) return 'billed';
   if (_anyOf(billed)) return 'partially_billed';
