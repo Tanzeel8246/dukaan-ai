@@ -671,10 +671,23 @@ class _AppShellState extends State<AppShell> {
         // The owner's shell directive: account cluster in the header.
         PopupMenuButton<String>(
           icon: const Icon(Icons.palette_outlined),
+          tooltip: s.raw('shell.chooseTheme'),
           onSelected: (v) => app.setTheme(v),
           itemBuilder: (_) => [
             for (final id in ['emerald', 'sand', 'ocean', 'midnight', 'dusk'])
-              PopupMenuItem(value: id, child: Text(id)),
+              PopupMenuItem(
+                value: id,
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    if (app.themeId == id) ...[
+                      const Icon(Icons.check, size: 16),
+                      const SizedBox(width: 8),
+                    ],
+                    Text(s.raw('shell.theme.$id')),
+                  ],
+                ),
+              ),
           ],
         ),
         // Language picker (Phase H §4.2): four locales, each option

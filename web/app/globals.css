@@ -235,7 +235,17 @@ img { max-width: 100%; }
 /* ---------- Urdu / RTL typography ---------- */
 html[lang="ur"] body { font-family: var(--font-urdu), var(--font-body); line-height: 1.9; }
 html[lang="ur"] h1, html[lang="ur"] h2, html[lang="ur"] h3, html[lang="ur"] .display,
-html[lang="ur"] .kpi-value, html[lang="ur"] .sb-brand-name { font-family: var(--font-urdu), var(--font-display); }
+html[lang="ur"] .kpi-value, html[lang="ur"] .sb-brand-name { font-family: var(--font-urdu), var(--font-display); line-height: 1.7; }
+html[lang="ur"] .btn,
+html[lang="ur"] input,
+html[lang="ur"] select,
+html[lang="ur"] textarea,
+html[lang="ur"] .pos-omni-input,
+html[lang="ur"] .search-box input,
+html[lang="ur"] .rep-chip,
+html[lang="ur"] .chip {
+  font-family: var(--font-urdu), var(--font-body);
+}
 html[lang="ur"] .eyebrow, html[lang="ur"] .kpi-label, html[lang="ur"] table.data th,
 html[lang="ur"] .sb-group-label, html[lang="ur"] .footer h4 {
   letter-spacing: 0; text-transform: none;
@@ -250,6 +260,12 @@ html[lang="ps"] h1, html[lang="ps"] h2, html[lang="ps"] h3, html[lang="ps"] .dis
 html[lang="ps"] .kpi-value, html[lang="ps"] .sb-brand-name,
 html[lang="fa"] h1, html[lang="fa"] h2, html[lang="fa"] h3, html[lang="fa"] .display,
 html[lang="fa"] .kpi-value, html[lang="fa"] .sb-brand-name { font-family: var(--font-naskh), var(--font-display); }
+html[lang="ps"] .btn, html[lang="ps"] input, html[lang="ps"] select, html[lang="ps"] textarea,
+html[lang="ps"] .pos-omni-input, html[lang="ps"] .search-box input, html[lang="ps"] .rep-chip, html[lang="ps"] .chip,
+html[lang="fa"] .btn, html[lang="fa"] input, html[lang="fa"] select, html[lang="fa"] textarea,
+html[lang="fa"] .pos-omni-input, html[lang="fa"] .search-box input, html[lang="fa"] .rep-chip, html[lang="fa"] .chip {
+  font-family: var(--font-naskh), var(--font-body);
+}
 html[lang="ps"] .eyebrow, html[lang="ps"] .kpi-label, html[lang="ps"] table.data th,
 html[lang="ps"] .sb-group-label, html[lang="ps"] .footer h4,
 html[lang="fa"] .eyebrow, html[lang="fa"] .kpi-label, html[lang="fa"] table.data th,
@@ -1038,7 +1054,7 @@ button.att-cell:hover { border-color: var(--accent); color: var(--accent-text); 
 .footer { border-top: 1px solid var(--line); background: var(--bg-2); margin-top: auto; }
 .footer-grid { display: grid; grid-template-columns: 1.6fr repeat(5, 1fr); gap: 40px 28px; padding: 56px 0 36px; }
 .footer-brand p { color: var(--muted); font-size: 0.94rem; margin: 12px 0 18px; max-width: 320px; }
-.footer h4 { font-size: 0.82rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted-2); margin-bottom: 16px; }
+.footer h4 { font-size: 0.82rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted-2); margin-bottom: 16px; min-height: 2.2em; }
 .footer ul { list-style: none; display: grid; gap: 9px; }
 .footer ul a { color: var(--muted); font-size: 0.94rem; }
 .footer ul a:hover { color: var(--text); }

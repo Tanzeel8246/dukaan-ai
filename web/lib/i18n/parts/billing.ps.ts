@@ -152,4 +152,11 @@ export const psBilling: Record<keyof typeof enBilling, string> = {
   "billing.tax.includedNote": "په بیو کې شامله",
   "billing.wa.tax": "{label}: {amount}",
   "billing.wa.taxIncluded": "{label}: {amount} (په بیو کې شامله)",
+  "billing.camScanSuccess": "سکین شو: {name}",
+  "billing.camNotFound": "بارکوډ وموندل شو خو دا توکی په هټۍ کې نشته.",
+  "billing.camUnsupported": "په دې براوزر کې اتومات بارکوډ لوستل شتون نلري — کوډ وګورئ او پورته بکس کې ولیکئ.",
+  "billing.camError": "کیمره نه خلاصیږي — د براوزر د کیمرې اجازه وګورئ، یا د بارکوډ بکس وکاروئ.",
+  "billing.advanceNeedCustomer": "د مخکې تادیې لپاره لومړی پیرودونکی وټاکئ (نوی جوړ کړئ یا له لیست څخه وټاکئ).",
+  "billing.advanceAmtZero": "د مخکې تادیې اندازه باید له صفر څخه زیاته وي.",
+  "billing.advanceSuccess": "مخکې تادیه ثبت شوه: {amount} — دا پیسې د امانتونو حساب ته تللې، د پورونو حساب ته نه.",
 };

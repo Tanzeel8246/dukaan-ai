@@ -55,6 +55,7 @@ import 'ledger.dart'
         refNormalBalance,
         roundPaisa,
         trialBalanceTotal;
+import 'loans.dart' show loansRegisterTotals;
 import 'periods.dart' show isPeriodLocked;
 import 'permissions.dart' show can;
 import 'stock.dart' show qtyAtWarehouse;
@@ -431,6 +432,7 @@ TieOutReport tieOutReport({
   required List<SupplierPayment> supplierPayments,
   required List<PurchaseReturn> purchaseReturns,
   required List<CreditEntry> credits,
+  List<Loan>? loans,
 }) {
   bool pass(double diff) => diff.abs() < 0.01;
   final tbDiff = roundPaisa(trialBalanceTotal(journal));
@@ -448,12 +450,22 @@ TieOutReport tieOutReport({
   final apGl = roundPaisa(accountNormalBalance(journal, 'payables'));
   final valuation = inventoryValuation(products);
   final glInv = glInventoryBalance(journal);
-  return TieOutReport(checks: [
+  final checks = <TieCheck>[
     TieCheck(id: 'tb', pass: pass(tbDiff), diff: tbDiff),
     TieCheck(id: 'ar', pass: pass(arGl - arSub), diff: roundPaisa(arGl - arSub)),
     TieCheck(id: 'ap', pass: pass(apGl - apSub), diff: roundPaisa(apGl - apSub)),
     TieCheck(id: 'valuation', pass: pass(glInv - valuation), diff: roundPaisa(glInv - valuation)),
-  ]);
+  ];
+  if (loans != null) {
+    final loanTotals = loansRegisterTotals(loans);
+    final loansGl = roundPaisa(accountNormalBalance(journal, 'loans_payable'));
+    checks.add(TieCheck(
+      id: 'loans',
+      pass: pass(loansGl - loanTotals.borrowedOutstanding),
+      diff: roundPaisa(loansGl - loanTotals.borrowedOutstanding),
+    ));
+  }
+  return TieOutReport(checks: checks);
 }
 
 /// Entry-balance helper kept beside the tie-outs: a split receipt

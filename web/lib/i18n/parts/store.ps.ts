@@ -85,6 +85,7 @@ export const psStore: Record<keyof typeof enStore, string> = {
   "shop.loading": "هټۍ پرانستل کېږي…",
   "shop.searchPh": "توکي ولټوئ…",
   "shop.noResults": "له دې لټون سره هیڅ شی نه سمون خوري.",
+  "shop.stockQty": "موجودي:",
   "shop.add": "زیات کړئ",
   "shop.inCart": "ستاسو په امر کې",
   "shop.available": "شته",

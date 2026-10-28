@@ -277,6 +277,48 @@ void main() {
       expect(rep.check('ap')!.diff, 0);
       expect(rep.check('ar')!.diff, 0);
       expect(rep.check('valuation')!.diff, 0);
+
+      // Loans tie-out check:
+      final loanJournal = [
+        ...journal,
+        je('j-loan', [
+          const JournalLine(account: 'wallet', debit: 150000, ref: 'acc-bank'),
+          const JournalLine(account: 'loans_payable', credit: 150000, ref: 'loan-1'),
+        ]),
+      ];
+      final loan = Loan(
+        id: 'loan-1',
+        number: 'LN-1',
+        direction: 'payable',
+        partyName: 'Malik Traders',
+        principal: 150000,
+        chargeType: 'none',
+        startDateISO: '2026-09-01',
+        instalmentCount: 10,
+        firstDueISO: '2026-10-01',
+        events: [
+          const LoanEvent(
+            kind: 'drawdown',
+            amount: 150000,
+            principalPart: 150000,
+            chargePart: 0,
+            entryId: 'j-loan',
+            ts: '2026-09-01T10:00:00.000Z',
+          ),
+        ],
+      );
+      final repWithLoan = mc.tieOutReport(
+        journal: loanJournal,
+        products: products,
+        purchases: purchases,
+        supplierPayments: payments,
+        purchaseReturns: const [],
+        credits: credits,
+        loans: [loan],
+      );
+      expect(repWithLoan.allPass, isTrue);
+      expect(repWithLoan.check('loans')!.diff, 0);
+      expect(repWithLoan.check('loans')!.pass, isTrue);
     });
     test('a failing tie-out reports its difference, never a blanket claim', () {
       final rep = mc.tieOutReport(

@@ -169,6 +169,8 @@ export default function FinanceView() {
 
   /** Localized label for a P&L expense category key ("rent", "salary", …). */
   const expenseCatLabel = (cat: string): string => {
+    if (cat === "finance") return t("fin.acct.expense_finance");
+    if (cat === "loyalty") return t("loyalty.title");
     if (EXPENSE_CATS.includes(cat)) return t(`common.expenseCat.${cat}` as I18nKey);
     return cap(cat);
   };

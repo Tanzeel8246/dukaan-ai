@@ -890,11 +890,11 @@ export default function BillingDesk() {
               const prod = findProductBySku(products, code);
               if (prod) {
                 addLine(prod.id);
-                setCameraMsg(`اسکین ہوا: ${prod.name}`);
+                setCameraMsg(t("billing.camScanSuccess", { name: prod.name }));
                 stopCamera();
                 return;
               }
-              setCameraMsg("بارکوڈ ملا مگر یہ آئٹم دکان میں نہیں ہے۔");
+              setCameraMsg(t("billing.camNotFound"));
             }
           } catch {
             /* retry next tick */
@@ -903,22 +903,22 @@ export default function BillingDesk() {
         };
         setTimeout(tick, 600);
       } else {
-        setCameraMsg("اس براؤزر میں خودکار بارکوڈ پڑھنا دستیاب نہیں — کوڈ دیکھ کر اوپر بارکوڈ باکس میں لکھیں۔");
+        setCameraMsg(t("billing.camUnsupported"));
       }
     } catch {
-      setCameraMsg("کیمرہ نہیں کھلا — براؤزر کی کیمرہ اجازت چیک کریں، یا بارکوڈ باکس استعمال کریں۔");
+      setCameraMsg(t("billing.camError"));
     }
   };
 
   /* Billing-time customer advance submission */
   const submitAdvance = () => {
     if (!customerId) {
-      fail("ایڈوانس کے لیے پہلے کسٹمر منتخب کریں (نیا کسٹمر بنائیں یا فہرست سے چنیں)۔");
+      fail(t("billing.advanceNeedCustomer"));
       return;
     }
     const amt = Math.round(parseFloat(advAmount) || 0);
     if (!(amt > 0)) {
-      fail("ایڈوانس کی رقم صفر سے زیادہ ہونی چاہیے۔");
+      fail(t("billing.advanceAmtZero"));
       return;
     }
     const cust = customers.find((c) => c.id === customerId);
@@ -933,7 +933,7 @@ export default function BillingDesk() {
     setAdvAmount("");
     setAdvNote("");
     setShowAdvanceModal(false);
-    succeed(`ایڈوانس درج ہو گیا: ${fmtPKR(amt)} — یہ رقم unearned کھاتے میں گئی ہے، وصولیوں (receivables) میں نہیں۔`);
+    succeed(t("billing.advanceSuccess", { amount: fmtPKR(amt) }));
   };
 
   const resumeHeld = (bill: Bill) => {

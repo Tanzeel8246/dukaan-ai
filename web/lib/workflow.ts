@@ -46,6 +46,7 @@ import type {
   CreditEntry,
   ExpenseCategory,
   JournalEntry,
+  Loan,
   Product,
   PurchaseOrder,
 } from "./types";
@@ -55,6 +56,7 @@ import {
   totalOutstandingCredit,
 } from "./ledger";
 import { poReceivedQty } from "./documents";
+import { loansRegisterTotals } from "./loans";
 
 /** The one stock-deduction point in the SO → challan → invoice chain. */
 export const STOCK_DEDUCTION_POINT = "bill" as const;
@@ -261,6 +263,7 @@ export function tieOutChecks(args: {
   dashboardCashIn?: number;
   cashFlowIn?: number;
   plugNote?: string;
+  loans?: Loan[];
 }): TieOutCheck[] {
   const { journal, credits, products } = args;
   const tbBalanced = journal.every(entryBalances);
@@ -312,6 +315,17 @@ export function tieOutChecks(args: {
       accountNormalBalance(journal, CUSTOMER_ADVANCES_ACCOUNT)
     ),
   ];
+  if (args.loans !== undefined) {
+    const loanTotals = loansRegisterTotals(args.loans);
+    checks.push(
+      check(
+        "loans",
+        "Loans register (borrowed) vs loans payable GL",
+        loanTotals.borrowedOutstanding,
+        accountNormalBalance(journal, "loans_payable")
+      )
+    );
+  }
   if (
     args.dashboardCashIn !== undefined &&
     args.cashFlowIn !== undefined

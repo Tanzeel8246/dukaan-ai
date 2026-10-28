@@ -163,6 +163,13 @@ export const enBilling = {
   "billing.tax.includedNote": "included in prices",
   "billing.wa.tax": "{label}: {amount}",
   "billing.wa.taxIncluded": "{label}: {amount} (included in prices)",
+  "billing.camScanSuccess": "Scanned: {name}",
+  "billing.camNotFound": "Barcode detected, but item not found in inventory.",
+  "billing.camUnsupported": "Automatic barcode scanning is not supported in this browser. Please type the code above.",
+  "billing.camError": "Could not open camera. Please check camera permissions or use the barcode box.",
+  "billing.advanceNeedCustomer": "Please select or add a customer before recording an advance.",
+  "billing.advanceAmtZero": "Advance amount must be greater than zero.",
+  "billing.advanceSuccess": "Advance recorded: {amount} (posted to customer advances liability, not receivables).",
 } as const;
 
 export const urBilling: Record<keyof typeof enBilling, string> = {
@@ -327,4 +334,11 @@ export const urBilling: Record<keyof typeof enBilling, string> = {
   "billing.tax.includedNote": "قیمتوں میں شامل",
   "billing.wa.tax": "{label}: {amount}",
   "billing.wa.taxIncluded": "{label}: {amount} (قیمتوں میں شامل)",
+  "billing.camScanSuccess": "اسکین ہوا: {name}",
+  "billing.camNotFound": "بارکوڈ ملا مگر یہ آئٹم دکان میں نہیں ہے۔",
+  "billing.camUnsupported": "اس براؤزر میں خودکار بارکوڈ پڑھنا دستیاب نہیں — کوڈ دیکھ کر اوپر بارکوڈ باکس میں لکھیں۔",
+  "billing.camError": "کیمرہ نہیں کھلا — براؤزر کی کیمرہ اجازت چیک کریں، یا بارکوڈ باکس استعمال کریں۔",
+  "billing.advanceNeedCustomer": "ایڈوانس کے لیے پہلے کسٹمر منتخب کریں (نیا کسٹمر بنائیں یا فہرست سے چنیں)۔",
+  "billing.advanceAmtZero": "ایڈوانس کی رقم صفر سے زیادہ ہونی چاہیے۔",
+  "billing.advanceSuccess": "ایڈوانس درج ہو گیا: {amount} — یہ رقم unearned کھاتے میں گئی ہے، وصولیوں (receivables) میں نہیں۔",
 };

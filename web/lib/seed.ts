@@ -685,7 +685,18 @@ export function getSeedLoans(): Loan[] {
       instalmentCount: 10,
       instalmentEvery: "month",
       firstDueISO: "2026-10-01",
-      events: [],
+      events: [
+        {
+          kind: "drawdown",
+          amount: 150000,
+          principalPart: 150000,
+          chargePart: 0,
+          accountId: "acc-bank",
+          entryId: "j-seed-loan-drawdown-1",
+          dayOffset: 0,
+          ts: "2026-09-01T10:00:00.000Z",
+        },
+      ],
       status: "active",
       note: "",
       dayOffset: 0,
@@ -771,7 +782,8 @@ export function getSeedJournal(
   purchases: Purchase[],
   payments: SupplierPayment[],
   expenses: Expense[],
-  credits: CreditEntry[]
+  credits: CreditEntry[],
+  loyaltyEntries: JournalEntry[] = []
 ): JournalEntry[] {
   const out: JournalEntry[] = [];
   const costOf = new Map(products.map((p) => [p.id, p.costPrice]));
@@ -839,6 +851,22 @@ export function getSeedJournal(
       );
     }
   }
+
+  // Drawdown entry for the sample demo loan (LN-1 from Malik Traders, sup-1)
+  // Dr bank 150,000 / Cr loans_payable 150,000 (ref: "loan-demo-1")
+  out.push(
+    entry("j-seed-loan-drawdown-1", "Loan drawdown — Malik Traders (seed)", "seed", "loan-demo-1", 0, [
+      { account: "wallet", debit: 150000, credit: 0, ref: "acc-bank" },
+      { account: "loans_payable", debit: 0, credit: 150000, ref: "loan-demo-1" },
+    ])
+  );
+
+  // If loyalty entries are provided (as in the demo showroom),
+  // they represent historical loyalty sales before go-live.
+  if (loyaltyEntries.length > 0) {
+    out.push(...loyaltyEntries);
+  }
+
   // F-12 — go-live OPENING entry: true the balance sheet up to the
   // physical position. Inventory becomes exactly the shelf value at
   // cost; Cash becomes the stated opening till; Owner Capital absorbs

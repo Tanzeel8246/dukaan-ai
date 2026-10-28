@@ -228,10 +228,13 @@ export default function ReportsView() {
     translate(outLang, key, params);
   const money = (n: number): string => moneyIn(outLang, n);
   const dateL = (ts: string): string => dateIn(outLang, ts);
-  const catL = (cat: string): string =>
-    EXPENSE_CATS.includes(cat)
+  const catL = (cat: string): string => {
+    if (cat === "finance") return trL("fin.acct.expense_finance");
+    if (cat === "loyalty") return trL("loyalty.title");
+    return EXPENSE_CATS.includes(cat)
       ? trL(`common.expenseCat.${cat}` as I18nKey)
       : cat;
+  };
   /** Localized journal account label (output language) — expense
    *  accounts reuse the category vocabulary, the rest the COA
    *  names; an unlabelled code falls back to its spaced form. */

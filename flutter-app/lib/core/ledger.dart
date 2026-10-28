@@ -553,8 +553,11 @@ class MonthPL {
     required this.expensesTotal, required this.stockLoss, required this.net});
 }
 
-const List<String> _expenseAccounts = [
+const List<String> _coreExpenseAccounts = [
   'expense_rent', 'expense_electricity', 'expense_salary', 'expense_transport', 'expense_other',
+];
+const List<String> _extendedExpenseAccounts = [
+  'expense_finance', 'expense_loyalty',
 ];
 
 /// P&L over an already-filtered entry set. `fy_close` entries are
@@ -569,10 +572,17 @@ MonthPL plOver(List<JournalEntry> selected) {
   final cogs = net('cogs');
   final expensesByCategory = <String, double>{};
   var expensesTotal = 0.0;
-  for (final acc in _expenseAccounts) {
+  for (final acc in _coreExpenseAccounts) {
     final v = net(acc);
     expensesByCategory[acc.replaceFirst('expense_', '')] = v;
     expensesTotal += v;
+  }
+  for (final acc in _extendedExpenseAccounts) {
+    final v = net(acc);
+    expensesTotal += v;
+    if (v != 0) {
+      expensesByCategory[acc.replaceFirst('expense_', '')] = v;
+    }
   }
   final stockLoss = net('inventory_loss');
   final netRevenue = revenue - discounts;

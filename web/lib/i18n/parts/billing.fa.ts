@@ -152,4 +152,11 @@ export const faBilling: Record<keyof typeof enBilling, string> = {
   "billing.tax.includedNote": "در قيمت‌ها شامل است",
   "billing.wa.tax": "{label}: {amount}",
   "billing.wa.taxIncluded": "{label}: {amount} (در قيمت‌ها شامل است)",
+  "billing.camScanSuccess": "اسکن شد: {name}",
+  "billing.camNotFound": "بارکد یافت شد اما این کالا در دکان نیست.",
+  "billing.camUnsupported": "خواندن خودکار بارکد در این مرورگر موجود نیست — کد را دیده و در کادر بالا بنویسید.",
+  "billing.camError": "کمره باز نشد — اجازه کمره مرورگر را بررسی کنید، یا کادر بارکد را استفاده کنید.",
+  "billing.advanceNeedCustomer": "برای پیش‌پرداخت ابتدا مشتری را انتخاب کنید (مشتری جدید بسازید یا از فهرست انتخاب کنید).",
+  "billing.advanceAmtZero": "مبلغ پیش‌پرداخت باید بیشتر از صفر باشد.",
+  "billing.advanceSuccess": "پیش‌پرداخت ثبت شد: {amount} — این پول به حساب امانات رفته است، نه حساب طلبات.",
 };

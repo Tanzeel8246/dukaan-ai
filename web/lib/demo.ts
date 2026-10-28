@@ -126,18 +126,15 @@ export function demoSetDocs(): Record<string, Array<{ id: string }>> {
   const supplierPayments = getSeedSupplierPayments();
   const expenses = getSeedExpenses();
   const credits = getSeedCredits();
-  const journal = getSeedJournal(
+  const demoJournal = getSeedJournal(
     products,
     sales,
     purchases,
     supplierPayments,
     expenses,
-    credits
+    credits,
+    getDemoLoyaltyEntries(getSeedCustomers())
   );
-  // The cloud journal is the frozen 21 PLUS the demo loyalty
-  // story (seedCollections' journal) — the live demo business
-  // carries 29 entries, and the pre-list must say 29, not 21.
-  const demoJournal = [...journal, ...getDemoLoyaltyEntries(getSeedCustomers())];
   const warehouses = getSeedWarehouses().filter((w) => w.id === DEFAULT_WAREHOUSE_ID);
   return {
     products,

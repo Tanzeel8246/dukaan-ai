@@ -179,6 +179,7 @@ import {
   billCreditOutstanding,
   classLegLines,
   defaultAccountForMethod,
+  entryBalances,
   findUnreversedPosting,
   glForAccount,
   makeEntry,
@@ -1679,14 +1680,17 @@ function seedCollections(): Collections {
     adjustments: [],
     dayCloses: [],
     cashEntries: [],
-    // Phase H · H6 (audit fix 3): the DEMO journal appends its
-    // small loyalty story (demo-only getter; the frozen 21 the
-    // cloud seeder pushes are untouched — the harness pins both
-    // the frozen SHA and the demo end-state identities).
-    journal: [
-      ...getSeedJournal(products, sales, purchases, supplierPayments, expenses, credits),
-      ...getDemoLoyaltyEntries(getSeedCustomers()),
-    ],
+    // Phase H · H6: the DEMO showroom journal includes loyalty
+    // and loan drawdown trued up with go-live opening balance.
+    journal: getSeedJournal(
+      products,
+      sales,
+      purchases,
+      supplierPayments,
+      expenses,
+      credits,
+      getDemoLoyaltyEntries(getSeedCustomers())
+    ),
     accounts: getSeedAccounts(),
     taxSlabs: getSeedTaxSlabs(),
     periods: [],
@@ -3346,6 +3350,9 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
   );
 
   const appendJournalDemo = useCallback((e: JournalEntry) => {
+    if (!entryBalances(e)) {
+      throw new Error(`Refusing to append unbalanced journal entry "${e.memo}" in demo mode.`);
+    }
     setCols((prev) => ({ ...prev, journal: [...prev.journal, e] }));
   }, []);
 
@@ -3376,6 +3383,9 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
    *  point every cloud journal write funnels through. */
   const postEntry = useCallback(
     (batch: WriteBatch, e: JournalEntry) => {
+      if (!entryBalances(e)) {
+        throw new Error(`Refusing to post unbalanced journal entry "${e.memo}" in postEntry.`);
+      }
       const ctx = cloudCtx();
       if (!ctx) return;
       batchJournal(

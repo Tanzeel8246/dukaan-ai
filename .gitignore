@@ -7,3 +7,7 @@ web-deploy/
 *.zip
 *.apk
 *.tsbuildinfo
+.dart_tool/
+build/
+flutter-app/.dart_tool/
+flutter-app/build/

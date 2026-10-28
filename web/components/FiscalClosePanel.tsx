@@ -43,7 +43,7 @@ import {
   openingStockGap,
 } from "@/lib/fiscal";
 
-const EXPENSE_CATS = ["rent", "electricity", "salary", "transport", "other", "finance"];
+const EXPENSE_CATS = ["rent", "electricity", "salary", "transport", "other", "finance", "loyalty"];
 
 export default function FiscalClosePanel() {
   const {

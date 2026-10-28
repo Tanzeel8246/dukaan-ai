@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "367593529864",
+    "project_id": "dukan-8246",
+    "storage_bucket": "dukan-8246.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:367593529864:android:66f0d7f4dfedf0d85227bd",
+        "android_client_info": {
+          "package_name": "com.codehubb.dukaanai"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAbRGP7Vx3NBWadUQaeC4g9ROzrpmVrL7M"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

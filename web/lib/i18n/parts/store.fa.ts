@@ -85,6 +85,7 @@ export const faStore: Record<keyof typeof enStore, string> = {
   "shop.loading": "دکان در حال باز شدن است…",
   "shop.searchPh": "کالاها را جستجو کنید…",
   "shop.noResults": "هیچ چیزی با آن جستجو مطابقت ندارد.",
+  "shop.stockQty": "موجودی:",
   "shop.add": "اضافه کنید",
   "shop.inCart": "در سفارش شما",
   "shop.available": "موجود",

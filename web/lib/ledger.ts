@@ -492,12 +492,17 @@ export interface MonthPL {
   net: number;
 }
 
-const EXPENSE_ACCOUNTS: AccountCode[] = [
+const CORE_EXPENSE_ACCOUNTS: AccountCode[] = [
   "expense_rent",
   "expense_electricity",
   "expense_salary",
   "expense_transport",
   "expense_other",
+];
+
+const EXTENDED_EXPENSE_ACCOUNTS: AccountCode[] = [
+  "expense_finance",
+  "expense_loyalty",
 ];
 
 /** P&L over an already-filtered entry set — the single computation
@@ -516,10 +521,17 @@ function plOver(selected: JournalEntry[]): MonthPL {
   const cogs = net("cogs");
   const expensesByCategory: Record<string, number> = {};
   let expensesTotal = 0;
-  for (const acc of EXPENSE_ACCOUNTS) {
+  for (const acc of CORE_EXPENSE_ACCOUNTS) {
     const v = net(acc);
     expensesByCategory[acc.replace("expense_", "")] = v;
     expensesTotal += v;
+  }
+  for (const acc of EXTENDED_EXPENSE_ACCOUNTS) {
+    const v = net(acc);
+    expensesTotal += v;
+    if (v !== 0) {
+      expensesByCategory[acc.replace("expense_", "")] = v;
+    }
   }
   const stockLoss = net("inventory_loss");
   const netRevenue = revenue - discounts;

@@ -105,7 +105,7 @@ export default function Footer() {
                 </a>
               </li>
               <li>
-                <span style={{ color: "var(--muted)", fontSize: "0.94rem" }}>
+                <span style={{ color: "var(--muted)", fontSize: "0.94rem", whiteSpace: "nowrap" }}>
                   {t("shell.footerTech")}
                 </span>
               </li>

@@ -320,7 +320,7 @@ export default function StorefrontPublicView({ slug }: { slug: string }) {
                     >
                       <strong>{fmtPKR(card.price)}</strong>
                       {card.stockQty !== undefined && (
-                        <span style={{ fontSize: "0.9rem" }}>اسٹاک: <b>{card.stockQty}</b> {card.unit}</span>
+                        <span style={{ fontSize: "0.9rem" }}>{t("shop.stockQty")} <b>{card.stockQty}</b> {card.unit}</span>
                       )}
                       {card.stockState === "in" && (
                         <span className="badge green">{t("shop.available")}</span>
